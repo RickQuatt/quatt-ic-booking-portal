@@ -75,7 +75,7 @@ const CICDetailRenderer = ({
 
   return (
     <div>
-      <CICDetail data={data.result} />
+      <CICDetail cicId={cicId} data={data.result} />
     </div>
   )
 }
