@@ -1,6 +1,6 @@
 import React from "react";
 import * as yup from "yup";
-import { FieldError, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import classes from "./CICDetail.module.css";
@@ -8,7 +8,14 @@ import { AdminCic } from "../apiClient/models";
 import { formatDate, formatDateDistance } from "../utils/formatDate";
 import { useApiClient } from "../apiClient/context";
 import { Button, ButtonLink } from "../Button/Button";
-import { getGrafanaLink, getHubspotSearchOrderLink, getMenderLink } from "./getLinks";
+import {
+  getGrafanaLink,
+  getHubspotSearchOrderLink,
+  getMenderLink,
+} from "./getLinks";
+import { AdvancedSettingsModal } from "./AdvancedSettingsModal";
+import { useModalState } from "../Modal/useModalState";
+import { FormField, FormFieldInput, FormFieldJson, FormFieldTitle, FormFieldValue, FormSection } from "./Form";
 
 interface CICDetailProps {
   cicId: string;
@@ -89,263 +96,276 @@ export function CICDetail({ cicId, data }: CICDetailProps) {
     }
   };
 
+  const {
+    isOpen: isAdvancedSettingsModalOpen,
+    open: openAdvancedSettingsModal,
+    close: closeAdvancedSettingsModal,
+  } = useModalState();
+
   return (
     <div className={classes["detail-sections"]}>
+      <AdvancedSettingsModal
+        isOpen={isAdvancedSettingsModalOpen}
+        closeModal={closeAdvancedSettingsModal}
+        cicId={cicId}
+        cicData={cicData}
+      />
       <div className={classes["detail-section"]}>
         <h3>CIC Details Main</h3>
-        <div className={classes["detail-list"]}>
+        <FormSection>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <DetailField>
-              <DetailFieldTitle>ID</DetailFieldTitle>
-              <DetailFieldValue value={cicData.id} />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>Order number</DetailFieldTitle>
-              <DetailFieldValue value={cicData.orderNumber} />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>Quatt build</DetailFieldTitle>
-              <DetailFieldValue value={cicData.quattBuild} />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>
+            <FormField>
+              <FormFieldTitle>ID</FormFieldTitle>
+              <FormFieldValue value={cicData.id} />
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Order number</FormFieldTitle>
+              <FormFieldValue value={cicData.orderNumber} />
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Quatt build</FormFieldTitle>
+              <FormFieldValue value={cicData.quattBuild} />
+            </FormField>
+            <FormField>
+              <FormFieldTitle>
                 Last connection status updated at
-              </DetailFieldTitle>
-              <DetailFieldValue
+              </FormFieldTitle>
+              <FormFieldValue
                 value={formatDateDistance(
                   cicData.lastConnectionStatusUpdatedAt
                 )}
               />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>Mender ID</DetailFieldTitle>
-              <DetailFieldValue value={cicData.menderId} />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>Number of heat pumps</DetailFieldTitle>
-              <DetailFieldValue value={cicData.numberOfHeatPumps} />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>Electricity price</DetailFieldTitle>
-              <DetailFieldInput
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Mender ID</FormFieldTitle>
+              <FormFieldValue value={cicData.menderId} />
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Number of heat pumps</FormFieldTitle>
+              <FormFieldValue value={cicData.numberOfHeatPumps} />
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Electricity price</FormFieldTitle>
+              <FormFieldInput
                 type="number"
                 error={errors.electricityPrice}
                 {...register("electricityPrice", {
                   valueAsNumber: true,
                 })}
               />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>Day electricity price</DetailFieldTitle>
-              <DetailFieldInput
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Day electricity price</FormFieldTitle>
+              <FormFieldInput
                 type="number"
                 error={errors.dayElectricityPrice}
                 {...register("dayElectricityPrice", {
                   valueAsNumber: true,
                 })}
               />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>Night electricity price</DetailFieldTitle>
-              <DetailFieldInput
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Night electricity price</FormFieldTitle>
+              <FormFieldInput
                 type="number"
                 error={errors.nightElectricityPrice}
                 {...register("nightElectricityPrice", {
                   valueAsNumber: true,
                 })}
               />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>Rated maximum house power</DetailFieldTitle>
-              <DetailFieldInput
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Rated maximum house power</FormFieldTitle>
+              <FormFieldInput
                 type="number"
                 error={errors.ratedMaximumHousePower}
                 {...register("ratedMaximumHousePower", {
                   valueAsNumber: true,
                 })}
               />
-            </DetailField>
-            <DetailField>
-              <DetailFieldTitle>
-                Maximum heating outdoor temperature
-              </DetailFieldTitle>
-              <DetailFieldInput
+            </FormField>
+            <FormField>
+              <FormFieldTitle>
+                Maximum heating outdoor temperature *
+              </FormFieldTitle>
+              <FormFieldInput
                 type="number"
                 error={errors.maximumHeatingOutdoorTemperature}
                 {...register("maximumHeatingOutdoorTemperature", {
                   valueAsNumber: true,
                 })}
               />
-            </DetailField>
-            <Button
-              type="submit"
-              disabled={!isDirty || isSubmitting}
-            >
+            </FormField>
+            <Button type="submit" disabled={!isDirty || isSubmitting}>
               Save updated settings to CIC
             </Button>
           </form>
-        </div>
+        </FormSection>
       </div>
       <div className={classes["detail-section"]}>
-        <h3>CIC Details</h3>
-        <div className={classes["detail-list"]}>
-          <DetailField>
-            <DetailFieldTitle>Quatt build</DetailFieldTitle>
-            <DetailFieldValue value={cicData.quattBuild} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>
+        <h3>CIC Details Extra</h3>
+        <FormSection>
+          <FormField>
+            <FormFieldTitle>Quatt build</FormFieldTitle>
+            <FormFieldValue value={cicData.quattBuild} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>
               Last connection status updated at
-            </DetailFieldTitle>
-            <DetailFieldValue
+            </FormFieldTitle>
+            <FormFieldValue
               value={formatDateDistance(cicData.lastConnectionStatusUpdatedAt)}
             />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Boiler power</DetailFieldTitle>
-            <DetailFieldValue value={cicData.boilerPower} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Cable connection status</DetailFieldTitle>
-            <DetailFieldValue value={cicData.cableConnectionStatus} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Flow rate</DetailFieldTitle>
-            <DetailFieldValue value={cicData.flowRate} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>LTE connection status</DetailFieldTitle>
-            <DetailFieldValue value={cicData.lteConnectionStatus} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Wifi connection status</DetailFieldTitle>
-            <DetailFieldValue value={cicData.wifiConnectionStatus} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Wifi SSID</DetailFieldTitle>
-            <DetailFieldValue value={cicData.wifiSSID} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Electricity price</DetailFieldTitle>
-            <DetailFieldValue value={cicData.electricityPrice} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Day electricity price</DetailFieldTitle>
-            <DetailFieldValue value={cicData.dayElectricityPrice} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Night electricity price</DetailFieldTitle>
-            <DetailFieldValue value={cicData.nightElectricityPrice} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Gas price</DetailFieldTitle>
-            <DetailFieldValue value={cicData.gasPrice} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Boiler demand</DetailFieldTitle>
-            <DetailFieldValue value={cicData.boilerDemand} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Boiler water temperature in</DetailFieldTitle>
-            <DetailFieldValue value={cicData.boilerWaterTemperatureIn} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Boiler water temperature out</DetailFieldTitle>
-            <DetailFieldValue value={cicData.boilerWaterTemperatureOut} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Boiler power</FormFieldTitle>
+            <FormFieldValue value={cicData.boilerPower} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Cable connection status</FormFieldTitle>
+            <FormFieldValue value={cicData.cableConnectionStatus} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Flow rate</FormFieldTitle>
+            <FormFieldValue value={cicData.flowRate} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>LTE connection status</FormFieldTitle>
+            <FormFieldValue value={cicData.lteConnectionStatus} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Wifi connection status</FormFieldTitle>
+            <FormFieldValue value={cicData.wifiConnectionStatus} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Wifi SSID</FormFieldTitle>
+            <FormFieldValue value={cicData.wifiSSID} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Electricity price</FormFieldTitle>
+            <FormFieldValue value={cicData.electricityPrice} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Day electricity price</FormFieldTitle>
+            <FormFieldValue value={cicData.dayElectricityPrice} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Night electricity price</FormFieldTitle>
+            <FormFieldValue value={cicData.nightElectricityPrice} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Gas price</FormFieldTitle>
+            <FormFieldValue value={cicData.gasPrice} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Boiler demand</FormFieldTitle>
+            <FormFieldValue value={cicData.boilerDemand} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Boiler water temperature in</FormFieldTitle>
+            <FormFieldValue value={cicData.boilerWaterTemperatureIn} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Boiler water temperature out</FormFieldTitle>
+            <FormFieldValue value={cicData.boilerWaterTemperatureOut} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>
               Thermostat control temperature set point
-            </DetailFieldTitle>
-            <DetailFieldValue
+            </FormFieldTitle>
+            <FormFieldValue
               value={cicData.thermostatControlTemperatureSetPoint}
             />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Thermostat demand</DetailFieldTitle>
-            <DetailFieldValue value={cicData.thermostatDemand} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Thermostat room temperature</DetailFieldTitle>
-            <DetailFieldValue value={cicData.thermostatRoomTemperature} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Serial</DetailFieldTitle>
-            <DetailFieldValue value={cicData.serial} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Supervisory control mode</DetailFieldTitle>
-            <DetailFieldValue value={cicData.supervisoryControlMode} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Is HP1 connected</DetailFieldTitle>
-            <DetailFieldValue value={cicData.isHp1Connected} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Is thermostat connected</DetailFieldTitle>
-            <DetailFieldValue value={cicData.isThermostatConnected} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Is boiler connected</DetailFieldTitle>
-            <DetailFieldValue value={cicData.isBoilerConnected} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Is temperature sensor connected</DetailFieldTitle>
-            <DetailFieldValue value={cicData.isTemperatureSensorConnected} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Is controller alive</DetailFieldTitle>
-            <DetailFieldValue value={cicData.isControllerAlive} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Boiler type</DetailFieldTitle>
-            <DetailFieldValue value={cicData.boilerType} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Zip code</DetailFieldTitle>
-            <DetailFieldValue value={cicData.zipCode} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Last commissioning completed at</DetailFieldTitle>
-            <DetailFieldValue
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Thermostat demand</FormFieldTitle>
+            <FormFieldValue value={cicData.thermostatDemand} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Thermostat room temperature</FormFieldTitle>
+            <FormFieldValue value={cicData.thermostatRoomTemperature} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Serial</FormFieldTitle>
+            <FormFieldValue value={cicData.serial} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Supervisory control mode</FormFieldTitle>
+            <FormFieldValue value={cicData.supervisoryControlMode} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Is HP1 connected</FormFieldTitle>
+            <FormFieldValue value={cicData.isHp1Connected} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Is thermostat connected</FormFieldTitle>
+            <FormFieldValue value={cicData.isThermostatConnected} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Is boiler connected</FormFieldTitle>
+            <FormFieldValue value={cicData.isBoilerConnected} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Is temperature sensor connected</FormFieldTitle>
+            <FormFieldValue value={cicData.isTemperatureSensorConnected} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Is controller alive</FormFieldTitle>
+            <FormFieldValue value={cicData.isControllerAlive} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Boiler type</FormFieldTitle>
+            <FormFieldValue value={cicData.boilerType} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Zip code</FormFieldTitle>
+            <FormFieldValue value={cicData.zipCode} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Last commissioning completed at</FormFieldTitle>
+            <FormFieldValue
               value={formatDateDistance(cicData.lastConnectionStatusUpdatedAt)}
             />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Thermostat type</DetailFieldTitle>
-            <DetailFieldValue value={cicData.thermostatType} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Rated maximum house power</DetailFieldTitle>
-            <DetailFieldValue value={cicData.ratedMaximumHousePower} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Thermostat type</FormFieldTitle>
+            <FormFieldValue value={cicData.thermostatType} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Rated maximum house power</FormFieldTitle>
+            <FormFieldValue value={cicData.ratedMaximumHousePower} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>
               Maximum heating outdoor temperature
-            </DetailFieldTitle>
-            <DetailFieldValue
+            </FormFieldTitle>
+            <FormFieldValue
               value={cicData.maximumHeatingOutdoorTemperature}
             />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Last commissioning</DetailFieldTitle>
-            <DetailFieldJson value={cicData.lastCommissioning} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Created at</DetailFieldTitle>
-            <DetailFieldValue value={formatDate(cicData.createdAt)} />
-          </DetailField>
-          <DetailField>
-            <DetailFieldTitle>Mender ID</DetailFieldTitle>
-            <DetailFieldValue value={cicData.menderId} />
-          </DetailField>
-        </div>
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Last commissioning</FormFieldTitle>
+            <FormFieldJson value={cicData.lastCommissioning} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Created at</FormFieldTitle>
+            <FormFieldValue value={formatDate(cicData.createdAt)} />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Mender ID</FormFieldTitle>
+            <FormFieldValue value={cicData.menderId} />
+          </FormField>
+        </FormSection>
       </div>
 
       <div className={classes["detail-section"]}>
-        <div className={classes["detail-list"]}>
+        <FormSection>
           <ButtonLink
-            href={cicData.orderNumber ? getHubspotSearchOrderLink(cicData.orderNumber) : undefined}
+            href={
+              cicData.orderNumber
+                ? getHubspotSearchOrderLink(cicData.orderNumber)
+                : undefined
+            }
             target="_blank"
             disabled={!cicData.orderNumber}
           >
@@ -357,70 +377,15 @@ export function CICDetail({ cicId, data }: CICDetailProps) {
           <ButtonLink href={getGrafanaLink(cicData.id)} target="_blank">
             Grafana
           </ButtonLink>
-          <DetailField>
-            <DetailFieldTitle>Supervisory Control Mode</DetailFieldTitle>
-            <DetailFieldValue value={cicData.supervisoryControlMode} />
-          </DetailField>
-          <Button color="danger">
+          <FormField>
+            <FormFieldTitle>Supervisory Control Mode</FormFieldTitle>
+            <FormFieldValue value={cicData.supervisoryControlMode} />
+          </FormField>
+          <Button color="danger" onClick={openAdvancedSettingsModal}>
             Advanced settings
           </Button>
-        </div>
+        </FormSection>
       </div>
     </div>
-  );
-}
-
-interface DetailFieldInputProps extends React.ComponentPropsWithRef<"input"> {
-  error?: FieldError;
-}
-
-const DetailFieldInput = React.forwardRef<
-  HTMLInputElement,
-  DetailFieldInputProps
->(function DetailFieldInput(
-  { error, ...inputProps }: DetailFieldInputProps,
-  ref
-) {
-  return (
-    <>
-      <input
-        className={classes["detail-field-input"]}
-        ref={ref}
-        {...inputProps}
-      />
-      {error && <p>{error.message}</p>}
-    </>
-  );
-});
-
-function DetailField({ children }: React.PropsWithChildren) {
-  return <div className={classes["detail-field"]}>{children}</div>;
-}
-
-function DetailFieldTitle({ children }: React.PropsWithChildren) {
-  return <span className={classes["detail-field-title"]}>{children}</span>;
-}
-
-type DetailFieldValueProps = {
-  value?: string | number | boolean | null;
-};
-function DetailFieldValue({ value }: DetailFieldValueProps) {
-  return (
-    <span className={classes["detail-field-value"]}>
-      {value ?? "N/A"}
-    </span>
-  );
-}
-
-type DetailFieldJsonProps = {
-  value?: object;
-};
-function DetailFieldJson({ value }: DetailFieldJsonProps) {
-  return (
-    <pre className={classes["detail-field-json"]}>
-      <code>
-        {JSON.stringify(value, null, 4)}
-      </code>
-    </pre>
   );
 }

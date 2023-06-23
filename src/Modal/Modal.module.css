@@ -1,0 +1,44 @@
+
+.modal {
+  overflow: hidden;
+  box-shadow: 1px 3px 10px 2px rgba(0,0,0,.2);
+  background: #fff;
+  border-radius: 4px;
+  max-width: 95vw;
+  max-height: 95vh;
+}
+
+.dimmer-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, .85);
+}
+
+.modal-header {
+  padding: 24px 16px;
+  padding-bottom: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.modal-content {
+  padding: 24px 16px;
+  margin-bottom: 16px;
+  line-height: 1.4;
+  max-width: 850px;
+}
+
+.modal-actions {
+    padding: 16px;
+    border-top: 1px solid rgba(34,36,38,.15);
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}

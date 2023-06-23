@@ -3,7 +3,7 @@ import classNames from 'classnames'
 
 import classes from './Button.module.css'
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   color?: "danger"
 }
 
