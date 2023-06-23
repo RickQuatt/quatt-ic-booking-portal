@@ -18,6 +18,10 @@
   font-weight: bold;
 }
 
+.form-field-error {
+  color: var(--error-color);
+}
+
 .form-field-input {
   display: block;
   box-sizing: border-box;
@@ -41,7 +45,6 @@
   /* max-width: 30ch; */
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 10px 15px;
   font-size: 14px;
   cursor: pointer;
   line-height: 1.1;
@@ -49,6 +52,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 
 .form-select:focus-within {
@@ -56,6 +60,9 @@
 }
 
 .form-select::after {
+  position: absolute;
+  right: 15px;
+  pointer-events: none;
   content: "";
   width: 0.8em;
   height: 0.5em;
@@ -67,7 +74,8 @@
   appearance: none;
   background-color: transparent;
   border: none;
-  padding: 0 1em 0 0;
+  padding: 10px 15px;
+  padding-right: 40px;
   margin: 0;
   width: 100%;
   font-family: inherit;

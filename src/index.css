@@ -4,9 +4,10 @@
   /* Variables */
   --primary-color: #26926a;
   --button-background: #f9f9f9;
+  --error-color: #E0401D;
 
   --border-color: #777;
-  --border-focus-color: var(--primary-color);
+  --border-focus-color: #5E9ED6;
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

@@ -39,6 +39,12 @@ interface FormFieldInputProps extends React.ComponentPropsWithRef<"input"> {
   error?: FieldError;
 }
 
+const FormFieldError = (props: React.PropsWithChildren) => {
+  return (
+    <div className={classes["form-field-error"]} {...props} />
+  )
+}
+
 export const FormFieldInput = React.forwardRef<
   HTMLInputElement,
   FormFieldInputProps
@@ -47,14 +53,14 @@ export const FormFieldInput = React.forwardRef<
   ref
 ) {
   return (
-    <>
+    <div>
       <input
         className={classes["form-field-input"]}
         ref={ref}
         {...inputProps}
       />
-      {error && <p>{error.message}</p>}
-    </>
+      {error && <FormFieldError>{error.message}</FormFieldError>}
+    </div>
   );
 });
 
@@ -71,13 +77,13 @@ export const FormSelectInput = React.forwardRef<
   ref
 ) {
   return (
-    <>
+    <div>
       <div className={classes['form-select']}>
         <select ref={ref} {...selectProps}>
           {children}
         </select>
       </div>
-      {error && <p>{error.message}</p>}
-    </>
+      {error && <FormFieldError>{error.message}</FormFieldError>}
+    </div>
   );
 });

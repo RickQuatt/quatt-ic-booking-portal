@@ -35,7 +35,7 @@
 }
 
 .button.danger {
-  background-color: #E0401D;
+  background-color: var(--error-color);
   color: white;
 }
 
