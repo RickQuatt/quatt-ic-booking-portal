@@ -38,17 +38,17 @@ export function CICList({
       <table className={classes.table}>
         <thead className={classes.thead}>
           <tr className={`${classes.tr} ${classes['main-table-header']}`}>
-            <Th>ID</Th>
-            <Th>Cable connection status</Th>
-            <Th>Wifi connection status</Th>
-            <Th>LTE connection status</Th>
-            <Th>Supervisory control mode</Th>
-            <Th>Order number</Th>
-            <Th>Created at</Th>
-            <Th>Last connection status updated at</Th>
-            <Th>Mender</Th>
-            <Th>Grafana</Th>
-            <Th>Details</Th>
+            <Th><TdText>ID</TdText></Th>
+            <Th><TdText>Cable connection status</TdText></Th>
+            <Th><TdText>Wifi connection status</TdText></Th>
+            <Th><TdText>LTE connection status</TdText></Th>
+            <Th><TdText>Supervisory control mode</TdText></Th>
+            <Th><TdText>Order number</TdText></Th>
+            <Th><TdText>Created at</TdText></Th>
+            <Th><TdText>Last connection status updated at</TdText></Th>
+            <Th><TdText>Mender</TdText></Th>
+            <Th><TdText>Grafana</TdText></Th>
+            <Th><TdText>Details</TdText></Th>
           </tr>
           <tr className={`${classes.tr}`}>
             <Th><IDFilter setFilters={setFilters} /></Th>
@@ -79,7 +79,9 @@ export function CICList({
 
 function Th(props: React.PropsWithChildren) {
   return (
-    <th className={classes.th} {...props} />
+    <th className={classes.th}>
+      {props.children}
+    </th>
   )
 }
 
@@ -87,34 +89,43 @@ function Td(props: React.PropsWithChildren<{
   noSidePadding?: boolean;
 }>) {
   return (
-    <td className={classNames(classes.td, props.noSidePadding && classes['no-side-padding'])} {...props} />
+    <td className={classes.td}>
+      {props.children}
+    </td>
+  )
+}
+
+
+function TdText(props: React.PropsWithChildren) {
+  return (
+    <span className={classes['tdh-text']}>{props.children}</span>
   )
 }
 
 function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
   return (
     <tr className={classes.tr}>
-      <Td>{cicEntry.id}</Td>
-      <Td>{cicEntry.cableConnectionStatus}</Td>
-      <Td>{cicEntry.wifiConnectionStatus}</Td>
-      <Td>{cicEntry.lteConnectionStatus}</Td>
-      <Td>{cicEntry.supervisoryControlMode}</Td>
-      <Td>{cicEntry.orderNumber}</Td>
-      <Td>{formatDate(cicEntry.createdAt)}</Td>
-      <Td>{formatDateDistance(cicEntry.lastConnectionStatusUpdatedAt)}</Td>
-      <Td noSidePadding>
+      <Td><TdText>{cicEntry.id}</TdText></Td>
+      <Td><TdText>{cicEntry.cableConnectionStatus}</TdText></Td>
+      <Td><TdText>{cicEntry.wifiConnectionStatus}</TdText></Td>
+      <Td><TdText>{cicEntry.lteConnectionStatus}</TdText></Td>
+      <Td><TdText>{cicEntry.supervisoryControlMode}</TdText></Td>
+      <Td><TdText>{cicEntry.orderNumber}</TdText></Td>
+      <Td><TdText>{formatDate(cicEntry.createdAt)}</TdText></Td>
+      <Td><TdText>{formatDateDistance(cicEntry.lastConnectionStatusUpdatedAt)}</TdText></Td>
+      <Td>
         <ButtonLink
           href={getMenderLink(cicEntry.id)}
           target='_blank'
         >Mender</ButtonLink>
       </Td>
-      <Td noSidePadding>
+      <Td>
         <ButtonLink
           href={getGrafanaLink(cicEntry.id)}
           target='_blank'
         >Grafana</ButtonLink>
       </Td>
-      <Td noSidePadding>
+      <Td>
         <Link href={`/${cicEntry.id}`}>
           <ButtonLink>Detail</ButtonLink>
         </Link>

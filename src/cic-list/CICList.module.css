@@ -1,4 +1,10 @@
 
+:root {
+  --table-header-top-bottom-padding: 15px;
+  --table-item-top-bottom-padding: 10px;
+  --table-side-padding: 10px;
+}
+
 .table {
     display: grid;
     border-collapse: collapse;
@@ -13,24 +19,34 @@
   display: contents;
 }
 
+
+
 .th,
 .td {
-  padding: 15px;
+  padding-top: var(--table-header-top-bottom-padding);
+  padding-bottom: var(--table-header-top-bottom-padding);
+  padding-right: var(--table-side-padding);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   display: flex;
   align-items: center;
 }
-.td.no-side-padding {
-  padding-left: 0;
-  padding-right: 0;
+
+.th:first-child, .td:first-child {
+  padding-left: var(--table-side-padding);
 }
 
 .th {
   text-align: left;
   font-weight: normal;
   font-size: 1.1rem;
+}
+
+.tdh-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .main-table-header .th {
@@ -45,8 +61,8 @@
 }
 
 .td {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: var(--table-item-top-bottom-padding);
+  padding-bottom: var(--table-item-top-bottom-padding);
   color: #808080;
 }
 
