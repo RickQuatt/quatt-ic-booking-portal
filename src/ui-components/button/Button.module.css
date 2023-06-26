@@ -29,6 +29,7 @@
   cursor: not-allowed;
 
   border-color: unset;
+
   &:hover {
     border-color: unset
   }
