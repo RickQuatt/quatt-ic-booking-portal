@@ -18,6 +18,7 @@ import { ButtonLink } from '../ui-components/button/Button'
 import { AdminCic } from '../api-client/models'
 import { formatDate, formatDateDistance } from '../utils/formatDate'
 import { getGrafanaLink, getMenderLink } from '../cic-detail/getLinks'
+import classNames from 'classnames'
 
 export function CICList({
   data
@@ -82,9 +83,11 @@ function Th(props: React.PropsWithChildren) {
   )
 }
 
-function Td(props: React.PropsWithChildren) {
+function Td(props: React.PropsWithChildren<{
+  noSidePadding?: boolean;
+}>) {
   return (
-    <td className={classes.td} {...props} />
+    <td className={classNames(classes.td, props.noSidePadding && classes['no-side-padding'])} {...props} />
   )
 }
 
@@ -99,19 +102,19 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
       <Td>{cicEntry.orderNumber}</Td>
       <Td>{formatDate(cicEntry.createdAt)}</Td>
       <Td>{formatDateDistance(cicEntry.lastConnectionStatusUpdatedAt)}</Td>
-      <Td>
+      <Td noSidePadding>
         <ButtonLink
           href={getMenderLink(cicEntry.id)}
           target='_blank'
         >Mender</ButtonLink>
       </Td>
-      <Td>
+      <Td noSidePadding>
         <ButtonLink
           href={getGrafanaLink(cicEntry.id)}
           target='_blank'
         >Grafana</ButtonLink>
       </Td>
-      <Td>
+      <Td noSidePadding>
         <Link href={`/${cicEntry.id}`}>
           <ButtonLink>Detail</ButtonLink>
         </Link>

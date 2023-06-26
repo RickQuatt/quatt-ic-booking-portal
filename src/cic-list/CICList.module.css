@@ -22,6 +22,10 @@
   display: flex;
   align-items: center;
 }
+.td.no-side-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
 
 .th {
   text-align: left;
