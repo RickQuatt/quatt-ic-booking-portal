@@ -15,9 +15,10 @@ import {
     filterCICList
    } from './Filters'
 import { ButtonLink } from '../ui-components/button/Button'
-import { AdminCic } from '../api-client/models'
+import { AdminCic, ConnectionStatus } from '../api-client/models'
 import { formatDate, formatDateDistance } from '../utils/formatDate'
 import { getGrafanaLink, getMenderLink } from '../cic-detail/getLinks'
+import classNames from 'classnames'
 
 export function CICList({
   data
@@ -94,9 +95,9 @@ function Td(props: React.PropsWithChildren<{
   )
 }
 
-function TdText(props: React.PropsWithChildren) {
+function TdText(props: React.PropsWithChildren<{ color?: "danger" }>) {
   return (
-    <span className={classes['tdh-text']}>{props.children}</span>
+    <span className={classNames(classes['tdh-text'], props.color && classes[props.color])}>{props.children}</span>
   )
 }
 
@@ -104,9 +105,9 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
   return (
     <tr className={classes.tr}>
       <Td><TdText>{cicEntry.id}</TdText></Td>
-      <Td><TdText>{cicEntry.cableConnectionStatus}</TdText></Td>
-      <Td><TdText>{cicEntry.wifiConnectionStatus}</TdText></Td>
-      <Td><TdText>{cicEntry.lteConnectionStatus}</TdText></Td>
+      <Td><ConnectionStatusText status={cicEntry.cableConnectionStatus} /></Td>
+      <Td><ConnectionStatusText status={cicEntry.wifiConnectionStatus} /></Td>
+      <Td><ConnectionStatusText status={cicEntry.lteConnectionStatus} /></Td>
       <Td><TdText>{cicEntry.supervisoryControlMode}</TdText></Td>
       <Td><TdText>{cicEntry.orderNumber}</TdText></Td>
       <Td><TdText>{formatDate(cicEntry.createdAt)}</TdText></Td>
@@ -129,5 +130,38 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
         </Link>
       </Td>
     </tr>
+  )
+}
+
+const getConnectionStatusText = (status: ConnectionStatus | null) => {
+  switch(status) {
+    case 'bad_credentials':
+      return "Bad Credentials"
+    case 'connected':
+      return "Connected"
+    case 'connecting':
+      return "Connecting"
+    case 'disconnected':
+      return "Disconnected"
+    case 'not_reachable':
+      return "Not Reachable"
+    default:
+      return status
+  }
+}
+const getConnectionStatusColor = (status: ConnectionStatus | null) => {
+  switch (status) {
+    case 'bad_credentials':
+    case 'disconnected':
+    case 'not_reachable':
+      return 'danger'
+    default:
+      return undefined
+  }
+}
+
+const ConnectionStatusText = ({ status }: { status: ConnectionStatus | null }) => {
+  return (
+    <TdText color={getConnectionStatusColor(status)}>{getConnectionStatusText(status)}</TdText>
   )
 }

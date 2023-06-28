@@ -49,6 +49,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &.danger {
+    color: var(--error-color);
+  }
 }
 
 .main-table-header .th {
