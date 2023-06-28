@@ -32,7 +32,7 @@ const requiredFieldText = "This field is required";
 const transformNaN = (value: unknown) => (Number.isNaN(value) ? null : value);
 
 const orderIdValidateText = "Should have the following format: QUATTxxxx, where x is a number"
-const orderIdReg = /^(QUATT)\d{4}$/
+const orderIdReg = /^(QUATT)\d{1,7}$/
 
 const CICAdvancedFormSchema = yup.object({
   boilerType: yup
