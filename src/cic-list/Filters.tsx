@@ -5,6 +5,7 @@ import { AdminCic } from '../api-client/models';
 import { Select } from '../ui-components/select/Select';
 import { TextFilter } from '../ui-components/filter/TextFilter';
 import { DateRangeFilter } from '../ui-components/filter/DateRangeFilter';
+import { fuzzyMatch } from '../ui-components/filter/utils';
 
 export type CICFilters = 
   Partial<Omit<AdminCic, 'created_at'>>
@@ -26,9 +27,10 @@ export function filterCICList(
         return filters.minCreatedAt < createdDate
       }
       if (filters.maxCreatedAt && filterKey === 'maxCreatedAt') {
-        const createdDate = new Date(cicEntry.createdAt)
+        const createdDate = cicEntry.createdAt
         return filters.maxCreatedAt > createdDate
       }
+
       if (filters.minLastConnectionStatusUpdatedAt && filterKey === 'minLastConnectionStatusUpdatedAt') {
         if (!cicEntry.lastConnectionStatusUpdatedAt) return false
         return filters.minLastConnectionStatusUpdatedAt < cicEntry.lastConnectionStatusUpdatedAt
@@ -36,6 +38,14 @@ export function filterCICList(
       if (filters.maxLastConnectionStatusUpdatedAt && filterKey === 'maxLastConnectionStatusUpdatedAt') {
         if (!cicEntry.lastConnectionStatusUpdatedAt) return false
         return filters.maxLastConnectionStatusUpdatedAt > cicEntry.lastConnectionStatusUpdatedAt
+      }
+
+      if (filters.id && filterKey === 'id') {
+        return fuzzyMatch(cicEntry.id, filters.id)
+      }
+
+      if (filters.orderNumber && filterKey === 'orderNumber') {
+        return fuzzyMatch(cicEntry.orderNumber, filters.orderNumber)
       }
 
       return filterValue === cicEntry[filterKey as keyof AdminCic]

@@ -3,12 +3,14 @@ import { Installer } from "../api-client/models"
 import { TextFilter } from "../ui-components/filter/TextFilter"
 import { SelectFilter } from "../ui-components/filter/SelectFilter"
 import { DateRangeFilter } from "../ui-components/filter/DateRangeFilter"
+import { fuzzyMatch, stringToBoolean } from "../ui-components/filter/utils"
 
 export type InstallerFilters = 
-  Partial<Pick<Installer, 'code' | 'name' | 'phone' | 'isActive'>>
+  Partial<Pick<Installer, 'code' | 'name' | 'phone'>>
   & {
     minCreatedAt?: Installer['createdAt']
     maxCreatedAt?: Installer['createdAt']
+    isActive: string
   }
 
 type SetFiltersFunc = (setFiltersFunc: (oldFilters: InstallerFilters) => InstallerFilters) => void
@@ -25,8 +27,25 @@ export function filterInstallerList(
         return filters.minCreatedAt < createdDate
       }
       if (filters.maxCreatedAt && filterKey === 'maxCreatedAt') {
-        const createdDate = new Date(cicEntry.createdAt)
+        const createdDate = cicEntry.createdAt
         return filters.maxCreatedAt > createdDate
+      }
+
+      if (filters.code && filterKey === 'code') {
+        return fuzzyMatch(cicEntry.code, filters.code)
+      }
+
+      if (filters.name && filterKey === 'name') {
+        return fuzzyMatch(cicEntry.name, filters.name)
+      }
+
+      if (filters.phone && filterKey === 'phone') {
+        return fuzzyMatch(cicEntry.phone, filters.phone)
+      }
+
+      if (filters.isActive && filterKey === 'isActive') {
+        const isActive = stringToBoolean(filters.isActive)
+        return cicEntry.isActive === isActive
       }
 
       return filterValue === cicEntry[filterKey as keyof Installer]
@@ -48,7 +67,7 @@ export function NameFilter({ setFilters }: FilterProps) {
 
 export function PhoneFilter({ setFilters }: FilterProps) {
   return (
-    <TextFilter setFilters={setFilters} filterKey={"phone"} />
+    <TextFilter inputType="tel" setFilters={setFilters} filterKey={"phone"} />
   )
 }
 
