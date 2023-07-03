@@ -1,4 +1,10 @@
 
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .page-title {
   margin-left: var(--table-side-padding);
 }

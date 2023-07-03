@@ -19,7 +19,7 @@ export function InstallerList({
   const installerListData = filterInstallerList(data, filters)
 
   return (
-    <div>
+    <div className={classes.page}>
       <h2 className={classes['page-title']}>Installer List, {installerListData.length} {hasFilters ? 'filtered ' : ''}results</h2>
       <Table gridClass={classes['table-grid']}>
         <THead>
