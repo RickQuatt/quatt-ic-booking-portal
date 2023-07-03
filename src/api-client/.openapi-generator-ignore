@@ -55,6 +55,19 @@ models/*
 !models/AdminGetCic200ResponseToJSON.ts
 !models/UpdateAdminCicFromJSON.ts
 !models/UpdateAdminCicToJSON.ts
+!models/AdminCreateInstaller200Response.ts
+!models/CompleteCommissioning200Response.ts
+!models/CreateUpdateInstaller.ts
+!models/AdminCreateInstaller200ResponseFromJSON.ts
+!models/AdminCreateInstaller200ResponseToJSON.ts
+!models/CompleteCommissioning200ResponseFromJSON.ts
+!models/CompleteCommissioning200ResponseToJSON.ts
+!models/CreateUpdateInstallerFromJSON.ts
+!models/CreateUpdateInstallerToJSON.ts
+!models/Installer.ts
+!models/AdminListInstallers200Response.ts
+!models/AdminListInstallers200ResponseFromJSON.ts
+!models/AdminListInstallers200ResponseToJSON.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

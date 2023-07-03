@@ -10,6 +10,7 @@ import { CICList } from './cic-list/CICList';
 import { CICDetail } from './cic-detail/CICDetail';
 import { ApiClientProvider, useApiClient } from './api-client/context';
 import { Button, ButtonLink } from './ui-components/button/Button';
+import { InstallerList } from './installer-list/InstallerList';
 
 const queryClient = new QueryClient()
 
@@ -39,6 +40,9 @@ function App() {
         <ApiClientProvider token={token}>
           <Route path="/">
             <Home />
+          </Route>
+          <Route path="/installers">
+            <InstallerListRenderer />
           </Route>
           <Route path="/cics">
             <CICListRenderer />
@@ -75,6 +79,9 @@ const Home = () => {
       <Link href={`/cics`}>
         <ButtonLink>CICs</ButtonLink>
       </Link>
+      <Link href={`/installers`}>
+        <ButtonLink>Installers</ButtonLink>
+      </Link>
     </div>
   )
 }
@@ -95,6 +102,20 @@ const CICDetailRenderer = ({
 
   return (
     <CICDetail cicId={cicId} data={data.result} />
+  )
+}
+
+const InstallerListRenderer = () => {
+  const apiClient = useApiClient()
+  const { data, status, error } = useQuery("installerList", () => {
+    return apiClient.adminListInstallers()
+  });
+
+  // TODO: Render a spinner and handle errors - 2023-06-19
+  if (status !== 'success') return null
+
+  return (
+    <InstallerList data={data.result} />
   )
 }
 

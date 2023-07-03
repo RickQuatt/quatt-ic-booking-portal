@@ -1,11 +1,15 @@
 apis/SupportDashboardApi.ts
 models/AdminCic.ts
+models/AdminCreateInstaller200Response.ts
 models/AdminGetCic200Response.ts
 models/AdminListCics200Response.ts
+models/AdminListInstallers200Response.ts
 models/BoilerType.ts
 models/CicAvailableWifiNetworksInner.ts
 models/CicStatus.ts
+models/CompleteCommissioning200Response.ts
 models/ConnectionStatus.ts
+models/CreateUpdateInstaller.ts
 models/ErrorCode.ts
 models/ErrorResponse.ts
 models/FlowRateTestStatus.ts
@@ -15,6 +19,7 @@ models/HeatPumpCommissioning.ts
 models/HeatPumpTestLevel.ts
 models/IdentificationStatus.ts
 models/IdentificationTestStatus.ts
+models/Installer.ts
 models/InstallerCicAllOfLastCommissioning.ts
 models/ResponseMeta.ts
 models/SilentMode.ts
