@@ -1,9 +1,11 @@
 import classNames from 'classnames';
 import classes from './Table.module.css'
 
-export function Table(props: React.PropsWithChildren) {
+export function Table(props: React.PropsWithChildren<{
+  gridClass: string
+}>) {
   return (
-    <table className={classes.table}>
+    <table className={classNames(classes.table, props.gridClass)}>
       {props.children}
     </table>
   )

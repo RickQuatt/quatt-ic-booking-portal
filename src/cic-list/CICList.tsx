@@ -35,7 +35,7 @@ export function CICList({
   return (
     <div>
       <h2 className={classes['page-title']}>CIC List, {CICListData.length} {hasFilters ? 'filtered ' : ''}results</h2>
-      <Table>
+      <Table gridClass={classes['table-grid']}>
         <THead>
           <Tr>
             <Th><TdText>ID</TdText></Th>

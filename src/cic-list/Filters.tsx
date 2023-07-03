@@ -1,10 +1,10 @@
 import React from 'react'
-import { debounce, omit } from 'lodash-es'
+import { omit } from 'lodash-es'
 
-import classes from './Filters.module.css'
 import { AdminCic } from '../api-client/models';
-import { Input } from '../ui-components/input/Input';
 import { Select } from '../ui-components/select/Select';
+import { TextFilter } from '../ui-components/filter/TextFilter';
+import { DateRangeFilter } from '../ui-components/filter/DateRangeFilter';
 
 export type CICFilters = 
   Partial<Omit<AdminCic, 'created_at'>>
@@ -41,44 +41,6 @@ export function filterCICList(
       return filterValue === cicEntry[filterKey as keyof AdminCic]
     })
   })
-}
-
-export function TextFilter({
-  setFilters,
-  filterKey,
-  inputType = 'text'
-}: {
-  setFilters: SetFiltersFunc
-  filterKey: keyof AdminCic
-  inputType?: React.HTMLInputTypeAttribute
-}) {
-  const doSetFilters = React.useCallback((value: string) => {
-    setFilters((filters: CICFilters) => {
-      console.log(value)
-      if (!value) {
-        return omit(filters, filterKey)
-      }
-      const parsedValue = inputType === 'number' ? Number(value) : value
-      return { ...filters, [filterKey]: parsedValue }
-    })
-  }, [setFilters, filterKey, inputType])
-
-  const debouncedSetFilters = React.useMemo(
-    () => debounce(doSetFilters, 100),
-    [doSetFilters]
-  )
-
-  const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    debouncedSetFilters(value)
-  }, [debouncedSetFilters])
-
-  return (
-    <Input
-      type={inputType}
-      onChange={onChange}
-    />
-  )
 }
 
 type SetFiltersFunc = (setFiltersFunc: (oldFilters: CICFilters) => CICFilters) => void
@@ -185,78 +147,22 @@ export function OrderNumberFilter({ setFilters }: FilterProps) {
   )
 }
 
-const maxDate = new Date().toISOString().slice(0,-8)
-
 export function CreatedDateFilter({ setFilters }: FilterProps) {
-  const onChangeMinDate = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFilters((filters: CICFilters) => {
-      if (!value) {
-        return omit(filters, 'minCreatedAt')
-      }
-      return { ...filters, minCreatedAt: new Date(value) }
-    })
-  }, [setFilters])
-
-  const onChangeMaxDate = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFilters((filters: CICFilters) => {
-      if (!value) {
-        return omit(filters, 'maxCreatedAt')
-      }
-      return { ...filters, maxCreatedAt: new Date(value) }
-    })
-  }, [setFilters])
-
   return (
-    <div className={classes['created-date-filter-container']}>
-      <input
-        type="datetime-local"
-        max={maxDate}
-        onChange={onChangeMinDate}
-      />
-      <input
-        type="datetime-local"
-        max={maxDate}
-        onChange={onChangeMaxDate}
-      />
-    </div>
+    <DateRangeFilter
+      setFilters={setFilters}
+      minFilterKey="minCreatedAt"
+      maxFilterKey="maxCreatedAt"
+    />
   )
 }
 
 export function LastConnectionStatusFilter({ setFilters }: FilterProps) {
-  const onChangeMinDate = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFilters((filters: CICFilters) => {
-      if (!value) {
-        return omit(filters, 'minLastConnectionStatusUpdatedAt')
-      }
-      return { ...filters, minLastConnectionStatusUpdatedAt: new Date(value) }
-    })
-  }, [setFilters])
-
-  const onChangeMaxDate = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFilters((filters: CICFilters) => {
-      if (!value) {
-        return omit(filters, 'maxLastConnectionStatusUpdatedAt')
-      }
-      return { ...filters, maxLastConnectionStatusUpdatedAt: new Date(value) }
-    })
-  }, [setFilters])
-
   return (
-    <div className={classes['created-date-filter-container']}>
-      <input
-        type="datetime-local"
-        max={maxDate}
-        onChange={onChangeMinDate}
-      />
-      <input
-        type="datetime-local"
-        max={maxDate}
-        onChange={onChangeMaxDate}
-      />
-    </div>
+    <DateRangeFilter
+      setFilters={setFilters}
+      minFilterKey="minLastConnectionStatusUpdatedAt"
+      maxFilterKey="maxLastConnectionStatusUpdatedAt"
+    />
   )
 }

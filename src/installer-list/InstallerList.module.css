@@ -1,0 +1,8 @@
+
+.page-title {
+  margin-left: var(--table-side-padding);
+}
+
+.table-grid {
+    grid-template-columns: repeat(6, 1fr);
+}

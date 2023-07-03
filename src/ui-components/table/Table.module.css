@@ -1,8 +1,12 @@
+:root {
+  --table-header-top-bottom-padding: 15px;
+  --table-item-top-bottom-padding: 10px;
+  --table-side-padding: 10px;
+}
 
 .table {
     display: grid;
     border-collapse: collapse;
-    grid-template-columns: repeat(8, 1fr) 120px 120px 120px;
     min-width: 1300px;
     background: white;
 }

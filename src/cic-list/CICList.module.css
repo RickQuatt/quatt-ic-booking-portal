@@ -1,10 +1,8 @@
 
-:root {
-  --table-header-top-bottom-padding: 15px;
-  --table-item-top-bottom-padding: 10px;
-  --table-side-padding: 10px;
-}
-
 .page-title {
   margin-left: var(--table-side-padding);
+}
+
+.table-grid {
+  grid-template-columns: repeat(8, 1fr) 120px 120px 120px;
 }
