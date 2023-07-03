@@ -18,7 +18,7 @@ import { ButtonLink } from '../ui-components/button/Button'
 import { AdminCic, ConnectionStatus } from '../api-client/models'
 import { formatDate, formatDateDistance } from '../utils/formatDate'
 import { getGrafanaLink, getMenderLink } from '../cic-detail/getLinks'
-import classNames from 'classnames'
+import { TBody, THead, Table, Td, TdText, Th, Tr } from '../ui-components/table/Table'
 
 export function CICList({
   data
@@ -35,9 +35,9 @@ export function CICList({
   return (
     <div>
       <h2 className={classes['page-title']}>CIC List, {CICListData.length} {hasFilters ? 'filtered ' : ''}results</h2>
-      <table className={classes.table}>
-        <thead className={classes.thead}>
-          <tr className={`${classes.tr} ${classes['main-table-header']}`}>
+      <Table>
+        <THead>
+          <Tr>
             <Th><TdText>ID</TdText></Th>
             <Th><TdText>Cable connection status</TdText></Th>
             <Th><TdText>Wifi connection status</TdText></Th>
@@ -49,8 +49,8 @@ export function CICList({
             <Th><TdText>Mender</TdText></Th>
             <Th><TdText>Grafana</TdText></Th>
             <Th><TdText>Details</TdText></Th>
-          </tr>
-          <tr className={`${classes.tr}`}>
+          </Tr>
+          <Tr>
             <Th><IDFilter setFilters={setFilters} /></Th>
             <Th><CableConnectionStatusFilter setFilters={setFilters} /></Th>
             <Th><WifiConnectionStatusFilter setFilters={setFilters} /></Th>
@@ -62,48 +62,24 @@ export function CICList({
             <Th></Th>
             <Th></Th>
             <Th></Th>
-          </tr>
-        </thead>
-        <tbody className={classes.tbody}>
+          </Tr>
+        </THead>
+        <TBody>
           {CICListData.map((cicEntry) => (
             <CICRow
               key={cicEntry.id}
               cicEntry={cicEntry}
             />
           ))}
-        </tbody>
-      </table>
+        </TBody>
+      </Table>
     </div>
-  )
-}
-
-function Th(props: React.PropsWithChildren) {
-  return (
-    <th className={classes.th}>
-      {props.children}
-    </th>
-  )
-}
-
-function Td(props: React.PropsWithChildren<{
-  noSidePadding?: boolean;
-}>) {
-  return (
-    <td className={classes.td}>
-      {props.children}
-    </td>
-  )
-}
-
-function TdText(props: React.PropsWithChildren<{ color?: "danger" }>) {
-  return (
-    <span className={classNames(classes['tdh-text'], props.color && classes[props.color])}>{props.children}</span>
   )
 }
 
 function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
   return (
-    <tr className={classes.tr}>
+    <Tr>
       <Td><TdText>{cicEntry.id}</TdText></Td>
       <Td><ConnectionStatusText status={cicEntry.cableConnectionStatus} /></Td>
       <Td><ConnectionStatusText status={cicEntry.wifiConnectionStatus} /></Td>
@@ -129,7 +105,7 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
           <ButtonLink>Detail</ButtonLink>
         </Link>
       </Td>
-    </tr>
+    </Tr>
   )
 }
 
