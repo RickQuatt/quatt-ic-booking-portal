@@ -15,7 +15,7 @@ import {
 } from "./getLinks";
 import { AdvancedSettingsModal } from "./AdvancedSettingsModal";
 import { useModalState } from "../ui-components/modal/useModalState";
-import { FormField, FormFieldInput, FormFieldJson, FormFieldTitle, FormFieldValue, FormSection } from "./Form";
+import { FormField, FormFieldInput, FormFieldJson, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
 
 interface CICDetailProps {
   cicId: string;

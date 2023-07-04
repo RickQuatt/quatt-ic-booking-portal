@@ -107,16 +107,14 @@ const CICDetailRenderer = ({
 
 const InstallerListRenderer = () => {
   const apiClient = useApiClient()
-  const { data, status, error } = useQuery("installerList", () => {
+  const { data, status, error, refetch } = useQuery("installerList", () => {
     return apiClient.adminListInstallers()
   });
 
   // TODO: Render a spinner and handle errors - 2023-06-19
   if (status !== 'success') return null
 
-  return (
-    <InstallerList data={data.result} />
-  )
+  return <InstallerList data={data.result} refetch={refetch} />;
 }
 
 const CICListRenderer = () => {
