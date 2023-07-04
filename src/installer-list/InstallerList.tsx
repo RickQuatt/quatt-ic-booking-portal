@@ -7,6 +7,7 @@ import { TBody, THead, Table, Td, TdText, Th, Tr } from '../ui-components/table/
 import { formatDate } from '../utils/formatDate'
 import { Button } from '../ui-components/button/Button'
 import { InstallerModal, OpenInstallerModal, useInstallerModalState } from './InstallerModal'
+import { useApiClient } from '../api-client/context'
 
 export function InstallerList({
   data,
@@ -81,6 +82,13 @@ export function InstallerList({
 }
 
 function InstallerRow({ data, openInstallerModal }: { data: Installer, openInstallerModal: OpenInstallerModal }) {
+  const apiClient = useApiClient()
+  const deleteInstaller = React.useCallback(() => {
+    const confirmed = window.confirm("Are you sure you want to delete this installer?")
+    if (!confirmed) return;
+    apiClient.adminDeleteInstaller({ installerId: data.id })
+  }, [apiClient, data.id])
+
   return (
     <Tr>
       <Td><TdText>{data.code}</TdText></Td>
@@ -91,6 +99,9 @@ function InstallerRow({ data, openInstallerModal }: { data: Installer, openInsta
       <Td>
         <Button onClick={() => openInstallerModal({ installerId: data.id, data })}>
           Edit
+        </Button>
+        <Button onClick={deleteInstaller} style={{marginLeft: '12px'}}>
+          Delete
         </Button>
       </Td>
     </Tr>
