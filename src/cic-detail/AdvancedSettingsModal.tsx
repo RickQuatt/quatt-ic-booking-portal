@@ -20,7 +20,7 @@ import {
   FormFieldValue,
   FormSection,
   FormSelectInput,
-} from "./Form";
+} from "../ui-components/form/Form";
 
 interface Props extends ModalProps {
   cicId: string;
@@ -166,7 +166,7 @@ export function AdvancedSettingsModal({
         <ModalActions>
           <ModalCloseButton onClick={closeModal} />
           <ModalConfirmButton
-            onClick={undefined}
+            type="submit"
             disabled={!isDirty || isSubmitting}
           >
             Submit
