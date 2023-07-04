@@ -40,7 +40,8 @@ function generateInstallerCode(){
 const InstallerFormSchema = yup.object({
   code: yup
     .string()
-    .required(requiredFieldText),
+    .required(requiredFieldText)
+    .matches(codeRegex),
   name: yup
     .string()
     .required(requiredFieldText),
@@ -156,7 +157,15 @@ export function InstallerModal({
                 {...register("phone")}
               />
             </FormField>
+            <FormField>
+              <FormFieldTitle>Is active</FormFieldTitle>
+              <FormSelectInput {...register("isActive")}>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </FormSelectInput>
+            </FormField>
           </FormSection>
+
         </ModalContent>
         <ModalActions>
           <ModalCloseButton onClick={closeModal} />
