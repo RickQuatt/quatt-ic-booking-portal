@@ -1,11 +1,18 @@
 .detail-sections {
   display: flex;
-  align-items: start;
   gap: 22px;
   justify-content: center;
   width: 100%;
-  margin-top: 32px;
-  margin-bottom: 32px;
+  margin: 32px auto;
+  padding: 0 12px;
+  max-width: 1200px;
+}
+
+@media (max-width: 768px) {
+  .detail-sections {
+    flex-direction: column-reverse;
+  }
+
 }
 
 .detail-section {
@@ -13,7 +20,20 @@
   box-shadow: 0px 3px 3px -2px rgba(0,0,0,0.2), 0px 3px 4px 0px rgba(0,0,0,0.14), 0px 1px 8px 0px rgba(0,0,0,0.12);
   padding: 16px;
   border-radius: 5px;
-  max-width: 500px;
-  flex: 1;
+  flex: auto;
   background: white;
+}
+
+.detail-sections-left {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: auto;
+  max-width: 100%;
+}
+
+.detail-sections-right {
+  max-width: 500px;
+  flex: auto;
+  max-width: 100%;
 }

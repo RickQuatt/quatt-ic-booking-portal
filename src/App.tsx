@@ -101,7 +101,7 @@ const CICDetailRenderer = ({
   if (status !== 'success') return null
 
   return (
-    <CICDetail cicId={cicId} data={data.result} />
+    <CICDetail data={data.result} />
   )
 }
 
