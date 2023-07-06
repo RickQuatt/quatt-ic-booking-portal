@@ -5,6 +5,7 @@ import { AdminCic } from "../api-client/models";
 import { CICDetailMain } from "./CICDetailMain";
 import { CICDetailExtra } from "./CICDetailExtra";
 import { CICDetailSide } from "./CICDetailSide";
+import { CICDetailJson } from "./CICDetailJson";
 
 interface CICDetailProps {
   data: AdminCic;
@@ -18,6 +19,7 @@ export function CICDetail({ data }: CICDetailProps) {
       <div className={classes["detail-sections-left"]}>
         <CICDetailMain cicData={cicData} />
         <CICDetailExtra cicData={cicData} />
+        <CICDetailJson cicData={cicData} />
       </div>
       <div className={classes["detail-sections-right"]}>
         <CICDetailSide cicData={cicData} />
