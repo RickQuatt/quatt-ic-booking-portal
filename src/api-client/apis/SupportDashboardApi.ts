@@ -281,6 +281,29 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     /**
      */
+    async adminInstallerInstallerIdOptionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/admin/installer/{installerId}`,
+            method: 'OPTIONS',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async adminInstallerInstallerIdOptions(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.adminInstallerInstallerIdOptionsRaw(initOverrides);
+    }
+
+    /**
+     */
     async adminInstallerListOptionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -415,6 +438,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
+        console.log(requestParameters, UpdateAdminCicToJSON(requestParameters.updateAdminCic))
         const response = await this.request({
             path: `/admin/cic/{cicId}`.replace(`{${"cicId"}}`, encodeURIComponent(String(requestParameters.cicId))),
             method: 'PUT',

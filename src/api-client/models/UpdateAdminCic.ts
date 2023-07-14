@@ -122,6 +122,12 @@ export interface UpdateAdminCic {
      * @memberof UpdateAdminCic
      */
     thermostatType?: ThermostatType | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpdateAdminCic
+     */
+    numberOfHeatPumps?: number;
 }
 
 /**
@@ -157,6 +163,7 @@ export function UpdateAdminCicFromJSONTyped(json: any, ignoreDiscriminator: bool
         'orderNumber': !exists(json, 'orderNumber') ? undefined : json['orderNumber'],
         'boilerType': !exists(json, 'boilerType') ? undefined : BoilerTypeFromJSON(json['boilerType']),
         'thermostatType': !exists(json, 'thermostatType') ? undefined : ThermostatTypeFromJSON(json['thermostatType']),
+        'numberOfHeatPumps': !exists(json, 'numberOfHeatPumps') ? undefined : json['numberOfHeatPumps'],
     };
 }
 
@@ -183,6 +190,7 @@ export function UpdateAdminCicToJSON(value?: UpdateAdminCic | null): any {
         'orderNumber': value.orderNumber,
         'boilerType': BoilerTypeToJSON(value.boilerType),
         'thermostatType': ThermostatTypeToJSON(value.thermostatType),
+        'numberOfHeatPumps': value.numberOfHeatPumps,
     };
 }
 
