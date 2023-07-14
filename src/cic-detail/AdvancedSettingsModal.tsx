@@ -54,6 +54,8 @@ const CICAdvancedFormSchema = yup.object({
     .number()
     .transform(transformNaN)
     .required(requiredFieldText)
+    .min(1)
+    .max(2)
 });
 
 // TODO: get yup to infer the right type (the enums)? - 2023-07-14
