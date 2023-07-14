@@ -134,6 +134,7 @@ export function CICDetailMain({
             <FormFieldTitle>Electricity price</FormFieldTitle>
             <FormFieldInput
               type="number"
+              step="0.01"
               error={errors.electricityPrice}
               {...register("electricityPrice", {
                 valueAsNumber: true,
@@ -144,6 +145,7 @@ export function CICDetailMain({
             <FormFieldTitle>Day electricity price</FormFieldTitle>
             <FormFieldInput
               type="number"
+              step="0.01"
               error={errors.dayElectricityPrice}
               {...register("dayElectricityPrice", {
                 valueAsNumber: true,
@@ -154,8 +156,20 @@ export function CICDetailMain({
             <FormFieldTitle>Night electricity price</FormFieldTitle>
             <FormFieldInput
               type="number"
+              step="0.01"
               error={errors.nightElectricityPrice}
               {...register("nightElectricityPrice", {
+                valueAsNumber: true,
+              })}
+            />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Gas price</FormFieldTitle>
+            <FormFieldInput
+              type="number"
+              step="0.01"
+              error={errors.gasPrice}
+              {...register("gasPrice", {
                 valueAsNumber: true,
               })}
             />
@@ -176,6 +190,7 @@ export function CICDetailMain({
             </FormFieldTitle>
             <FormFieldInput
               type="number"
+              step="0.01"
               error={errors.maximumHeatingOutdoorTemperature}
               {...register("maximumHeatingOutdoorTemperature", {
                 valueAsNumber: true,
