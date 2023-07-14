@@ -95,7 +95,6 @@ export function InstallerModal({
 
   const apiClient = useApiClient();
   const onSubmit = React.useCallback(async (data: InstallerFormData) => {
-    console.log(data);
 
     let response: AdminCreateInstaller200Response
 

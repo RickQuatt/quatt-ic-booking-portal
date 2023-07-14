@@ -10,7 +10,6 @@ export const auth = getAuth(app)
 
 export const signinWithGoogle = async () => {
   const oldToken = await auth.currentUser?.getIdToken();
-  console.log("Already has token");
   if (oldToken) {
     return { token: oldToken }
   }
@@ -25,6 +24,6 @@ export const signinWithGoogle = async () => {
     const user = result.user;
     return { token }
   } catch (e) {
-    console.log("Error in firebase popup", e);
+    console.error("Error in firebase popup", e);
   }
 }

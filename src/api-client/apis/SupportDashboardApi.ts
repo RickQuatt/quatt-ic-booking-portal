@@ -438,7 +438,6 @@ export class SupportDashboardApi extends runtime.BaseAPI {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
-        console.log(requestParameters, UpdateAdminCicToJSON(requestParameters.updateAdminCic))
         const response = await this.request({
             path: `/admin/cic/{cicId}`.replace(`{${"cicId"}}`, encodeURIComponent(String(requestParameters.cicId))),
             method: 'PUT',

@@ -92,7 +92,6 @@ export function AdvancedSettingsModal({
 
   const apiClient = useApiClient();
   const onSubmit = React.useCallback(async (data: CICAdvancedFormData) => {
-    console.log(data);
     if (
       !window.confirm(
         "Are you sure you would like to update these critical CIC settings?"
