@@ -7,6 +7,9 @@
   border: 1px solid var(--border-color);
   padding: 10px 15px;
   font-size: 14px;
+
+  background-color: #fff;
+  color: #000
 }
 .input:focus-visible {
   outline: var(--border-focus-color) auto 1px;

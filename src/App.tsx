@@ -99,7 +99,9 @@ const CICDetailRenderer = ({
 
 
   // TODO: Render a spinner and handle errors - 2023-06-19
-  if (status !== 'success') return null
+  if (status !== 'success') return (
+    <Loader />
+  )
 
   return (
     <CICDetail data={data.result} />
@@ -113,7 +115,9 @@ const InstallerListRenderer = () => {
   });
 
   // TODO: Render a spinner and handle errors - 2023-06-19
-  if (status !== 'success') return null
+  if (status !== 'success') return (
+    <Loader />
+  )
 
   return <InstallerList data={data.result} refetch={refetch} />;
 }
