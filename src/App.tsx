@@ -11,6 +11,7 @@ import { CICDetail } from './cic-detail/CICDetail';
 import { ApiClientProvider, useApiClient } from './api-client/context';
 import { Button, ButtonLink } from './ui-components/button/Button';
 import { InstallerList } from './installer-list/InstallerList';
+import { Loader } from './ui-components/loader/Loader';
 
 const queryClient = new QueryClient()
 
@@ -124,7 +125,9 @@ const CICListRenderer = () => {
   });
 
   // TODO: Render a spinner and handle errors - 2023-06-19
-  if (status !== 'success') return null
+  if (status !== 'success') return (
+    <Loader />
+  )
 
   return (
     <CICList data={data.result} />
