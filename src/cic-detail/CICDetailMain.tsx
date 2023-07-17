@@ -1,3 +1,4 @@
+import React from "react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -75,7 +76,7 @@ export function CICDetailMain({
   });
 
   const apiClient = useApiClient();
-  const onSubmit = async (data: CICDetailFormData) => {
+  const onSubmit = React.useCallback(async (data: CICDetailFormData) => {
     const response = await apiClient.adminUpdateCic({
       cicId: cicData.id,
       updateAdminCic: data,
@@ -84,8 +85,7 @@ export function CICDetailMain({
       // this sets isDirty back to false
       reset({}, { keepValues: true });
     }
-  };
-
+  }, [apiClient, cicData.id, reset])
 
   return (
     <div className={classes["detail-section"]}>

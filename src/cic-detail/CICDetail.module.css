@@ -4,6 +4,7 @@
   justify-content: center;
   width: 100%;
   margin: 32px auto;
+  margin-top: 72px;
   padding: 0 12px;
   max-width: 1200px;
 }
@@ -12,7 +13,6 @@
   .detail-sections {
     flex-direction: column-reverse;
   }
-
 }
 
 .detail-section {
@@ -36,4 +36,10 @@
   max-width: 500px;
   flex: auto;
   max-width: 100%;
+}
+
+.back-button {
+  position: absolute;
+  top: 12px;
+  left: 12px;
 }

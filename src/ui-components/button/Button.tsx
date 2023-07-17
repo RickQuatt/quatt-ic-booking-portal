@@ -26,11 +26,21 @@ interface ButtonLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> 
   disabled?: boolean;
 }
 
-export const ButtonLink = (props: ButtonLinkProps) => {
+export const ButtonLink = ({
+  color,
+  disabled,
+  className,
+  ...restProps
+}: ButtonLinkProps) => {
   return (
     <a
-      {...props}
-      className={classNames(classes.button, props.color && classes[props.color], props.disabled && classes.disabled)}
+      {...restProps}
+      className={classNames(
+        classes.button,
+        color && classes[color],
+        disabled && classes.disabled,
+        className
+      )}
     />
-  )
-}
+  );
+};

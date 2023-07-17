@@ -78,9 +78,10 @@ export function CICList({
 }
 
 function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
+  const cicDetailLink = `/cics/${cicEntry.id}`
   return (
     <Tr>
-      <Td><TdText>{cicEntry.id}</TdText></Td>
+      <Td><TdText><Link to={cicDetailLink}>{cicEntry.id}</Link></TdText></Td>
       <Td><ConnectionStatusText status={cicEntry.cableConnectionStatus} /></Td>
       <Td><ConnectionStatusText status={cicEntry.wifiConnectionStatus} /></Td>
       <Td><ConnectionStatusText status={cicEntry.lteConnectionStatus} /></Td>
@@ -101,7 +102,7 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
         >Grafana</ButtonLink>
       </Td>
       <Td>
-        <Link href={`/cics/${cicEntry.id}`}>
+        <Link href={cicDetailLink}>
           <ButtonLink>Detail</ButtonLink>
         </Link>
       </Td>

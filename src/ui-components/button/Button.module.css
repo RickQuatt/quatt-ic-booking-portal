@@ -8,6 +8,7 @@
   cursor: pointer;
   transition: border-color 0.25s;
   text-align: center;
+  text-decoration: inherit;
 
   /* Dark mode */
   background-color: var(--button-background);

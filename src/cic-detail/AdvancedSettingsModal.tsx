@@ -35,6 +35,12 @@ const orderIdValidateText = "Should have the following format: QUATTxxxx, where 
 const orderIdReg = /^(QUATT)\d{1,7}$/
 
 const CICAdvancedFormSchema = yup.object({
+  orderNumber: yup.string().matches(orderIdReg, orderIdValidateText).required(requiredFieldText),
+  silentMode: yup
+    .string()
+    .required(requiredFieldText)
+    .nullable(requiredFieldText)
+    .oneOf(["never", "night", "always"]),
   boilerType: yup
     .string()
     .required(requiredFieldText)
@@ -48,8 +54,6 @@ const CICAdvancedFormSchema = yup.object({
       "opentherm_room_temperature",
       "opentherm_without_room_temperature",
     ]),
-  orderNumber: yup.string().matches(orderIdReg, orderIdValidateText).required(requiredFieldText),
-  // .nullable(requiredFieldText),
   numberOfHeatPumps: yup
     .number()
     .transform(transformNaN)
@@ -61,9 +65,10 @@ const CICAdvancedFormSchema = yup.object({
 // TODO: get yup to infer the right type (the enums)? - 2023-07-14
 type CICAdvancedFormData = yup.InferType<typeof CICAdvancedFormSchema>;
 type CICAdvancedFormDataActual = {
+  orderNumber: NonNullable<AdminCic['orderNumber']>
+  silentMode: AdminCic['silentMode']
   boilerType: AdminCic['boilerType']
   thermostatType: AdminCic['thermostatType']
-  orderNumber: NonNullable<AdminCic['orderNumber']>
   numberOfHeatPumps: NonNullable<AdminCic['numberOfHeatPumps']>
 }
 
@@ -82,10 +87,11 @@ export function AdvancedSettingsModal({
   } = useForm<CICAdvancedFormData>({
     resolver: yupResolver(CICAdvancedFormSchema),
     defaultValues: {
-      boilerType: cicData.boilerType,
-      thermostatType: cicData.thermostatType,
       orderNumber:
         cicData.orderNumber === null ? undefined : cicData.orderNumber,
+      silentMode: cicData.silentMode,
+      boilerType: cicData.boilerType,
+      thermostatType: cicData.thermostatType,
       numberOfHeatPumps: cicData.numberOfHeatPumps === null ? undefined : cicData.numberOfHeatPumps,
     },
   });
@@ -129,6 +135,22 @@ export function AdvancedSettingsModal({
               <FormFieldValue value={cicData.id} />
             </FormField>
             <FormField>
+              <FormFieldTitle>Order number *</FormFieldTitle>
+              <FormFieldInput
+                type="text"
+                error={errors.orderNumber}
+                {...register("orderNumber")}
+              />
+            </FormField>
+            <FormField>
+              <FormFieldTitle>Silent mode</FormFieldTitle>
+              <FormSelectInput {...register("silentMode")}>
+                <option value="never">Never</option>
+                <option value="night">Night</option>
+                <option value="always">Always</option>
+              </FormSelectInput>
+            </FormField>
+            <FormField>
               <FormFieldTitle>Boiler type</FormFieldTitle>
               <FormSelectInput {...register("boilerType")}>
                 <option value="opentherm">Opentherm</option>
@@ -145,14 +167,6 @@ export function AdvancedSettingsModal({
                   OpenthermWithoutRoomTemperature
                 </option>
               </FormSelectInput>
-            </FormField>
-            <FormField>
-              <FormFieldTitle>Order number *</FormFieldTitle>
-              <FormFieldInput
-                type="text"
-                error={errors.orderNumber}
-                {...register("orderNumber")}
-              />
             </FormField>
             <FormField>
               <FormFieldTitle>Number of heat pumps</FormFieldTitle>

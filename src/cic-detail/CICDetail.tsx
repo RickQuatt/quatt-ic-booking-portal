@@ -10,6 +10,8 @@ import { CICDetailNetworkConnection } from "./CICDetailNetworkConnection";
 import { CICDetailBoilerInfo } from "./CICDetailBoilerInfo";
 import { CICDetailThermostatInfo } from "./CICDetailThermostatInfo";
 import { CICDetailHouseInfo } from "./CICDetailHouseInfo";
+import { ButtonLink } from "../ui-components/button/Button";
+import { Link } from "wouter";
 
 interface CICDetailProps {
   data: AdminCic;
@@ -32,6 +34,15 @@ export function CICDetail({ data }: CICDetailProps) {
       <div className={classes["detail-sections-right"]}>
         <CICDetailSide cicData={cicData} />
       </div>
+      <BackButton />
     </div>
   );
+}
+
+function BackButton() {
+  return (
+    <Link href={`/cics`} className={classes['back-button']}>
+      <ButtonLink className={classes['back-button']}>← Back to list</ButtonLink>
+    </Link>
+  )
 }
