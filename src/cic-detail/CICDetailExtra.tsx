@@ -1,6 +1,5 @@
 import { AdminCic } from "../api-client/models";
-import { FormField, FormFieldJson, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
-import { formatDateDistance } from "../utils/formatDate";
+import { FormField, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
 import classes from "./CICDetail.module.css";
 import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 
@@ -40,16 +39,6 @@ export function CICDetailExtra({
         <FormField>
           <FormFieldTitle>Is controller alive</FormFieldTitle>
           <FormFieldValue value={cicData.isControllerAlive} />
-        </FormField>
-        <FormField>
-          <FormFieldTitle>Last commissioning completed at</FormFieldTitle>
-          <FormFieldValue
-            value={formatDateDistance(cicData.lastConnectionStatusUpdatedAt)}
-          />
-        </FormField>
-        <FormField>
-          <FormFieldTitle>Last commissioning</FormFieldTitle>
-          <FormFieldJson value={cicData.lastCommissioning} />
         </FormField>
       </FormSection>
     </div>

@@ -14,6 +14,7 @@ import { CICDetailHouseInfo } from "./CICDetailHouseInfo";
 import { CICDetailHeatpumps } from "./CICDetailHeatpumps";
 import { ButtonLink } from "../ui-components/button/Button";
 import { CICDetailUpdateInfo } from "./CICDetailUpdateInfo";
+import { CICDetailLastCommissioning } from "./CICDetailLastCommissioning";
 
 interface CICDetailProps {
   data: AdminCic;
@@ -33,6 +34,7 @@ export function CICDetail({ data }: CICDetailProps) {
         <CICDetailHeatpumps cicData={cicData} />
         <CICDetailHouseInfo cicData={cicData} />
         <CICDetailExtra cicData={cicData} />
+        <CICDetailLastCommissioning data={cicData.lastCommissioning} />
         <CICDetailJson cicData={cicData} />
       </div>
       <div className={classes["detail-sections-right"]}>
