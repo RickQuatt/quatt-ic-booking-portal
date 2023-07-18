@@ -11,7 +11,7 @@ export function CICDetailExtra({
 }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="CIC extra details" />
+      <CICDetailSectionHeader title="Extra details" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Created at</FormFieldTitle>
@@ -22,8 +22,8 @@ export function CICDetailExtra({
           <FormFieldValue value={cicData.flowRate} />
         </FormField>
         <FormField>
-          <FormFieldTitle>Gas price</FormFieldTitle>
-          <FormFieldValue value={cicData.gasPrice} />
+          <FormFieldTitle>Supply temperature</FormFieldTitle>
+          <FormFieldValue value={cicData.supplyTemperature} />
         </FormField>
         <FormField>
           <FormFieldTitle>Serial</FormFieldTitle>
@@ -32,10 +32,6 @@ export function CICDetailExtra({
         <FormField>
           <FormFieldTitle>Supervisory control mode</FormFieldTitle>
           <FormFieldValue value={cicData.supervisoryControlMode} />
-        </FormField>
-        <FormField>
-          <FormFieldTitle>Is HP1 connected</FormFieldTitle>
-          <FormFieldValue value={cicData.isHp1Connected} />
         </FormField>
         <FormField>
           <FormFieldTitle>Is temperature sensor connected</FormFieldTitle>

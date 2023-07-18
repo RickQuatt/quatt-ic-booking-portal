@@ -10,7 +10,7 @@ export function CICDetailBoilerInfo({
 }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="CIC boiler info" />
+      <CICDetailSectionHeader title="Boiler info" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Is boiler connected</FormFieldTitle>

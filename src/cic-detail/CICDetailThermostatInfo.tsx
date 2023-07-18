@@ -10,7 +10,7 @@ export function CICDetailThermostatInfo({
 }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="CIC thermostat info" />
+      <CICDetailSectionHeader title="Thermostat info" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Is thermostat connected</FormFieldTitle>

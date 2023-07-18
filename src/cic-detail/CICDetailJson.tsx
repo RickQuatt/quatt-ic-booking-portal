@@ -10,7 +10,7 @@ export function CICDetailJson({
 }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="CIC raw json response" />
+      <CICDetailSectionHeader title="Raw JSON response" />
       <FormSection>
         <FormField>
           <FormFieldJson value={cicData} />

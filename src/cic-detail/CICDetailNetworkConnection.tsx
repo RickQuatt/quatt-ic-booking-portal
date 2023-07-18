@@ -11,7 +11,7 @@ export function CICDetailNetworkConnection({
 }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="CIC network connection" />
+      <CICDetailSectionHeader title="Network connection" />
       <FormSection>
         <FormField>
           <FormFieldTitle>
