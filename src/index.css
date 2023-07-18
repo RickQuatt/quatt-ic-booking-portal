@@ -7,9 +7,13 @@
 
   --button-background: #f9f9f9;
   --button-background-hover: #f1f1f1;
+  --button-border-color: #777;
+  --button-border-focus-color: #5E9ED6;
 
-  --border-color: #777;
-  --border-focus-color: #5E9ED6;
+  --border-color: rgba(0, 0, 0, 0.12);
+
+  --main-background: #FAFBFC;
+  --box-background: #fff;
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -35,7 +39,7 @@ body {
 #root {
   display: flex;
   width: 100%;
-  background: #FAFBFC;
+  background: var(--main-background);
 }
 
 * {

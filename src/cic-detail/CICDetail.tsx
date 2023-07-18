@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "wouter";
 
 import classes from "./CICDetail.module.css";
 import { AdminCic } from "../api-client/models";
@@ -10,8 +11,8 @@ import { CICDetailNetworkConnection } from "./CICDetailNetworkConnection";
 import { CICDetailBoilerInfo } from "./CICDetailBoilerInfo";
 import { CICDetailThermostatInfo } from "./CICDetailThermostatInfo";
 import { CICDetailHouseInfo } from "./CICDetailHouseInfo";
+import { CICDetailHeatpumps } from "./CICDetailHeatpumps";
 import { ButtonLink } from "../ui-components/button/Button";
-import { Link } from "wouter";
 
 interface CICDetailProps {
   data: AdminCic;
@@ -27,6 +28,7 @@ export function CICDetail({ data }: CICDetailProps) {
         <CICDetailNetworkConnection cicData={cicData} />
         <CICDetailBoilerInfo cicData={cicData} />
         <CICDetailThermostatInfo cicData={cicData} />
+        <CICDetailHeatpumps cicData={cicData} />
         <CICDetailHouseInfo cicData={cicData} />
         <CICDetailExtra cicData={cicData} />
         <CICDetailJson cicData={cicData} />

@@ -1,0 +1,36 @@
+
+.accordion {
+
+}
+
+.accordion-item {
+  border: 1px solid var(--border-color);
+
+  &:not(:last-child) {
+    border-bottom: 0;
+  }
+}
+
+.accordion-item-title {
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  background: #F7F7F7;
+  cursor: pointer;
+
+  & > div {
+    margin: 12px 8px;
+  }
+}
+
+.accordion-item-content {
+  overflow: hidden;
+
+  padding: 0px;
+  height: 0px;
+  &.is-open {
+    border-top: 1px solid var(--border-color);
+    height: auto;
+    padding: 16px;
+  }
+}

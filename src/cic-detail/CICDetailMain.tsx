@@ -89,7 +89,7 @@ export function CICDetailMain({
 
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="CIC details main" />
+      <CICDetailSectionHeader title="Main CIC details" />
       <FormSection>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormField>
@@ -113,6 +113,10 @@ export function CICDetailMain({
                 cicData.lastConnectionStatusUpdatedAt
               )}
             />
+          </FormField>
+          <FormField>
+            <FormFieldTitle>Status</FormFieldTitle>
+            <FormFieldValue value={cicData.status} />
           </FormField>
           <FormField>
             <FormFieldTitle>Mender ID</FormFieldTitle>
