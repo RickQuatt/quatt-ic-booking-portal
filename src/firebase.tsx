@@ -1,17 +1,17 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp } from "firebase/app";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = JSON.parse(
-  import.meta.env.VITE_FIREBASE_CONFIG_JSON as string
+  import.meta.env.VITE_FIREBASE_CONFIG_JSON as string,
 );
 
 export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app)
+export const auth = getAuth(app);
 
 export const signinWithGoogle = async () => {
   const oldToken = await auth.currentUser?.getIdToken();
   if (oldToken) {
-    return { token: oldToken }
+    return { token: oldToken };
   }
 
   try {
@@ -22,8 +22,8 @@ export const signinWithGoogle = async () => {
     const token = credential?.accessToken;
     // The signed-in user info.
     const user = result.user;
-    return { token }
+    return { token };
   } catch (e) {
     console.error("Error in firebase popup", e);
   }
-}
+};

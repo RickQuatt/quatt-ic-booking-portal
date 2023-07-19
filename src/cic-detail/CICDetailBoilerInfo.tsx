@@ -1,13 +1,14 @@
 import { AdminCic } from "../api-client/models";
-import { FormField, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
+import {
+  FormField,
+  FormFieldTitle,
+  FormFieldValue,
+  FormSection,
+} from "../ui-components/form/Form";
 import classes from "./CICDetail.module.css";
 import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 
-export function CICDetailBoilerInfo({
-  cicData
-}: {
-  cicData: AdminCic
-}) {
+export function CICDetailBoilerInfo({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
       <CICDetailSectionHeader title="Boiler info" />
@@ -44,8 +45,7 @@ export function CICDetailBoilerInfo({
           <FormFieldTitle>Boiler water temperature out</FormFieldTitle>
           <FormFieldValue value={cicData.boilerWaterTemperatureOut} />
         </FormField>
-
       </FormSection>
     </div>
-  )
+  );
 }

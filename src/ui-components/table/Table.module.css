@@ -5,10 +5,10 @@
 }
 
 .table {
-    display: grid;
-    border-collapse: collapse;
-    min-width: 1300px;
-    background: var(--box-background);
+  display: grid;
+  border-collapse: collapse;
+  min-width: 1300px;
+  background: var(--box-background);
 }
 
 .thead,
@@ -37,7 +37,8 @@
   align-items: center;
 }
 
-.th:first-child, .td:first-child {
+.th:first-child,
+.td:first-child {
   padding-left: var(--table-side-padding);
 }
 

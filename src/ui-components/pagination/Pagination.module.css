@@ -1,10 +1,9 @@
-
 .pagination {
   display: flex;
   gap: 12px;
   justify-content: center;
 
-  list-style-type: none
+  list-style-type: none;
 }
 
 .pagination-item {
@@ -27,5 +26,4 @@
     color: white;
     background: var(--primary-color);
   }
-
 }

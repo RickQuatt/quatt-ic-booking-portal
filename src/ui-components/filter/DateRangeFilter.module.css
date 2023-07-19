@@ -1,11 +1,10 @@
-
 .date-range-filter-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 
-    input {
-      background: #fff;
-      color: #000;
-    }
+  input {
+    background: #fff;
+    color: #000;
+  }
 }

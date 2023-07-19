@@ -27,7 +27,8 @@
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.button.disabled, .button:disabled {
+.button.disabled,
+.button:disabled {
   background-color: #cccccc;
   color: #666666;
   cursor: not-allowed;
@@ -35,7 +36,7 @@
   border-color: unset;
 
   &:hover {
-    border-color: unset
+    border-color: unset;
   }
 }
 

@@ -28,6 +28,6 @@ npx @openapitools/openapi-generator-cli generate \
   --skip-validate-spec
 ```
 
-This will generate the API client in `src/api-client`. If there are unresolved imports in the `src/apiClient/SupportDashboardApi.ts` or elsewhere, then you must add these missing files to `src/apiClient/.openapi-generator-ignore` to make sure that file is not ignored. 
+This will generate the API client in `src/api-client`. If there are unresolved imports in the `src/apiClient/SupportDashboardApi.ts` or elsewhere, then you must add these missing files to `src/apiClient/.openapi-generator-ignore` to make sure that file is not ignored.
 
 The reason that we have to do this is because `openapi-generator-cli` by default includes all models from the API in the output. And because this dashboard's source-code is publically available, we don't want to expose the complete API to the end-user. Hence, we only include the exact files we need. It would be nice if `openapi-generator-cli` did this by default as a feature based on the tags in the openAPI spec but unfortunately it doesn't do that. Alternatively, we could consider moving the complete application behind an authentication wall in the future. In that case we wouldn't have to worry about this.

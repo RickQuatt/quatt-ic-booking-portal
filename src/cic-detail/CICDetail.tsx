@@ -47,8 +47,8 @@ export function CICDetail({ data }: CICDetailProps) {
 
 function BackButton() {
   return (
-    <Link href={`/cics`} className={classes['back-button']}>
-      <ButtonLink className={classes['back-button']}>← Back to list</ButtonLink>
+    <Link href={`/cics`} className={classes["back-button"]}>
+      <ButtonLink className={classes["back-button"]}>← Back to list</ButtonLink>
     </Link>
-  )
+  );
 }

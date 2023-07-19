@@ -1,24 +1,23 @@
 import React from "react";
 import { AdminCic, CicAvailableWifiNetworksInner } from "../api-client/models";
-import { FormField, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
+import {
+  FormField,
+  FormFieldTitle,
+  FormFieldValue,
+  FormSection,
+} from "../ui-components/form/Form";
 import { formatDateDistance } from "../utils/formatDate";
 import classes from "./CICDetail.module.css";
 import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
 
-export function CICDetailNetworkConnection({
-  cicData
-}: {
-  cicData: AdminCic
-}) {
+export function CICDetailNetworkConnection({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
       <CICDetailSectionHeader title="Network connection" />
       <FormSection>
         <FormField>
-          <FormFieldTitle>
-            Last connection status updated at
-          </FormFieldTitle>
+          <FormFieldTitle>Last connection status updated at</FormFieldTitle>
           <FormFieldValue
             value={formatDateDistance(cicData.lastConnectionStatusUpdatedAt)}
           />
@@ -48,9 +47,7 @@ export function CICDetailNetworkConnection({
           <FormFieldValue value={cicData.isScanningForWifi} />
         </FormField>
         <FormField>
-          <FormFieldTitle>
-            Last scanned for Wifi
-          </FormFieldTitle>
+          <FormFieldTitle>Last scanned for Wifi</FormFieldTitle>
           <FormFieldValue
             value={formatDateDistance(cicData.lastScannedForWifi)}
           />
@@ -59,24 +56,23 @@ export function CICDetailNetworkConnection({
         {cicData.availableWifiNetworks && (
           <Accordion>
             {cicData.availableWifiNetworks.map((data, index) => (
-              <AvailableWifiNetwork key={index} data={data} index={index+1} />
+              <AvailableWifiNetwork key={index} data={data} index={index + 1} />
             ))}
           </Accordion>
         )}
       </FormSection>
     </div>
-  )
+  );
 }
-
 
 function AvailableWifiNetwork({
   index,
-  data
+  data,
 }: {
   index: number;
-  data: CicAvailableWifiNetworksInner
+  data: CicAvailableWifiNetworksInner;
 }) {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const [isOpen, setIsOpen] = React.useState(false);
   return (
     <AccordionItem
       title={`Available network ${index}: ${data.sSID}`}

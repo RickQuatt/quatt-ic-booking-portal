@@ -1,35 +1,55 @@
-import React from 'react'
+import React from "react";
 
-import { Installer } from '../api-client/models'
-import classes from './InstallerList.module.css'
-import { CodeFilter, CreatedDateFilter, InstallerFilters, IsActiveFilter, NameFilter, PhoneFilter, filterInstallerList } from './Filters'
-import { TBody, THead, Table, Td, TdText, Th, Tr } from '../ui-components/table/Table'
-import { formatDate } from '../utils/formatDate'
-import { Button } from '../ui-components/button/Button'
-import { InstallerModal, OpenInstallerModal, useInstallerModalState } from './InstallerModal'
-import { useApiClient } from '../api-client/context'
+import { Installer } from "../api-client/models";
+import classes from "./InstallerList.module.css";
+import {
+  CodeFilter,
+  CreatedDateFilter,
+  InstallerFilters,
+  IsActiveFilter,
+  NameFilter,
+  PhoneFilter,
+  filterInstallerList,
+} from "./Filters";
+import {
+  TBody,
+  THead,
+  Table,
+  Td,
+  TdText,
+  Th,
+  Tr,
+} from "../ui-components/table/Table";
+import { formatDate } from "../utils/formatDate";
+import { Button } from "../ui-components/button/Button";
+import {
+  InstallerModal,
+  OpenInstallerModal,
+  useInstallerModalState,
+} from "./InstallerModal";
+import { useApiClient } from "../api-client/context";
 
 export function InstallerList({
   data,
-  refetch
+  refetch,
 }: {
-  data: Installer[]
+  data: Installer[];
   refetch: () => void;
 }) {
-  const [filters, setFilters] = React.useState<InstallerFilters>({})
+  const [filters, setFilters] = React.useState<InstallerFilters>({});
   const hasFilters = React.useMemo(() => {
-    return Object.values(filters).length
-  }, [filters])
+    return Object.values(filters).length;
+  }, [filters]);
 
-  const installerListData = filterInstallerList(data, filters)
+  const installerListData = filterInstallerList(data, filters);
 
-  const [modalId, setModalId] = React.useState<string | undefined>()
+  const [modalId, setModalId] = React.useState<string | undefined>();
   const {
     isOpen: isInstallerModalOpen,
     open: openInstallerModal,
     close: closeInstallerModal,
     installerId,
-    data: installerData
+    data: installerData,
   } = useInstallerModalState();
 
   return (
@@ -42,15 +62,28 @@ export function InstallerList({
         // when adding a new installer, we need to refetch to make sure it's shown in the table afterwards
         onSuccess={refetch}
       />
-      <h2 className={classes['page-title']}>Installer List, {installerListData.length} {hasFilters ? 'filtered ' : ''}results</h2>
-      <Table gridClass={classes['table-grid']}>
+      <h2 className={classes["page-title"]}>
+        Installer List, {installerListData.length}{" "}
+        {hasFilters ? "filtered " : ""}results
+      </h2>
+      <Table gridClass={classes["table-grid"]}>
         <THead>
           <Tr>
-            <Th><TdText>Code</TdText></Th>
-            <Th><TdText>Name</TdText></Th>
-            <Th><TdText>Phone</TdText></Th>
-            <Th><TdText>Is active</TdText></Th>
-            <Th><TdText>Created at</TdText></Th>
+            <Th>
+              <TdText>Code</TdText>
+            </Th>
+            <Th>
+              <TdText>Name</TdText>
+            </Th>
+            <Th>
+              <TdText>Phone</TdText>
+            </Th>
+            <Th>
+              <TdText>Is active</TdText>
+            </Th>
+            <Th>
+              <TdText>Created at</TdText>
+            </Th>
             <Th>
               <Button onClick={() => openInstallerModal()}>
                 Add Installer
@@ -58,13 +91,22 @@ export function InstallerList({
             </Th>
           </Tr>
           <Tr>
-            <Th><CodeFilter setFilters={setFilters} /></Th>
-            <Th><NameFilter setFilters={setFilters} /></Th>
-            <Th><PhoneFilter setFilters={setFilters} /></Th>
-            <Th><IsActiveFilter setFilters={setFilters} /></Th>
-            <Th><CreatedDateFilter setFilters={setFilters} /></Th>
             <Th>
+              <CodeFilter setFilters={setFilters} />
             </Th>
+            <Th>
+              <NameFilter setFilters={setFilters} />
+            </Th>
+            <Th>
+              <PhoneFilter setFilters={setFilters} />
+            </Th>
+            <Th>
+              <IsActiveFilter setFilters={setFilters} />
+            </Th>
+            <Th>
+              <CreatedDateFilter setFilters={setFilters} />
+            </Th>
+            <Th></Th>
           </Tr>
         </THead>
         <TBody>
@@ -78,39 +120,59 @@ export function InstallerList({
         </TBody>
       </Table>
     </div>
-  )
+  );
 }
 
-function InstallerRow({ data, openInstallerModal }: { data: Installer, openInstallerModal: OpenInstallerModal }) {
-  const apiClient = useApiClient()
+function InstallerRow({
+  data,
+  openInstallerModal,
+}: {
+  data: Installer;
+  openInstallerModal: OpenInstallerModal;
+}) {
+  const apiClient = useApiClient();
   const deleteInstaller = React.useCallback(() => {
-    const confirmed = window.confirm("Are you sure you want to delete this installer?")
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this installer?",
+    );
     if (!confirmed) return;
-    apiClient.adminDeleteInstaller({ installerId: data.id })
-  }, [apiClient, data.id])
+    apiClient.adminDeleteInstaller({ installerId: data.id });
+  }, [apiClient, data.id]);
 
   return (
     <Tr>
-      <Td><TdText>{data.code}</TdText></Td>
-      <Td><TdText>{data.name}</TdText></Td>
-      <Td><TdText>{data.phone}</TdText></Td>
-      <Td><TdText>{formatIsActive(data.isActive)}</TdText></Td>
-      <Td><TdText>{formatDate(data.createdAt)}</TdText></Td>
       <Td>
-        <Button onClick={() => openInstallerModal({ installerId: data.id, data })}>
+        <TdText>{data.code}</TdText>
+      </Td>
+      <Td>
+        <TdText>{data.name}</TdText>
+      </Td>
+      <Td>
+        <TdText>{data.phone}</TdText>
+      </Td>
+      <Td>
+        <TdText>{formatIsActive(data.isActive)}</TdText>
+      </Td>
+      <Td>
+        <TdText>{formatDate(data.createdAt)}</TdText>
+      </Td>
+      <Td>
+        <Button
+          onClick={() => openInstallerModal({ installerId: data.id, data })}
+        >
           Edit
         </Button>
-        <Button onClick={deleteInstaller} style={{marginLeft: '12px'}}>
+        <Button onClick={deleteInstaller} style={{ marginLeft: "12px" }}>
           Delete
         </Button>
       </Td>
     </Tr>
-  )
+  );
 }
 
-function formatIsActive(isActive: Installer['isActive']) {
+function formatIsActive(isActive: Installer["isActive"]) {
   if (isActive === undefined) {
-    return ''
+    return "";
   }
-  return isActive ? 'Yes' : 'No'
+  return isActive ? "Yes" : "No";
 }

@@ -1,14 +1,15 @@
 import { AdminCic } from "../api-client/models";
-import { FormField, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
+import {
+  FormField,
+  FormFieldTitle,
+  FormFieldValue,
+  FormSection,
+} from "../ui-components/form/Form";
 import { formatDate } from "../utils/formatDate";
 import classes from "./CICDetail.module.css";
 import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 
-export function CICDetailUpdateInfo({
-  cicData
-}: {
-  cicData: AdminCic
-}) {
+export function CICDetailUpdateInfo({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
       <CICDetailSectionHeader title="Update info" />
@@ -29,10 +30,10 @@ export function CICDetailUpdateInfo({
           <FormFieldTitle>Needs update</FormFieldTitle>
           <FormFieldValue value={cicData.needsUpdate} />
         </FormField>
-          <FormField>
-            <FormFieldTitle>Update until</FormFieldTitle>
-            <FormFieldValue value={formatDate(cicData.updateUntil)} />
-          </FormField>
+        <FormField>
+          <FormFieldTitle>Update until</FormFieldTitle>
+          <FormFieldValue value={formatDate(cicData.updateUntil)} />
+        </FormField>
         <FormField>
           <FormFieldTitle>Mender ID</FormFieldTitle>
           <FormFieldValue value={cicData.menderId} />
@@ -43,5 +44,5 @@ export function CICDetailUpdateInfo({
         </FormField>
       </FormSection>
     </div>
-  )
+  );
 }

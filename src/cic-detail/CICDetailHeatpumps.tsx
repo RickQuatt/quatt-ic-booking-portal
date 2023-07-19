@@ -1,15 +1,16 @@
 import React from "react";
 import { AdminCic } from "../api-client/models";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
-import { FormField, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
+import {
+  FormField,
+  FormFieldTitle,
+  FormFieldValue,
+  FormSection,
+} from "../ui-components/form/Form";
 import classes from "./CICDetail.module.css";
 import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 
-export function CICDetailHeatpumps({
-  cicData
-}: {
-  cicData: AdminCic
-}) {
+export function CICDetailHeatpumps({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
       <CICDetailSectionHeader title="Heat pumps" />
@@ -33,22 +34,26 @@ export function CICDetailHeatpumps({
 
         <Accordion>
           {cicData.heatPumps.map((heatpump, index) => (
-            <CICDetailHeatpump key={index} heatpump={heatpump} index={index+1} />
+            <CICDetailHeatpump
+              key={index}
+              heatpump={heatpump}
+              index={index + 1}
+            />
           ))}
         </Accordion>
       </FormSection>
     </div>
-  )
+  );
 }
 
 function CICDetailHeatpump({
   index,
-  heatpump
+  heatpump,
 }: {
   index: number;
-  heatpump: AdminCic['heatPumps'][0]
+  heatpump: AdminCic["heatPumps"][0];
 }) {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const [isOpen, setIsOpen] = React.useState(false);
   return (
     <AccordionItem
       title={`Heat pump ${index}`}

@@ -1,6 +1,4 @@
-
 .accordion {
-
 }
 
 .accordion-item {
@@ -15,7 +13,7 @@
   padding: 0 16px;
   display: flex;
   align-items: center;
-  background: #F7F7F7;
+  background: #f7f7f7;
   cursor: pointer;
 
   & > div {

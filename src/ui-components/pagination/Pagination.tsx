@@ -15,7 +15,6 @@ export function Pagination({
   currentPage,
   changePage,
 }: Props) {
-
   const nextPage = React.useCallback(() => {
     changePage(currentPage + 1);
   }, [changePage, currentPage]);
@@ -42,7 +41,11 @@ export function Pagination({
 
       {paginationRange.map((value, i) => {
         if (value === DOTS) {
-          return <li key={i} className={classes['pagination-item']}>...</li>
+          return (
+            <li key={i} className={classes["pagination-item"]}>
+              ...
+            </li>
+          );
         }
 
         return (
@@ -55,7 +58,7 @@ export function Pagination({
           >
             {value}
           </li>
-        )
+        );
       })}
       <li
         className={classNames(classes["pagination-item"], {

@@ -1,7 +1,3 @@
 {
-  "recommendations": [
-    "arcanis.vscode-zipfs",
-    "dbaeumer.vscode-eslint",
-    "clinyong.vscode-css-modules"
-  ]
+  "recommendations": ["dbaeumer.vscode-eslint", "clinyong.vscode-css-modules"]
 }

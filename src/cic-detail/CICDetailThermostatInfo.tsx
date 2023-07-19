@@ -1,13 +1,14 @@
 import { AdminCic } from "../api-client/models";
-import { FormField, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
+import {
+  FormField,
+  FormFieldTitle,
+  FormFieldValue,
+  FormSection,
+} from "../ui-components/form/Form";
 import classes from "./CICDetail.module.css";
 import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 
-export function CICDetailThermostatInfo({
-  cicData
-}: {
-  cicData: AdminCic
-}) {
+export function CICDetailThermostatInfo({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
       <CICDetailSectionHeader title="Thermostat info" />
@@ -46,5 +47,5 @@ export function CICDetailThermostatInfo({
         </FormField>
       </FormSection>
     </div>
-  )
+  );
 }

@@ -1,20 +1,21 @@
 import { AdminCic } from "../api-client/models";
-import { FormField, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
+import {
+  FormField,
+  FormFieldTitle,
+  FormFieldValue,
+  FormSection,
+} from "../ui-components/form/Form";
 import classes from "./CICDetail.module.css";
 import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 
-export function CICDetailExtra({
-  cicData
-}: {
-  cicData: AdminCic
-}) {
+export function CICDetailExtra({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
       <CICDetailSectionHeader title="Extra details" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Heat delivery systems</FormFieldTitle>
-          <FormFieldValue value={cicData.heatDeliverySystems?.join(', ')} />
+          <FormFieldValue value={cicData.heatDeliverySystems?.join(", ")} />
         </FormField>
         <FormField>
           <FormFieldTitle>Flow rate</FormFieldTitle>
@@ -42,5 +43,5 @@ export function CICDetailExtra({
         </FormField>
       </FormSection>
     </div>
-  )
+  );
 }

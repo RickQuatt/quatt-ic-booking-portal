@@ -1,15 +1,16 @@
-import React from 'react'
-import classNames from 'classnames'
+import React from "react";
+import classNames from "classnames";
 
-import classes from './Button.module.css'
+import classes from "./Button.module.css";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  color?: "danger"
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  color?: "danger";
 }
 
 export const Button = ({
   color,
-  type="button",
+  type = "button",
   ...restProps
 }: ButtonProps) => {
   return (
@@ -18,11 +19,12 @@ export const Button = ({
       type={type}
       className={classNames(classes.button, color && classes[color])}
     />
-  )
-}
+  );
+};
 
-interface ButtonLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
-  color?: "danger"
+interface ButtonLinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  color?: "danger";
   disabled?: boolean;
 }
 
@@ -39,7 +41,7 @@ export const ButtonLink = ({
         classes.button,
         color && classes[color],
         disabled && classes.disabled,
-        className
+        className,
       )}
     />
   );

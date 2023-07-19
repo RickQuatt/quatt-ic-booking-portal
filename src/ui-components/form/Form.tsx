@@ -21,7 +21,7 @@ type FormFieldValueProps = {
   value?: string | number | boolean | null;
 };
 export function FormFieldValue({ value }: FormFieldValueProps) {
-  const stringValue = typeof value === 'boolean' ? String(value) : value
+  const stringValue = typeof value === "boolean" ? String(value) : value;
   return (
     <span className={classes["form-field-value"]}>{stringValue ?? "N/A"}</span>
   );
@@ -39,12 +39,8 @@ export function FormFieldJson({ value }: FormFieldJsonProps) {
 }
 
 const FormFieldError = ({ children }: React.PropsWithChildren) => {
-  return (
-    <div className={classes["form-field-error"]}>
-      ⚠ {children}
-    </div>
-  )
-}
+  return <div className={classes["form-field-error"]}>⚠ {children}</div>;
+};
 
 interface FormFieldInputProps extends InputProps {
   error?: FieldError;
@@ -53,10 +49,7 @@ interface FormFieldInputProps extends InputProps {
 export const FormFieldInput = React.forwardRef<
   HTMLInputElement,
   FormFieldInputProps
->(function FormFieldInput(
-  { error, ...inputProps },
-  ref
-) {
+>(function FormFieldInput({ error, ...inputProps }, ref) {
   return (
     <div>
       <Input ref={ref} {...inputProps} />
@@ -69,14 +62,10 @@ interface FormSelectProps extends SelectProps {
   error?: FieldError;
 }
 
-
 export const FormSelectInput = React.forwardRef<
   HTMLSelectElement,
   FormSelectProps
->(function FormSelectInput(
-  { error, ...selectProps },
-  ref
-) {
+>(function FormSelectInput({ error, ...selectProps }, ref) {
   return (
     <div>
       <Select ref={ref} {...selectProps} />

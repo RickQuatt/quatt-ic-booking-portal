@@ -1,16 +1,21 @@
 import { AdminCic } from "../api-client/models";
 import { Button, ButtonLink } from "../ui-components/button/Button";
-import { FormField, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
+import {
+  FormField,
+  FormFieldTitle,
+  FormFieldValue,
+  FormSection,
+} from "../ui-components/form/Form";
 import { useModalState } from "../ui-components/modal/useModalState";
 import { AdvancedSettingsModal } from "./AdvancedSettingsModal";
 import classes from "./CICDetail.module.css";
-import { getGrafanaLink, getHubspotSearchOrderLink, getMenderLink } from "./getLinks";
+import {
+  getGrafanaLink,
+  getHubspotSearchOrderLink,
+  getMenderLink,
+} from "./getLinks";
 
-export function CICDetailSide({
-  cicData
-}: {
-  cicData: AdminCic
-}) {
+export function CICDetailSide({ cicData }: { cicData: AdminCic }) {
   const {
     isOpen: isAdvancedSettingsModalOpen,
     open: openAdvancedSettingsModal,

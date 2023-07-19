@@ -5,7 +5,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { useApiClient } from "../api-client/context";
 import { AdminCic } from "../api-client/models";
-import { FormField, FormFieldInput, FormFieldTitle, FormFieldValue, FormSection } from "../ui-components/form/Form";
+import {
+  FormField,
+  FormFieldInput,
+  FormFieldTitle,
+  FormFieldValue,
+  FormSection,
+} from "../ui-components/form/Form";
 import { Button } from "../ui-components/button/Button";
 import classes from "./CICDetail.module.css";
 import { formatDate, formatDateDistance } from "../utils/formatDate";
@@ -50,11 +56,7 @@ const CICDetailFormSchema = yup.object({
 
 type CICDetailFormData = yup.InferType<typeof CICDetailFormSchema>;
 
-export function CICDetailMain({
-  cicData
-}: {
-  cicData: AdminCic
-}) {
+export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
   const {
     register,
     handleSubmit,
@@ -76,16 +78,19 @@ export function CICDetailMain({
   });
 
   const apiClient = useApiClient();
-  const onSubmit = React.useCallback(async (data: CICDetailFormData) => {
-    const response = await apiClient.adminUpdateCic({
-      cicId: cicData.id,
-      updateAdminCic: data,
-    });
-    if (response.meta.status === 200) {
-      // this sets isDirty back to false
-      reset({}, { keepValues: true });
-    }
-  }, [apiClient, cicData.id, reset])
+  const onSubmit = React.useCallback(
+    async (data: CICDetailFormData) => {
+      const response = await apiClient.adminUpdateCic({
+        cicId: cicData.id,
+        updateAdminCic: data,
+      });
+      if (response.meta.status === 200) {
+        // this sets isDirty back to false
+        reset({}, { keepValues: true });
+      }
+    },
+    [apiClient, cicData.id, reset],
+  );
 
   return (
     <div className={classes["detail-section"]}>
@@ -105,13 +110,9 @@ export function CICDetailMain({
             <FormFieldValue value={cicData.quattBuild} />
           </FormField>
           <FormField>
-            <FormFieldTitle>
-              Last connection status updated at
-            </FormFieldTitle>
+            <FormFieldTitle>Last connection status updated at</FormFieldTitle>
             <FormFieldValue
-              value={formatDateDistance(
-                cicData.lastConnectionStatusUpdatedAt
-              )}
+              value={formatDateDistance(cicData.lastConnectionStatusUpdatedAt)}
             />
           </FormField>
           <FormField>
@@ -203,5 +204,5 @@ export function CICDetailMain({
         </form>
       </FormSection>
     </div>
-  )
+  );
 }

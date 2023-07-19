@@ -11,7 +11,10 @@ import {
   ModalHeader,
   ModalProps,
 } from "../ui-components/modal/Modal";
-import { AdminCreateInstaller200Response, Installer } from "../api-client/models";
+import {
+  AdminCreateInstaller200Response,
+  Installer,
+} from "../api-client/models";
 import { useApiClient } from "../api-client/context";
 import {
   FormField,
@@ -28,29 +31,27 @@ interface Props extends ModalProps {
 }
 
 const requiredFieldText = "This field is required";
-const codeRegex = /^\w{4}-\w{4}$/
-const phoneRegexName = /^\+.*/
-const phoneValidateFailText = "The phone number should be of the form +XXYYYYYYYY"
+const codeRegex = /^\w{4}-\w{4}$/;
+const phoneRegexName = /^\+.*/;
+const phoneValidateFailText =
+  "The phone number should be of the form +XXYYYYYYYY";
 
-function generateInstallerCode(){
-  return btoa(Math.random().toString()).substring(10,14).toUpperCase()+"-"+btoa(Math.random().toString()).substring(10,14).toUpperCase();
- }
+function generateInstallerCode() {
+  return (
+    btoa(Math.random().toString()).substring(10, 14).toUpperCase() +
+    "-" +
+    btoa(Math.random().toString()).substring(10, 14).toUpperCase()
+  );
+}
 
 const InstallerFormSchema = yup.object({
-  code: yup
-    .string()
-    .required(requiredFieldText)
-    .matches(codeRegex),
-  name: yup
-    .string()
-    .required(requiredFieldText),
+  code: yup.string().required(requiredFieldText).matches(codeRegex),
+  name: yup.string().required(requiredFieldText),
   phone: yup
     .string()
     .required(requiredFieldText)
     .matches(phoneRegexName, phoneValidateFailText),
-  isActive: yup
-    .bool()
-    .required(requiredFieldText)
+  isActive: yup.bool().required(requiredFieldText),
 });
 
 type InstallerFormData = yup.InferType<typeof InstallerFormSchema>;
@@ -60,17 +61,16 @@ export function InstallerModal({
   closeModal,
   installerId,
   installerData,
-  onSuccess
+  onSuccess,
 }: Props) {
-
   const defaultValues = React.useMemo(() => {
     return {
       code: installerData?.code ?? generateInstallerCode(),
       name: installerData?.name,
       phone: installerData?.phone,
-      isActive: installerData?.isActive ?? false
-    }
-  }, [installerData])
+      isActive: installerData?.isActive ?? false,
+    };
+  }, [installerData]);
 
   const {
     register,
@@ -84,46 +84,40 @@ export function InstallerModal({
   });
 
   React.useEffect(() => {
-    reset(defaultValues)
+    reset(defaultValues);
 
     return () => {
-      reset()
-    }
-  }, [reset, defaultValues])
+      reset();
+    };
+  }, [reset, defaultValues]);
 
   // console.log(watch("orderNumber")); // watch input value by passing the name of it
 
   const apiClient = useApiClient();
-  const onSubmit = React.useCallback(async (data: InstallerFormData) => {
+  const onSubmit = React.useCallback(
+    async (data: InstallerFormData) => {
+      let response: AdminCreateInstaller200Response;
 
-    let response: AdminCreateInstaller200Response
+      if (installerId) {
+        response = await apiClient.adminUpdateInstaller({
+          installerId,
+          createUpdateInstaller: data,
+        });
+      } else {
+        response = await apiClient.adminCreateInstaller({
+          createUpdateInstaller: data,
+        });
+      }
 
-    if (installerId) {
-      response = await apiClient.adminUpdateInstaller({
-        installerId,
-        createUpdateInstaller: data
-      });
-    }
-    else {
-      response = await apiClient.adminCreateInstaller({
-        createUpdateInstaller: data
-      });
-    }
-
-    if (response.meta.status === 200) {
-      // this sets isDirty back to false
-      reset({}, { keepValues: true });
-      closeModal()
-      onSuccess()
-    }
-
-  }, [
-    apiClient,
-    installerId,
-    closeModal,
-    reset,
-    onSuccess
-  ])
+      if (response.meta.status === 200) {
+        // this sets isDirty back to false
+        reset({}, { keepValues: true });
+        closeModal();
+        onSuccess();
+      }
+    },
+    [apiClient, installerId, closeModal, reset, onSuccess],
+  );
 
   return (
     <Modal isOpen={isOpen} closeModal={closeModal}>
@@ -163,14 +157,10 @@ export function InstallerModal({
               </FormSelectInput>
             </FormField>
           </FormSection>
-
         </ModalContent>
         <ModalActions>
           <ModalCloseButton onClick={closeModal} />
-          <ModalConfirmButton
-            type="submit"
-            disabled={!isDirty || isSubmitting}
-          >
+          <ModalConfirmButton type="submit" disabled={!isDirty || isSubmitting}>
             Submit
           </ModalConfirmButton>
         </ModalActions>
@@ -179,31 +169,34 @@ export function InstallerModal({
   );
 }
 
-export type OpenInstallerModal = (args?: { installerId?: string, data?: Installer }) => void
+export type OpenInstallerModal = (args?: {
+  installerId?: string;
+  data?: Installer;
+}) => void;
 
 export const useInstallerModalState = (defaultState?: boolean) => {
-  const [installerId, setInstallerId] = React.useState<string | undefined>()
-  const [data, setData] = React.useState<Installer | undefined>()
+  const [installerId, setInstallerId] = React.useState<string | undefined>();
+  const [data, setData] = React.useState<Installer | undefined>();
   const [isOpen, setIsOpen] = React.useState(() => {
-    return defaultState ?? false
-  })
+    return defaultState ?? false;
+  });
 
   const toggleIsOpen = React.useCallback(() => {
-    setIsOpen(isOpen => !isOpen)
-  }, [])
+    setIsOpen((isOpen) => !isOpen);
+  }, []);
 
-  const open = React.useCallback<OpenInstallerModal>(({
-    installerId,
-    data
-  } = {}) => {
-    setIsOpen(true)
-    setInstallerId(installerId)
-    setData(data)
-  }, [])
+  const open = React.useCallback<OpenInstallerModal>(
+    ({ installerId, data } = {}) => {
+      setIsOpen(true);
+      setInstallerId(installerId);
+      setData(data);
+    },
+    [],
+  );
 
   const close = React.useCallback(() => {
-    setIsOpen(false)
-  }, [])
+    setIsOpen(false);
+  }, []);
 
-  return { isOpen, toggleIsOpen, open, close, installerId, data }
-}
+  return { isOpen, toggleIsOpen, open, close, installerId, data };
+};

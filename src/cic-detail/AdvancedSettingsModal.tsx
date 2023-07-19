@@ -31,11 +31,15 @@ const requiredFieldText = "This field is required";
 // required for inputs of type="number"
 const transformNaN = (value: unknown) => (Number.isNaN(value) ? null : value);
 
-const orderIdValidateText = "Should have the following format: QUATTxxxx, where x is a number"
-const orderIdReg = /^(QUATT)\d{1,7}$/
+const orderIdValidateText =
+  "Should have the following format: QUATTxxxx, where x is a number";
+const orderIdReg = /^(QUATT)\d{1,7}$/;
 
 const CICAdvancedFormSchema = yup.object({
-  orderNumber: yup.string().matches(orderIdReg, orderIdValidateText).required(requiredFieldText),
+  orderNumber: yup
+    .string()
+    .matches(orderIdReg, orderIdValidateText)
+    .required(requiredFieldText),
   silentMode: yup
     .string()
     .required(requiredFieldText)
@@ -59,18 +63,18 @@ const CICAdvancedFormSchema = yup.object({
     .transform(transformNaN)
     .required(requiredFieldText)
     .min(1)
-    .max(2)
+    .max(2),
 });
 
 // TODO: get yup to infer the right type (the enums)? - 2023-07-14
 type CICAdvancedFormData = yup.InferType<typeof CICAdvancedFormSchema>;
 type CICAdvancedFormDataActual = {
-  orderNumber: NonNullable<AdminCic['orderNumber']>
-  silentMode: AdminCic['silentMode']
-  boilerType: AdminCic['boilerType']
-  thermostatType: AdminCic['thermostatType']
-  numberOfHeatPumps: NonNullable<AdminCic['numberOfHeatPumps']>
-}
+  orderNumber: NonNullable<AdminCic["orderNumber"]>;
+  silentMode: AdminCic["silentMode"];
+  boilerType: AdminCic["boilerType"];
+  thermostatType: AdminCic["thermostatType"];
+  numberOfHeatPumps: NonNullable<AdminCic["numberOfHeatPumps"]>;
+};
 
 export function AdvancedSettingsModal({
   isOpen,
@@ -92,37 +96,38 @@ export function AdvancedSettingsModal({
       silentMode: cicData.silentMode,
       boilerType: cicData.boilerType,
       thermostatType: cicData.thermostatType,
-      numberOfHeatPumps: cicData.numberOfHeatPumps === null ? undefined : cicData.numberOfHeatPumps,
+      numberOfHeatPumps:
+        cicData.numberOfHeatPumps === null
+          ? undefined
+          : cicData.numberOfHeatPumps,
     },
   });
 
   // console.log(watch("orderNumber")); // watch input value by passing the name of it
 
   const apiClient = useApiClient();
-  const onSubmit = React.useCallback(async (data: CICAdvancedFormData) => {
-    if (
-      !window.confirm(
-        "Are you sure you would like to update these critical CIC settings?"
-      )
-    ) {
-      return;
-    }
+  const onSubmit = React.useCallback(
+    async (data: CICAdvancedFormData) => {
+      if (
+        !window.confirm(
+          "Are you sure you would like to update these critical CIC settings?",
+        )
+      ) {
+        return;
+      }
 
-    const response = await apiClient.adminUpdateCic({
-      cicId,
-      updateAdminCic: data as unknown as CICAdvancedFormDataActual,
-    });
-    if (response.meta.status === 200) {
-      // this sets isDirty back to false
-      reset({}, { keepValues: true });
-      closeModal()
-    }
-  }, [
-    apiClient,
-    cicId,
-    closeModal,
-    reset
-  ])
+      const response = await apiClient.adminUpdateCic({
+        cicId,
+        updateAdminCic: data as unknown as CICAdvancedFormDataActual,
+      });
+      if (response.meta.status === 200) {
+        // this sets isDirty back to false
+        reset({}, { keepValues: true });
+        closeModal();
+      }
+    },
+    [apiClient, cicId, closeModal, reset],
+  );
 
   return (
     <Modal isOpen={isOpen} closeModal={closeModal}>
@@ -182,10 +187,7 @@ export function AdvancedSettingsModal({
         </ModalContent>
         <ModalActions>
           <ModalCloseButton onClick={closeModal} />
-          <ModalConfirmButton
-            type="submit"
-            disabled={!isDirty || isSubmitting}
-          >
+          <ModalConfirmButton type="submit" disabled={!isDirty || isSubmitting}>
             Submit
           </ModalConfirmButton>
         </ModalActions>
