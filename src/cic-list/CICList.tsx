@@ -19,22 +19,37 @@ import { AdminCic, ConnectionStatus } from '../api-client/models'
 import { formatDate, formatDateDistance } from '../utils/formatDate'
 import { getGrafanaLink, getMenderLink } from '../cic-detail/getLinks'
 import { TBody, THead, Table, Td, TdText, Th, Tr } from '../ui-components/table/Table'
+import { usePaginate } from '../ui-components/pagination/usePaginate'
+import { Pagination } from '../ui-components/pagination/Pagination'
 
 export function CICList({
   data
 }: {
   data: AdminCic[]
 }) {
-  const [filters, setFilters] = React.useState<CICFilters>({})
+  const [filters, doSetFilters] = React.useState<CICFilters>({})
   const hasFilters = React.useMemo(() => {
     return Object.values(filters).length
   }, [filters])
 
-  const CICListData = filterCICList(data, filters)
+  const filteredItems = React.useMemo(
+    () => filterCICList(data, filters),
+    [data, filters]
+  );
+
+  const { paginatedItems, paginationRange, currentPage, changePage } = usePaginate({
+    items: filteredItems,
+    pageSize: 50
+  })
+
+  const setFilters = React.useCallback((filters: React.SetStateAction<CICFilters>) => {
+    doSetFilters(filters)
+    changePage(1)
+  }, [changePage])
 
   return (
     <div className={classes.page}>
-      <h2 className={classes['page-title']}>CIC List, {CICListData.length} {hasFilters ? 'filtered ' : ''}results</h2>
+      <h2 className={classes['page-title']}>CIC List, {filteredItems.length} {hasFilters ? 'filtered ' : ''}results</h2>
       <Table gridClass={classes['table-grid']}>
         <THead>
           <Tr>
@@ -65,7 +80,7 @@ export function CICList({
           </Tr>
         </THead>
         <TBody>
-          {CICListData.map((cicEntry) => (
+          {paginatedItems.map((cicEntry) => (
             <CICRow
               key={cicEntry.id}
               cicEntry={cicEntry}
@@ -73,6 +88,11 @@ export function CICList({
           ))}
         </TBody>
       </Table>
+      <Pagination
+        paginationRange={paginationRange}
+        currentPage={currentPage}
+        changePage={changePage}
+      />
     </div>
   )
 }
