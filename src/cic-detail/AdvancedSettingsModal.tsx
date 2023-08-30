@@ -31,15 +31,7 @@ const requiredFieldText = "This field is required";
 // required for inputs of type="number"
 const transformNaN = (value: unknown) => (Number.isNaN(value) ? null : value);
 
-const orderIdValidateText =
-  "Should have the following format: QUATTxxxx, where x is a number";
-const orderIdReg = /^(QUATT)\d{1,7}$/;
-
 const CICAdvancedFormSchema = yup.object({
-  orderNumber: yup
-    .string()
-    .matches(orderIdReg, orderIdValidateText)
-    .required(requiredFieldText),
   silentMode: yup
     .string()
     .required(requiredFieldText)
@@ -69,7 +61,6 @@ const CICAdvancedFormSchema = yup.object({
 // TODO: get yup to infer the right type (the enums)? - 2023-07-14
 type CICAdvancedFormData = yup.InferType<typeof CICAdvancedFormSchema>;
 type CICAdvancedFormDataActual = {
-  orderNumber: NonNullable<AdminCic["orderNumber"]>;
   silentMode: AdminCic["silentMode"];
   boilerType: AdminCic["boilerType"];
   thermostatType: AdminCic["thermostatType"];
@@ -86,13 +77,10 @@ export function AdvancedSettingsModal({
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<CICAdvancedFormData>({
     resolver: yupResolver(CICAdvancedFormSchema),
     defaultValues: {
-      orderNumber:
-        cicData.orderNumber === null ? undefined : cicData.orderNumber,
       silentMode: cicData.silentMode,
       boilerType: cicData.boilerType,
       thermostatType: cicData.thermostatType,
@@ -102,8 +90,6 @@ export function AdvancedSettingsModal({
           : cicData.numberOfHeatPumps,
     },
   });
-
-  // console.log(watch("orderNumber")); // watch input value by passing the name of it
 
   const apiClient = useApiClient();
   const onSubmit = React.useCallback(
@@ -138,14 +124,6 @@ export function AdvancedSettingsModal({
             <FormField>
               <FormFieldTitle>ID</FormFieldTitle>
               <FormFieldValue value={cicData.id} />
-            </FormField>
-            <FormField>
-              <FormFieldTitle>Order number *</FormFieldTitle>
-              <FormFieldInput
-                type="text"
-                error={errors.orderNumber}
-                {...register("orderNumber")}
-              />
             </FormField>
             <FormField>
               <FormFieldTitle>Silent mode</FormFieldTitle>
