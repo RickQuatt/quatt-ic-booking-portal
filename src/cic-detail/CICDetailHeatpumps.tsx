@@ -25,7 +25,7 @@ export function CICDetailHeatpumps({ cicData }: { cicData: AdminCic }) {
         </FormField>
         <FormField>
           <FormFieldTitle>Is HP2 connected</FormFieldTitle>
-          <FormFieldValue value={cicData.isHp1Connected} />
+          <FormFieldValue value={cicData.isHp2Connected} />
         </FormField>
         <FormField>
           <FormFieldTitle>Use pricing to limit heat pump</FormFieldTitle>
