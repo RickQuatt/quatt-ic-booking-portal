@@ -3,7 +3,7 @@ export function getMenderLink(id: string) {
 }
 
 export function getGrafanaLink(id: string) {
-  return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/HaR0DRlVk/production?orgId=1&from=now-6h&to=now&var-CICuuid=${id}`;
+  return `https://g-fd0b96b931.grafana-workspace.eu-west-1.amazonaws.com/d/0px6CXfVk/production-athena?orgId=1&from=now-6h&to=now&var-CICuuid=${id}&refresh=1m`;
 }
 
 export function getHubspotSearchOrderLink(orderNumber: string) {
