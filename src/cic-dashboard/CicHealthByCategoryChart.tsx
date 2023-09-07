@@ -119,7 +119,7 @@ export function CicHealthByCategoryChart({
         categoryFilters: { [category]: healthCheckStatus },
       } as CICFilters;
 
-      navigate(`/cicHealth?${stringifyCICFilters(filter)}`);
+      navigate(`/cicHealth?orderNumber=quatt&${stringifyCICFilters(filter)}`);
     },
     [chartData.datasets, categories],
   );

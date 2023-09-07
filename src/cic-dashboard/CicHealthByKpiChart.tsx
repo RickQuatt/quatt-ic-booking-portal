@@ -128,7 +128,7 @@ export function CicHealthByKpiChart({
       const healthCheckStatus = chartData.datasets[element.datasetIndex].status;
       const filter = { kpiFilters: { [kpi]: healthCheckStatus } } as CICFilters;
 
-      navigate(`/cicHealth?${stringifyCICFilters(filter)}`);
+      navigate(`/cicHealth?orderNumber=quatt&${stringifyCICFilters(filter)}`);
     },
     [chartData.datasets, kpis],
   );

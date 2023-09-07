@@ -72,7 +72,7 @@ export function CicHealthAggregateChart({
         chartData.datasets[0].data[element.index].status;
       const filter = { healthCheck: healthCheckStatus };
 
-      navigate(`/cicHealth?${stringifyCICFilters(filter)}`);
+      navigate(`/cicHealth?orderNumber=quatt&${stringifyCICFilters(filter)}`);
     },
     [chartData.datasets],
   );
