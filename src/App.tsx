@@ -20,15 +20,14 @@ const queryClient = new QueryClient();
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const token = await user.getIdToken();
         setUser(user);
-        setToken(token);
+        setIsAuthenticated(true);
       }
       setLoading(false);
     });
@@ -36,14 +35,14 @@ function App() {
 
   if (loading) return null;
 
-  return !user || !token ? (
+  return !user || !isAuthenticated ? (
     <SignIn />
   ) : (
     <div className={classes["main-container"]}>
       <Sidebar />
       <div className={classes["main-content"]}>
         <QueryClientProvider client={queryClient}>
-          <ApiClientProvider token={token}>
+          <ApiClientProvider>
             <Route path="/">
               <Redirect to="/dashboard" replace />
             </Route>

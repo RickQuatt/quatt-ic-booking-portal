@@ -3,19 +3,20 @@ import React from "react";
 import { SupportDashboardApi } from "./apis/SupportDashboardApi";
 import { Configuration } from "./runtime";
 import { useContextWithCheck } from "../utils/useContextWithCheck";
+import firebase from "firebase/compat/app";
 
 const ApiClientContext = React.createContext<SupportDashboardApi | undefined>(
   undefined,
 );
 
-type ProviderProps = React.PropsWithChildren<{ token: string }>;
+type ProviderProps = React.PropsWithChildren;
 
-export const ApiClientProvider = ({ children, token }: ProviderProps) => {
+export const ApiClientProvider = ({ children }: ProviderProps) => {
   const [apiClient] = React.useState(() => {
     return new SupportDashboardApi(
       new Configuration({
         basePath: import.meta.env.VITE_API_BASE_PATH as string,
-        accessToken: token,
+        accessToken: () => firebase.auth().currentUser!.getIdToken(),
       }),
     );
   });
