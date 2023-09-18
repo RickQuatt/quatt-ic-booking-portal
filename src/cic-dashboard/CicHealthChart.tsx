@@ -6,6 +6,8 @@ import {
   correctColor,
   errorBorderColor,
   errorColor,
+  notApplicableBorderColor,
+  notApplicableColor,
   warningBorderColor,
   warningColor,
 } from "./colors";
@@ -34,10 +36,14 @@ export function CicHealthAggregateChart({
   const chartRef = React.useRef();
   const chartData = React.useMemo(() => {
     return {
-      labels: ["All good", "Warning", "Error"],
+      labels: ["Not applicable", "All good", "Warning", "Error"],
       datasets: [
         {
           data: [
+            {
+              status: "notApplicable" as const,
+              value: data.notApplicable,
+            },
             {
               status: "correct" as const,
               value: data.correct,
@@ -51,8 +57,14 @@ export function CicHealthAggregateChart({
               value: data.error,
             },
           ],
-          backgroundColor: [correctColor, warningColor, errorColor],
+          backgroundColor: [
+            notApplicableColor,
+            correctColor,
+            warningColor,
+            errorColor,
+          ],
           borderColor: [
+            notApplicableBorderColor,
             correctBorderColor,
             warningBorderColor,
             errorBorderColor,

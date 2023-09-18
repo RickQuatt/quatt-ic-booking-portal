@@ -20,7 +20,12 @@ ChartJS.register(
 
 import { Bar, getElementAtEvent } from "react-chartjs-2";
 import { CicDashboardAggregate } from "../api-client/models";
-import { correctColor, errorColor, warningColor } from "./colors";
+import {
+  correctColor,
+  errorColor,
+  notApplicableColor,
+  warningColor,
+} from "./colors";
 import { getKeys, getValues } from "../utils/object";
 import { CICFilters } from "../cic-list/filters/types";
 import { stringifyCICFilters } from "../cic-list/filters/url";
@@ -85,6 +90,12 @@ export function CicHealthByCategoryChart({
 
     return {
       datasets: [
+        {
+          label: "Not applicable",
+          status: "notApplicable" as const,
+          data: datasets.notApplicable,
+          backgroundColor: notApplicableColor,
+        },
         {
           label: "All good",
           status: "correct" as const,
