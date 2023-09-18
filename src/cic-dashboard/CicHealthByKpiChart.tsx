@@ -54,7 +54,7 @@ const options = {
 export const kpiToLabel = {
   validSettings: "Cloud settings",
   isConnectedAWS: "Is online",
-  isConnectedInternet: "Is connected to Wifi or Ethernet",
+  isConnectedInternet: "Internet connectivity",
   hasLatestSoftware: "Has latest software version",
   isCommissioned: "Is commissioned",
   cloudConsistency: "Cloud settings consistency",
