@@ -8,8 +8,8 @@ import {
   FormSection,
 } from "../ui-components/form/Form";
 import { getEntries } from "../utils/object";
-import { kpiToLabel } from "../cic-dashboard/CicHealthByKpiChart";
 import { HealthCheckCircle } from "../cic-health-list/HealthCheckCircle";
+import { kpiToLabel } from "../constants";
 
 export function CICDetailHealthChecks({ cicData }: { cicData: AdminCic }) {
   const rows = React.useMemo(() => {

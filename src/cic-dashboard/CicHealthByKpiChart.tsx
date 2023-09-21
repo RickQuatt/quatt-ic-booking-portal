@@ -19,7 +19,10 @@ ChartJS.register(
 );
 
 import { Bar, getElementAtEvent } from "react-chartjs-2";
-import { CicDashboardAggregate } from "../api-client/models";
+import {
+  CicHealthChecksByKpi,
+  CicDashboardAggregate,
+} from "../api-client/models";
 import {
   correctColor,
   errorColor,
@@ -30,6 +33,7 @@ import { getKeys, getValues } from "../utils/object";
 import { navigate } from "wouter/use-location";
 import { stringifyCICFilters } from "../cic-list/filters/url";
 import { CICFilters } from "../cic-list/filters/types";
+import { kpiToLabel, labelToKpi } from "../constants";
 
 const options = {
   indexAxis: "y" as const,
@@ -37,6 +41,52 @@ const options = {
     title: {
       display: true,
       text: "CIC health per KPI",
+    },
+    tooltip: {
+      callbacks: {
+        beforeBody: (value: any) => {
+          const kpi = labelToKpi[value[0].label] as keyof CicHealthChecksByKpi;
+
+          switch (kpi) {
+            case "validSettings":
+              return "CiC should have valid (non-null) settings in the cloud";
+            case "isConnectedAWS":
+              return "CiC is online in Quatt AWS";
+            case "isConnectedInternet":
+              return "CiC is connected to Wifi or ethernet (this is only reliable when CiC is online in AWS)";
+            case "hasLatestSoftware":
+              return "CIC has the latest software version";
+            case "isCommissioned":
+              return "CiC is properly commissioned";
+            case "cloudConsistency":
+              return "The following settings should be consistent between CiC and cloud: `thermostatType`, `boilerType`, `numberOfHeatpumps`, `ratedMaximumHousePower`, `maximumHeatingOutdoorTemperature`";
+            case "runningController":
+              return "Ensure the correct controller (based on cloud setting) is running";
+            case "thermostatConnected":
+              return "Check if a thermostat is connected";
+            case "roomTemperatureControl":
+              return "Verify `thermostatType` setting in the cloud is correct";
+            case "openthermBoilerConnected":
+              return "Verify `boilerType` setting in the cloud, and that an OT boiler is connected";
+            case "heatpumpsConnected":
+              return "Check if (correct number of) heatpumps are connected";
+            case "cpuTemperature":
+              return "Last value of CPU temperature is within the defined limits";
+            case "loadAverage":
+              return "Last value of load average is within the defined limits";
+            case "watchdog":
+              return "Last value of watchdog code is within the defined limits";
+            case "minimumCop":
+              return 'Verify if customer has not disabled the "use tariff-based optimization" feature AND minimum COP based on user tarrifs has a correct value';
+            case "supervisoryControlMode":
+              return "Controller is in normal operation mode";
+            case "heatpumpErrors":
+              return "Check if the heatpump(s) reports any errors";
+            case "numberOfRestarts":
+              return "Check estimated number of restarts in the last 24 hours";
+          }
+        },
+      },
     },
   },
   responsive: true,
@@ -49,28 +99,7 @@ const options = {
       stacked: true,
     },
   },
-};
-
-export const kpiToLabel = {
-  validSettings: "Cloud settings",
-  isConnectedAWS: "Is online",
-  isConnectedInternet: "Internet connectivity",
-  hasLatestSoftware: "Has latest software version",
-  isCommissioned: "Is commissioned",
-  cloudConsistency: "Cloud settings consistency",
-  runningController: "Correct controller running",
-  thermostatConnected: "Thermostat connected",
-  roomTemperatureControl: "Room temperature control",
-  openthermBoilerConnected: "Opentherm boiler connected",
-  heatpumpsConnected: "Heatpumps connected",
-  cpuTemperature: "CPU temperature",
-  loadAverage: "Load average",
-  watchdog: "Watchdog",
-  minimumCop: "Minimum COP is too high",
-  supervisoryControlMode: "Controller in normal operation",
-  heatpumpErrors: "Error flag from heatpump",
-  numberOfRestarts: "Number of restarts",
-};
+} as const;
 
 export function CicHealthByKpiChart({
   data,

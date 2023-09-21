@@ -23,10 +23,13 @@ const options = {
       display: true,
       text: "CIC health",
     },
+    tooltip: {
+      mode: "index",
+    },
   },
   responsive: true,
   maintainAspectRatio: false,
-};
+} as const;
 
 export function CicHealthAggregateChart({
   data,
@@ -43,6 +46,7 @@ export function CicHealthAggregateChart({
             {
               status: "notApplicable" as const,
               value: data.notApplicable,
+              description: "",
             },
             {
               status: "correct" as const,

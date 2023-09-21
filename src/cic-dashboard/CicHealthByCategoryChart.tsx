@@ -19,7 +19,10 @@ ChartJS.register(
 );
 
 import { Bar, getElementAtEvent } from "react-chartjs-2";
-import { CicDashboardAggregate } from "../api-client/models";
+import {
+  CicDashboardAggregate,
+  CicHealthChecksByCategory,
+} from "../api-client/models";
 import {
   correctColor,
   errorColor,
@@ -30,6 +33,11 @@ import { getKeys, getValues } from "../utils/object";
 import { CICFilters } from "../cic-list/filters/types";
 import { stringifyCICFilters } from "../cic-list/filters/url";
 import { navigate } from "wouter/use-location";
+import {
+  categoryToLabel,
+  labelToCategory,
+  categoryToKpiLabels,
+} from "../constants";
 
 const options = {
   indexAxis: "y" as const,
@@ -37,6 +45,18 @@ const options = {
     title: {
       display: true,
       text: "CIC health per category",
+    },
+    tooltip: {
+      callbacks: {
+        beforeBody: (value: any) => {
+          const category = labelToCategory[
+            value[0].label
+          ] as keyof CicHealthChecksByCategory;
+          return `A health check combining the following KPIs: ${categoryToKpiLabels(
+            category,
+          )}`;
+        },
+      },
     },
   },
   responsive: true,
@@ -49,17 +69,6 @@ const options = {
       stacked: true,
     },
   },
-};
-
-const categoryToLabel = {
-  cic_software: "CIC software",
-  connectivity: "Connectivity",
-  controller: "Controller",
-  heatpump: "Heatpump",
-  io_connectivity: "IO Connectivity",
-  settings: "Settings",
-  software: "Software",
-  updates: "Updates",
 };
 
 export function CicHealthByCategoryChart({
