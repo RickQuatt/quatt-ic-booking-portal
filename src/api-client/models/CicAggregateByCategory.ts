@@ -43,12 +43,6 @@ export interface CicAggregateByCategory {
    * @type {CicAggregate}
    * @memberof CicAggregateByCategory
    */
-  software: CicAggregate;
-  /**
-   *
-   * @type {CicAggregate}
-   * @memberof CicAggregateByCategory
-   */
   heatpump: CicAggregate;
   /**
    *
@@ -83,7 +77,6 @@ export function instanceOfCicAggregateByCategory(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "settings" in value;
   isInstance = isInstance && "connectivity" in value;
-  isInstance = isInstance && "software" in value;
   isInstance = isInstance && "heatpump" in value;
   isInstance = isInstance && "io_connectivity" in value;
   isInstance = isInstance && "cic_software" in value;
@@ -109,7 +102,6 @@ export function CicAggregateByCategoryFromJSONTyped(
   return {
     settings: CicAggregateFromJSON(json["settings"]),
     connectivity: CicAggregateFromJSON(json["connectivity"]),
-    software: CicAggregateFromJSON(json["software"]),
     heatpump: CicAggregateFromJSON(json["heatpump"]),
     io_connectivity: CicAggregateFromJSON(json["io_connectivity"]),
     cic_software: CicAggregateFromJSON(json["cic_software"]),
@@ -130,7 +122,6 @@ export function CicAggregateByCategoryToJSON(
   return {
     settings: CicAggregateToJSON(value.settings),
     connectivity: CicAggregateToJSON(value.connectivity),
-    software: CicAggregateToJSON(value.software),
     heatpump: CicAggregateToJSON(value.heatpump),
     io_connectivity: CicAggregateToJSON(value.io_connectivity),
     cic_software: CicAggregateToJSON(value.cic_software),
