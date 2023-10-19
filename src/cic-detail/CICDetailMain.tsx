@@ -135,7 +135,7 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
             <FormFieldTitle>Electricity price</FormFieldTitle>
             <FormFieldInput
               type="number"
-              // step="0.01"
+              step="0.00001"
               error={errors.electricityPrice}
               {...register("electricityPrice", {
                 valueAsNumber: true,
@@ -146,7 +146,7 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
             <FormFieldTitle>Day electricity price</FormFieldTitle>
             <FormFieldInput
               type="number"
-              // step="0.01"
+              step="0.00001"
               error={errors.dayElectricityPrice}
               {...register("dayElectricityPrice", {
                 valueAsNumber: true,
@@ -157,7 +157,7 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
             <FormFieldTitle>Night electricity price</FormFieldTitle>
             <FormFieldInput
               type="number"
-              // step="0.01"
+              step="0.00001"
               error={errors.nightElectricityPrice}
               {...register("nightElectricityPrice", {
                 valueAsNumber: true,
@@ -168,7 +168,7 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
             <FormFieldTitle>Gas price</FormFieldTitle>
             <FormFieldInput
               type="number"
-              // step="0.01"
+              step="0.00001"
               error={errors.gasPrice}
               {...register("gasPrice", {
                 valueAsNumber: true,
