@@ -8,3 +8,11 @@
     margin-bottom: 26px;
   }
 }
+
+.detail-sub-section-header {
+  h4 {
+    margin: 0;
+    margin-top: 16px;
+    font-size: 20px;
+  }
+}

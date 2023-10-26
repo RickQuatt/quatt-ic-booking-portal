@@ -8,3 +8,12 @@ export function CICDetailSectionHeader({ title }: { title: string }) {
     </div>
   );
 }
+
+export function CICDetailSubSectionHeader({ title }: { title: string }) {
+  return (
+    <div className={classes["detail-sub-section-header"]}>
+      <h4>{title}</h4>
+      <hr />
+    </div>
+  );
+}
