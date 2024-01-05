@@ -220,6 +220,18 @@ export interface CicCommissioning {
   completedAt: Date | null;
   /**
    *
+   * @type {Date}
+   * @memberof CicCommissioning
+   */
+  createdAt: Date | null;
+  /**
+   *
+   * @type {Date}
+   * @memberof CicCommissioning
+   */
+  updatedAt: Date | null;
+  /**
+   *
    * @type {Array<HeatPumpCommissioning>}
    * @memberof CicCommissioning
    */
@@ -318,6 +330,8 @@ export function instanceOfCicCommissioning(value: object): boolean {
   isInstance = isInstance && "boilerTestStatus" in value;
   isInstance = isInstance && "commissioningMode" in value;
   isInstance = isInstance && "completedAt" in value;
+  isInstance = isInstance && "createdAt" in value;
+  isInstance = isInstance && "updatedAt" in value;
   isInstance = isInstance && "heatPumps" in value;
 
   return isInstance;
@@ -410,6 +424,8 @@ export function CicCommissioningFromJSONTyped(
     commissioningMode: json["commissioningMode"],
     completedAt:
       json["completedAt"] === null ? null : new Date(json["completedAt"]),
+    createdAt: json["createdAt"] === null ? null : new Date(json["createdAt"]),
+    updatedAt: json["updatedAt"] === null ? null : new Date(json["updatedAt"]),
     heatPumps: (json["heatPumps"] as Array<any>).map(
       HeatPumpCommissioningFromJSON,
     ),
@@ -494,6 +510,8 @@ export function CicCommissioningToJSON(value?: CicCommissioning | null): any {
     commissioningMode: value.commissioningMode,
     completedAt:
       value.completedAt === null ? null : value.completedAt.toISOString(),
+    createdAt: value.createdAt === null ? null : value.createdAt.toISOString(),
+    updatedAt: value.updatedAt === null ? null : value.updatedAt.toISOString(),
     heatPumps: (value.heatPumps as Array<any>).map(HeatPumpCommissioningToJSON),
     canStartCommissioning: value.canStartCommissioning,
   };
