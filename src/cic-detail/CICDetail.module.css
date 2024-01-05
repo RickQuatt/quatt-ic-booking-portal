@@ -33,6 +33,14 @@
   background: var(--box-background);
 }
 
+.detail-section-table {
+  border: 1px solid var(--border-color);
+  overflow: auto;
+  border-radius: 5px;
+  position: relative;
+  max-height: 200px;
+}
+
 .detail-sections-health {
   grid-area: sections-health;
 }
@@ -46,10 +54,17 @@
 
 .detail-sections-actions {
   grid-area: sections-actions;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .back-button {
   position: absolute;
   top: 12px;
   left: 24px;
+}
+
+.table-grid {
+  grid-template-columns: 1fr 1fr;
 }
