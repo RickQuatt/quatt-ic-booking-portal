@@ -1,3 +1,5 @@
+import React from "react";
+import classes from "./CICDetail.module.css";
 import { AdminCic } from "../api-client/models";
 import {
   FormField,
@@ -5,11 +7,9 @@ import {
   FormFieldTitle,
   FormSection,
 } from "../ui-components/form/Form";
-import classes from "./CICDetail.module.css";
 import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
 import { formatDateTime } from "../utils/formatDate";
-import React from "react";
 
 interface CICDetailCommissioningProps {
   cicData: AdminCic;
