@@ -41,6 +41,13 @@
   max-height: 200px;
 }
 
+.detail-section-commissioning {
+  overflow: auto;
+  border-radius: 5px;
+  position: relative;
+  max-height: 200px;
+}
+
 .detail-sections-health {
   grid-area: sections-health;
 }

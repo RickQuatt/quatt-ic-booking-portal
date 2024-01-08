@@ -1,6 +1,7 @@
 import React from "react";
+
 import classes from "./CICDetail.module.css";
-import { AdminCic } from "../api-client/models";
+import { AdminCic, CicCommissioning } from "../api-client/models";
 import {
   FormField,
   FormFieldJson,
@@ -11,36 +12,55 @@ import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
 import { formatDateTime } from "../utils/formatDate";
 
-interface CICDetailCommissioningProps {
+interface CICDetailProps {
   cicData: AdminCic;
 }
 
-export function CICDetailCommissioning({
-  cicData,
-}: CICDetailCommissioningProps) {
+export function CICDetailCommissioning({ cicData }: CICDetailProps) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Commissioning  details" />
+      <CICDetailSectionHeader title="Commissioning details" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Date of commissionings</FormFieldTitle>
-          <Accordion>
-            {cicData.commissioningHistory.map((commissioning) => (
-              <CICDetailCommissioningItem commissioning={commissioning} />
-            ))}
-          </Accordion>
+          <div className={classes["detail-section-commissioning"]}>
+            <Accordion>
+              {cicData.commissioningHistory
+                .map((commissioning) => (
+                  <CICDetailCommissioningItem commissioning={commissioning} />
+                ))
+                .sort((a, b) => {
+                  if (
+                    a.props.commissioning.createdAt >
+                    b.props.commissioning.createdAt
+                  ) {
+                    return -1;
+                  }
+                  if (
+                    a.props.commissioning.createdAt <
+                    b.props.commissioning.createdAt
+                  ) {
+                    return 1;
+                  }
+                  return 0;
+                })}
+            </Accordion>
+          </div>
         </FormField>
       </FormSection>
     </div>
   );
 }
 
+interface CICDetailCommissioningItemProps {
+  commissioning: CicCommissioning;
+}
+
 function CICDetailCommissioningItem({
   commissioning,
-}: {
-  commissioning: AdminCic["commissioningHistory"][0];
-}) {
+}: CICDetailCommissioningItemProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+
   return (
     <AccordionItem
       title={formatDateTime(commissioning.createdAt) || "No date"}
