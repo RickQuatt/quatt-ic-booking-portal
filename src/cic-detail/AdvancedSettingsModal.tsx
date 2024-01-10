@@ -117,7 +117,6 @@ export function AdvancedSettingsModal({
         cicId,
         updateAdminCic: data as unknown as CICAdvancedFormDataActual,
       });
-      console.log("response", response);
       if (response.meta.status === 200) {
         // this sets isDirty back to false
         reset({}, { keepValues: true });
