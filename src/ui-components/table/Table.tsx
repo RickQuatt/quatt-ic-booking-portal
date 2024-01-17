@@ -40,6 +40,7 @@ export function Td(
 export function TdText(props: React.PropsWithChildren<{ color?: "danger" }>) {
   return (
     <span
+      title={props.children as string}
       className={classNames(
         classes["tdh-text"],
         props.color && classes[props.color],

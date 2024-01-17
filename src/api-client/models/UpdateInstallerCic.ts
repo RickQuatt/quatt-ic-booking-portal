@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { BoilerType } from "./BoilerType";
+import type { HeatDeliverySystem } from "./HeatDeliverySystem";
 import {
-  BoilerTypeFromJSON,
-  BoilerTypeFromJSONTyped,
-  BoilerTypeToJSON,
-} from "./BoilerType";
+  HeatDeliverySystemFromJSON,
+  HeatDeliverySystemFromJSONTyped,
+  HeatDeliverySystemToJSON,
+} from "./HeatDeliverySystem";
 import type { MaxSoundLevel } from "./MaxSoundLevel";
 import {
   MaxSoundLevelFromJSON,
@@ -31,140 +31,134 @@ import {
   SilentModeFromJSONTyped,
   SilentModeToJSON,
 } from "./SilentMode";
-import type { ThermostatType } from "./ThermostatType";
-import {
-  ThermostatTypeFromJSON,
-  ThermostatTypeFromJSONTyped,
-  ThermostatTypeToJSON,
-} from "./ThermostatType";
 
 /**
  *
  * @export
- * @interface UpdateAdminCic
+ * @interface UpdateInstallerCic
  */
-export interface UpdateAdminCic {
+export interface UpdateInstallerCic {
   /**
    *
    * @type {string}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   wifiSSID?: string;
   /**
    *
    * @type {string}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   wifiPassword?: string;
   /**
    * Electricity price for single tariff
    * @type {number}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   electricityPrice?: number | null;
   /**
    * Day electricity price for double tariff
    * @type {number}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   dayElectricityPrice?: number | null;
   /**
    * Night electricity price for double tariff
    * @type {number}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   nightElectricityPrice?: number | null;
   /**
    * Gas price
    * @type {number}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   gasPrice?: number | null;
   /**
    * When false, send default prices to not limit the heat pump
    * @type {boolean}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   usePricingToLimitHeatPump?: boolean;
   /**
    *
    * @type {SilentMode}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   silentMode?: SilentMode;
   /**
    * Name of the CIC (max 100 characters) for the user
    * @type {string}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   name?: string | null;
   /**
    *
    * @type {MaxSoundLevel}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   dayMaxSoundLevel?: MaxSoundLevel;
   /**
    *
    * @type {MaxSoundLevel}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   nightMaxSoundLevel?: MaxSoundLevel;
   /**
+   *
+   * @type {string}
+   * @memberof UpdateInstallerCic
+   */
+  addressStreet?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof UpdateInstallerCic
+   */
+  addressNumber?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof UpdateInstallerCic
+   */
+  zipCode?: string;
+  /**
+   *
+   * @type {Array<HeatDeliverySystem>}
+   * @memberof UpdateInstallerCic
+   */
+  heatDeliverySystems?: Array<HeatDeliverySystem>;
+  /**
    * Rated maximum house power in watt
    * @type {number}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   ratedMaximumHousePower?: number | null;
   /**
    * Temperature in degrees celcius
    * @type {number}
-   * @memberof UpdateAdminCic
+   * @memberof UpdateInstallerCic
    */
   maximumHeatingOutdoorTemperature?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof UpdateAdminCic
-   */
-  orderNumber?: string | null;
-  /**
-   *
-   * @type {BoilerType}
-   * @memberof UpdateAdminCic
-   */
-  boilerType?: BoilerType | null;
-  /**
-   *
-   * @type {ThermostatType}
-   * @memberof UpdateAdminCic
-   */
-  thermostatType?: ThermostatType | null;
-  /**
-   *
-   * @type {number}
-   * @memberof UpdateAdminCic
-   */
-  numberOfHeatPumps?: number;
 }
 
 /**
- * Check if a given object implements the UpdateAdminCic interface.
+ * Check if a given object implements the UpdateInstallerCic interface.
  */
-export function instanceOfUpdateAdminCic(value: object): boolean {
+export function instanceOfUpdateInstallerCic(value: object): boolean {
   let isInstance = true;
 
   return isInstance;
 }
 
-export function UpdateAdminCicFromJSON(json: any): UpdateAdminCic {
-  return UpdateAdminCicFromJSONTyped(json, false);
+export function UpdateInstallerCicFromJSON(json: any): UpdateInstallerCic {
+  return UpdateInstallerCicFromJSONTyped(json, false);
 }
 
-export function UpdateAdminCicFromJSONTyped(
+export function UpdateInstallerCicFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): UpdateAdminCic {
+): UpdateInstallerCic {
   if (json === undefined || json === null) {
     return json;
   }
@@ -196,6 +190,18 @@ export function UpdateAdminCicFromJSONTyped(
     nightMaxSoundLevel: !exists(json, "nightMaxSoundLevel")
       ? undefined
       : MaxSoundLevelFromJSON(json["nightMaxSoundLevel"]),
+    addressStreet: !exists(json, "addressStreet")
+      ? undefined
+      : json["addressStreet"],
+    addressNumber: !exists(json, "addressNumber")
+      ? undefined
+      : json["addressNumber"],
+    zipCode: !exists(json, "zipCode") ? undefined : json["zipCode"],
+    heatDeliverySystems: !exists(json, "heatDeliverySystems")
+      ? undefined
+      : (json["heatDeliverySystems"] as Array<any>).map(
+          HeatDeliverySystemFromJSON,
+        ),
     ratedMaximumHousePower: !exists(json, "ratedMaximumHousePower")
       ? undefined
       : json["ratedMaximumHousePower"],
@@ -205,20 +211,12 @@ export function UpdateAdminCicFromJSONTyped(
     )
       ? undefined
       : json["maximumHeatingOutdoorTemperature"],
-    orderNumber: !exists(json, "orderNumber") ? undefined : json["orderNumber"],
-    boilerType: !exists(json, "boilerType")
-      ? undefined
-      : BoilerTypeFromJSON(json["boilerType"]),
-    thermostatType: !exists(json, "thermostatType")
-      ? undefined
-      : ThermostatTypeFromJSON(json["thermostatType"]),
-    numberOfHeatPumps: !exists(json, "numberOfHeatPumps")
-      ? undefined
-      : json["numberOfHeatPumps"],
   };
 }
 
-export function UpdateAdminCicToJSON(value?: UpdateAdminCic | null): any {
+export function UpdateInstallerCicToJSON(
+  value?: UpdateInstallerCic | null,
+): any {
   if (value === undefined) {
     return undefined;
   }
@@ -237,11 +235,16 @@ export function UpdateAdminCicToJSON(value?: UpdateAdminCic | null): any {
     name: value.name,
     dayMaxSoundLevel: MaxSoundLevelToJSON(value.dayMaxSoundLevel),
     nightMaxSoundLevel: MaxSoundLevelToJSON(value.nightMaxSoundLevel),
+    addressStreet: value.addressStreet,
+    addressNumber: value.addressNumber,
+    zipCode: value.zipCode,
+    heatDeliverySystems:
+      value.heatDeliverySystems === undefined
+        ? undefined
+        : (value.heatDeliverySystems as Array<any>).map(
+            HeatDeliverySystemToJSON,
+          ),
     ratedMaximumHousePower: value.ratedMaximumHousePower,
     maximumHeatingOutdoorTemperature: value.maximumHeatingOutdoorTemperature,
-    orderNumber: value.orderNumber,
-    boilerType: BoilerTypeToJSON(value.boilerType),
-    thermostatType: ThermostatTypeToJSON(value.thermostatType),
-    numberOfHeatPumps: value.numberOfHeatPumps,
   };
 }

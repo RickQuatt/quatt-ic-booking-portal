@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { ErrorResponseResult } from "./ErrorResponseResult";
+import type { ReferralMember } from "./ReferralMember";
 import {
-  ErrorResponseResultFromJSON,
-  ErrorResponseResultFromJSONTyped,
-  ErrorResponseResultToJSON,
-} from "./ErrorResponseResult";
+  ReferralMemberFromJSON,
+  ReferralMemberFromJSONTyped,
+  ReferralMemberToJSON,
+} from "./ReferralMember";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -29,27 +29,27 @@ import {
 /**
  *
  * @export
- * @interface ErrorResponse
+ * @interface GetReferral200Response
  */
-export interface ErrorResponse {
+export interface GetReferral200Response {
   /**
    *
    * @type {ResponseMeta}
-   * @memberof ErrorResponse
+   * @memberof GetReferral200Response
    */
   meta: ResponseMeta;
   /**
    *
-   * @type {ErrorResponseResult}
-   * @memberof ErrorResponse
+   * @type {ReferralMember}
+   * @memberof GetReferral200Response
    */
-  result: ErrorResponseResult;
+  result: ReferralMember;
 }
 
 /**
- * Check if a given object implements the ErrorResponse interface.
+ * Check if a given object implements the GetReferral200Response interface.
  */
-export function instanceOfErrorResponse(value: object): boolean {
+export function instanceOfGetReferral200Response(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "meta" in value;
   isInstance = isInstance && "result" in value;
@@ -57,24 +57,28 @@ export function instanceOfErrorResponse(value: object): boolean {
   return isInstance;
 }
 
-export function ErrorResponseFromJSON(json: any): ErrorResponse {
-  return ErrorResponseFromJSONTyped(json, false);
+export function GetReferral200ResponseFromJSON(
+  json: any,
+): GetReferral200Response {
+  return GetReferral200ResponseFromJSONTyped(json, false);
 }
 
-export function ErrorResponseFromJSONTyped(
+export function GetReferral200ResponseFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): ErrorResponse {
+): GetReferral200Response {
   if (json === undefined || json === null) {
     return json;
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: ErrorResponseResultFromJSON(json["result"]),
+    result: ReferralMemberFromJSON(json["result"]),
   };
 }
 
-export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
+export function GetReferral200ResponseToJSON(
+  value?: GetReferral200Response | null,
+): any {
   if (value === undefined) {
     return undefined;
   }
@@ -83,6 +87,6 @@ export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: ErrorResponseResultToJSON(value.result),
+    result: ReferralMemberToJSON(value.result),
   };
 }

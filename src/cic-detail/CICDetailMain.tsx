@@ -131,6 +131,23 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
             <FormFieldTitle>Created at</FormFieldTitle>
             <FormFieldValue value={formatDate(cicData.createdAt)} />
           </FormField>
+          {cicData.hasSoundSlider ? (
+            <>
+              <FormField>
+                <FormFieldTitle>Day max sound level</FormFieldTitle>
+                <FormFieldValue value={cicData.dayMaxSoundLevel} />
+              </FormField>
+              <FormField>
+                <FormFieldTitle>Night max sound level</FormFieldTitle>
+                <FormFieldValue value={cicData.nightMaxSoundLevel} />
+              </FormField>
+            </>
+          ) : (
+            <FormField>
+              <FormFieldTitle>Silent mode status</FormFieldTitle>
+              <FormFieldValue value={cicData.silentMode} />
+            </FormField>
+          )}
           <FormField>
             <FormFieldTitle>Electricity price</FormFieldTitle>
             <FormFieldInput

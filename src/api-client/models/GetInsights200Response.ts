@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { ErrorResponseResult } from "./ErrorResponseResult";
+import type { GetInsights200ResponseResult } from "./GetInsights200ResponseResult";
 import {
-  ErrorResponseResultFromJSON,
-  ErrorResponseResultFromJSONTyped,
-  ErrorResponseResultToJSON,
-} from "./ErrorResponseResult";
+  GetInsights200ResponseResultFromJSON,
+  GetInsights200ResponseResultFromJSONTyped,
+  GetInsights200ResponseResultToJSON,
+} from "./GetInsights200ResponseResult";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -29,27 +29,27 @@ import {
 /**
  *
  * @export
- * @interface ErrorResponse
+ * @interface GetInsights200Response
  */
-export interface ErrorResponse {
+export interface GetInsights200Response {
   /**
    *
    * @type {ResponseMeta}
-   * @memberof ErrorResponse
+   * @memberof GetInsights200Response
    */
   meta: ResponseMeta;
   /**
    *
-   * @type {ErrorResponseResult}
-   * @memberof ErrorResponse
+   * @type {GetInsights200ResponseResult}
+   * @memberof GetInsights200Response
    */
-  result: ErrorResponseResult;
+  result: GetInsights200ResponseResult;
 }
 
 /**
- * Check if a given object implements the ErrorResponse interface.
+ * Check if a given object implements the GetInsights200Response interface.
  */
-export function instanceOfErrorResponse(value: object): boolean {
+export function instanceOfGetInsights200Response(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "meta" in value;
   isInstance = isInstance && "result" in value;
@@ -57,24 +57,28 @@ export function instanceOfErrorResponse(value: object): boolean {
   return isInstance;
 }
 
-export function ErrorResponseFromJSON(json: any): ErrorResponse {
-  return ErrorResponseFromJSONTyped(json, false);
+export function GetInsights200ResponseFromJSON(
+  json: any,
+): GetInsights200Response {
+  return GetInsights200ResponseFromJSONTyped(json, false);
 }
 
-export function ErrorResponseFromJSONTyped(
+export function GetInsights200ResponseFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): ErrorResponse {
+): GetInsights200Response {
   if (json === undefined || json === null) {
     return json;
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: ErrorResponseResultFromJSON(json["result"]),
+    result: GetInsights200ResponseResultFromJSON(json["result"]),
   };
 }
 
-export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
+export function GetInsights200ResponseToJSON(
+  value?: GetInsights200Response | null,
+): any {
   if (value === undefined) {
     return undefined;
   }
@@ -83,6 +87,6 @@ export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: ErrorResponseResultToJSON(value.result),
+    result: GetInsights200ResponseResultToJSON(value.result),
   };
 }

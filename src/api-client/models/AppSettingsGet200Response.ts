@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { ErrorResponseResult } from "./ErrorResponseResult";
+import type { AppSettingsGet200ResponseResult } from "./AppSettingsGet200ResponseResult";
 import {
-  ErrorResponseResultFromJSON,
-  ErrorResponseResultFromJSONTyped,
-  ErrorResponseResultToJSON,
-} from "./ErrorResponseResult";
+  AppSettingsGet200ResponseResultFromJSON,
+  AppSettingsGet200ResponseResultFromJSONTyped,
+  AppSettingsGet200ResponseResultToJSON,
+} from "./AppSettingsGet200ResponseResult";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -29,27 +29,27 @@ import {
 /**
  *
  * @export
- * @interface ErrorResponse
+ * @interface AppSettingsGet200Response
  */
-export interface ErrorResponse {
+export interface AppSettingsGet200Response {
   /**
    *
    * @type {ResponseMeta}
-   * @memberof ErrorResponse
+   * @memberof AppSettingsGet200Response
    */
   meta: ResponseMeta;
   /**
    *
-   * @type {ErrorResponseResult}
-   * @memberof ErrorResponse
+   * @type {AppSettingsGet200ResponseResult}
+   * @memberof AppSettingsGet200Response
    */
-  result: ErrorResponseResult;
+  result: AppSettingsGet200ResponseResult;
 }
 
 /**
- * Check if a given object implements the ErrorResponse interface.
+ * Check if a given object implements the AppSettingsGet200Response interface.
  */
-export function instanceOfErrorResponse(value: object): boolean {
+export function instanceOfAppSettingsGet200Response(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "meta" in value;
   isInstance = isInstance && "result" in value;
@@ -57,24 +57,28 @@ export function instanceOfErrorResponse(value: object): boolean {
   return isInstance;
 }
 
-export function ErrorResponseFromJSON(json: any): ErrorResponse {
-  return ErrorResponseFromJSONTyped(json, false);
+export function AppSettingsGet200ResponseFromJSON(
+  json: any,
+): AppSettingsGet200Response {
+  return AppSettingsGet200ResponseFromJSONTyped(json, false);
 }
 
-export function ErrorResponseFromJSONTyped(
+export function AppSettingsGet200ResponseFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): ErrorResponse {
+): AppSettingsGet200Response {
   if (json === undefined || json === null) {
     return json;
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: ErrorResponseResultFromJSON(json["result"]),
+    result: AppSettingsGet200ResponseResultFromJSON(json["result"]),
   };
 }
 
-export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
+export function AppSettingsGet200ResponseToJSON(
+  value?: AppSettingsGet200Response | null,
+): any {
   if (value === undefined) {
     return undefined;
   }
@@ -83,6 +87,6 @@ export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: ErrorResponseResultToJSON(value.result),
+    result: AppSettingsGet200ResponseResultToJSON(value.result),
   };
 }

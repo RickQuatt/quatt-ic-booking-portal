@@ -13,12 +13,8 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { ErrorResponseResult } from "./ErrorResponseResult";
-import {
-  ErrorResponseResultFromJSON,
-  ErrorResponseResultFromJSONTyped,
-  ErrorResponseResultToJSON,
-} from "./ErrorResponseResult";
+import type { MeUser } from "./MeUser";
+import { MeUserFromJSON, MeUserFromJSONTyped, MeUserToJSON } from "./MeUser";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -29,27 +25,27 @@ import {
 /**
  *
  * @export
- * @interface ErrorResponse
+ * @interface GetMe200Response
  */
-export interface ErrorResponse {
+export interface GetMe200Response {
   /**
    *
    * @type {ResponseMeta}
-   * @memberof ErrorResponse
+   * @memberof GetMe200Response
    */
   meta: ResponseMeta;
   /**
    *
-   * @type {ErrorResponseResult}
-   * @memberof ErrorResponse
+   * @type {MeUser}
+   * @memberof GetMe200Response
    */
-  result: ErrorResponseResult;
+  result: MeUser;
 }
 
 /**
- * Check if a given object implements the ErrorResponse interface.
+ * Check if a given object implements the GetMe200Response interface.
  */
-export function instanceOfErrorResponse(value: object): boolean {
+export function instanceOfGetMe200Response(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "meta" in value;
   isInstance = isInstance && "result" in value;
@@ -57,24 +53,24 @@ export function instanceOfErrorResponse(value: object): boolean {
   return isInstance;
 }
 
-export function ErrorResponseFromJSON(json: any): ErrorResponse {
-  return ErrorResponseFromJSONTyped(json, false);
+export function GetMe200ResponseFromJSON(json: any): GetMe200Response {
+  return GetMe200ResponseFromJSONTyped(json, false);
 }
 
-export function ErrorResponseFromJSONTyped(
+export function GetMe200ResponseFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): ErrorResponse {
+): GetMe200Response {
   if (json === undefined || json === null) {
     return json;
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: ErrorResponseResultFromJSON(json["result"]),
+    result: MeUserFromJSON(json["result"]),
   };
 }
 
-export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
+export function GetMe200ResponseToJSON(value?: GetMe200Response | null): any {
   if (value === undefined) {
     return undefined;
   }
@@ -83,6 +79,6 @@ export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: ErrorResponseResultToJSON(value.result),
+    result: MeUserToJSON(value.result),
   };
 }

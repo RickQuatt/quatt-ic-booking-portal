@@ -31,30 +31,6 @@ import {
   CicCommissioningFromJSONTyped,
   CicCommissioningToJSON,
 } from "./CicCommissioning";
-import type { CicHealthCheckStatus } from "./CicHealthCheckStatus";
-import {
-  CicHealthCheckStatusFromJSON,
-  CicHealthCheckStatusFromJSONTyped,
-  CicHealthCheckStatusToJSON,
-} from "./CicHealthCheckStatus";
-import type { CicHealthChecksByCategory } from "./CicHealthChecksByCategory";
-import {
-  CicHealthChecksByCategoryFromJSON,
-  CicHealthChecksByCategoryFromJSONTyped,
-  CicHealthChecksByCategoryToJSON,
-} from "./CicHealthChecksByCategory";
-import type { CicHealthChecksByKpi } from "./CicHealthChecksByKpi";
-import {
-  CicHealthChecksByKpiFromJSON,
-  CicHealthChecksByKpiFromJSONTyped,
-  CicHealthChecksByKpiToJSON,
-} from "./CicHealthChecksByKpi";
-import type { CicState } from "./CicState";
-import {
-  CicStateFromJSON,
-  CicStateFromJSONTyped,
-  CicStateToJSON,
-} from "./CicState";
 import type { CicStatus } from "./CicStatus";
 import {
   CicStatusFromJSON,
@@ -101,468 +77,420 @@ import {
 /**
  *
  * @export
- * @interface AdminCic
+ * @interface InstallerCic
  */
-export interface AdminCic {
+export interface InstallerCic {
   /**
    *
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   id: string;
   /**
    *
    * @type {ConnectionStatus}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   lteConnectionStatus: ConnectionStatus | null;
   /**
    *
    * @type {ConnectionStatus}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   cableConnectionStatus: ConnectionStatus | null;
   /**
    *
    * @type {ConnectionStatus}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   wifiConnectionStatus: ConnectionStatus | null;
   /**
    * The SSID of the WiFi network the CIC is connected to. (human readable)
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   wifiSSID: string | null;
   /**
    *
    * @type {Array<CicAvailableWifiNetworksInner>}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   availableWifiNetworks: Array<CicAvailableWifiNetworksInner> | null;
   /**
    *
    * @type {Date}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   lastScannedForWifi: Date | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   isScanningForWifi: boolean;
   /**
    *
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
-  updateStatus: AdminCicUpdateStatusEnum;
+  updateStatus: InstallerCicUpdateStatusEnum;
   /**
    *
    * @type {Date}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   updateUntil: Date | null;
   /**
    *
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
-  boilerDemand: AdminCicBoilerDemandEnum;
+  boilerDemand: InstallerCicBoilerDemandEnum;
   /**
    * Amount of power in watt
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   boilerPower: number | null;
   /**
    * Temperature in degrees celcius of the water flowing out
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   boilerWaterTemperatureIn: number | null;
   /**
    * Temperature in degrees celcius of the water flowing out
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   boilerWaterTemperatureOut: number | null;
   /**
    * Boiler pressure in bar
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   boilerPressure: number | null;
   /**
    *
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
-  thermostatDemand: AdminCicThermostatDemandEnum;
+  thermostatDemand: InstallerCicThermostatDemandEnum;
   /**
    * Temperature in degrees celcius of the room
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   thermostatRoomTemperature: number | null;
   /**
    * Temperature in degrees celcius set point of the room
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   thermostatRoomTemperatureSetPoint: number | null;
   /**
    * If the flame symbol is on on the thermostat
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   thermostatFlameOn: boolean | null;
   /**
    * If the live temperature is shown on the app
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   showThermostatTemperatures: boolean | null;
   /**
    * If the boiler is on
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   boilerOn: boolean;
   /**
    * Temperature in degrees celcius set point of the control
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   thermostatControlTemperatureSetPoint: number | null;
   /**
    * Temperature in degrees celcius of supply
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   supplyTemperature: number | null;
   /**
    *
    * @type {CicStatus}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   status: CicStatus;
   /**
    * The cic serial number
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   serial: string | null;
   /**
    *
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   numberOfHeatPumps: number | null;
   /**
    * The image version of the cic
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   quattBuild: string | null;
   /**
    * The amount (liter) of water flowing per hour
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   flowRate: number | null;
   /**
    * Electricity price for single tariff
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   electricityPrice: number | null;
   /**
    * Day electricity price for double tariff
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   dayElectricityPrice: number | null;
   /**
    * Night electricity price for double tariff
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   nightElectricityPrice: number | null;
   /**
    * Night time start hour for double tariff (weekdays)
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   electricityNightTimeStartHour: number;
   /**
    * Night time end hour for double tariff (weekdays)
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   electricityNightTimeEndHour: number;
   /**
    * Gas price
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   gasPrice: number | null;
   /**
    * When false, send default prices to not limit the heat pump
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   usePricingToLimitHeatPump: boolean;
   /**
    *
    * @type {SilentMode}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   silentMode: SilentMode;
   /**
    *
    * @type {Array<HeatPump>}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   heatPumps: Array<HeatPump>;
   /**
    *
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   supervisoryControlMode?: number | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   isHp1Connected?: boolean | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   isHp2Connected?: boolean | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   isThermostatConnected?: boolean | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   isBoilerConnected?: boolean | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   isTemperatureSensorConnected?: boolean | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   isControllerAlive?: boolean | null;
   /**
    * The name of the CIC/house
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   name: string | null;
   /**
    *
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   zipCode: string | null;
   /**
    *
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   orderNumber: string | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   wifiEnabled: boolean;
   /**
    *
    * @type {Date}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   insightsStartAt: Date | null;
   /**
    *
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   hasSoundSlider: boolean;
   /**
    *
    * @type {MaxSoundLevel}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   dayMaxSoundLevel: MaxSoundLevel;
   /**
    *
    * @type {MaxSoundLevel}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   nightMaxSoundLevel: MaxSoundLevel;
   /**
    *
    * @type {Array<HeatDeliverySystem>}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   heatDeliverySystems: Array<HeatDeliverySystem> | null;
   /**
    *
    * @type {ThermostatType}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   thermostatType: ThermostatType | null;
   /**
    *
    * @type {BoilerType}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   boilerType: BoilerType | null;
   /**
    * The minimal image version the CIC needs to be updated to to install
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   quattBuildRequired: string | null;
   /**
    * If the cic needs an update, null if unknown
    * @type {boolean}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   needsUpdate: boolean | null;
   /**
    * The state of the mender update
    * @type {string}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
-  menderUpdateState: AdminCicMenderUpdateStateEnum;
+  menderUpdateState: InstallerCicMenderUpdateStateEnum;
   /**
    * Rated maximum house power in watt
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   ratedMaximumHousePower: number | null;
   /**
    * Temperature in degrees celcius
    * @type {number}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   maximumHeatingOutdoorTemperature: number | null;
   /**
    *
    * @type {CicCommissioning}
-   * @memberof AdminCic
+   * @memberof InstallerCic
    */
   lastCommissioning: CicCommissioning;
-  /**
-   *
-   * @type {string}
-   * @memberof AdminCic
-   */
-  menderId: string | null;
-  /**
-   *
-   * @type {Date}
-   * @memberof AdminCic
-   */
-  createdAt: Date;
-  /**
-   *
-   * @type {Date}
-   * @memberof AdminCic
-   */
-  lastConnectionStatusUpdatedAt: Date | null;
-  /**
-   *
-   * @type {CicHealthCheckStatus}
-   * @memberof AdminCic
-   */
-  healthCheck: CicHealthCheckStatus;
-  /**
-   *
-   * @type {CicHealthChecksByKpi}
-   * @memberof AdminCic
-   */
-  healthChecksByKpi: CicHealthChecksByKpi;
-  /**
-   *
-   * @type {CicHealthChecksByCategory}
-   * @memberof AdminCic
-   */
-  healthChecksByCategory: CicHealthChecksByCategory;
-  /**
-   *
-   * @type {Array<CicState>}
-   * @memberof AdminCic
-   */
-  stateHistory: Array<CicState>;
-  /**
-   *
-   * @type {Array<CicCommissioning>}
-   * @memberof AdminCic
-   */
-  commissioningHistory: Array<CicCommissioning>;
 }
 
 /**
  * @export
  */
-export const AdminCicUpdateStatusEnum = {
+export const InstallerCicUpdateStatusEnum = {
   UpToDate: "up_to_date",
   Updating: "updating",
 } as const;
-export type AdminCicUpdateStatusEnum =
-  (typeof AdminCicUpdateStatusEnum)[keyof typeof AdminCicUpdateStatusEnum];
+export type InstallerCicUpdateStatusEnum =
+  (typeof InstallerCicUpdateStatusEnum)[keyof typeof InstallerCicUpdateStatusEnum];
 
 /**
  * @export
  */
-export const AdminCicBoilerDemandEnum = {
+export const InstallerCicBoilerDemandEnum = {
   Heat: "heat",
 } as const;
-export type AdminCicBoilerDemandEnum =
-  (typeof AdminCicBoilerDemandEnum)[keyof typeof AdminCicBoilerDemandEnum];
+export type InstallerCicBoilerDemandEnum =
+  (typeof InstallerCicBoilerDemandEnum)[keyof typeof InstallerCicBoilerDemandEnum];
 
 /**
  * @export
  */
-export const AdminCicThermostatDemandEnum = {
+export const InstallerCicThermostatDemandEnum = {
   Heat: "heat",
 } as const;
-export type AdminCicThermostatDemandEnum =
-  (typeof AdminCicThermostatDemandEnum)[keyof typeof AdminCicThermostatDemandEnum];
+export type InstallerCicThermostatDemandEnum =
+  (typeof InstallerCicThermostatDemandEnum)[keyof typeof InstallerCicThermostatDemandEnum];
 
 /**
  * @export
  */
-export const AdminCicMenderUpdateStateEnum = {
+export const InstallerCicMenderUpdateStateEnum = {
   Idle: "idle",
   Download: "download",
   Install: "install",
 } as const;
-export type AdminCicMenderUpdateStateEnum =
-  (typeof AdminCicMenderUpdateStateEnum)[keyof typeof AdminCicMenderUpdateStateEnum];
+export type InstallerCicMenderUpdateStateEnum =
+  (typeof InstallerCicMenderUpdateStateEnum)[keyof typeof InstallerCicMenderUpdateStateEnum];
 
 /**
- * Check if a given object implements the AdminCic interface.
+ * Check if a given object implements the InstallerCic interface.
  */
-export function instanceOfAdminCic(value: object): boolean {
+export function instanceOfInstallerCic(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "id" in value;
   isInstance = isInstance && "lteConnectionStatus" in value;
@@ -618,26 +546,18 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "ratedMaximumHousePower" in value;
   isInstance = isInstance && "maximumHeatingOutdoorTemperature" in value;
   isInstance = isInstance && "lastCommissioning" in value;
-  isInstance = isInstance && "menderId" in value;
-  isInstance = isInstance && "createdAt" in value;
-  isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
-  isInstance = isInstance && "healthCheck" in value;
-  isInstance = isInstance && "healthChecksByKpi" in value;
-  isInstance = isInstance && "healthChecksByCategory" in value;
-  isInstance = isInstance && "stateHistory" in value;
-  isInstance = isInstance && "commissioningHistory" in value;
 
   return isInstance;
 }
 
-export function AdminCicFromJSON(json: any): AdminCic {
-  return AdminCicFromJSONTyped(json, false);
+export function InstallerCicFromJSON(json: any): InstallerCic {
+  return InstallerCicFromJSONTyped(json, false);
 }
 
-export function AdminCicFromJSONTyped(
+export function InstallerCicFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): AdminCic {
+): InstallerCic {
   if (json === undefined || json === null) {
     return json;
   }
@@ -740,25 +660,10 @@ export function AdminCicFromJSONTyped(
     ratedMaximumHousePower: json["ratedMaximumHousePower"],
     maximumHeatingOutdoorTemperature: json["maximumHeatingOutdoorTemperature"],
     lastCommissioning: CicCommissioningFromJSON(json["lastCommissioning"]),
-    menderId: json["menderId"],
-    createdAt: new Date(json["createdAt"]),
-    lastConnectionStatusUpdatedAt:
-      json["lastConnectionStatusUpdatedAt"] === null
-        ? null
-        : new Date(json["lastConnectionStatusUpdatedAt"]),
-    healthCheck: CicHealthCheckStatusFromJSON(json["healthCheck"]),
-    healthChecksByKpi: CicHealthChecksByKpiFromJSON(json["healthChecksByKpi"]),
-    healthChecksByCategory: CicHealthChecksByCategoryFromJSON(
-      json["healthChecksByCategory"],
-    ),
-    stateHistory: (json["stateHistory"] as Array<any>).map(CicStateFromJSON),
-    commissioningHistory: (json["commissioningHistory"] as Array<any>).map(
-      CicCommissioningFromJSON,
-    ),
   };
 }
 
-export function AdminCicToJSON(value?: AdminCic | null): any {
+export function InstallerCicToJSON(value?: InstallerCic | null): any {
   if (value === undefined) {
     return undefined;
   }
@@ -845,20 +750,5 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     ratedMaximumHousePower: value.ratedMaximumHousePower,
     maximumHeatingOutdoorTemperature: value.maximumHeatingOutdoorTemperature,
     lastCommissioning: CicCommissioningToJSON(value.lastCommissioning),
-    menderId: value.menderId,
-    createdAt: value.createdAt.toISOString(),
-    lastConnectionStatusUpdatedAt:
-      value.lastConnectionStatusUpdatedAt === null
-        ? null
-        : value.lastConnectionStatusUpdatedAt.toISOString(),
-    healthCheck: CicHealthCheckStatusToJSON(value.healthCheck),
-    healthChecksByKpi: CicHealthChecksByKpiToJSON(value.healthChecksByKpi),
-    healthChecksByCategory: CicHealthChecksByCategoryToJSON(
-      value.healthChecksByCategory,
-    ),
-    stateHistory: (value.stateHistory as Array<any>).map(CicStateToJSON),
-    commissioningHistory: (value.commissioningHistory as Array<any>).map(
-      CicCommissioningToJSON,
-    ),
   };
 }

@@ -5,7 +5,7 @@ import classes from "./CICDetail.module.css";
 import { AdminCic } from "../api-client/models";
 import { CICDetailMain } from "./CICDetailMain";
 import { CICDetailExtra } from "./CICDetailExtra";
-import { CICDetailSide } from "./CICDetailSide";
+import { CICDetailAdvanced } from "./CICDetailAdvanced";
 import { CICDetailJson } from "./CICDetailJson";
 import { CICDetailNetworkConnection } from "./CICDetailNetworkConnection";
 import { CICDetailBoilerInfo } from "./CICDetailBoilerInfo";
@@ -16,6 +16,8 @@ import { ButtonLink } from "../ui-components/button/Button";
 import { CICDetailUpdateInfo } from "./CICDetailUpdateInfo";
 import { CICDetailLastCommissioning } from "./CICDetailLastCommissioning";
 import { CICDetailHealthChecks } from "./CICDetailHealthChecks";
+import { CICDetailState } from "./CICDetailState";
+import { CICDetailCommissioning } from "./CICDetailCommissioning";
 
 interface CICDetailProps {
   data: AdminCic;
@@ -42,7 +44,9 @@ export function CICDetail({ data }: CICDetailProps) {
         <CICDetailJson cicData={cicData} />
       </div>
       <div className={classes["detail-sections-actions"]}>
-        <CICDetailSide cicData={cicData} />
+        <CICDetailAdvanced cicData={cicData} />
+        <CICDetailState cicData={cicData} />
+        <CICDetailCommissioning cicData={cicData} />
       </div>
       <BackButton />
     </div>

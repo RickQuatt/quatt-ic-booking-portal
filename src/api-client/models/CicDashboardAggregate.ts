@@ -62,6 +62,18 @@ export interface CicDashboardAggregate {
    * @memberof CicDashboardAggregate
    */
   aggregateByVersion: { [key: string]: number };
+  /**
+   * Latest Quatt build
+   * @type {string}
+   * @memberof CicDashboardAggregate
+   */
+  latestVersion?: string;
+  /**
+   * Minimum required Quatt build
+   * @type {string}
+   * @memberof CicDashboardAggregate
+   */
+  requiredVersion?: string;
 }
 
 /**
@@ -97,6 +109,12 @@ export function CicDashboardAggregateFromJSONTyped(
     ),
     aggregateByKpi: CicAggregateByKpiFromJSON(json["aggregateByKpi"]),
     aggregateByVersion: json["aggregateByVersion"],
+    latestVersion: !exists(json, "latestVersion")
+      ? undefined
+      : json["latestVersion"],
+    requiredVersion: !exists(json, "requiredVersion")
+      ? undefined
+      : json["requiredVersion"],
   };
 }
 
@@ -116,5 +134,7 @@ export function CicDashboardAggregateToJSON(
     ),
     aggregateByKpi: CicAggregateByKpiToJSON(value.aggregateByKpi),
     aggregateByVersion: value.aggregateByVersion,
+    latestVersion: value.latestVersion,
+    requiredVersion: value.requiredVersion,
   };
 }

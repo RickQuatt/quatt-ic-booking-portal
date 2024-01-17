@@ -3,6 +3,12 @@ export function getMenderLink(id: string) {
 }
 
 export function getGrafanaLink(id: string) {
+  const url = window.location.href;
+
+  if (url.includes("localhost") || url.includes("internal-support-develop")) {
+    return `https://g-d4ebd27178.grafana-workspace.eu-west-1.amazonaws.com/d/2iE68EiSkB/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
+  }
+
   return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/2iE68EiSkB/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
 }
 

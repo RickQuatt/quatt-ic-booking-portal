@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { ErrorResponseResult } from "./ErrorResponseResult";
+import type { InstallerCic } from "./InstallerCic";
 import {
-  ErrorResponseResultFromJSON,
-  ErrorResponseResultFromJSONTyped,
-  ErrorResponseResultToJSON,
-} from "./ErrorResponseResult";
+  InstallerCicFromJSON,
+  InstallerCicFromJSONTyped,
+  InstallerCicToJSON,
+} from "./InstallerCic";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -29,27 +29,27 @@ import {
 /**
  *
  * @export
- * @interface ErrorResponse
+ * @interface GetInstallerCic200Response
  */
-export interface ErrorResponse {
+export interface GetInstallerCic200Response {
   /**
    *
    * @type {ResponseMeta}
-   * @memberof ErrorResponse
+   * @memberof GetInstallerCic200Response
    */
   meta: ResponseMeta;
   /**
    *
-   * @type {ErrorResponseResult}
-   * @memberof ErrorResponse
+   * @type {InstallerCic}
+   * @memberof GetInstallerCic200Response
    */
-  result: ErrorResponseResult;
+  result: InstallerCic;
 }
 
 /**
- * Check if a given object implements the ErrorResponse interface.
+ * Check if a given object implements the GetInstallerCic200Response interface.
  */
-export function instanceOfErrorResponse(value: object): boolean {
+export function instanceOfGetInstallerCic200Response(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "meta" in value;
   isInstance = isInstance && "result" in value;
@@ -57,24 +57,28 @@ export function instanceOfErrorResponse(value: object): boolean {
   return isInstance;
 }
 
-export function ErrorResponseFromJSON(json: any): ErrorResponse {
-  return ErrorResponseFromJSONTyped(json, false);
+export function GetInstallerCic200ResponseFromJSON(
+  json: any,
+): GetInstallerCic200Response {
+  return GetInstallerCic200ResponseFromJSONTyped(json, false);
 }
 
-export function ErrorResponseFromJSONTyped(
+export function GetInstallerCic200ResponseFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): ErrorResponse {
+): GetInstallerCic200Response {
   if (json === undefined || json === null) {
     return json;
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: ErrorResponseResultFromJSON(json["result"]),
+    result: InstallerCicFromJSON(json["result"]),
   };
 }
 
-export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
+export function GetInstallerCic200ResponseToJSON(
+  value?: GetInstallerCic200Response | null,
+): any {
   if (value === undefined) {
     return undefined;
   }
@@ -83,6 +87,6 @@ export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: ErrorResponseResultToJSON(value.result),
+    result: InstallerCicToJSON(value.result),
   };
 }

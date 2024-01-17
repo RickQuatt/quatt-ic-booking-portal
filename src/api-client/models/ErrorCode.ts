@@ -57,11 +57,13 @@ export const ErrorCode = {
   MissingMaximumHeatingOutdoorTemperature:
     "MISSING_MAXIMUM_HEATING_OUTDOOR_TEMPERATURE",
   HubspotDealNotFound: "HUBSPOT_DEAL_NOT_FOUND",
+  HubspotCicAlreadyLinked: "HUBSPOT_CIC_ALREADY_LINKED",
   ExternalApiError: "EXTERNAL_API_ERROR",
   NotPossibleWith1HeatPump: "NOT_POSSIBLE_WITH_1_HEAT_PUMP",
   CicNeedsUpdate: "CIC_NEEDS_UPDATE",
   MissingInstallationId: "MISSING_INSTALLATION_ID",
   InstallationInsightsNotAvailable: "INSTALLATION_INSIGHTS_NOT_AVAILABLE",
+  InstallationDateNotToday: "INSTALLATION_DATE_NOT_TODAY",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

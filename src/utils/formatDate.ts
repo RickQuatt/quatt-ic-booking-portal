@@ -1,9 +1,14 @@
-import { formatDistance } from "date-fns";
+import { formatDistance, format } from "date-fns";
 
 // as in 2023-05-23
 export function formatDate(date: Date | null) {
   if (!date) return null;
   return date.toISOString().split("T")[0];
+}
+
+export function formatDateTime(date: Date | null) {
+  if (!date) return null;
+  return format(date, "yyyy-MM-dd HH:mm:ss");
 }
 
 // as in "x minutes ago"

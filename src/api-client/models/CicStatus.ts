@@ -18,8 +18,10 @@
  */
 export const CicStatus = {
   Active: "active",
-  Blacklisted: "blacklisted",
   Registering: "registering",
+  Factory: "factory",
+  Service: "service",
+  Dead: "dead",
 } as const;
 export type CicStatus = (typeof CicStatus)[keyof typeof CicStatus];
 

@@ -13,12 +13,8 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { ErrorResponseResult } from "./ErrorResponseResult";
-import {
-  ErrorResponseResultFromJSON,
-  ErrorResponseResultFromJSONTyped,
-  ErrorResponseResultToJSON,
-} from "./ErrorResponseResult";
+import type { MeCic } from "./MeCic";
+import { MeCicFromJSON, MeCicFromJSONTyped, MeCicToJSON } from "./MeCic";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -29,27 +25,27 @@ import {
 /**
  *
  * @export
- * @interface ErrorResponse
+ * @interface GetMeCic200Response
  */
-export interface ErrorResponse {
+export interface GetMeCic200Response {
   /**
    *
    * @type {ResponseMeta}
-   * @memberof ErrorResponse
+   * @memberof GetMeCic200Response
    */
   meta: ResponseMeta;
   /**
    *
-   * @type {ErrorResponseResult}
-   * @memberof ErrorResponse
+   * @type {MeCic}
+   * @memberof GetMeCic200Response
    */
-  result: ErrorResponseResult;
+  result: MeCic;
 }
 
 /**
- * Check if a given object implements the ErrorResponse interface.
+ * Check if a given object implements the GetMeCic200Response interface.
  */
-export function instanceOfErrorResponse(value: object): boolean {
+export function instanceOfGetMeCic200Response(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "meta" in value;
   isInstance = isInstance && "result" in value;
@@ -57,24 +53,26 @@ export function instanceOfErrorResponse(value: object): boolean {
   return isInstance;
 }
 
-export function ErrorResponseFromJSON(json: any): ErrorResponse {
-  return ErrorResponseFromJSONTyped(json, false);
+export function GetMeCic200ResponseFromJSON(json: any): GetMeCic200Response {
+  return GetMeCic200ResponseFromJSONTyped(json, false);
 }
 
-export function ErrorResponseFromJSONTyped(
+export function GetMeCic200ResponseFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): ErrorResponse {
+): GetMeCic200Response {
   if (json === undefined || json === null) {
     return json;
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: ErrorResponseResultFromJSON(json["result"]),
+    result: MeCicFromJSON(json["result"]),
   };
 }
 
-export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
+export function GetMeCic200ResponseToJSON(
+  value?: GetMeCic200Response | null,
+): any {
   if (value === undefined) {
     return undefined;
   }
@@ -83,6 +81,6 @@ export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: ErrorResponseResultToJSON(value.result),
+    result: MeCicToJSON(value.result),
   };
 }

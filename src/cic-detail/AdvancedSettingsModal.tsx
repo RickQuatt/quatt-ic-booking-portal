@@ -32,10 +32,20 @@ const requiredFieldText = "This field is required";
 const transformNaN = (value: unknown) => (Number.isNaN(value) ? null : value);
 
 const CICAdvancedFormSchema = yup.object({
+  dayMaxSoundLevel: yup
+    .string()
+    .optional()
+    .nullable()
+    .oneOf(["normal", "library", "silent", "building87"]),
+  nightMaxSoundLevel: yup
+    .string()
+    .optional()
+    .nullable()
+    .oneOf(["normal", "library", "silent", "building87"]),
   silentMode: yup
     .string()
-    .required(requiredFieldText)
-    .nullable(requiredFieldText)
+    .optional()
+    .nullable()
     .oneOf(["never", "night", "always"]),
   boilerType: yup
     .string()
@@ -61,7 +71,9 @@ const CICAdvancedFormSchema = yup.object({
 // TODO: get yup to infer the right type (the enums)? - 2023-07-14
 type CICAdvancedFormData = yup.InferType<typeof CICAdvancedFormSchema>;
 type CICAdvancedFormDataActual = {
-  silentMode: AdminCic["silentMode"];
+  dayMaxSoundLevel?: AdminCic["dayMaxSoundLevel"];
+  nightMaxSoundLevel?: AdminCic["nightMaxSoundLevel"];
+  silentMode?: AdminCic["silentMode"];
   boilerType: AdminCic["boilerType"];
   thermostatType: AdminCic["thermostatType"];
   numberOfHeatPumps: NonNullable<AdminCic["numberOfHeatPumps"]>;
@@ -81,7 +93,6 @@ export function AdvancedSettingsModal({
   } = useForm<CICAdvancedFormData>({
     resolver: yupResolver(CICAdvancedFormSchema),
     defaultValues: {
-      silentMode: cicData.silentMode,
       boilerType: cicData.boilerType,
       thermostatType: cicData.thermostatType,
       numberOfHeatPumps:
@@ -125,14 +136,48 @@ export function AdvancedSettingsModal({
               <FormFieldTitle>ID</FormFieldTitle>
               <FormFieldValue value={cicData.id} />
             </FormField>
-            <FormField>
-              <FormFieldTitle>Silent mode</FormFieldTitle>
-              <FormSelectInput {...register("silentMode")}>
-                <option value="never">Never</option>
-                <option value="night">Night</option>
-                <option value="always">Always</option>
-              </FormSelectInput>
-            </FormField>
+            {cicData.hasSoundSlider ? (
+              <>
+                <FormField>
+                  <FormFieldTitle>Day max sound level</FormFieldTitle>
+                  <FormSelectInput
+                    defaultValue={cicData.dayMaxSoundLevel}
+                    {...register("dayMaxSoundLevel")}
+                  >
+                    <option value="normal">Normal</option>
+                    <option value="library">Library</option>
+                    <option value="silent">Silent</option>
+                    <option value="building87">Building87</option>
+                  </FormSelectInput>
+                </FormField>
+                <FormField>
+                  <FormFieldTitle>Night max sound level</FormFieldTitle>
+                  <FormSelectInput
+                    defaultValue={cicData.nightMaxSoundLevel}
+                    {...register("nightMaxSoundLevel")}
+                  >
+                    <option value="normal">Normal</option>
+                    <option value="library">Library</option>
+                    <option value="silent">Silent</option>
+                    <option value="building87">Building87</option>
+                  </FormSelectInput>
+                </FormField>
+              </>
+            ) : (
+              <>
+                <FormField>
+                  <FormFieldTitle>Silent mode</FormFieldTitle>
+                  <FormSelectInput
+                    defaultValue={cicData.silentMode}
+                    {...register("silentMode")}
+                  >
+                    <option value="never">Never</option>
+                    <option value="night">Night</option>
+                    <option value="always">Always</option>
+                  </FormSelectInput>
+                </FormField>
+              </>
+            )}
             <FormField>
               <FormFieldTitle>Boiler type</FormFieldTitle>
               <FormSelectInput {...register("boilerType")}>
