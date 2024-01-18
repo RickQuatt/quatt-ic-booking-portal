@@ -18,7 +18,7 @@ export function CICDetailState({ cicData }: { cicData: AdminCic }) {
       <CICDetailSectionHeader title="State history" />
       {cicData.stateHistory && (
         <div className={classes["detail-section-table"]}>
-          <Table gridClass={classes["table-grid"]}>
+          <Table gridClass={classes["table-grid-state-history"]}>
             <THead>
               <Tr>
                 <Th>
