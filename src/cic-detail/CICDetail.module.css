@@ -75,3 +75,7 @@
 .table-grid {
   grid-template-columns: 1fr 1fr;
 }
+
+.table-grid-state-history {
+  grid-template-columns: 2fr 1fr;
+}
