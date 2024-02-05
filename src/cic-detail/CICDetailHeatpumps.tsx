@@ -24,6 +24,22 @@ export function CICDetailHeatpumps({ cicData }: { cicData: AdminCic }) {
           <FormFieldValue value={cicData.isHp1Connected} />
         </FormField>
         <FormField>
+          <FormFieldTitle>HP1 OduType</FormFieldTitle>
+          <FormFieldValue
+            value={
+              cicData.heatPumps.find((e) => e.modbusSlaveId === 1)?.oduType
+            }
+          />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>HP2 OduType</FormFieldTitle>
+          <FormFieldValue
+            value={
+              cicData.heatPumps.find((e) => e.modbusSlaveId === 2)?.oduType
+            }
+          />
+        </FormField>
+        <FormField>
           <FormFieldTitle>Is HP2 connected</FormFieldTitle>
           <FormFieldValue value={cicData.isHp2Connected} />
         </FormField>

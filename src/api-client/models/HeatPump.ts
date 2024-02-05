@@ -115,6 +115,12 @@ export interface HeatPump {
    * @memberof HeatPump
    */
   limitedByCop: boolean | null;
+  /**
+   * the type of heatpump, "AMM4" for first versions. Will only be set for installers
+   * @type {string}
+   * @memberof HeatPump
+   */
+  oduType?: string | null;
 }
 
 /**
@@ -178,6 +184,7 @@ export function HeatPumpFromJSONTyped(
     _true: !exists(json, "true") ? undefined : json["true"],
     silentModeStatus: json["silentModeStatus"],
     limitedByCop: json["limitedByCop"],
+    oduType: !exists(json, "oduType") ? undefined : json["oduType"],
   };
 }
 
@@ -205,5 +212,6 @@ export function HeatPumpToJSON(value?: HeatPump | null): any {
     true: value._true,
     silentModeStatus: value.silentModeStatus,
     limitedByCop: value.limitedByCop,
+    oduType: value.oduType,
   };
 }

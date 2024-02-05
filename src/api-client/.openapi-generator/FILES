@@ -36,6 +36,9 @@ models/FlowRateTestStatus.ts
 models/GetInsights200Response.ts
 models/GetInsights200ResponseResult.ts
 models/GetInsights200ResponseResultGraphInner.ts
+models/GetInsights200ResponseResultOutsideTemperatureGraphInner.ts
+models/GetInsights200ResponseResultRoomTemperatureGraphInner.ts
+models/GetInsights200ResponseResultWaterTemperatureGraphInner.ts
 models/GetInstallerCic200Response.ts
 models/GetMe200Response.ts
 models/GetMeCic200Response.ts

@@ -417,6 +417,18 @@ export interface AdminCic {
    */
   nightMaxSoundLevel: MaxSoundLevel;
   /**
+   * Outside temperature in degrees celcius
+   * @type {number}
+   * @memberof AdminCic
+   */
+  temperatureOutside: number | null;
+  /**
+   * Water temperature in degrees celcius
+   * @type {number}
+   * @memberof AdminCic
+   */
+  waterTemperature: number | null;
+  /**
    *
    * @type {Array<HeatDeliverySystem>}
    * @memberof AdminCic
@@ -609,6 +621,8 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "hasSoundSlider" in value;
   isInstance = isInstance && "dayMaxSoundLevel" in value;
   isInstance = isInstance && "nightMaxSoundLevel" in value;
+  isInstance = isInstance && "temperatureOutside" in value;
+  isInstance = isInstance && "waterTemperature" in value;
   isInstance = isInstance && "heatDeliverySystems" in value;
   isInstance = isInstance && "thermostatType" in value;
   isInstance = isInstance && "boilerType" in value;
@@ -726,6 +740,8 @@ export function AdminCicFromJSONTyped(
     hasSoundSlider: json["hasSoundSlider"],
     dayMaxSoundLevel: MaxSoundLevelFromJSON(json["dayMaxSoundLevel"]),
     nightMaxSoundLevel: MaxSoundLevelFromJSON(json["nightMaxSoundLevel"]),
+    temperatureOutside: json["temperatureOutside"],
+    waterTemperature: json["waterTemperature"],
     heatDeliverySystems:
       json["heatDeliverySystems"] === null
         ? null
@@ -831,6 +847,8 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     hasSoundSlider: value.hasSoundSlider,
     dayMaxSoundLevel: MaxSoundLevelToJSON(value.dayMaxSoundLevel),
     nightMaxSoundLevel: MaxSoundLevelToJSON(value.nightMaxSoundLevel),
+    temperatureOutside: value.temperatureOutside,
+    waterTemperature: value.waterTemperature,
     heatDeliverySystems:
       value.heatDeliverySystems === null
         ? null
