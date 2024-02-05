@@ -19,6 +19,24 @@ import {
   GetInsights200ResponseResultGraphInnerFromJSONTyped,
   GetInsights200ResponseResultGraphInnerToJSON,
 } from "./GetInsights200ResponseResultGraphInner";
+import type { GetInsights200ResponseResultOutsideTemperatureGraphInner } from "./GetInsights200ResponseResultOutsideTemperatureGraphInner";
+import {
+  GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSON,
+  GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSONTyped,
+  GetInsights200ResponseResultOutsideTemperatureGraphInnerToJSON,
+} from "./GetInsights200ResponseResultOutsideTemperatureGraphInner";
+import type { GetInsights200ResponseResultRoomTemperatureGraphInner } from "./GetInsights200ResponseResultRoomTemperatureGraphInner";
+import {
+  GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSON,
+  GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSONTyped,
+  GetInsights200ResponseResultRoomTemperatureGraphInnerToJSON,
+} from "./GetInsights200ResponseResultRoomTemperatureGraphInner";
+import type { GetInsights200ResponseResultWaterTemperatureGraphInner } from "./GetInsights200ResponseResultWaterTemperatureGraphInner";
+import {
+  GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSON,
+  GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSONTyped,
+  GetInsights200ResponseResultWaterTemperatureGraphInnerToJSON,
+} from "./GetInsights200ResponseResultWaterTemperatureGraphInner";
 
 /**
  *
@@ -111,11 +129,35 @@ export interface GetInsights200ResponseResult {
    */
   co2Electricity: number | null;
   /**
+   * Whether the user has tarrifs set (otherwise no savings are available)
+   * @type {boolean}
+   * @memberof GetInsights200ResponseResult
+   */
+  hasTarrifs: boolean;
+  /**
    *
    * @type {Array<GetInsights200ResponseResultGraphInner>}
    * @memberof GetInsights200ResponseResult
    */
   graph?: Array<GetInsights200ResponseResultGraphInner>;
+  /**
+   *
+   * @type {Array<GetInsights200ResponseResultOutsideTemperatureGraphInner>}
+   * @memberof GetInsights200ResponseResult
+   */
+  outsideTemperatureGraph?: Array<GetInsights200ResponseResultOutsideTemperatureGraphInner> | null;
+  /**
+   *
+   * @type {Array<GetInsights200ResponseResultWaterTemperatureGraphInner>}
+   * @memberof GetInsights200ResponseResult
+   */
+  waterTemperatureGraph?: Array<GetInsights200ResponseResultWaterTemperatureGraphInner> | null;
+  /**
+   *
+   * @type {Array<GetInsights200ResponseResultRoomTemperatureGraphInner>}
+   * @memberof GetInsights200ResponseResult
+   */
+  roomTemperatureGraph?: Array<GetInsights200ResponseResultRoomTemperatureGraphInner> | null;
 }
 
 /**
@@ -137,6 +179,7 @@ export function instanceOfGetInsights200ResponseResult(value: object): boolean {
   isInstance = isInstance && "savingsQuattElectricityCost" in value;
   isInstance = isInstance && "co2GasSaved" in value;
   isInstance = isInstance && "co2Electricity" in value;
+  isInstance = isInstance && "hasTarrifs" in value;
 
   return isInstance;
 }
@@ -169,10 +212,32 @@ export function GetInsights200ResponseResultFromJSONTyped(
     savingsQuattElectricityCost: json["savingsQuattElectricityCost"],
     co2GasSaved: json["co2GasSaved"],
     co2Electricity: json["co2Electricity"],
+    hasTarrifs: json["hasTarrifs"],
     graph: !exists(json, "graph")
       ? undefined
       : (json["graph"] as Array<any>).map(
           GetInsights200ResponseResultGraphInnerFromJSON,
+        ),
+    outsideTemperatureGraph: !exists(json, "outsideTemperatureGraph")
+      ? undefined
+      : json["outsideTemperatureGraph"] === null
+      ? null
+      : (json["outsideTemperatureGraph"] as Array<any>).map(
+          GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSON,
+        ),
+    waterTemperatureGraph: !exists(json, "waterTemperatureGraph")
+      ? undefined
+      : json["waterTemperatureGraph"] === null
+      ? null
+      : (json["waterTemperatureGraph"] as Array<any>).map(
+          GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSON,
+        ),
+    roomTemperatureGraph: !exists(json, "roomTemperatureGraph")
+      ? undefined
+      : json["roomTemperatureGraph"] === null
+      ? null
+      : (json["roomTemperatureGraph"] as Array<any>).map(
+          GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSON,
         ),
   };
 }
@@ -201,11 +266,36 @@ export function GetInsights200ResponseResultToJSON(
     savingsQuattElectricityCost: value.savingsQuattElectricityCost,
     co2GasSaved: value.co2GasSaved,
     co2Electricity: value.co2Electricity,
+    hasTarrifs: value.hasTarrifs,
     graph:
       value.graph === undefined
         ? undefined
         : (value.graph as Array<any>).map(
             GetInsights200ResponseResultGraphInnerToJSON,
+          ),
+    outsideTemperatureGraph:
+      value.outsideTemperatureGraph === undefined
+        ? undefined
+        : value.outsideTemperatureGraph === null
+        ? null
+        : (value.outsideTemperatureGraph as Array<any>).map(
+            GetInsights200ResponseResultOutsideTemperatureGraphInnerToJSON,
+          ),
+    waterTemperatureGraph:
+      value.waterTemperatureGraph === undefined
+        ? undefined
+        : value.waterTemperatureGraph === null
+        ? null
+        : (value.waterTemperatureGraph as Array<any>).map(
+            GetInsights200ResponseResultWaterTemperatureGraphInnerToJSON,
+          ),
+    roomTemperatureGraph:
+      value.roomTemperatureGraph === undefined
+        ? undefined
+        : value.roomTemperatureGraph === null
+        ? null
+        : (value.roomTemperatureGraph as Array<any>).map(
+            GetInsights200ResponseResultRoomTemperatureGraphInnerToJSON,
           ),
   };
 }

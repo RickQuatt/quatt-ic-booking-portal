@@ -368,6 +368,18 @@ export interface MeCic {
    * @memberof MeCic
    */
   nightMaxSoundLevel: MaxSoundLevel;
+  /**
+   * Outside temperature in degrees celcius
+   * @type {number}
+   * @memberof MeCic
+   */
+  temperatureOutside: number | null;
+  /**
+   * Water temperature in degrees celcius
+   * @type {number}
+   * @memberof MeCic
+   */
+  waterTemperature: number | null;
 }
 
 /**
@@ -448,6 +460,8 @@ export function instanceOfMeCic(value: object): boolean {
   isInstance = isInstance && "hasSoundSlider" in value;
   isInstance = isInstance && "dayMaxSoundLevel" in value;
   isInstance = isInstance && "nightMaxSoundLevel" in value;
+  isInstance = isInstance && "temperatureOutside" in value;
+  isInstance = isInstance && "waterTemperature" in value;
 
   return isInstance;
 }
@@ -548,6 +562,8 @@ export function MeCicFromJSONTyped(
     hasSoundSlider: json["hasSoundSlider"],
     dayMaxSoundLevel: MaxSoundLevelFromJSON(json["dayMaxSoundLevel"]),
     nightMaxSoundLevel: MaxSoundLevelFromJSON(json["nightMaxSoundLevel"]),
+    temperatureOutside: json["temperatureOutside"],
+    waterTemperature: json["waterTemperature"],
   };
 }
 
@@ -624,5 +640,7 @@ export function MeCicToJSON(value?: MeCic | null): any {
     hasSoundSlider: value.hasSoundSlider,
     dayMaxSoundLevel: MaxSoundLevelToJSON(value.dayMaxSoundLevel),
     nightMaxSoundLevel: MaxSoundLevelToJSON(value.nightMaxSoundLevel),
+    temperatureOutside: value.temperatureOutside,
+    waterTemperature: value.waterTemperature,
   };
 }

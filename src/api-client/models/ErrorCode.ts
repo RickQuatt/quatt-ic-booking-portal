@@ -42,6 +42,8 @@ export const ErrorCode = {
     "COMMISSIONING_IDENTIFICATION_THERMOSTAT_UNIDENTIFIED",
   CommissioningIdentificationHeatPumpUnidentified:
     "COMMISSIONING_IDENTIFICATION_HEAT_PUMP_UNIDENTIFIED",
+  CommissioningIdentificationOduUnidentified:
+    "COMMISSIONING_IDENTIFICATION_ODU_UNIDENTIFIED",
   CommissioningIdentificationFlowTemperatureSensorUnidentified:
     "COMMISSIONING_IDENTIFICATION_FLOW_TEMPERATURE_SENSOR_UNIDENTIFIED",
   CommissioningHeatPumpNotFinished: "COMMISSIONING_HEAT_PUMP_NOT_FINISHED",
