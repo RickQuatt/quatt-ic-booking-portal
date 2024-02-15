@@ -23,6 +23,7 @@ models/CicHealthCheckEntry.ts
 models/CicHealthCheckStatus.ts
 models/CicHealthChecksByCategory.ts
 models/CicHealthChecksByKpi.ts
+models/CicSettingsUpdate.ts
 models/CicState.ts
 models/CicStatus.ts
 models/CompleteCommissioning200Response.ts

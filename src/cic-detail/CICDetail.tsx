@@ -18,6 +18,7 @@ import { CICDetailLastCommissioning } from "./CICDetailLastCommissioning";
 import { CICDetailHealthChecks } from "./CICDetailHealthChecks";
 import { CICDetailState } from "./CICDetailState";
 import { CICDetailCommissioning } from "./CICDetailCommissioning";
+import { CICDetailSettings } from "./CICDetailSettings";
 
 interface CICDetailProps {
   data: AdminCic;
@@ -47,6 +48,7 @@ export function CICDetail({ data }: CICDetailProps) {
         <CICDetailAdvanced cicData={cicData} />
         <CICDetailState cicData={cicData} />
         <CICDetailCommissioning cicData={cicData} />
+        <CICDetailSettings cicData={cicData} />
       </div>
       <BackButton />
     </div>

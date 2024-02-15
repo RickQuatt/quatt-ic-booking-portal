@@ -69,6 +69,7 @@ models/*
 !models/AdminListInstallers200ResponseFromJSON.ts
 !models/AdminListInstallers200ResponseToJSON.ts
 !models/CicHealthChecks.ts
+!models/CicSettingsUpdate.ts
 !models/CicHealthCheckEntry.ts
 !models/CicHealthCheckCategory.ts
 !models/CicHealthCheckStatus.ts

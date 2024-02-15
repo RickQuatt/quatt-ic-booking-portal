@@ -24,6 +24,7 @@ export * from "./CicHealthCheckEntry";
 export * from "./CicHealthCheckStatus";
 export * from "./CicHealthChecksByCategory";
 export * from "./CicHealthChecksByKpi";
+export * from "./CicSettingsUpdate";
 export * from "./CicState";
 export * from "./CicStatus";
 export * from "./CompleteCommissioning200Response";
