@@ -1,11 +1,7 @@
 import React from "react";
 
 import classes from "./CICDetail.module.css";
-import {
-  AdminCic,
-  CicCommissioning,
-  CicSettingsUpdate,
-} from "../api-client/models";
+import { AdminCic, CicSettingsUpdate } from "../api-client/models";
 import {
   FormField,
   FormFieldJson,
@@ -52,6 +48,7 @@ function CICDetailSettingsItem({
   return (
     <AccordionItem
       title={formatDateTime(settingsUpdate.createdAt) || "No date"}
+      additionalInfo={`Updated by: ${settingsUpdate.fullname}`}
       isOpen={isOpen}
       onChangeIsOpen={() => setIsOpen(!isOpen)}
     >

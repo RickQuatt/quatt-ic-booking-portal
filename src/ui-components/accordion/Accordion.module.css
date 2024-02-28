@@ -3,6 +3,8 @@
 
 .accordion-item {
   border: 1px solid var(--border-color);
+  margin-top: 6px;
+  border-radius: 10px;
 
   &:not(:last-child) {
     border-bottom: 0;
@@ -14,10 +16,11 @@
   display: flex;
   align-items: center;
   background: #f7f7f7;
+  border-radius: 10px;
   cursor: pointer;
 
   & > div {
-    margin: 12px 8px;
+    margin: 10px 8px;
   }
 }
 

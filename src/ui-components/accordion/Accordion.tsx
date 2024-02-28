@@ -11,12 +11,14 @@ export function Accordion(props: AccordionProps) {
 
 interface AccordionItemProps extends React.PropsWithChildren {
   title: string;
+  additionalInfo?: string | null;
   isOpen?: boolean;
   onChangeIsOpen?: () => void;
 }
 
 export function AccordionItem({
   title,
+  additionalInfo,
   isOpen = true,
   onChangeIsOpen,
   children,
@@ -25,7 +27,15 @@ export function AccordionItem({
     <div className={classes["accordion-item"]}>
       <div className={classes["accordion-item-title"]} onClick={onChangeIsOpen}>
         {">"}
-        <div>{title}</div>
+        <div>
+          {title}
+          {additionalInfo && (
+            <>
+              <br />
+              <div>{additionalInfo}</div>
+            </>
+          )}
+        </div>
       </div>
       <div
         className={classNames(

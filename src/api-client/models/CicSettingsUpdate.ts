@@ -42,6 +42,12 @@ export interface CicSettingsUpdate {
    * @type {string}
    * @memberof CicSettingsUpdate
    */
+  fullname: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof CicSettingsUpdate
+   */
   settingsType: CicSettingsUpdateSettingsTypeEnum;
   /**
    *
@@ -61,6 +67,12 @@ export interface CicSettingsUpdate {
    * @memberof CicSettingsUpdate
    */
   supportsConfirmation: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CicSettingsUpdate
+   */
+  isUnconfirmed: boolean;
   /**
    *
    * @type {Date}
@@ -106,10 +118,12 @@ export function instanceOfCicSettingsUpdate(value: object): boolean {
   isInstance = isInstance && "settingsId" in value;
   isInstance = isInstance && "cicId" in value;
   isInstance = isInstance && "userId" in value;
+  isInstance = isInstance && "fullname" in value;
   isInstance = isInstance && "settingsType" in value;
   isInstance = isInstance && "settings" in value;
   isInstance = isInstance && "retries" in value;
   isInstance = isInstance && "supportsConfirmation" in value;
+  isInstance = isInstance && "isUnconfirmed" in value;
   isInstance = isInstance && "confirmedAt" in value;
   isInstance = isInstance && "cancelledAt" in value;
   isInstance = isInstance && "createdAt" in value;
@@ -133,10 +147,12 @@ export function CicSettingsUpdateFromJSONTyped(
     settingsId: json["settingsId"],
     cicId: json["cicId"],
     userId: json["userId"],
+    fullname: json["fullname"],
     settingsType: json["settingsType"],
     settings: json["settings"],
     retries: json["retries"],
     supportsConfirmation: json["supportsConfirmation"],
+    isUnconfirmed: json["isUnconfirmed"],
     confirmedAt:
       json["confirmedAt"] === null ? null : new Date(json["confirmedAt"]),
     cancelledAt:
@@ -157,10 +173,12 @@ export function CicSettingsUpdateToJSON(value?: CicSettingsUpdate | null): any {
     settingsId: value.settingsId,
     cicId: value.cicId,
     userId: value.userId,
+    fullname: value.fullname,
     settingsType: value.settingsType,
     settings: value.settings,
     retries: value.retries,
     supportsConfirmation: value.supportsConfirmation,
+    isUnconfirmed: value.isUnconfirmed,
     confirmedAt:
       value.confirmedAt === null ? null : value.confirmedAt.toISOString(),
     cancelledAt:
