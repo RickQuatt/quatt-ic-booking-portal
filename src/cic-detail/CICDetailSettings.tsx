@@ -50,7 +50,7 @@ function CICDetailSettingsItem({
       title={formatDateTime(settingsUpdate.createdAt) || "No date"}
       additionalInfo={
         <>
-          <div>Updated by: {settingsUpdate.fullname}</div>
+          <div>Updated by: {settingsUpdate.fullname ?? "-"}</div>
           <div>Is Confirmed: {settingsUpdate.isUnconfirmed ? "❌" : "✅"}</div>
         </>
       }
