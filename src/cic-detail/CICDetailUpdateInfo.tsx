@@ -22,10 +22,6 @@ export function CICDetailUpdateInfo({ cicData }: { cicData: AdminCic }) {
           <FormFieldValue value={cicData.quattBuildRequired} />
         </FormField>
         <FormField>
-          <FormFieldTitle>Update status</FormFieldTitle>
-          <FormFieldValue value={cicData.updateStatus} />
-        </FormField>
-        <FormField>
           <FormFieldTitle>Needs update</FormFieldTitle>
           <FormFieldValue value={cicData.needsUpdate} />
         </FormField>
