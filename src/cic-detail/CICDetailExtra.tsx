@@ -22,10 +22,6 @@ export function CICDetailExtra({ cicData }: { cicData: AdminCic }) {
           <FormFieldValue value={cicData.flowRate} />
         </FormField>
         <FormField>
-          <FormFieldTitle>Supply temperature</FormFieldTitle>
-          <FormFieldValue value={cicData.supplyTemperature} />
-        </FormField>
-        <FormField>
           <FormFieldTitle>Serial</FormFieldTitle>
           <FormFieldValue value={cicData.serial} />
         </FormField>
