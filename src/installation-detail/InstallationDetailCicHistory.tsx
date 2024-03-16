@@ -1,0 +1,59 @@
+import { AdminInstallationDetail } from "../api-client/models";
+import classes from "./InstallationDetail.module.css";
+import { CICDetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import { formatDateTime } from "../utils/formatDate";
+import {
+  TBody,
+  THead,
+  Table,
+  Td,
+  TdText,
+  Th,
+  Tr,
+} from "../ui-components/table/Table";
+
+export function InstallationDetailCicHistory({
+  installation,
+}: {
+  installation: AdminInstallationDetail;
+}) {
+  return (
+    <div className={classes["detail-section"]}>
+      <CICDetailSectionHeader title="🕐 CIC history" />
+      {installation.cicState && (
+        <div className={classes["detail-section-table"]}>
+          <Table gridClass={classes["table-grid-cic-history"]}>
+            <THead>
+              <Tr>
+                <Th>
+                  <TdText>CIC</TdText>
+                </Th>
+                <Th>
+                  <TdText>Starts at</TdText>
+                </Th>
+                <Th>
+                  <TdText>Status</TdText>
+                </Th>
+              </Tr>
+            </THead>
+            <TBody>
+              {installation.cicState.map((state) => (
+                <Tr>
+                  <Td>
+                    <TdText>{state.cicId}</TdText>
+                  </Td>
+                  <Td>
+                    <TdText>{formatDateTime(state.startAt)}</TdText>
+                  </Td>
+                  <Td>
+                    <TdText>{state.status}</TdText>
+                  </Td>
+                </Tr>
+              ))}
+            </TBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+}

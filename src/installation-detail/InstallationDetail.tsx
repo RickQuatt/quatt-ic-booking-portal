@@ -4,6 +4,7 @@ import { CICDetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import classes from "./InstallationDetail.module.css";
 import { ButtonLink } from "../ui-components/button/Button";
 import { InstallationDetailExtraInformation } from "./InstallationDetailExtraInformation";
+import { InstallationDetailCicHistory } from "./InstallationDetailCicHistory";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
@@ -28,6 +29,7 @@ export function InstallationDetail({ data }: InstallationDetailProps) {
         </div>
 
         <InstallationDetailExtraInformation installation={data} />
+        <InstallationDetailCicHistory installation={data} />
       </div>
 
       <div className={classes["detail-sections-insights"]}>

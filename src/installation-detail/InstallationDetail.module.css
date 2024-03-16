@@ -88,6 +88,7 @@
   grid-template-columns: 1fr 1fr;
 }
 
-.table-grid-state-history {
-  grid-template-columns: 2fr 1fr;
+.table-grid-cic-history {
+  font-size: 0.8rem;
+  grid-template-columns: 2.8fr 2.2fr 0.9fr;
 }
