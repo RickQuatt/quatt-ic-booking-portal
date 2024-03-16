@@ -81,7 +81,6 @@ export * from "./StopIdentificationTestRequest";
 export * from "./Tariff";
 export * from "./ThermostatType";
 export * from "./UpdateAdminCic";
-export * from "./UpdateAdminInstallation";
 export * from "./UpdateCic";
 export * from "./UpdateInstallerCic";
 export * from "./UpdateMeCic";

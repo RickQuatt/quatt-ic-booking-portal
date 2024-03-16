@@ -1,0 +1,93 @@
+.detail-sections {
+  width: 100%;
+  margin: 32px auto;
+  margin-top: 72px;
+  padding: 0 12px;
+  max-width: 1600px;
+
+  display: grid;
+  grid-template-columns: minmax(400px, 600px) minmax(300px, 400px) minmax(
+      300px,
+      400px
+    );
+  align-items: start;
+  grid-template-areas: "sections-health sections-insights sections-api";
+  gap: 22px;
+}
+
+@media (max-width: 1100px) {
+  .detail-sections {
+    grid-template-areas:
+      "sections-actions"
+      "sections-health"
+      "sections-main";
+    grid-template-columns: minmax(200px, 500px);
+    justify-content: center;
+  }
+}
+
+.detail-section-header {
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 5px;
+  background: var(--box-background);
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.detail-section {
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 5px;
+  background: var(--box-background);
+  margin-bottom: 10px;
+}
+
+.detail-section-table {
+  border: 1px solid var(--border-color);
+  overflow: auto;
+  border-radius: 5px;
+  position: relative;
+  max-height: 200px;
+}
+
+.detail-section-commissioning {
+  overflow: auto;
+  border-radius: 5px;
+  position: relative;
+  max-height: 200px;
+}
+
+.detail-sections-health {
+  grid-area: sections-health;
+}
+
+.detail-sections-main {
+  grid-area: sections-main;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.detail-sections-actions {
+  grid-area: sections-actions;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.back-button {
+  position: absolute;
+  top: 12px;
+  left: 24px;
+}
+
+.table-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.table-grid-state-history {
+  grid-template-columns: 2fr 1fr;
+}

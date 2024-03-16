@@ -88,6 +88,12 @@ export interface AdminInstallationDetail {
   externalId: string | null;
   /**
    *
+   * @type {string}
+   * @memberof AdminInstallationDetail
+   */
+  activeCic: string;
+  /**
+   *
    * @type {number}
    * @memberof AdminInstallationDetail
    */
@@ -261,6 +267,18 @@ export interface AdminInstallationDetail {
    */
   updatedAt: Date;
   /**
+   * The image version of the cic
+   * @type {string}
+   * @memberof AdminInstallationDetail
+   */
+  quattBuild: string | null;
+  /**
+   *
+   * @type {Date}
+   * @memberof AdminInstallationDetail
+   */
+  lastConnectionStatusUpdatedAt: Date | null;
+  /**
    *
    * @type {Array<CicState>}
    * @memberof AdminInstallationDetail
@@ -287,6 +305,7 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "id" in value;
   isInstance = isInstance && "externalId" in value;
+  isInstance = isInstance && "activeCic" in value;
   isInstance = isInstance && "electricityPrice" in value;
   isInstance = isInstance && "dayElectricityPrice" in value;
   isInstance = isInstance && "nightElectricityPrice" in value;
@@ -316,6 +335,8 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "hasBrokenCounters" in value;
   isInstance = isInstance && "createdAt" in value;
   isInstance = isInstance && "updatedAt" in value;
+  isInstance = isInstance && "quattBuild" in value;
+  isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
   isInstance = isInstance && "cicState" in value;
   isInstance = isInstance && "cicCommissioning" in value;
   isInstance = isInstance && "settingsUpdates" in value;
@@ -339,6 +360,7 @@ export function AdminInstallationDetailFromJSONTyped(
   return {
     id: json["id"],
     externalId: json["externalId"],
+    activeCic: json["activeCic"],
     electricityPrice: json["electricityPrice"],
     dayElectricityPrice: json["dayElectricityPrice"],
     nightElectricityPrice: json["nightElectricityPrice"],
@@ -377,6 +399,11 @@ export function AdminInstallationDetailFromJSONTyped(
     hasBrokenCounters: json["hasBrokenCounters"],
     createdAt: new Date(json["createdAt"]),
     updatedAt: new Date(json["updatedAt"]),
+    quattBuild: json["quattBuild"],
+    lastConnectionStatusUpdatedAt:
+      json["lastConnectionStatusUpdatedAt"] === null
+        ? null
+        : new Date(json["lastConnectionStatusUpdatedAt"]),
     cicState: (json["cicState"] as Array<any>).map(CicStateFromJSON),
     cicCommissioning: (json["cicCommissioning"] as Array<any>).map(
       CicCommissioningFromJSON,
@@ -399,6 +426,7 @@ export function AdminInstallationDetailToJSON(
   return {
     id: value.id,
     externalId: value.externalId,
+    activeCic: value.activeCic,
     electricityPrice: value.electricityPrice,
     dayElectricityPrice: value.dayElectricityPrice,
     nightElectricityPrice: value.nightElectricityPrice,
@@ -437,6 +465,11 @@ export function AdminInstallationDetailToJSON(
     hasBrokenCounters: value.hasBrokenCounters,
     createdAt: value.createdAt.toISOString(),
     updatedAt: value.updatedAt.toISOString(),
+    quattBuild: value.quattBuild,
+    lastConnectionStatusUpdatedAt:
+      value.lastConnectionStatusUpdatedAt === null
+        ? null
+        : value.lastConnectionStatusUpdatedAt.toISOString(),
     cicState: (value.cicState as Array<any>).map(CicStateToJSON),
     cicCommissioning: (value.cicCommissioning as Array<any>).map(
       CicCommissioningToJSON,

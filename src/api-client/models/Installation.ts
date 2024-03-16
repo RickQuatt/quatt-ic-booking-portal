@@ -70,6 +70,12 @@ export interface Installation {
   externalId: string | null;
   /**
    *
+   * @type {string}
+   * @memberof Installation
+   */
+  activeCic: string;
+  /**
+   *
    * @type {number}
    * @memberof Installation
    */
@@ -242,6 +248,18 @@ export interface Installation {
    * @memberof Installation
    */
   updatedAt: Date;
+  /**
+   * The image version of the cic
+   * @type {string}
+   * @memberof Installation
+   */
+  quattBuild: string | null;
+  /**
+   *
+   * @type {Date}
+   * @memberof Installation
+   */
+  lastConnectionStatusUpdatedAt: Date | null;
 }
 
 /**
@@ -251,6 +269,7 @@ export function instanceOfInstallation(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "id" in value;
   isInstance = isInstance && "externalId" in value;
+  isInstance = isInstance && "activeCic" in value;
   isInstance = isInstance && "electricityPrice" in value;
   isInstance = isInstance && "dayElectricityPrice" in value;
   isInstance = isInstance && "nightElectricityPrice" in value;
@@ -280,6 +299,8 @@ export function instanceOfInstallation(value: object): boolean {
   isInstance = isInstance && "hasBrokenCounters" in value;
   isInstance = isInstance && "createdAt" in value;
   isInstance = isInstance && "updatedAt" in value;
+  isInstance = isInstance && "quattBuild" in value;
+  isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
 
   return isInstance;
 }
@@ -298,6 +319,7 @@ export function InstallationFromJSONTyped(
   return {
     id: json["id"],
     externalId: json["externalId"],
+    activeCic: json["activeCic"],
     electricityPrice: json["electricityPrice"],
     dayElectricityPrice: json["dayElectricityPrice"],
     nightElectricityPrice: json["nightElectricityPrice"],
@@ -336,6 +358,11 @@ export function InstallationFromJSONTyped(
     hasBrokenCounters: json["hasBrokenCounters"],
     createdAt: new Date(json["createdAt"]),
     updatedAt: new Date(json["updatedAt"]),
+    quattBuild: json["quattBuild"],
+    lastConnectionStatusUpdatedAt:
+      json["lastConnectionStatusUpdatedAt"] === null
+        ? null
+        : new Date(json["lastConnectionStatusUpdatedAt"]),
   };
 }
 
@@ -349,6 +376,7 @@ export function InstallationToJSON(value?: Installation | null): any {
   return {
     id: value.id,
     externalId: value.externalId,
+    activeCic: value.activeCic,
     electricityPrice: value.electricityPrice,
     dayElectricityPrice: value.dayElectricityPrice,
     nightElectricityPrice: value.nightElectricityPrice,
@@ -387,5 +415,10 @@ export function InstallationToJSON(value?: Installation | null): any {
     hasBrokenCounters: value.hasBrokenCounters,
     createdAt: value.createdAt.toISOString(),
     updatedAt: value.updatedAt.toISOString(),
+    quattBuild: value.quattBuild,
+    lastConnectionStatusUpdatedAt:
+      value.lastConnectionStatusUpdatedAt === null
+        ? null
+        : value.lastConnectionStatusUpdatedAt.toISOString(),
   };
 }

@@ -72,10 +72,10 @@ export const ErrorCode = {
   TariffNotFound: "TARIFF_NOT_FOUND",
   TariffValidationError: "TARIFF_VALIDATION_ERROR",
   TariffOutOfBounds: "TARIFF_OUT_OF_BOUNDS",
-  InstallationDateNotToday: "INSTALLATION_DATE_NOT_TODAY",
   InstallationNotFound: "INSTALLATION_NOT_FOUND",
-  InstallationUpdateError: "INSTALLATION_UPDATE_ERROR",
-  InstallationWithNoActiveCic: "INSTALLATION_WITH_NO_ACTIVE_CIC",
+  InstallationDateNotToday: "INSTALLATION_DATE_NOT_TODAY",
+  CicNotFactoryOrActive: "CIC_NOT_FACTORY_OR_ACTIVE",
+  InstallationNotFound2: "INSTALLATION_NOT_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

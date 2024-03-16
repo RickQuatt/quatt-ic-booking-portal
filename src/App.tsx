@@ -16,6 +16,7 @@ import { CicDashboard } from "./cic-dashboard/CicDashboard";
 import { CICHealthList } from "./cic-health-list/CICHealthList";
 import { Sidebar } from "./sidebar/Sidebar";
 import { InstallationList } from "./installation-list/InstallationList";
+import { InstallationDetail } from "./installation-detail/InstallationDetail";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,15 @@ function App() {
                 return <CICDetailRenderer cicId={params.cicId} />;
               }}
             </Route>
+            <Route path="/installations/:installationId">
+              {(params) => {
+                return (
+                  <InstallationDetailRenderer
+                    installationId={params.installationId}
+                  />
+                );
+              }}
+            </Route>
           </ApiClientProvider>
         </QueryClientProvider>
       </div>
@@ -111,6 +121,24 @@ const CICDetailRenderer = ({ cicId }: { cicId: string }) => {
   if (status !== "success") return <Loader />;
 
   return <CICDetail data={data.result} />;
+};
+
+const InstallationDetailRenderer = ({
+  installationId,
+}: {
+  installationId: string;
+}) => {
+  const apiClient = useApiClient();
+  const { data, status, error } = useQuery(
+    ["installationDetail", installationId],
+    () => {
+      return apiClient.adminGetInstallation({ installationId });
+    },
+  );
+
+  if (status !== "success") return <Loader />;
+
+  return <InstallationDetail data={data.result} />;
 };
 
 const InstallerListRenderer = () => {
