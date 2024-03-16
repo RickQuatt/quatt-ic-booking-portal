@@ -129,7 +129,7 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
   }: {
     installation: AdminInstallationsList;
   }) {
-    const installationDetailLink = `/installation/${installation.externalId}`;
+    const installationDetailLink = `/installations/${installation.externalId}`;
     return (
       <Tr>
         <Td>
