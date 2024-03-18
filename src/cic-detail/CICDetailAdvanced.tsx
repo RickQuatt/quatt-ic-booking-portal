@@ -9,7 +9,7 @@ import {
 import { useModalState } from "../ui-components/modal/useModalState";
 import { AdvancedSettingsModal } from "./AdvancedSettingsModal";
 import classes from "./CICDetail.module.css";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 import {
   getGrafanaLink,
   getHubspotSearchOrderLink,
@@ -25,7 +25,7 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
 
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Advanced details" />
+      <DetailSectionHeader title="Advanced details" />
       <AdvancedSettingsModal
         isOpen={isAdvancedSettingsModalOpen}
         closeModal={closeAdvancedSettingsModal}

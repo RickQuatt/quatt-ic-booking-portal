@@ -1,33 +1,40 @@
 import React from "react";
 
-import classes from "./CICDetail.module.css";
-import { AdminCic, CicCommissioning } from "../api-client/models";
+import {
+  AdminInstallationDetail,
+  CicCommissioning,
+} from "../api-client/models";
 import {
   FormField,
   FormFieldJson,
   FormFieldTitle,
   FormSection,
 } from "../ui-components/form/Form";
-import { DetailSectionHeader } from "./CICDetailSectionHeader";
+import classes from "./InstallationDetail.module.css";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
 import { formatDateTime } from "../utils/formatDate";
+import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 
 interface CICDetailProps {
-  cicData: AdminCic;
+  installation: AdminInstallationDetail;
 }
 
-export function CICDetailCommissioning({ cicData }: CICDetailProps) {
+export function InstallationDetailCommissioningHistory({
+  installation,
+}: CICDetailProps) {
   return (
     <div className={classes["detail-section"]}>
-      <DetailSectionHeader title="Commissioning details" />
+      <DetailSectionHeader title="👨‍🔧 Commissioning history" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Date of commissionings</FormFieldTitle>
           <div className={classes["detail-section-commissioning"]}>
             <Accordion>
-              {cicData.commissioningHistory
+              {installation.cicCommissioning
                 .map((commissioning) => (
-                  <CICDetailCommissioningItem commissioning={commissioning} />
+                  <InstallationDetailCommissioningItem
+                    commissioning={commissioning}
+                  />
                 ))
                 .sort((a, b) => {
                   if (
@@ -52,13 +59,13 @@ export function CICDetailCommissioning({ cicData }: CICDetailProps) {
   );
 }
 
-interface CICDetailCommissioningItemProps {
+interface InstallationDetailCommissioningItemProps {
   commissioning: CicCommissioning;
 }
 
-function CICDetailCommissioningItem({
+function InstallationDetailCommissioningItem({
   commissioning,
-}: CICDetailCommissioningItemProps) {
+}: InstallationDetailCommissioningItemProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (

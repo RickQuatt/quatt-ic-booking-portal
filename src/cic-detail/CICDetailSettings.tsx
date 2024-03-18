@@ -8,7 +8,7 @@ import {
   FormFieldTitle,
   FormSection,
 } from "../ui-components/form/Form";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
 import { formatDateTime } from "../utils/formatDate";
 
@@ -19,7 +19,7 @@ interface CICDetailProps {
 export function CICDetailSettings({ cicData }: CICDetailProps) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Settings history" />
+      <DetailSectionHeader title="Settings history" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Date of updated setting</FormFieldTitle>

@@ -1,6 +1,6 @@
 import { AdminInstallationDetail } from "../api-client/models";
 import classes from "./InstallationDetail.module.css";
-import { CICDetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { formatDateTime } from "../utils/formatDate";
 import {
   TBody,
@@ -19,7 +19,7 @@ export function InstallationDetailCicHistory({
 }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="🕐 CIC history" />
+      <DetailSectionHeader title="🕐 CIC history" />
       {installation.cicState && (
         <div className={classes["detail-section-table"]}>
           <Table gridClass={classes["table-grid-cic-history"]}>
@@ -37,8 +37,8 @@ export function InstallationDetailCicHistory({
               </Tr>
             </THead>
             <TBody>
-              {installation.cicState.map((state) => (
-                <Tr>
+              {installation.cicState.map((state, index) => (
+                <Tr key={index}>
                   <Td>
                     <TdText>{state.cicId}</TdText>
                   </Td>

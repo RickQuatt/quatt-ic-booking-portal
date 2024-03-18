@@ -8,13 +8,13 @@ import {
 } from "../ui-components/form/Form";
 import { formatDateDistance } from "../utils/formatDate";
 import classes from "./CICDetail.module.css";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
 
 export function CICDetailNetworkConnection({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Network connection" />
+      <DetailSectionHeader title="Network connection" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Last connection status updated at</FormFieldTitle>

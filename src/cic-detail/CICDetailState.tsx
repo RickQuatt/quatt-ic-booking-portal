@@ -9,13 +9,13 @@ import {
   Tr,
 } from "../ui-components/table/Table";
 import classes from "./CICDetail.module.css";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 import { formatDateTime } from "../utils/formatDate";
 
 export function CICDetailState({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="State history" />
+      <DetailSectionHeader title="State history" />
       {cicData.stateHistory && (
         <div className={classes["detail-section-table"]}>
           <Table gridClass={classes["table-grid-state-history"]}>

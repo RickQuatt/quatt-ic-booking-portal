@@ -1,6 +1,6 @@
 import classes from "./CICDetailSectionHeader.module.css";
 
-export function CICDetailSectionHeader({ title }: { title: string }) {
+export function DetailSectionHeader({ title }: { title: string }) {
   return (
     <div className={classes["detail-section-header"]}>
       <h3>{title}</h3>
@@ -9,7 +9,7 @@ export function CICDetailSectionHeader({ title }: { title: string }) {
   );
 }
 
-export function CICDetailSubSectionHeader({ title }: { title: string }) {
+export function DetailSubSectionHeader({ title }: { title: string }) {
   return (
     <div className={classes["detail-sub-section-header"]}>
       <h4>{title}</h4>

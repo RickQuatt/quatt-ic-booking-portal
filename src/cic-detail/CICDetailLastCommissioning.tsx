@@ -9,7 +9,7 @@ import {
 } from "../ui-components/form/Form";
 import { formatDateDistance } from "../utils/formatDate";
 import classes from "./CICDetail.module.css";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 
 export function CICDetailLastCommissioning({
   data,
@@ -18,7 +18,7 @@ export function CICDetailLastCommissioning({
 }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Last commissioning" />
+      <DetailSectionHeader title="Last commissioning" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Completed at</FormFieldTitle>

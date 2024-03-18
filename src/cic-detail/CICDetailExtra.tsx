@@ -6,12 +6,12 @@ import {
   FormSection,
 } from "../ui-components/form/Form";
 import classes from "./CICDetail.module.css";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 
 export function CICDetailExtra({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Extra details" />
+      <DetailSectionHeader title="Extra details" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Heat delivery systems</FormFieldTitle>

@@ -6,12 +6,12 @@ import {
   FormSection,
 } from "../ui-components/form/Form";
 import classes from "./CICDetail.module.css";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 
 export function CICDetailThermostatInfo({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Thermostat info" />
+      <DetailSectionHeader title="Thermostat info" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Is thermostat connected</FormFieldTitle>

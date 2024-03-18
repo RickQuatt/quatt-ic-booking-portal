@@ -1,10 +1,11 @@
 import { Link } from "wouter";
 import { AdminInstallationDetail } from "../api-client/models";
-import { CICDetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import classes from "./InstallationDetail.module.css";
 import { ButtonLink } from "../ui-components/button/Button";
 import { InstallationDetailExtraInformation } from "./InstallationDetailExtraInformation";
 import { InstallationDetailCicHistory } from "./InstallationDetailCicHistory";
+import { InstallationDetailCommissioningHistory } from "./InstallationDetailCommissioningHistory";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
@@ -19,29 +20,30 @@ export function InstallationDetail({ data }: InstallationDetailProps) {
         </div>
 
         <div className={classes["detail-section"]}>
-          <CICDetailSectionHeader title="🏥 Health checks" />
+          <DetailSectionHeader title="🏥 Health checks" />
           TODO
         </div>
 
         <div className={classes["detail-section"]}>
-          <CICDetailSectionHeader title="📝 Notes" />
+          <DetailSectionHeader title="📝 Notes" />
           TODO
         </div>
 
         <InstallationDetailExtraInformation installation={data} />
         <InstallationDetailCicHistory installation={data} />
+        <InstallationDetailCommissioningHistory installation={data} />
       </div>
 
       <div className={classes["detail-sections-insights"]}>
         <div className={classes["detail-section"]}>
-          <CICDetailSectionHeader title="📊 Advanced insights" />
+          <DetailSectionHeader title="📊 Advanced insights" />
           TODO
         </div>
       </div>
 
       <div className={classes["detail-sections-api"]}>
         <div className={classes["detail-section"]}>
-          <CICDetailSectionHeader title="Hubspot tickets" />
+          <DetailSectionHeader title="Hubspot tickets" />
           TODO
         </div>
       </div>

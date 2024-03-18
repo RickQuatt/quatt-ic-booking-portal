@@ -6,7 +6,7 @@ import {
   FormSection,
 } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
-import { CICDetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { formatDateDistance } from "../utils/formatDate";
 
 export function InstallationDetailExtraInformation({
@@ -16,7 +16,7 @@ export function InstallationDetailExtraInformation({
 }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="🔍 Extra information" />
+      <DetailSectionHeader title="🔍 Extra information" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Active CIC</FormFieldTitle>

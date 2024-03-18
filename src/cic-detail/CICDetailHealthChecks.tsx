@@ -2,8 +2,8 @@ import React from "react";
 import { AdminCic, CicHealthCheckCategory } from "../api-client/models";
 import classes from "./CICDetail.module.css";
 import {
-  CICDetailSectionHeader,
-  CICDetailSubSectionHeader,
+  DetailSectionHeader,
+  DetailSubSectionHeader,
 } from "./CICDetailSectionHeader";
 import {
   FormField,
@@ -36,7 +36,7 @@ export function CICDetailHealthChecks({ cicData }: { cicData: AdminCic }) {
 
       return (
         <>
-          <CICDetailSubSectionHeader
+          <DetailSubSectionHeader
             title={categoryToLabel[category as CicHealthCheckCategory]}
           />
           {rows}
@@ -47,7 +47,7 @@ export function CICDetailHealthChecks({ cicData }: { cicData: AdminCic }) {
 
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Health checks" />
+      <DetailSectionHeader title="Health checks" />
       <FormSection>{rows}</FormSection>
     </div>
   );

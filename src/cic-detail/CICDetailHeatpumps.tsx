@@ -8,12 +8,12 @@ import {
   FormSection,
 } from "../ui-components/form/Form";
 import classes from "./CICDetail.module.css";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 
 export function CICDetailHeatpumps({ cicData }: { cicData: AdminCic }) {
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Heat pumps" />
+      <DetailSectionHeader title="Heat pumps" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Number of heat pumps</FormFieldTitle>

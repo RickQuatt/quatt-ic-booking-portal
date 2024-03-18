@@ -15,7 +15,7 @@ import {
 import { Button } from "../ui-components/button/Button";
 import classes from "./CICDetail.module.css";
 import { formatDate, formatDateDistance } from "../utils/formatDate";
-import { CICDetailSectionHeader } from "./CICDetailSectionHeader";
+import { DetailSectionHeader } from "./CICDetailSectionHeader";
 
 const requiredFieldText = "This field is required";
 // required for inputs of type="number"
@@ -94,7 +94,7 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
 
   return (
     <div className={classes["detail-section"]}>
-      <CICDetailSectionHeader title="Main CIC details" />
+      <DetailSectionHeader title="Main CIC details" />
       <FormSection>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormField>
