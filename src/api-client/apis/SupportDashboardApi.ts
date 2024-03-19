@@ -25,6 +25,7 @@ import type {
   CreateUpdateInstaller,
   ErrorResponse,
   UpdateAdminCic,
+  UpdateAdminInstallation,
 } from "../models/index";
 import {
   AdminCreateInstaller200ResponseFromJSON,
@@ -49,6 +50,8 @@ import {
   ErrorResponseToJSON,
   UpdateAdminCicFromJSON,
   UpdateAdminCicToJSON,
+  UpdateAdminInstallationFromJSON,
+  UpdateAdminInstallationToJSON,
 } from "../models/index";
 
 export interface AdminCicCicIdOptionsRequest {
@@ -82,6 +85,11 @@ export interface AdminInstallationInstallationIdOptionsRequest {
 export interface AdminUpdateCicRequest {
   cicId: string;
   updateAdminCic?: UpdateAdminCic;
+}
+
+export interface AdminUpdateInstallationRequest {
+  installationId: string;
+  updateAdminInstallation?: UpdateAdminInstallation;
 }
 
 export interface AdminUpdateInstallerRequest {
@@ -893,6 +901,72 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminGetCic200Response> {
     const response = await this.adminUpdateCicRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   * Update installation
+   */
+  async adminUpdateInstallationRaw(
+    requestParameters: AdminUpdateInstallationRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<AdminGetInstallation200Response>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminUpdateInstallation.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "PUT",
+        headers: headerParameters,
+        query: queryParameters,
+        body: UpdateAdminInstallationToJSON(
+          requestParameters.updateAdminInstallation,
+        ),
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminGetInstallation200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Update installation
+   */
+  async adminUpdateInstallation(
+    requestParameters: AdminUpdateInstallationRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminGetInstallation200Response> {
+    const response = await this.adminUpdateInstallationRaw(
       requestParameters,
       initOverrides,
     );

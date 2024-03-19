@@ -280,6 +280,12 @@ export interface AdminInstallationDetail {
   lastConnectionStatusUpdatedAt: Date | null;
   /**
    *
+   * @type {string}
+   * @memberof AdminInstallationDetail
+   */
+  menderId: string | null;
+  /**
+   *
    * @type {Array<CicState>}
    * @memberof AdminInstallationDetail
    */
@@ -337,6 +343,7 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "updatedAt" in value;
   isInstance = isInstance && "quattBuild" in value;
   isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
+  isInstance = isInstance && "menderId" in value;
   isInstance = isInstance && "cicState" in value;
   isInstance = isInstance && "cicCommissioning" in value;
   isInstance = isInstance && "settingsUpdates" in value;
@@ -404,6 +411,7 @@ export function AdminInstallationDetailFromJSONTyped(
       json["lastConnectionStatusUpdatedAt"] === null
         ? null
         : new Date(json["lastConnectionStatusUpdatedAt"]),
+    menderId: json["menderId"],
     cicState: (json["cicState"] as Array<any>).map(CicStateFromJSON),
     cicCommissioning: (json["cicCommissioning"] as Array<any>).map(
       CicCommissioningFromJSON,
@@ -470,6 +478,7 @@ export function AdminInstallationDetailToJSON(
       value.lastConnectionStatusUpdatedAt === null
         ? null
         : value.lastConnectionStatusUpdatedAt.toISOString(),
+    menderId: value.menderId,
     cicState: (value.cicState as Array<any>).map(CicStateToJSON),
     cicCommissioning: (value.cicCommissioning as Array<any>).map(
       CicCommissioningToJSON,

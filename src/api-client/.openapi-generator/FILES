@@ -80,6 +80,7 @@ models/StopIdentificationTestRequest.ts
 models/Tariff.ts
 models/ThermostatType.ts
 models/UpdateAdminCic.ts
+models/UpdateAdminInstallation.ts
 models/UpdateCic.ts
 models/UpdateInstallerCic.ts
 models/UpdateMeCic.ts

@@ -6,6 +6,7 @@ import { ButtonLink } from "../ui-components/button/Button";
 import { InstallationDetailExtraInformation } from "./InstallationDetailExtraInformation";
 import { InstallationDetailCicHistory } from "./InstallationDetailCicHistory";
 import { InstallationDetailCommissioningHistory } from "./InstallationDetailCommissioningHistory";
+import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
@@ -35,10 +36,7 @@ export function InstallationDetail({ data }: InstallationDetailProps) {
       </div>
 
       <div className={classes["detail-sections-insights"]}>
-        <div className={classes["detail-section"]}>
-          <DetailSectionHeader title="📊 Advanced insights" />
-          TODO
-        </div>
+        <InstallationDetailAdvanced installation={data} />
       </div>
 
       <div className={classes["detail-sections-api"]}>
