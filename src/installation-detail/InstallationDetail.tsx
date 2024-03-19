@@ -7,6 +7,7 @@ import { InstallationDetailExtraInformation } from "./InstallationDetailExtraInf
 import { InstallationDetailCicHistory } from "./InstallationDetailCicHistory";
 import { InstallationDetailCommissioningHistory } from "./InstallationDetailCommissioningHistory";
 import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
+import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
@@ -37,6 +38,7 @@ export function InstallationDetail({ data }: InstallationDetailProps) {
 
       <div className={classes["detail-sections-insights"]}>
         <InstallationDetailAdvanced installation={data} />
+        <InstallationDetailSettingsHistory installation={data} />
       </div>
 
       <div className={classes["detail-sections-api"]}>
