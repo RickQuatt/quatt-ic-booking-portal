@@ -30,8 +30,11 @@ export function InstallationDetailSettingsHistory({
           <FormFieldTitle>Date of updated setting</FormFieldTitle>
           <div className={classes["detail-section-commissioning"]}>
             <Accordion>
-              {installation.settingsUpdates.map((setting) => (
-                <InstallationDetailSettingsItem settingsUpdate={setting} />
+              {installation.settingsUpdates.map((setting, index) => (
+                <InstallationDetailSettingsItem
+                  settingsUpdate={setting}
+                  key={index}
+                />
               ))}
             </Accordion>
           </div>

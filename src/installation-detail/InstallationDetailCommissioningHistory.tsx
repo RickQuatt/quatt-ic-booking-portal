@@ -31,9 +31,10 @@ export function InstallationDetailCommissioningHistory({
           <div className={classes["detail-section-commissioning"]}>
             <Accordion>
               {installation.cicCommissioning
-                .map((commissioning) => (
+                .map((commissioning, index) => (
                   <InstallationDetailCommissioningItem
                     commissioning={commissioning}
+                    key={index}
                   />
                 ))
                 .sort((a, b) => {

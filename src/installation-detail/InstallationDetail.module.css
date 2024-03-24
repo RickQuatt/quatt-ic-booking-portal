@@ -26,6 +26,10 @@
   }
 }
 
+.detail-section-bold {
+  font-weight: bold;
+}
+
 .detail-section-header {
   border: 1px solid var(--border-color);
   padding: 16px;

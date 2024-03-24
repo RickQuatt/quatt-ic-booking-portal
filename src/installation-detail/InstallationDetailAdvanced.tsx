@@ -14,7 +14,6 @@ export function InstallationDetailAdvanced({
 }: {
   installation: AdminInstallationDetail;
 }) {
-  console.log(installation);
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="📊 Advanced insights" />

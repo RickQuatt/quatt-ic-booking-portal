@@ -11,6 +11,11 @@ export function formatDateTime(date: Date | null) {
   return format(date, "yyyy-MM-dd HH:mm:ss");
 }
 
+export function formatDateTimeString(date: string | null) {
+  if (!date) return null;
+  return format(new Date(date), "yyyy-MM-dd HH:mm:ss");
+}
+
 // as in "x minutes ago"
 export function formatDateDistance(date: Date | null) {
   if (!date) return null;

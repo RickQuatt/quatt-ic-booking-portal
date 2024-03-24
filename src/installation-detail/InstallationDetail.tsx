@@ -9,6 +9,7 @@ import { InstallationDetailCommissioningHistory } from "./InstallationDetailComm
 import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { InstallationDetailSettings } from "./InstallationDetailSettings";
 import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
+import { InstallationDetailService } from "./InstallationDetailService";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
@@ -48,6 +49,7 @@ export function InstallationDetail({ data }: InstallationDetailProps) {
           <DetailSectionHeader title="Hubspot tickets" />
           TODO
         </div>
+        <InstallationDetailService installation={data} />
       </div>
 
       <BackButton />

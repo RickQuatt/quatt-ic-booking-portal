@@ -7,7 +7,7 @@ import {
 } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
-import { formatDateDistance } from "../utils/formatDate";
+import { formatDateDistance, formatDateTimeString } from "../utils/formatDate";
 
 export function InstallationDetailExtraInformation({
   installation,
@@ -36,7 +36,9 @@ export function InstallationDetailExtraInformation({
         </FormField>
         <FormField>
           <FormFieldTitle>Installation date</FormFieldTitle>
-          <FormFieldValue value={installation.createdAt.toISOString()} />
+          <FormFieldValue
+            value={formatDateTimeString(installation.createdAt.toISOString())}
+          />
         </FormField>
       </FormSection>
     </div>
