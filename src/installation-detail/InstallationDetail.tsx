@@ -59,7 +59,7 @@ export function InstallationDetail({
           <DetailSectionHeader title="Hubspot tickets" />
           TODO
         </div>
-        <InstallationDetailService installation={data} zuperJobs={zuperJobs} />
+        <InstallationDetailService zuperJobs={zuperJobs} />
       </div>
 
       <BackButton />
