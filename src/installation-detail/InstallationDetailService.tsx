@@ -1,4 +1,4 @@
-import { AdminInstallationDetail } from "../api-client/models";
+import { AdminInstallationDetail, ServiceJob } from "../api-client/models";
 import { FormField, FormSection } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
@@ -9,9 +9,13 @@ import zuperLogo from "../../images/ZuperPro.webp";
 
 interface CICDetailProps {
   installation: AdminInstallationDetail;
+  zuperJobs: ServiceJob[] | null;
 }
 
-export function InstallationDetailService({ installation }: CICDetailProps) {
+export function InstallationDetailService({
+  installation,
+  zuperJobs,
+}: CICDetailProps) {
   const [service, setService] = React.useState<GetServiceData>();
 
   useEffect(() => {

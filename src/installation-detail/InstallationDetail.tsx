@@ -1,5 +1,9 @@
 import { Link } from "wouter";
-import { AdminInstallationDetail } from "../api-client/models";
+import {
+  AdminInstallationDetail,
+  ServiceJob,
+  Ticket,
+} from "../api-client/models";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import classes from "./InstallationDetail.module.css";
 import { ButtonLink } from "../ui-components/button/Button";
@@ -13,9 +17,15 @@ import { InstallationDetailService } from "./InstallationDetailService";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
+  hubsoptTickets: Ticket[] | null;
+  zuperJobs: ServiceJob[] | null;
 }
 
-export function InstallationDetail({ data }: InstallationDetailProps) {
+export function InstallationDetail({
+  data,
+  hubsoptTickets,
+  zuperJobs,
+}: InstallationDetailProps) {
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
@@ -49,7 +59,7 @@ export function InstallationDetail({ data }: InstallationDetailProps) {
           <DetailSectionHeader title="Hubspot tickets" />
           TODO
         </div>
-        <InstallationDetailService installation={data} />
+        <InstallationDetailService installation={data} zuperJobs={zuperJobs} />
       </div>
 
       <BackButton />

@@ -129,16 +129,40 @@ const InstallationDetailRenderer = ({
   installationId: string;
 }) => {
   const apiClient = useApiClient();
-  const { data, status, error } = useQuery(
-    ["installationDetail", installationId],
+
+  const {
+    data: installationData,
+    status: installationStatus,
+    error,
+  } = useQuery(["installationDetail", installationId], () => {
+    return apiClient.adminGetInstallation({ installationId });
+  });
+
+  const { data: hubspotData, status: hubspotStatus } = useQuery(
+    ["installationHubspotTickets", installationId],
     () => {
-      return apiClient.adminGetInstallation({ installationId });
+      return apiClient.adminGetInstallationTickets({ installationId });
     },
   );
 
-  if (status !== "success") return <Loader />;
+  const { data: zuperData, status: zuperStatus } = useQuery(
+    ["installationZuperJobs", installationId],
+    () => {
+      return apiClient.adminGetInstallationTicketsZuper({ installationId });
+    },
+  );
 
-  return <InstallationDetail data={data.result} />;
+  if (installationStatus !== "success") return <Loader />;
+  if (hubspotStatus !== "success") return <Loader />;
+  if (zuperStatus !== "success") return <Loader />;
+
+  return (
+    <InstallationDetail
+      data={installationData.result}
+      hubsoptTickets={hubspotData.result}
+      zuperJobs={zuperData.result}
+    />
+  );
 };
 
 const InstallerListRenderer = () => {
