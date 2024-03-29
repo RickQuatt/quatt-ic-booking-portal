@@ -33,7 +33,7 @@ export function InstallationDetailService({ zuperJobs }: CICDetailProps) {
                 <div>{`Installer: ${service.installer}`}</div>
                 <div>{`Status: ${service.status_name}`}</div>
                 <div>{`End time: ${
-                  formatDate(service.actual_end_time) || "N/A"
+                  formatDate(service.updated_at) || "N/A"
                 }`}</div>
               </div>
             ))}
