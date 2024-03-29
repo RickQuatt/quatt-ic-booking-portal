@@ -64,6 +64,12 @@
   max-height: 200px;
 }
 
+.detail-section-api-cards {
+  overflow: auto;
+  position: relative;
+  max-height: 360px;
+}
+
 .detail-sections-health {
   grid-area: sections-health;
 }

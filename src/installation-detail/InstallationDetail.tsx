@@ -14,6 +14,7 @@ import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { InstallationDetailSettings } from "./InstallationDetailSettings";
 import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
 import { InstallationDetailService } from "./InstallationDetailService";
+import { InstallationDetailTickets } from "./InstallationDetailTickets";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
@@ -55,10 +56,7 @@ export function InstallationDetail({
       </div>
 
       <div className={classes["detail-sections-api"]}>
-        <div className={classes["detail-section"]}>
-          <DetailSectionHeader title="Hubspot tickets" />
-          TODO
-        </div>
+        <InstallationDetailTickets hubsoptTickets={hubsoptTickets} />
         <InstallationDetailService zuperJobs={zuperJobs} />
       </div>
 

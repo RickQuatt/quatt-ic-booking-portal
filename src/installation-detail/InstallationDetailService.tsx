@@ -1,4 +1,4 @@
-import { formatDate } from "../utils/formatDate";
+import { formatDateTime } from "../utils/formatDate";
 import { ServiceJob } from "../api-client/models";
 import { FormField, FormSection } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
@@ -15,28 +15,30 @@ export function InstallationDetailService({ zuperJobs }: CICDetailProps) {
       <DetailSectionHeader logo={zuperLogo} title="Services" />
       <FormSection>
         <FormField>
-          {zuperJobs &&
-            zuperJobs.map((service) => (
-              <div
-                style={{ cursor: "pointer" }}
-                className={classes["detail-section"]}
-                key={service.job_uid}
-                onClick={() =>
-                  window.open(
-                    `https://app.zuperpro.com/jobs/${service.job_uid}/details`,
-                  )
-                }
-              >
-                <div className={classes["detail-section-bold"]}>
-                  {service.job_title}
+          <div className={classes["detail-section-api-cards"]}>
+            {zuperJobs &&
+              zuperJobs.map((service) => (
+                <div
+                  style={{ cursor: "pointer" }}
+                  className={classes["detail-section"]}
+                  key={service.job_uid}
+                  onClick={() =>
+                    window.open(
+                      `https://app.zuperpro.com/jobs/${service.job_uid}/details`,
+                    )
+                  }
+                >
+                  <div className={classes["detail-section-bold"]}>
+                    {service.job_title}
+                  </div>
+                  <div>{`Installer: ${service.installer}`}</div>
+                  <div>{`Status: ${service.status_name}`}</div>
+                  <div>{`Updated at: ${
+                    formatDateTime(service.updated_at) || "N/A"
+                  }`}</div>
                 </div>
-                <div>{`Installer: ${service.installer}`}</div>
-                <div>{`Status: ${service.status_name}`}</div>
-                <div>{`End time: ${
-                  formatDate(service.updated_at) || "N/A"
-                }`}</div>
-              </div>
-            ))}
+              ))}
+          </div>
           {zuperJobs && zuperJobs.length === 0 && (
             <div style={{ textAlign: "center" }}>No services 👍</div>
           )}
