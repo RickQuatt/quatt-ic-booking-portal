@@ -139,6 +139,9 @@ models/*
 !models/Ticket.ts
 !models/TicketHsPipelineStage.ts
 !models/TicketHubspotOwnerId.ts
+!models/AdminGetInstallationClickhouseData200Response.ts
+!models/ClickhouseData.ts
+!models/ClickhouseDataModeReparation.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

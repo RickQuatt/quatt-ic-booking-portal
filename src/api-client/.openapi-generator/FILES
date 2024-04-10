@@ -4,6 +4,7 @@ models/AdminCreateInstaller200Response.ts
 models/AdminDashboardCics200Response.ts
 models/AdminGetCic200Response.ts
 models/AdminGetInstallation200Response.ts
+models/AdminGetInstallationClickhouseData200Response.ts
 models/AdminGetInstallationTickets200Response.ts
 models/AdminGetInstallationTicketsZuper200Response.ts
 models/AdminInstallationDetail.ts
@@ -32,6 +33,8 @@ models/CicHealthChecksByKpi.ts
 models/CicSettingsUpdate.ts
 models/CicState.ts
 models/CicStatus.ts
+models/ClickhouseData.ts
+models/ClickhouseDataModeReparation.ts
 models/CompleteCommissioning200Response.ts
 models/ConnectionStatus.ts
 models/CreateTariff200Response.ts

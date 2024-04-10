@@ -18,6 +18,7 @@ import type {
   AdminDashboardCics200Response,
   AdminGetCic200Response,
   AdminGetInstallation200Response,
+  AdminGetInstallationClickhouseData200Response,
   AdminGetInstallationTickets200Response,
   AdminGetInstallationTicketsZuper200Response,
   AdminInstallationsList200Response,
@@ -38,6 +39,8 @@ import {
   AdminGetCic200ResponseToJSON,
   AdminGetInstallation200ResponseFromJSON,
   AdminGetInstallation200ResponseToJSON,
+  AdminGetInstallationClickhouseData200ResponseFromJSON,
+  AdminGetInstallationClickhouseData200ResponseToJSON,
   AdminGetInstallationTickets200ResponseFromJSON,
   AdminGetInstallationTickets200ResponseToJSON,
   AdminGetInstallationTicketsZuper200ResponseFromJSON,
@@ -80,6 +83,10 @@ export interface AdminGetInstallationRequest {
   installationId: string;
 }
 
+export interface AdminGetInstallationClickhouseDataRequest {
+  installationId: string;
+}
+
 export interface AdminGetInstallationTicketsRequest {
   installationId: string;
 }
@@ -90,6 +97,10 @@ export interface AdminGetInstallationTicketsZuperRequest {
 
 export interface AdminGetInstallerRequest {
   installerId: string;
+}
+
+export interface AdminInstallationInstallationIdClickhouseOptionsRequest {
+  installationId: string;
 }
 
 export interface AdminInstallationInstallationIdHubspotOptionsRequest {
@@ -508,6 +519,69 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   * Get installation data from clickhouse
+   */
+  async adminGetInstallationClickhouseDataRaw(
+    requestParameters: AdminGetInstallationClickhouseDataRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<
+    runtime.ApiResponse<AdminGetInstallationClickhouseData200Response>
+  > {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationClickhouseData.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/clickhouse`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminGetInstallationClickhouseData200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Get installation data from clickhouse
+   */
+  async adminGetInstallationClickhouseData(
+    requestParameters: AdminGetInstallationClickhouseDataRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminGetInstallationClickhouseData200Response> {
+    const response = await this.adminGetInstallationClickhouseDataRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
    * Get installation tickets from hubspot
    */
   async adminGetInstallationTicketsRaw(
@@ -688,6 +762,54 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       initOverrides,
     );
     return await response.value();
+  }
+
+  /**
+   */
+  async adminInstallationInstallationIdClickhouseOptionsRaw(
+    requestParameters: AdminInstallationInstallationIdClickhouseOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdClickhouseOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/clickhouse`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationInstallationIdClickhouseOptions(
+    requestParameters: AdminInstallationInstallationIdClickhouseOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationIdClickhouseOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
   }
 
   /**
