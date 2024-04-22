@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import {
   AdminInstallationDetail,
   ServiceJob,
+  TarrifsResult,
   Ticket,
 } from "../api-client/models";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
@@ -15,18 +16,25 @@ import { InstallationDetailSettings } from "./InstallationDetailSettings";
 import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
 import { InstallationDetailService } from "./InstallationDetailService";
 import { InstallationDetailTickets } from "./InstallationDetailTickets";
+import { InstallationDetailTariff } from "./InstallationDetailTariff";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
   hubsoptTickets: Ticket[] | null;
   zuperJobs: ServiceJob[] | null;
+  tariff: TarrifsResult | null;
 }
 
 export function InstallationDetail({
   data,
   hubsoptTickets,
   zuperJobs,
+  tariff,
 }: InstallationDetailProps) {
+  if (!data.externalId) {
+    return <div>No externalId included for this installation 🚨</div>;
+  }
+
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
@@ -58,6 +66,10 @@ export function InstallationDetail({
       <div className={classes["detail-sections-api"]}>
         <InstallationDetailTickets hubsoptTickets={hubsoptTickets} />
         <InstallationDetailService zuperJobs={zuperJobs} />
+        <InstallationDetailTariff
+          tariff={tariff}
+          installationId={data.externalId}
+        />
       </div>
 
       <BackButton />

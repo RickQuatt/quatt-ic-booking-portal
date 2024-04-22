@@ -57,3 +57,25 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
+
+.react-datepicker-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  border: none;
+}
+
+.react-datepicker__input-container input {
+  display: block;
+  width: 100%;
+  background-color: transparent;
+  color: black;
+  font-size: 14px;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  border-radius: 4px;
+  border: 1px solid var(--button-border-color);
+  padding: 10px 15px;
+  cursor: pointer;
+}

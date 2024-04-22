@@ -6,6 +6,7 @@ import classes from "./Button.module.css";
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   color?: "danger";
+  text?: string;
 }
 
 export const Button = ({
@@ -23,6 +24,27 @@ export const Button = ({
         restProps.className,
       )}
     />
+  );
+};
+
+export const CircleButton = ({
+  color,
+  type = "button",
+  text,
+  ...restProps
+}: ButtonProps) => {
+  return (
+    <button
+      {...restProps}
+      type={type}
+      className={classNames(
+        classes["circle-button"],
+        color && classes[color],
+        restProps.className,
+      )}
+    >
+      {text}
+    </button>
   );
 };
 

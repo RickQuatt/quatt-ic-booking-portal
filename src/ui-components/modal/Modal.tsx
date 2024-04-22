@@ -90,6 +90,10 @@ export const ModalConfirmButton = (props: ButtonProps) => {
   return <Button {...props} />;
 };
 
+export const ModalDeleteButton = (props: ButtonProps) => {
+  return <Button {...props} />;
+};
+
 // TODO: Make a flat button and add icon - 2023-06-23
 export const ModalCloseButton = (props: ButtonProps) => {
   return <Button {...props}>Close</Button>;

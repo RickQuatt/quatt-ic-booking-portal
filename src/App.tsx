@@ -152,15 +152,24 @@ const InstallationDetailRenderer = ({
     },
   );
 
+  const { data: tariffData, status: tariffStatus } = useQuery(
+    ["installationTariffs", installationId],
+    () => {
+      return apiClient.adminGetInstallationTariff({ installationId });
+    },
+  );
+
   if (installationStatus !== "success") return <Loader />;
   if (hubspotStatus !== "success") return <Loader />;
   if (zuperStatus !== "success") return <Loader />;
+  if (tariffStatus !== "success") return <Loader />;
 
   return (
     <InstallationDetail
       data={installationData.result}
       hubsoptTickets={hubspotData.result}
       zuperJobs={zuperData.result}
+      tariff={tariffData.result}
     />
   );
 };
