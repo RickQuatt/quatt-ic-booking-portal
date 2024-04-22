@@ -193,8 +193,6 @@ export function TariffsModal({
     closeModal();
   }, [apiClient, closeModal, reset, installationId, tariffData]);
 
-  console.log(errors);
-
   return (
     <Modal isOpen={isOpen} closeModal={closeModal}>
       <ModalHeader>Edit tariff data</ModalHeader>

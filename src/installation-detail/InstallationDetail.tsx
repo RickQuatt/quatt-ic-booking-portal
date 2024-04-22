@@ -20,19 +20,19 @@ import { InstallationDetailTariff } from "./InstallationDetailTariff";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
-  hubsoptTickets: Ticket[] | null;
+  hubspotTickets: Ticket[] | null;
   zuperJobs: ServiceJob[] | null;
   tariff: TarrifsResult | null;
 }
 
 export function InstallationDetail({
   data,
-  hubsoptTickets,
+  hubspotTickets,
   zuperJobs,
   tariff,
 }: InstallationDetailProps) {
   if (!data.externalId) {
-    return <div>No externalId included for this installation 🚨</div>;
+    return <span>No externalId included for this installation 🚨</span>;
   }
 
   return (
@@ -64,7 +64,7 @@ export function InstallationDetail({
       </div>
 
       <div className={classes["detail-sections-api"]}>
-        <InstallationDetailTickets hubsoptTickets={hubsoptTickets} />
+        <InstallationDetailTickets hubspotTickets={hubspotTickets} />
         <InstallationDetailService zuperJobs={zuperJobs} />
         <InstallationDetailTariff
           tariff={tariff}

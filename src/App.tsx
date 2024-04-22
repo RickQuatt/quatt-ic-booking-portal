@@ -167,7 +167,7 @@ const InstallationDetailRenderer = ({
   return (
     <InstallationDetail
       data={installationData.result}
-      hubsoptTickets={hubspotData.result}
+      hubspotTickets={hubspotData.result}
       zuperJobs={zuperData.result}
       tariff={tariffData.result}
     />

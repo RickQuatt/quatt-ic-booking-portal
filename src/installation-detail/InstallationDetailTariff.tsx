@@ -31,7 +31,7 @@ export function InstallationDetailTariff({
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader
-        title="💰 Electricity / Gas tariffs"
+        title="💰 Tariffs"
         onClick={() => {
           setTariffData(null); // Set to null to create a new tariff
           openTariffsModal();
@@ -47,7 +47,7 @@ export function InstallationDetailTariff({
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
             {/* Current Tariffs */}
-            {tariff && tariff.currentTariff && (
+            {tariff?.currentTariff && (
               <>
                 <FormFieldTitle>Current tariff</FormFieldTitle>
                 <InstallationDetailTariffItem
@@ -61,7 +61,7 @@ export function InstallationDetailTariff({
             )}
 
             {/* Future Tariffs */}
-            {tariff && tariff.futureTariffs && (
+            {tariff?.futureTariffs && (
               <>
                 <FormFieldTitle>Upcoming tariffs</FormFieldTitle>
                 {tariff.futureTariffs.map((tariff, index) => (
@@ -79,7 +79,7 @@ export function InstallationDetailTariff({
             )}
 
             {/* Past Tariffs */}
-            {tariff && tariff.pastTariffs && (
+            {tariff?.pastTariffs && (
               <>
                 <FormFieldTitle>Past tariffs</FormFieldTitle>
                 {tariff.pastTariffs.map((tariff, index) => (
@@ -114,7 +114,7 @@ function InstallationDetailTariffItem({
   onClick: () => void;
 }) {
   return (
-    <>
+    <div>
       <div className={classes["tariff-header"]}>
         From: {formatDateShortAsString(tariff.validFrom)}
       </div>
@@ -138,6 +138,6 @@ function InstallationDetailTariffItem({
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
