@@ -136,10 +136,14 @@ export function TariffsModal({
         }
       }
 
+      if (!tariffData?.id) {
+        return;
+      }
+
       if (tariffType === "single") {
         const response = await apiClient.adminUpdateInstallationTariff({
           installationId: installationId,
-          tariffId: tariffData?.id as string,
+          tariffId: tariffData.id,
           createTariffRequest: {
             tariffType: "single",
             electricityPrice: data.electricityPrice as number,
@@ -156,7 +160,7 @@ export function TariffsModal({
       } else {
         const response = await apiClient.adminUpdateInstallationTariff({
           installationId: installationId,
-          tariffId: tariffData?.id as string,
+          tariffId: tariffData.id,
           createTariffRequest: {
             tariffType: "double",
             dayElectricityPrice: data.dayElectricityPrice as number,
@@ -184,9 +188,13 @@ export function TariffsModal({
       return;
     }
 
+    if (!tariffData?.id) {
+      return;
+    }
+
     await apiClient.adminDeleteInstallationTariff({
       installationId: installationId,
-      tariffId: tariffData?.id as string,
+      tariffId: tariffData.id,
     });
 
     reset({}, { keepValues: true });

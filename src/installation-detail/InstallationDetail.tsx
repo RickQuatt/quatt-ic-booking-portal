@@ -1,10 +1,5 @@
 import { Link } from "wouter";
-import {
-  AdminInstallationDetail,
-  ServiceJob,
-  TarrifsResult,
-  Ticket,
-} from "../api-client/models";
+import { AdminInstallationDetail, TarrifsResult } from "../api-client/models";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import classes from "./InstallationDetail.module.css";
 import { ButtonLink } from "../ui-components/button/Button";
@@ -14,25 +9,20 @@ import { InstallationDetailCommissioningHistory } from "./InstallationDetailComm
 import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { InstallationDetailSettings } from "./InstallationDetailSettings";
 import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
-import { InstallationDetailService } from "./InstallationDetailService";
 import { InstallationDetailTickets } from "./InstallationDetailTickets";
 import { InstallationDetailTariff } from "./InstallationDetailTariff";
+import { InstallationDetailService } from "./InstallationDetailService";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
-  hubspotTickets: Ticket[] | null;
-  zuperJobs: ServiceJob[] | null;
   tariff: TarrifsResult | null;
 }
 
-export function InstallationDetail({
-  data,
-  hubspotTickets,
-  zuperJobs,
-  tariff,
-}: InstallationDetailProps) {
-  if (!data.externalId) {
-    return <span>No externalId included for this installation 🚨</span>;
+export function InstallationDetail({ data, tariff }: InstallationDetailProps) {
+  const installationId = data.externalId;
+
+  if (!installationId) {
+    return <span>No installationId included for this installation 🚨</span>;
   }
 
   return (
@@ -64,11 +54,11 @@ export function InstallationDetail({
       </div>
 
       <div className={classes["detail-sections-api"]}>
-        <InstallationDetailTickets hubspotTickets={hubspotTickets} />
-        <InstallationDetailService zuperJobs={zuperJobs} />
+        <InstallationDetailTickets installationId={installationId} />
+        <InstallationDetailService installationId={installationId} />
         <InstallationDetailTariff
           tariff={tariff}
-          installationId={data.externalId}
+          installationId={installationId}
         />
       </div>
 

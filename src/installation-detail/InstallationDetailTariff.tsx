@@ -14,7 +14,7 @@ import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 
 interface InstallationDetailTariffProps {
   installationId: string;
-  tariff: TarrifsResult | null;
+  tariff?: TarrifsResult | null;
 }
 
 export function InstallationDetailTariff({
@@ -28,13 +28,17 @@ export function InstallationDetailTariff({
     close: closeTariffsModal,
   } = useModalState();
 
+  const createNewTariff = () => {
+    setTariffData(null);
+    openTariffsModal();
+  };
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader
         title="💰 Tariffs"
         onClick={() => {
-          setTariffData(null); // Set to null to create a new tariff
-          openTariffsModal();
+          createNewTariff();
         }}
       />
       <TariffsModal
@@ -95,11 +99,11 @@ export function InstallationDetailTariff({
                 ))}
               </>
             )}
-          </div>
 
-          {tariff && tariff.currentTariff === null && (
-            <div style={{ textAlign: "center" }}>No tariffs set 😴</div>
-          )}
+            {tariff?.currentTariff === null && (
+              <div style={{ textAlign: "center" }}>No tariffs set 😴</div>
+            )}
+          </div>
         </FormField>
       </FormSection>
     </div>

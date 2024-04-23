@@ -1,47 +1,69 @@
 import { formatDateTime } from "../utils/formatDate";
-import { ServiceJob } from "../api-client/models";
 import { FormField, FormSection } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import zuperLogo from "../../images/ZuperPro.webp";
+import { useQuery } from "react-query";
+import { useApiClient } from "../api-client/context";
+import { Loader } from "../ui-components/loader/Loader";
 
-interface CICDetailProps {
-  zuperJobs: ServiceJob[] | null;
+interface InstallationDetailServiceProps {
+  installationId: string;
 }
 
-export function InstallationDetailService({ zuperJobs }: CICDetailProps) {
+export function InstallationDetailService({
+  installationId,
+}: InstallationDetailServiceProps) {
+  const apiClient = useApiClient();
+
+  const { data: zuperData, status: zuperStatus } = useQuery(
+    ["installationZuperJobs", installationId],
+    () => {
+      return apiClient.adminGetInstallationTicketsZuper({
+        installationId: installationId,
+      });
+    },
+  );
+  const zuperJobs = zuperData?.result;
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader logo={zuperLogo} title="Services" />
       <FormSection>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
-            {zuperJobs &&
-              zuperJobs.map((service) => (
-                <div
-                  style={{ cursor: "pointer" }}
-                  className={classes["detail-section"]}
-                  key={service.job_uid}
-                  onClick={() =>
-                    window.open(
-                      `https://app.zuperpro.com/jobs/${service.job_uid}/details`,
-                    )
-                  }
-                >
-                  <div className={classes["detail-section-bold"]}>
-                    {service.job_title}
-                  </div>
-                  <div>{`Installer: ${service.installer}`}</div>
-                  <div>{`Status: ${service.status_name}`}</div>
-                  <div>{`Updated at: ${
-                    formatDateTime(service.updated_at) || "N/A"
-                  }`}</div>
-                </div>
-              ))}
+            {zuperStatus !== "success" ? (
+              <Loader />
+            ) : (
+              <>
+                {zuperJobs &&
+                  zuperJobs.map((service) => (
+                    <div
+                      style={{ cursor: "pointer" }}
+                      className={classes["detail-section"]}
+                      key={service.job_uid}
+                      onClick={() =>
+                        window.open(
+                          `https://app.zuperpro.com/jobs/${service.job_uid}/details`,
+                        )
+                      }
+                    >
+                      <div className={classes["detail-section-bold"]}>
+                        {service.job_title}
+                      </div>
+                      <div>{`Installer: ${service.installer}`}</div>
+                      <div>{`Status: ${service.status_name}`}</div>
+                      <div>{`Updated at: ${
+                        formatDateTime(service.updated_at) || "N/A"
+                      }`}</div>
+                    </div>
+                  ))}
+                {zuperJobs && zuperJobs.length === 0 && (
+                  <div style={{ textAlign: "center" }}>No services 👍</div>
+                )}
+              </>
+            )}
           </div>
-          {zuperJobs && zuperJobs.length === 0 && (
-            <div style={{ textAlign: "center" }}>No services 👍</div>
-          )}
         </FormField>
       </FormSection>
     </div>
