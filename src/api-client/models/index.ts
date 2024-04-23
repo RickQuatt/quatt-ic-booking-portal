@@ -48,6 +48,7 @@ export * from "./ErrorResponse";
 export * from "./ErrorResponseResult";
 export * from "./FinishIdentificationTestRequest";
 export * from "./FlowRateTestStatus";
+export * from "./ForgetWifiMeCicRequest";
 export * from "./GetAllTariffs200Response";
 export * from "./GetInsights200Response";
 export * from "./GetInsights200ResponseResult";

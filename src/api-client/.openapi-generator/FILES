@@ -47,6 +47,7 @@ models/ErrorResponse.ts
 models/ErrorResponseResult.ts
 models/FinishIdentificationTestRequest.ts
 models/FlowRateTestStatus.ts
+models/ForgetWifiMeCicRequest.ts
 models/GetAllTariffs200Response.ts
 models/GetInsights200Response.ts
 models/GetInsights200ResponseResult.ts

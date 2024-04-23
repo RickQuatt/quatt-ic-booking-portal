@@ -33,6 +33,8 @@ export function InstallationDetailTariff({
     openTariffsModal();
   };
 
+  console.log("tariff", tariff);
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader
@@ -65,7 +67,7 @@ export function InstallationDetailTariff({
             )}
 
             {/* Future Tariffs */}
-            {tariff?.futureTariffs && (
+            {tariff?.futureTariffs && tariff.futureTariffs.length !== 0 && (
               <>
                 <FormFieldTitle>Upcoming tariffs</FormFieldTitle>
                 {tariff.futureTariffs.map((tariff, index) => (
@@ -83,7 +85,7 @@ export function InstallationDetailTariff({
             )}
 
             {/* Past Tariffs */}
-            {tariff?.pastTariffs && (
+            {tariff?.pastTariffs && tariff.pastTariffs.length !== 0 && (
               <>
                 <FormFieldTitle>Past tariffs</FormFieldTitle>
                 {tariff.pastTariffs.map((tariff, index) => (
