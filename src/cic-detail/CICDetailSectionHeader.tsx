@@ -1,4 +1,4 @@
-import { CircleButton } from "../ui-components/button/Button";
+import { Button } from "../ui-components/button/Button";
 import classes from "./CICDetailSectionHeader.module.css";
 
 export function DetailSectionHeader({
@@ -22,7 +22,11 @@ export function DetailSectionHeader({
     >
       {logo && <img src={logo} alt="Logo" style={{ height: "28px" }} />}
       <h3>{title}</h3>
-      {onClick && <CircleButton text="+" onClick={onClick} />}
+      {onClick && (
+        <Button onClick={onClick} className={classes["circle-button"]}>
+          +
+        </Button>
+      )}
     </div>
   );
 }

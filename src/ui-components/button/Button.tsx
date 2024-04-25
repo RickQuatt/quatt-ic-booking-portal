@@ -27,27 +27,6 @@ export const Button = ({
   );
 };
 
-export const CircleButton = ({
-  color,
-  type = "button",
-  text,
-  ...restProps
-}: ButtonProps) => {
-  return (
-    <button
-      {...restProps}
-      type={type}
-      className={classNames(
-        classes["circle-button"],
-        color && classes[color],
-        restProps.className,
-      )}
-    >
-      {text}
-    </button>
-  );
-};
-
 interface ButtonLinkProps
   extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   color?: "danger";

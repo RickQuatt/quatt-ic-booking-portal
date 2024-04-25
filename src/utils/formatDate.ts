@@ -12,11 +12,6 @@ export function formatDateShortAsString(date: Date | null) {
   return format(date, "dd MMM yyyy");
 }
 
-export function formatDateShortAsDate(date: Date | null) {
-  if (!date) return null;
-  return new Date(format(date, "dd MMM yyyy"));
-}
-
 export function formatAsDate(date: Date | null) {
   if (!date) return null;
   return new Date(format(date, "yyyy-MM-dd"));
