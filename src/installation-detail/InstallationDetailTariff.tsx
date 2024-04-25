@@ -122,6 +122,7 @@ function InstallationDetailTariffItem({
         From: {formatDateShortAsString(tariff.validFrom)}
       </div>
       <div
+        style={{ cursor: "pointer" }}
         className={classes["detail-section"]}
         onClick={onClick}
         key={tariff.id}

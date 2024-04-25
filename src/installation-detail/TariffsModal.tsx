@@ -108,27 +108,35 @@ export function TariffsModal({
         return;
       }
 
+      const tariffBody =
+        tariffType === "single"
+          ? ({
+              tariffType,
+              electricityPrice: data.electricityPrice,
+              gasPrice: data.gasPrice,
+              validFrom: formatAsDate(startDate),
+            } as CreateUpdateSingleTariff)
+          : ({
+              tariffType,
+              dayElectricityPrice: data.dayElectricityPrice,
+              nightElectricityPrice: data.nightElectricityPrice,
+              gasPrice: data.gasPrice,
+              validFrom: formatAsDate(startDate),
+            } as CreateUpdateDoubleTariff);
+
       // If there is no tariff data, create a new tariff
       if (!tariffData) {
         const response = await apiClient.adminCreateInstallationTariff({
           installationId: installationId,
-          createTariffRequest: {
-            tariffType,
-            ...(tariffType === "single"
-              ? {
-                  electricityPrice: data.electricityPrice,
-                }
-              : {
-                  dayElectricityPrice: data.dayElectricityPrice,
-                  nightElectricityPrice: data.nightElectricityPrice,
-                }),
-            gasPrice: data.gasPrice,
-            validFrom: formatAsDate(startDate),
-          } as CreateUpdateSingleTariff | CreateUpdateDoubleTariff,
+          createTariffRequest: tariffBody,
         });
         if (response.meta.status === 200) {
           reset({}, { keepValues: true });
           closeModal();
+        }
+        if (response.meta.status !== 200) {
+          console.error("Failed to create tariff data");
+          return;
         }
       } else {
         if (!tariffData?.id) {
@@ -139,20 +147,12 @@ export function TariffsModal({
         const response = await apiClient.adminUpdateInstallationTariff({
           installationId: installationId,
           tariffId: tariffData.id,
-          createTariffRequest: {
-            tariffType,
-            ...(tariffType === "single"
-              ? {
-                  electricityPrice: data.electricityPrice,
-                }
-              : {
-                  dayElectricityPrice: data.dayElectricityPrice,
-                  nightElectricityPrice: data.nightElectricityPrice,
-                }),
-            gasPrice: data.gasPrice,
-            validFrom: formatAsDate(startDate),
-          } as CreateUpdateSingleTariff | CreateUpdateDoubleTariff,
+          createTariffRequest: tariffBody,
         });
+        if (response.meta.status !== 200) {
+          console.error("Failed to update tariff data");
+          return;
+        }
         if (response.meta.status === 200) {
           reset({}, { keepValues: true });
           closeModal();
