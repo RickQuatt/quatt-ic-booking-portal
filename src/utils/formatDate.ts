@@ -6,6 +6,17 @@ export function formatDate(date: Date | null) {
   return date.toISOString().split("T")[0];
 }
 
+// as in 05 Apr 2024
+export function formatDateShortAsString(date: Date | null) {
+  if (!date) return null;
+  return format(date, "dd MMM yyyy");
+}
+
+export function formatAsDate(date: Date | null) {
+  if (!date) return null;
+  return new Date(format(date, "yyyy-MM-dd"));
+}
+
 export function formatDateTime(date: Date | null) {
   if (!date) return null;
   return format(date, "yyyy-MM-dd HH:mm:ss");

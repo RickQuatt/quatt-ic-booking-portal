@@ -6,6 +6,7 @@ import classes from "./Button.module.css";
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   color?: "danger";
+  text?: string;
 }
 
 export const Button = ({

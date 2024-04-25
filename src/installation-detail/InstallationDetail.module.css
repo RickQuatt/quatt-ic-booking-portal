@@ -102,3 +102,13 @@
   font-size: 0.8rem;
   grid-template-columns: 2.8fr 2.2fr 0.9fr;
 }
+
+.tariff-header {
+  font-size: 12px;
+  color: grey;
+}
+
+.tariff-grid {
+  display: grid;
+  grid-template-columns: auto auto auto;
+}

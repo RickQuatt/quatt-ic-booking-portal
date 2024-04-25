@@ -91,8 +91,6 @@ export function InstallerModal({
     };
   }, [reset, defaultValues]);
 
-  // console.log(watch("orderNumber")); // watch input value by passing the name of it
-
   const apiClient = useApiClient();
   const onSubmit = React.useCallback(
     async (data: InstallerFormData) => {

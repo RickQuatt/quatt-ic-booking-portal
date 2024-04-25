@@ -1,9 +1,5 @@
 import { Link } from "wouter";
-import {
-  AdminInstallationDetail,
-  ServiceJob,
-  Ticket,
-} from "../api-client/models";
+import { AdminInstallationDetail, TarrifsResult } from "../api-client/models";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import classes from "./InstallationDetail.module.css";
 import { ButtonLink } from "../ui-components/button/Button";
@@ -13,20 +9,22 @@ import { InstallationDetailCommissioningHistory } from "./InstallationDetailComm
 import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { InstallationDetailSettings } from "./InstallationDetailSettings";
 import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
-import { InstallationDetailService } from "./InstallationDetailService";
 import { InstallationDetailTickets } from "./InstallationDetailTickets";
+import { InstallationDetailTariff } from "./InstallationDetailTariff";
+import { InstallationDetailService } from "./InstallationDetailService";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
-  hubsoptTickets: Ticket[] | null;
-  zuperJobs: ServiceJob[] | null;
+  tariff: TarrifsResult | null;
 }
 
-export function InstallationDetail({
-  data,
-  hubsoptTickets,
-  zuperJobs,
-}: InstallationDetailProps) {
+export function InstallationDetail({ data, tariff }: InstallationDetailProps) {
+  const installationId = data.externalId;
+
+  if (!installationId) {
+    return <span>No installationId included for this installation 🚨</span>;
+  }
+
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
@@ -56,8 +54,12 @@ export function InstallationDetail({
       </div>
 
       <div className={classes["detail-sections-api"]}>
-        <InstallationDetailTickets hubsoptTickets={hubsoptTickets} />
-        <InstallationDetailService zuperJobs={zuperJobs} />
+        <InstallationDetailTickets installationId={installationId} />
+        <InstallationDetailService installationId={installationId} />
+        <InstallationDetailTariff
+          tariff={tariff}
+          installationId={installationId}
+        />
       </div>
 
       <BackButton />

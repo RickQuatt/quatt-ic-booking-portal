@@ -21,6 +21,18 @@ import { exists, mapValues } from "../runtime";
 export interface GetInsights200ResponseResultGraphInner {
   /**
    *
+   * @type {boolean}
+   * @memberof GetInsights200ResponseResultGraphInner
+   */
+  isInterpolated?: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof GetInsights200ResponseResultGraphInner
+   */
+  hideInterpolated?: boolean;
+  /**
+   *
    * @type {number}
    * @memberof GetInsights200ResponseResultGraphInner
    */
@@ -81,6 +93,12 @@ export function GetInsights200ResponseResultGraphInnerFromJSONTyped(
     return json;
   }
   return {
+    isInterpolated: !exists(json, "isInterpolated")
+      ? undefined
+      : json["isInterpolated"],
+    hideInterpolated: !exists(json, "hideInterpolated")
+      ? undefined
+      : json["hideInterpolated"],
     hpElectric: json["hpElectric"],
     hpHeat: json["hpHeat"],
     boilerHeat: json["boilerHeat"],
@@ -99,6 +117,8 @@ export function GetInsights200ResponseResultGraphInnerToJSON(
     return null;
   }
   return {
+    isInterpolated: value.isInterpolated,
+    hideInterpolated: value.hideInterpolated,
     hpElectric: value.hpElectric,
     hpHeat: value.hpHeat,
     boilerHeat: value.boilerHeat,

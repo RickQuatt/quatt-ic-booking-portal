@@ -24,7 +24,7 @@ export interface CreateUpdateSingleTariff {
    * @type {string}
    * @memberof CreateUpdateSingleTariff
    */
-  tariffType?: CreateUpdateSingleTariffTariffTypeEnum;
+  tariffType: CreateUpdateSingleTariffTariffTypeEnum;
   /**
    * Electricity price for single tariff
    * @type {number}
@@ -59,6 +59,7 @@ export type CreateUpdateSingleTariffTariffTypeEnum =
  */
 export function instanceOfCreateUpdateSingleTariff(value: object): boolean {
   let isInstance = true;
+  isInstance = isInstance && "tariffType" in value;
   isInstance = isInstance && "electricityPrice" in value;
   isInstance = isInstance && "gasPrice" in value;
   isInstance = isInstance && "validFrom" in value;
@@ -80,7 +81,7 @@ export function CreateUpdateSingleTariffFromJSONTyped(
     return json;
   }
   return {
-    tariffType: !exists(json, "tariffType") ? undefined : json["tariffType"],
+    tariffType: json["tariffType"],
     electricityPrice: json["electricityPrice"],
     gasPrice: json["gasPrice"],
     validFrom: new Date(json["validFrom"]),

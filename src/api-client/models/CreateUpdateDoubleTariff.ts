@@ -24,7 +24,7 @@ export interface CreateUpdateDoubleTariff {
    * @type {string}
    * @memberof CreateUpdateDoubleTariff
    */
-  tariffType?: CreateUpdateDoubleTariffTariffTypeEnum;
+  tariffType: CreateUpdateDoubleTariffTariffTypeEnum;
   /**
    * Day electricity price for double tariff
    * @type {number}
@@ -65,6 +65,7 @@ export type CreateUpdateDoubleTariffTariffTypeEnum =
  */
 export function instanceOfCreateUpdateDoubleTariff(value: object): boolean {
   let isInstance = true;
+  isInstance = isInstance && "tariffType" in value;
   isInstance = isInstance && "dayElectricityPrice" in value;
   isInstance = isInstance && "nightElectricityPrice" in value;
   isInstance = isInstance && "gasPrice" in value;
@@ -87,7 +88,7 @@ export function CreateUpdateDoubleTariffFromJSONTyped(
     return json;
   }
   return {
-    tariffType: !exists(json, "tariffType") ? undefined : json["tariffType"],
+    tariffType: json["tariffType"],
     dayElectricityPrice: json["dayElectricityPrice"],
     nightElectricityPrice: json["nightElectricityPrice"],
     gasPrice: json["gasPrice"],
