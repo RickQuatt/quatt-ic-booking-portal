@@ -44,7 +44,10 @@ export function InstallationDetail({ data, tariff }: InstallationDetailProps) {
 
         <InstallationDetailExtraInformation installation={data} />
         <InstallationDetailCicHistory installation={data} />
-        <InstallationDetailCommissioningHistory installation={data} />
+        <InstallationDetailCommissioningHistory
+          installationId={installationId}
+          installation={data}
+        />
       </div>
 
       <div className={classes["detail-sections-insights"]}>

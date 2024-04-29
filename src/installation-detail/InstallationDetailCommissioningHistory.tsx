@@ -14,14 +14,46 @@ import classes from "./InstallationDetail.module.css";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
 import { formatDateTime } from "../utils/formatDate";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import { useApiClient } from "../api-client/context";
+import { useMutation } from "react-query";
+import { AdminGetInstallationCommissioningRequest } from "../api-client/apis";
 
-interface CICDetailProps {
+interface InstallationDetailCommissioningHistoryProps {
+  installationId: string;
   installation: AdminInstallationDetail;
 }
 
 export function InstallationDetailCommissioningHistory({
+  installationId,
   installation,
-}: CICDetailProps) {
+}: InstallationDetailCommissioningHistoryProps) {
+  const apiClient = useApiClient();
+
+  const { mutateAsync, data, isLoading } = useMutation({
+    mutationFn: ({
+      installationId,
+      commissioningId,
+    }: AdminGetInstallationCommissioningRequest) =>
+      apiClient.adminGetInstallationCommissioning({
+        installationId,
+        commissioningId,
+      }),
+
+    onError: (error) => {
+      console.error("Error fetching commissioning details", error);
+    },
+  });
+
+  const commissioningData = data ? data.result : null;
+
+  const getCommissioningDetails = async (id: number) => {
+    const commmissioning = await mutateAsync({
+      installationId: installationId,
+      commissioningId: id,
+    });
+    return commmissioning.result;
+  };
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="👨‍🔧 Commissioning history" />
@@ -30,28 +62,15 @@ export function InstallationDetailCommissioningHistory({
           <FormFieldTitle>Date of commissionings</FormFieldTitle>
           <div className={classes["detail-section-commissioning"]}>
             <Accordion>
-              {installation.cicCommissioning
-                .map((commissioning, index) => (
-                  <InstallationDetailCommissioningItem
-                    commissioning={commissioning}
-                    key={index}
-                  />
-                ))
-                .sort((a, b) => {
-                  if (
-                    a.props.commissioning.createdAt >
-                    b.props.commissioning.createdAt
-                  ) {
-                    return -1;
-                  }
-                  if (
-                    a.props.commissioning.createdAt <
-                    b.props.commissioning.createdAt
-                  ) {
-                    return 1;
-                  }
-                  return 0;
-                })}
+              {installation.cicCommissioning.map((commissioning, index) => (
+                <InstallationDetailCommissioningItem
+                  key={index}
+                  isLoading={isLoading}
+                  data={commissioningData}
+                  createdAt={commissioning.createdAt}
+                  onClick={() => getCommissioningDetails(commissioning.id)}
+                />
+              ))}
             </Accordion>
           </div>
         </FormField>
@@ -61,21 +80,34 @@ export function InstallationDetailCommissioningHistory({
 }
 
 interface InstallationDetailCommissioningItemProps {
-  commissioning: CicCommissioning;
+  createdAt: Date;
+  isLoading: boolean;
+  onClick?: () => void;
+  data: CicCommissioning | null;
 }
 
 function InstallationDetailCommissioningItem({
-  commissioning,
+  data,
+  onClick,
+  isLoading,
+  createdAt,
 }: InstallationDetailCommissioningItemProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <AccordionItem
-      title={formatDateTime(commissioning.createdAt) || "No date"}
+      title={formatDateTime(createdAt) || "No date"}
       isOpen={isOpen}
-      onChangeIsOpen={() => setIsOpen(!isOpen)}
+      onChangeIsOpen={() => {
+        setIsOpen(!isOpen);
+        onClick?.();
+      }}
     >
-      <FormFieldJson value={commissioning} />
+      {isLoading ? (
+        <div>is Loading....</div>
+      ) : (
+        data && <FormFieldJson value={data} />
+      )}
     </AccordionItem>
   );
 }
