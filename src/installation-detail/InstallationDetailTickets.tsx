@@ -41,7 +41,10 @@ export function InstallationDetailTickets({ installationId }: CICDetailProps) {
       <FormSection>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
-            {hubspotStatus !== "success" ? (
+            {hubspotStatus === "error" && (
+              <div style={{ textAlign: "center" }}>No tickets 👍</div>
+            )}
+            {hubspotStatus === "loading" ? (
               <Loader />
             ) : (
               <>
