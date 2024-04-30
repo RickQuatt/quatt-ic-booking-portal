@@ -144,6 +144,8 @@ models/*
 !models/ClickhouseDataModeReparation.ts
 !models/TarrifsResult.ts
 !models/ForgetWifiMeCicRequest.ts
+!models/AdminGetInstallationCommissioning200Response.ts
+!models/AdminInstallationDetailAllOfCicCommissioning.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

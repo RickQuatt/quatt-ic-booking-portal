@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from "../runtime";
+import type { AdminInstallationDetailAllOfCicCommissioning } from "./AdminInstallationDetailAllOfCicCommissioning";
+import {
+  AdminInstallationDetailAllOfCicCommissioningFromJSON,
+  AdminInstallationDetailAllOfCicCommissioningFromJSONTyped,
+  AdminInstallationDetailAllOfCicCommissioningToJSON,
+} from "./AdminInstallationDetailAllOfCicCommissioning";
 import type { BoilerType } from "./BoilerType";
 import {
   BoilerTypeFromJSON,
   BoilerTypeFromJSONTyped,
   BoilerTypeToJSON,
 } from "./BoilerType";
-import type { CicCommissioning } from "./CicCommissioning";
-import {
-  CicCommissioningFromJSON,
-  CicCommissioningFromJSONTyped,
-  CicCommissioningToJSON,
-} from "./CicCommissioning";
 import type { CicSettingsUpdate } from "./CicSettingsUpdate";
 import {
   CicSettingsUpdateFromJSON,
@@ -298,10 +298,10 @@ export interface AdminInstallationDetail {
   cicState: Array<CicState>;
   /**
    *
-   * @type {Array<CicCommissioning>}
+   * @type {Array<AdminInstallationDetailAllOfCicCommissioning>}
    * @memberof AdminInstallationDetail
    */
-  cicCommissioning: Array<CicCommissioning>;
+  cicCommissioning: Array<AdminInstallationDetailAllOfCicCommissioning>;
   /**
    *
    * @type {Array<CicSettingsUpdate>}
@@ -422,7 +422,7 @@ export function AdminInstallationDetailFromJSONTyped(
     hasSoundSlider: json["hasSoundSlider"],
     cicState: (json["cicState"] as Array<any>).map(CicStateFromJSON),
     cicCommissioning: (json["cicCommissioning"] as Array<any>).map(
-      CicCommissioningFromJSON,
+      AdminInstallationDetailAllOfCicCommissioningFromJSON,
     ),
     settingsUpdates: (json["settingsUpdates"] as Array<any>).map(
       CicSettingsUpdateFromJSON,
@@ -490,7 +490,7 @@ export function AdminInstallationDetailToJSON(
     hasSoundSlider: value.hasSoundSlider,
     cicState: (value.cicState as Array<any>).map(CicStateToJSON),
     cicCommissioning: (value.cicCommissioning as Array<any>).map(
-      CicCommissioningToJSON,
+      AdminInstallationDetailAllOfCicCommissioningToJSON,
     ),
     settingsUpdates: (value.settingsUpdates as Array<any>).map(
       CicSettingsUpdateToJSON,

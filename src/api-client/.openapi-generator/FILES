@@ -5,9 +5,11 @@ models/AdminDashboardCics200Response.ts
 models/AdminGetCic200Response.ts
 models/AdminGetInstallation200Response.ts
 models/AdminGetInstallationClickhouseData200Response.ts
+models/AdminGetInstallationCommissioning200Response.ts
 models/AdminGetInstallationTickets200Response.ts
 models/AdminGetInstallationTicketsZuper200Response.ts
 models/AdminInstallationDetail.ts
+models/AdminInstallationDetailAllOfCicCommissioning.ts
 models/AdminInstallationsList.ts
 models/AdminInstallationsList200Response.ts
 models/AdminListCics200Response.ts

@@ -32,7 +32,10 @@ export function InstallationDetailService({
       <FormSection>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
-            {zuperStatus !== "success" ? (
+            {zuperStatus === "error" && (
+              <div style={{ textAlign: "center" }}>No services 👍</div>
+            )}
+            {zuperStatus === "loading" ? (
               <Loader />
             ) : (
               <>

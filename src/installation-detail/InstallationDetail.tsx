@@ -12,6 +12,7 @@ import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsH
 import { InstallationDetailTickets } from "./InstallationDetailTickets";
 import { InstallationDetailTariff } from "./InstallationDetailTariff";
 import { InstallationDetailService } from "./InstallationDetailService";
+import { InstallationHealthChecks } from "./InstallationHealthChecks";
 
 interface InstallationDetailProps {
   data: AdminInstallationDetail;
@@ -34,7 +35,7 @@ export function InstallationDetail({ data, tariff }: InstallationDetailProps) {
 
         <div className={classes["detail-section"]}>
           <DetailSectionHeader title="🏥 Health checks" />
-          TODO
+          <InstallationHealthChecks installationId={installationId} />
         </div>
 
         <div className={classes["detail-section"]}>
@@ -44,7 +45,10 @@ export function InstallationDetail({ data, tariff }: InstallationDetailProps) {
 
         <InstallationDetailExtraInformation installation={data} />
         <InstallationDetailCicHistory installation={data} />
-        <InstallationDetailCommissioningHistory installation={data} />
+        <InstallationDetailCommissioningHistory
+          installationId={installationId}
+          installation={data}
+        />
       </div>
 
       <div className={classes["detail-sections-insights"]}>

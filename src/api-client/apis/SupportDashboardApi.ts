@@ -19,6 +19,7 @@ import type {
   AdminGetCic200Response,
   AdminGetInstallation200Response,
   AdminGetInstallationClickhouseData200Response,
+  AdminGetInstallationCommissioning200Response,
   AdminGetInstallationTickets200Response,
   AdminGetInstallationTicketsZuper200Response,
   AdminInstallationsList200Response,
@@ -29,6 +30,7 @@ import type {
   CreateTariffRequest,
   CreateUpdateInstaller,
   ErrorResponse,
+  ForgetWifiMeCicRequest,
   GetAllTariffs200Response,
   UpdateAdminCic,
   UpdateAdminInstallation,
@@ -44,6 +46,8 @@ import {
   AdminGetInstallation200ResponseToJSON,
   AdminGetInstallationClickhouseData200ResponseFromJSON,
   AdminGetInstallationClickhouseData200ResponseToJSON,
+  AdminGetInstallationCommissioning200ResponseFromJSON,
+  AdminGetInstallationCommissioning200ResponseToJSON,
   AdminGetInstallationTickets200ResponseFromJSON,
   AdminGetInstallationTickets200ResponseToJSON,
   AdminGetInstallationTicketsZuper200ResponseFromJSON,
@@ -64,6 +68,8 @@ import {
   CreateUpdateInstallerToJSON,
   ErrorResponseFromJSON,
   ErrorResponseToJSON,
+  ForgetWifiMeCicRequestFromJSON,
+  ForgetWifiMeCicRequestToJSON,
   GetAllTariffs200ResponseFromJSON,
   GetAllTariffs200ResponseToJSON,
   UpdateAdminCicFromJSON,
@@ -94,6 +100,11 @@ export interface AdminDeleteInstallerRequest {
   installerId: string;
 }
 
+export interface AdminForgetWifiRequest {
+  cicId: string;
+  forgetWifiMeCicRequest?: ForgetWifiMeCicRequest;
+}
+
 export interface AdminGetCicRequest {
   cicId: string;
 }
@@ -104,6 +115,11 @@ export interface AdminGetInstallationRequest {
 
 export interface AdminGetInstallationClickhouseDataRequest {
   installationId: string;
+}
+
+export interface AdminGetInstallationCommissioningRequest {
+  installationId: string;
+  commissioningId: number;
 }
 
 export interface AdminGetInstallationTariffRequest {
@@ -123,6 +139,10 @@ export interface AdminGetInstallerRequest {
 }
 
 export interface AdminInstallationInstallationIdClickhouseOptionsRequest {
+  installationId: string;
+}
+
+export interface AdminInstallationInstallationIdCommissioningCommissioningIdOptionsRequest {
   installationId: string;
 }
 
@@ -571,6 +591,66 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   * Forget wifi
+   */
+  async adminForgetWifiRaw(
+    requestParameters: AdminForgetWifiRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminForgetWifi.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/forgetWifi`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: ForgetWifiMeCicRequestToJSON(
+          requestParameters.forgetWifiMeCicRequest,
+        ),
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   * Forget wifi
+   */
+  async adminForgetWifi(
+    requestParameters: AdminForgetWifiRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminForgetWifiRaw(requestParameters, initOverrides);
+  }
+
+  /**
    * Get cic
    */
   async adminGetCicRaw(
@@ -749,6 +829,84 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminGetInstallationClickhouseData200Response> {
     const response = await this.adminGetInstallationClickhouseDataRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   * Get details for selected commissioning
+   */
+  async adminGetInstallationCommissioningRaw(
+    requestParameters: AdminGetInstallationCommissioningRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<
+    runtime.ApiResponse<AdminGetInstallationCommissioning200Response>
+  > {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationCommissioning.",
+      );
+    }
+
+    if (
+      requestParameters.commissioningId === null ||
+      requestParameters.commissioningId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "commissioningId",
+        "Required parameter requestParameters.commissioningId was null or undefined when calling adminGetInstallationCommissioning.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/commissioning/{commissioningId}`
+          .replace(
+            `{${"installationId"}}`,
+            encodeURIComponent(String(requestParameters.installationId)),
+          )
+          .replace(
+            `{${"commissioningId"}}`,
+            encodeURIComponent(String(requestParameters.commissioningId)),
+          ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminGetInstallationCommissioning200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Get details for selected commissioning
+   */
+  async adminGetInstallationCommissioning(
+    requestParameters: AdminGetInstallationCommissioningRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminGetInstallationCommissioning200Response> {
+    const response = await this.adminGetInstallationCommissioningRaw(
       requestParameters,
       initOverrides,
     );
@@ -1042,6 +1200,54 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminInstallationInstallationIdClickhouseOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
+  async adminInstallationInstallationIdCommissioningCommissioningIdOptionsRaw(
+    requestParameters: AdminInstallationInstallationIdCommissioningCommissioningIdOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdCommissioningCommissioningIdOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/commissioning/{commissioningId}`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationInstallationIdCommissioningCommissioningIdOptions(
+    requestParameters: AdminInstallationInstallationIdCommissioningCommissioningIdOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationIdCommissioningCommissioningIdOptionsRaw(
       requestParameters,
       initOverrides,
     );

@@ -1,3 +1,5 @@
+import React from "react";
+import { useApiClient } from "../api-client/context";
 import { AdminCic } from "../api-client/models";
 import { Button, ButtonLink } from "../ui-components/button/Button";
 import {
@@ -22,6 +24,23 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
     open: openAdvancedSettingsModal,
     close: closeAdvancedSettingsModal,
   } = useModalState();
+
+  const apiClient = useApiClient();
+
+  const resetWifiNetwork = React.useCallback(async () => {
+    if (
+      !window.confirm(
+        "Are you sure you would like to forget the current WiFi network?",
+      )
+    ) {
+      return;
+    }
+
+    await apiClient.adminForgetWifi({
+      cicId: cicData.id,
+      forgetWifiMeCicRequest: { ssid: cicData.wifiSSID as string },
+    });
+  }, [apiClient, cicData.id, cicData.wifiSSID]);
 
   return (
     <div className={classes["detail-section"]}>
@@ -59,6 +78,7 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         <Button color="danger" onClick={openAdvancedSettingsModal}>
           Advanced settings
         </Button>
+        <Button onClick={resetWifiNetwork}>Forget WiFi network</Button>
       </FormSection>
     </div>
   );

@@ -20,6 +20,12 @@ import { exists, mapValues } from "../runtime";
  */
 export interface Tariff {
   /**
+   *
+   * @type {string}
+   * @memberof Tariff
+   */
+  id?: string;
+  /**
    * Electricity price for single tariff
    * @type {number}
    * @memberof Tariff
@@ -50,11 +56,17 @@ export interface Tariff {
    */
   validFrom: Date;
   /**
-   *
-   * @type {string}
+   * If the tariff can be deleted
+   * @type {boolean}
    * @memberof Tariff
    */
-  id?: string;
+  isDeletable: boolean;
+  /**
+   * If the date can be edited
+   * @type {boolean}
+   * @memberof Tariff
+   */
+  isDateEditable: boolean;
 }
 
 /**
@@ -64,6 +76,8 @@ export function instanceOfTariff(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "gasPrice" in value;
   isInstance = isInstance && "validFrom" in value;
+  isInstance = isInstance && "isDeletable" in value;
+  isInstance = isInstance && "isDateEditable" in value;
 
   return isInstance;
 }
@@ -80,6 +94,7 @@ export function TariffFromJSONTyped(
     return json;
   }
   return {
+    id: !exists(json, "id") ? undefined : json["id"],
     electricityPrice: !exists(json, "electricityPrice")
       ? undefined
       : json["electricityPrice"],
@@ -91,7 +106,8 @@ export function TariffFromJSONTyped(
       : json["nightElectricityPrice"],
     gasPrice: json["gasPrice"],
     validFrom: new Date(json["validFrom"]),
-    id: !exists(json, "id") ? undefined : json["id"],
+    isDeletable: json["isDeletable"],
+    isDateEditable: json["isDateEditable"],
   };
 }
 
@@ -103,11 +119,13 @@ export function TariffToJSON(value?: Tariff | null): any {
     return null;
   }
   return {
+    id: value.id,
     electricityPrice: value.electricityPrice,
     dayElectricityPrice: value.dayElectricityPrice,
     nightElectricityPrice: value.nightElectricityPrice,
     gasPrice: value.gasPrice,
     validFrom: value.validFrom.toISOString().substring(0, 10),
-    id: value.id,
+    isDeletable: value.isDeletable,
+    isDateEditable: value.isDateEditable,
   };
 }

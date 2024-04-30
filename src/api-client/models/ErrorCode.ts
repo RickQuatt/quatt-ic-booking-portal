@@ -81,6 +81,7 @@ export const ErrorCode = {
   HubspotApiError: "HUBSPOT_API_ERROR",
   ZuperApiError: "ZUPER_API_ERROR",
   OrderNumberNotFound: "ORDER_NUMBER_NOT_FOUND",
+  CommissioningNotFound: "COMMISSIONING_NOT_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
