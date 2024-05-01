@@ -78,7 +78,15 @@ import {
   UpdateAdminInstallationToJSON,
 } from "../models/index";
 
+export interface AdminCicCicIdForgetWifiOptionsRequest {
+  cicId: string;
+}
+
 export interface AdminCicCicIdOptionsRequest {
+  cicId: string;
+}
+
+export interface AdminCicCicIdRebootOptionsRequest {
   cicId: string;
 }
 
@@ -166,6 +174,11 @@ export interface AdminInstallationInstallationIdZuperOptionsRequest {
   installationId: string;
 }
 
+export interface AdminRebootCICRequest {
+  cicId: string;
+  body?: object;
+}
+
 export interface AdminUpdateCicRequest {
   cicId: string;
   updateAdminCic?: UpdateAdminCic;
@@ -191,6 +204,54 @@ export interface AdminUpdateInstallerRequest {
  *
  */
 export class SupportDashboardApi extends runtime.BaseAPI {
+  /**
+   */
+  async adminCicCicIdForgetWifiOptionsRaw(
+    requestParameters: AdminCicCicIdForgetWifiOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCicCicIdForgetWifiOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/forgetWifi`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminCicCicIdForgetWifiOptions(
+    requestParameters: AdminCicCicIdForgetWifiOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminCicCicIdForgetWifiOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
   /**
    */
   async adminCicCicIdOptionsRaw(
@@ -234,6 +295,51 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminCicCicIdOptionsRaw(requestParameters, initOverrides);
+  }
+
+  /**
+   */
+  async adminCicCicIdRebootOptionsRaw(
+    requestParameters: AdminCicCicIdRebootOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCicCicIdRebootOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/reboot`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminCicCicIdRebootOptions(
+    requestParameters: AdminCicCicIdRebootOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminCicCicIdRebootOptionsRaw(requestParameters, initOverrides);
   }
 
   /**
@@ -1740,6 +1846,64 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   ): Promise<AdminListInstallers200Response> {
     const response = await this.adminListInstallersRaw(initOverrides);
     return await response.value();
+  }
+
+  /**
+   * Reboot CIC
+   */
+  async adminRebootCICRaw(
+    requestParameters: AdminRebootCICRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminRebootCIC.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/reboot`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: requestParameters.body as any,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   * Reboot CIC
+   */
+  async adminRebootCIC(
+    requestParameters: AdminRebootCICRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminRebootCICRaw(requestParameters, initOverrides);
   }
 
   /**
