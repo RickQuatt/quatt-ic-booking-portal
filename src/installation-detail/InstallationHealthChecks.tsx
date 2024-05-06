@@ -11,6 +11,7 @@ import {
 import { useApiClient } from "../api-client/context";
 import { useQuery } from "react-query";
 import { Loader } from "../ui-components/loader/Loader";
+import { roundNumber } from "../utils/number";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -138,7 +139,7 @@ export function InstallationHealthChecks({
               <h3 style={{ margin: "0" }}>Setpoint reached</h3>
               <h2 style={{ margin: "0" }}>
                 {chResults?.setpointAdherence
-                  ? `${Math.round(chResults.setpointAdherence * 10) / 10} %`
+                  ? `${roundNumber(chResults.setpointAdherence, 1)}%`
                   : "N/A"}
               </h2>
             </div>
