@@ -26,7 +26,7 @@ const options = {
       callbacks: {
         label: function (context: any) {
           const value = context.dataset.data[context.dataIndex].value;
-          return `${value}%`;
+          return `${value}`;
         },
       },
     },
@@ -101,7 +101,7 @@ export function InstallationHealthChecks({
 
   const emptyModeReperation = Object.values(
     chResults?.modeReparation || {},
-  ).every((value) => value === 0);
+  ).every((value) => value === "0");
 
   return (
     <>
@@ -138,13 +138,13 @@ export function InstallationHealthChecks({
               <h3 style={{ margin: "0" }}>Setpoint reached</h3>
               <h2 style={{ margin: "0" }}>
                 {chResults?.setpointAdherence
-                  ? `${chResults.setpointAdherence} %`
+                  ? `${Math.round(chResults.setpointAdherence * 10) / 10} %`
                   : "N/A"}
               </h2>
             </div>
             <div>
-              <h3 style={{ margin: "0" }}>Mode reperation</h3>
-              {emptyModeReperation && chResults?.modeReparation ? (
+              <h3 style={{ margin: "0" }}>Mode reparation</h3>
+              {!emptyModeReperation && chResults?.modeReparation ? (
                 <div style={{ height: "100px", width: "100px" }}>
                   <Pie ref={chartRef} data={chartData} options={options} />
                 </div>
