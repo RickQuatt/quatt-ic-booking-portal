@@ -11,6 +11,7 @@ import { Tariff, TarrifsResult } from "../api-client/models";
 import { formatDateShortAsString } from "../utils/formatDate";
 import { useModalState } from "../ui-components/modal/useModalState";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import { roundNumber } from "../utils/number";
 interface InstallationDetailTariffProps {
   installationId: string;
   tariff?: TarrifsResult | null;
@@ -130,14 +131,19 @@ function InstallationDetailTariffItem({
         <div className={classes["detail-section-bold"]}>
           {tariff.dayElectricityPrice && tariff.nightElectricityPrice ? (
             <div className={classes["tariff-grid"]}>
-              <div>⚡️☀️ €{tariff.dayElectricityPrice}</div>
-              <div>⚡️🌙 €{tariff.nightElectricityPrice}</div>
-              <div>🔥 €{tariff.gasPrice}</div>
+              <div>⚡️☀️ €{roundNumber(tariff.dayElectricityPrice, 2)}</div>
+              <div>⚡️🌙 €{roundNumber(tariff.nightElectricityPrice, 2)}</div>
+              <div>🔥 €{roundNumber(tariff.gasPrice, 2)}</div>
             </div>
           ) : (
             <div className={classes["tariff-grid"]}>
-              <div>⚡️ €{tariff.electricityPrice}</div>
-              <div>🔥 €{tariff.gasPrice}</div>
+              <div>
+                ⚡️ €
+                {tariff.electricityPrice
+                  ? roundNumber(tariff.electricityPrice, 2)
+                  : "n/a"}
+              </div>
+              <div>🔥 €{roundNumber(tariff.gasPrice, 2)}</div>
             </div>
           )}
         </div>
