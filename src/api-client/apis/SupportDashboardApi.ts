@@ -20,6 +20,7 @@ import type {
   AdminGetInstallation200Response,
   AdminGetInstallationClickhouseData200Response,
   AdminGetInstallationCommissioning200Response,
+  AdminGetInstallationSetting200Response,
   AdminGetInstallationTickets200Response,
   AdminGetInstallationTicketsZuper200Response,
   AdminInstallationsList200Response,
@@ -48,6 +49,8 @@ import {
   AdminGetInstallationClickhouseData200ResponseToJSON,
   AdminGetInstallationCommissioning200ResponseFromJSON,
   AdminGetInstallationCommissioning200ResponseToJSON,
+  AdminGetInstallationSetting200ResponseFromJSON,
+  AdminGetInstallationSetting200ResponseToJSON,
   AdminGetInstallationTickets200ResponseFromJSON,
   AdminGetInstallationTickets200ResponseToJSON,
   AdminGetInstallationTicketsZuper200ResponseFromJSON,
@@ -130,6 +133,11 @@ export interface AdminGetInstallationCommissioningRequest {
   commissioningId: number;
 }
 
+export interface AdminGetInstallationSettingRequest {
+  installationId: string;
+  settingsId: string;
+}
+
 export interface AdminGetInstallationTariffRequest {
   installationId: string;
 }
@@ -159,6 +167,10 @@ export interface AdminInstallationInstallationIdHubspotOptionsRequest {
 }
 
 export interface AdminInstallationInstallationIdOptionsRequest {
+  installationId: string;
+}
+
+export interface AdminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRequest {
   installationId: string;
 }
 
@@ -1020,6 +1032,82 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   * Get details for selected setting
+   */
+  async adminGetInstallationSettingRaw(
+    requestParameters: AdminGetInstallationSettingRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<AdminGetInstallationSetting200Response>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationSetting.",
+      );
+    }
+
+    if (
+      requestParameters.settingsId === null ||
+      requestParameters.settingsId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "settingsId",
+        "Required parameter requestParameters.settingsId was null or undefined when calling adminGetInstallationSetting.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/settingsUpdate/{settingsId}`
+          .replace(
+            `{${"installationId"}}`,
+            encodeURIComponent(String(requestParameters.installationId)),
+          )
+          .replace(
+            `{${"settingsId"}}`,
+            encodeURIComponent(String(requestParameters.settingsId)),
+          ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminGetInstallationSetting200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Get details for selected setting
+   */
+  async adminGetInstallationSetting(
+    requestParameters: AdminGetInstallationSettingRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminGetInstallationSetting200Response> {
+    const response = await this.adminGetInstallationSettingRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
    * Get installation tariff
    */
   async adminGetInstallationTariffRaw(
@@ -1457,6 +1545,54 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
+  async adminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRaw(
+    requestParameters: AdminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdSettingsUpdateSettingsIdOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/settingsUpdate/{settingsId}`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationInstallationIdSettingsUpdateSettingsIdOptions(
+    requestParameters: AdminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
   async adminInstallationInstallationIdTariffOptionsRaw(
     requestParameters: AdminInstallationInstallationIdTariffOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
@@ -1854,7 +1990,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   async adminRebootCICRaw(
     requestParameters: AdminRebootCICRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<void>> {
+  ): Promise<runtime.ApiResponse<CompleteCommissioning200Response>> {
     if (
       requestParameters.cicId === null ||
       requestParameters.cicId === undefined
@@ -1893,7 +2029,9 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       initOverrides,
     );
 
-    return new runtime.VoidApiResponse(response);
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      CompleteCommissioning200ResponseFromJSON(jsonValue),
+    );
   }
 
   /**
@@ -1902,8 +2040,12 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   async adminRebootCIC(
     requestParameters: AdminRebootCICRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<void> {
-    await this.adminRebootCICRaw(requestParameters, initOverrides);
+  ): Promise<CompleteCommissioning200Response> {
+    const response = await this.adminRebootCICRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
   }
 
   /**

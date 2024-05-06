@@ -25,12 +25,6 @@ import {
   BoilerTypeFromJSONTyped,
   BoilerTypeToJSON,
 } from "./BoilerType";
-import type { CicSettingsUpdate } from "./CicSettingsUpdate";
-import {
-  CicSettingsUpdateFromJSON,
-  CicSettingsUpdateFromJSONTyped,
-  CicSettingsUpdateToJSON,
-} from "./CicSettingsUpdate";
 import type { CicState } from "./CicState";
 import {
   CicStateFromJSON,
@@ -49,12 +43,24 @@ import {
   InstallationStatusFromJSONTyped,
   InstallationStatusToJSON,
 } from "./InstallationStatus";
+import type { InstallationType } from "./InstallationType";
+import {
+  InstallationTypeFromJSON,
+  InstallationTypeFromJSONTyped,
+  InstallationTypeToJSON,
+} from "./InstallationType";
 import type { MaxSoundLevel } from "./MaxSoundLevel";
 import {
   MaxSoundLevelFromJSON,
   MaxSoundLevelFromJSONTyped,
   MaxSoundLevelToJSON,
 } from "./MaxSoundLevel";
+import type { SettingsHeader } from "./SettingsHeader";
+import {
+  SettingsHeaderFromJSON,
+  SettingsHeaderFromJSONTyped,
+  SettingsHeaderToJSON,
+} from "./SettingsHeader";
 import type { SilentMode } from "./SilentMode";
 import {
   SilentModeFromJSON,
@@ -274,6 +280,12 @@ export interface AdminInstallationDetail {
   quattBuild: string | null;
   /**
    *
+   * @type {InstallationType}
+   * @memberof AdminInstallationDetail
+   */
+  installationType: InstallationType;
+  /**
+   *
    * @type {Date}
    * @memberof AdminInstallationDetail
    */
@@ -304,10 +316,10 @@ export interface AdminInstallationDetail {
   cicCommissioning: Array<AdminInstallationDetailAllOfCicCommissioning>;
   /**
    *
-   * @type {Array<CicSettingsUpdate>}
+   * @type {Array<SettingsHeader>}
    * @memberof AdminInstallationDetail
    */
-  settingsUpdates: Array<CicSettingsUpdate>;
+  settingsUpdates: Array<SettingsHeader>;
 }
 
 /**
@@ -348,6 +360,7 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "createdAt" in value;
   isInstance = isInstance && "updatedAt" in value;
   isInstance = isInstance && "quattBuild" in value;
+  isInstance = isInstance && "installationType" in value;
   isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
   isInstance = isInstance && "menderId" in value;
   isInstance = isInstance && "hasSoundSlider" in value;
@@ -414,6 +427,7 @@ export function AdminInstallationDetailFromJSONTyped(
     createdAt: new Date(json["createdAt"]),
     updatedAt: new Date(json["updatedAt"]),
     quattBuild: json["quattBuild"],
+    installationType: InstallationTypeFromJSON(json["installationType"]),
     lastConnectionStatusUpdatedAt:
       json["lastConnectionStatusUpdatedAt"] === null
         ? null
@@ -425,7 +439,7 @@ export function AdminInstallationDetailFromJSONTyped(
       AdminInstallationDetailAllOfCicCommissioningFromJSON,
     ),
     settingsUpdates: (json["settingsUpdates"] as Array<any>).map(
-      CicSettingsUpdateFromJSON,
+      SettingsHeaderFromJSON,
     ),
   };
 }
@@ -482,6 +496,7 @@ export function AdminInstallationDetailToJSON(
     createdAt: value.createdAt.toISOString(),
     updatedAt: value.updatedAt.toISOString(),
     quattBuild: value.quattBuild,
+    installationType: InstallationTypeToJSON(value.installationType),
     lastConnectionStatusUpdatedAt:
       value.lastConnectionStatusUpdatedAt === null
         ? null
@@ -493,7 +508,7 @@ export function AdminInstallationDetailToJSON(
       AdminInstallationDetailAllOfCicCommissioningToJSON,
     ),
     settingsUpdates: (value.settingsUpdates as Array<any>).map(
-      CicSettingsUpdateToJSON,
+      SettingsHeaderToJSON,
     ),
   };
 }

@@ -31,6 +31,12 @@ import {
   InstallationStatusFromJSONTyped,
   InstallationStatusToJSON,
 } from "./InstallationStatus";
+import type { InstallationType } from "./InstallationType";
+import {
+  InstallationTypeFromJSON,
+  InstallationTypeFromJSONTyped,
+  InstallationTypeToJSON,
+} from "./InstallationType";
 import type { MaxSoundLevel } from "./MaxSoundLevel";
 import {
   MaxSoundLevelFromJSON,
@@ -256,6 +262,12 @@ export interface Installation {
   quattBuild: string | null;
   /**
    *
+   * @type {InstallationType}
+   * @memberof Installation
+   */
+  installationType: InstallationType;
+  /**
+   *
    * @type {Date}
    * @memberof Installation
    */
@@ -312,6 +324,7 @@ export function instanceOfInstallation(value: object): boolean {
   isInstance = isInstance && "createdAt" in value;
   isInstance = isInstance && "updatedAt" in value;
   isInstance = isInstance && "quattBuild" in value;
+  isInstance = isInstance && "installationType" in value;
   isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
   isInstance = isInstance && "menderId" in value;
   isInstance = isInstance && "hasSoundSlider" in value;
@@ -373,6 +386,7 @@ export function InstallationFromJSONTyped(
     createdAt: new Date(json["createdAt"]),
     updatedAt: new Date(json["updatedAt"]),
     quattBuild: json["quattBuild"],
+    installationType: InstallationTypeFromJSON(json["installationType"]),
     lastConnectionStatusUpdatedAt:
       json["lastConnectionStatusUpdatedAt"] === null
         ? null
@@ -432,6 +446,7 @@ export function InstallationToJSON(value?: Installation | null): any {
     createdAt: value.createdAt.toISOString(),
     updatedAt: value.updatedAt.toISOString(),
     quattBuild: value.quattBuild,
+    installationType: InstallationTypeToJSON(value.installationType),
     lastConnectionStatusUpdatedAt:
       value.lastConnectionStatusUpdatedAt === null
         ? null
