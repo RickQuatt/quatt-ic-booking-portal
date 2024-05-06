@@ -101,7 +101,7 @@ export function InstallationHealthChecks({
 
   const emptyModeReperation = Object.values(
     chResults?.modeReparation || {},
-  ).every((value) => value === 0);
+  ).every((value) => value === "0");
 
   return (
     <>
