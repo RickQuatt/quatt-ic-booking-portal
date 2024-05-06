@@ -146,6 +146,10 @@ models/*
 !models/ForgetWifiMeCicRequest.ts
 !models/AdminGetInstallationCommissioning200Response.ts
 !models/AdminInstallationDetailAllOfCicCommissioning.ts
+!models/AdminGetInstallationSetting200Response.ts
+!models/InstallationType.ts
+!models/SettingsHeader.ts
+!models/UserRole.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

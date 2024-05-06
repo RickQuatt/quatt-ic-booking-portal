@@ -53,7 +53,10 @@ export function InstallationDetail({ data, tariff }: InstallationDetailProps) {
 
       <div className={classes["detail-sections-insights"]}>
         <InstallationDetailAdvanced installation={data} />
-        <InstallationDetailSettingsHistory installation={data} />
+        <InstallationDetailSettingsHistory
+          installationId={installationId}
+          installation={data}
+        />
         <InstallationDetailSettings installation={data} />
       </div>
 

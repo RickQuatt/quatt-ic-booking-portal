@@ -82,6 +82,7 @@ export const ErrorCode = {
   ZuperApiError: "ZUPER_API_ERROR",
   OrderNumberNotFound: "ORDER_NUMBER_NOT_FOUND",
   CommissioningNotFound: "COMMISSIONING_NOT_FOUND",
+  SettingsUpdateNotFound: "SETTINGS_UPDATE_NOT_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

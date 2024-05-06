@@ -6,6 +6,7 @@ models/AdminGetCic200Response.ts
 models/AdminGetInstallation200Response.ts
 models/AdminGetInstallationClickhouseData200Response.ts
 models/AdminGetInstallationCommissioning200Response.ts
+models/AdminGetInstallationSetting200Response.ts
 models/AdminGetInstallationTickets200Response.ts
 models/AdminGetInstallationTicketsZuper200Response.ts
 models/AdminInstallationDetail.ts
@@ -69,6 +70,7 @@ models/IdentificationStatus.ts
 models/IdentificationTestStatus.ts
 models/Installation.ts
 models/InstallationStatus.ts
+models/InstallationType.ts
 models/Installer.ts
 models/InstallerCic.ts
 models/LinkHubspotInstallerCicRequest.ts
@@ -83,6 +85,7 @@ models/ReferralMember.ts
 models/RequestPairInstallerCicRequest.ts
 models/ResponseMeta.ts
 models/ServiceJob.ts
+models/SettingsHeader.ts
 models/SilentMode.ts
 models/StartHeatPumpTestRequest.ts
 models/StopIdentificationTestRequest.ts
@@ -98,5 +101,6 @@ models/UpdateCic.ts
 models/UpdateInstallerCic.ts
 models/UpdateMeCic.ts
 models/UpdateMeUser.ts
+models/UserRole.ts
 models/index.ts
 runtime.ts

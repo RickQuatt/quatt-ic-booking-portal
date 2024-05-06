@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from "../runtime";
+import type { UserRole } from "./UserRole";
+import {
+  UserRoleFromJSON,
+  UserRoleFromJSONTyped,
+  UserRoleToJSON,
+} from "./UserRole";
+
 /**
  *
  * @export
@@ -45,10 +52,10 @@ export interface CicSettingsUpdate {
   updatedBy: string | null;
   /**
    *
-   * @type {string}
+   * @type {UserRole}
    * @memberof CicSettingsUpdate
    */
-  role: CicSettingsUpdateRoleEnum;
+  role: UserRole | null;
   /**
    *
    * @type {string}
@@ -108,17 +115,6 @@ export interface CicSettingsUpdate {
 /**
  * @export
  */
-export const CicSettingsUpdateRoleEnum = {
-  Admin: "admin",
-  Installer: "installer",
-  App: "app",
-} as const;
-export type CicSettingsUpdateRoleEnum =
-  (typeof CicSettingsUpdateRoleEnum)[keyof typeof CicSettingsUpdateRoleEnum];
-
-/**
- * @export
- */
 export const CicSettingsUpdateSettingsTypeEnum = {
   Setting: "setting",
   Config: "config",
@@ -166,7 +162,7 @@ export function CicSettingsUpdateFromJSONTyped(
     cicId: json["cicId"],
     userId: json["userId"],
     updatedBy: json["updatedBy"],
-    role: json["role"],
+    role: UserRoleFromJSON(json["role"]),
     settingsType: json["settingsType"],
     settings: json["settings"],
     retries: json["retries"],
@@ -193,7 +189,7 @@ export function CicSettingsUpdateToJSON(value?: CicSettingsUpdate | null): any {
     cicId: value.cicId,
     userId: value.userId,
     updatedBy: value.updatedBy,
-    role: value.role,
+    role: UserRoleToJSON(value.role),
     settingsType: value.settingsType,
     settings: value.settings,
     retries: value.retries,

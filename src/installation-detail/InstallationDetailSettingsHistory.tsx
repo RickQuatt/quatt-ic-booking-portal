@@ -4,19 +4,52 @@ import classes from "./InstallationDetail.module.css";
 import {
   AdminInstallationDetail,
   CicSettingsUpdate,
+  SettingsHeader,
 } from "../api-client/models";
 import { FormField, FormSection } from "../ui-components/form/Form";
 import { Accordion, AccordionItem } from "../ui-components/accordion/Accordion";
 import { formatDateTime } from "../utils/formatDate";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import { useApiClient } from "../api-client/context";
+import { useMutation } from "react-query";
+import { AdminGetInstallationSettingRequest } from "../api-client/apis";
 
 interface InstallationDetailProps {
+  installationId: string;
   installation: AdminInstallationDetail;
 }
 
 export function InstallationDetailSettingsHistory({
+  installationId,
   installation,
 }: InstallationDetailProps) {
+  const apiClient = useApiClient();
+
+  const { mutateAsync, data, isLoading } = useMutation({
+    mutationFn: ({
+      installationId,
+      settingsId,
+    }: AdminGetInstallationSettingRequest) =>
+      apiClient.adminGetInstallationSetting({
+        installationId,
+        settingsId,
+      }),
+
+    onError: (error) => {
+      console.error("Error fetching settings details", error);
+    },
+  });
+
+  const settingsData = data ? data.result : null;
+
+  const getSettingsDetails = async (id: string) => {
+    const settings = await mutateAsync({
+      installationId: installationId,
+      settingsId: id,
+    });
+    return settings.result;
+  };
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="👀 Settings history" />
@@ -26,8 +59,13 @@ export function InstallationDetailSettingsHistory({
             <Accordion>
               {installation.settingsUpdates.map((setting, index) => (
                 <InstallationDetailSettingsItem
-                  settingsUpdate={setting}
                   key={index}
+                  isLoading={isLoading}
+                  data={settingsData}
+                  createdAt={setting.createdAt}
+                  updatedBy={setting.updatedBy}
+                  isUnconfirmed={setting.isUnconfirmed}
+                  onClick={() => getSettingsDetails(setting.settingsId)}
                 />
               ))}
             </Accordion>
@@ -42,20 +80,31 @@ export function InstallationDetailSettingsHistory({
 }
 
 interface InstallationDetailSettingsItemProps {
-  settingsUpdate: CicSettingsUpdate;
+  isLoading: boolean;
+  createdAt: Date;
+  updatedBy: string | null;
+  isUnconfirmed: boolean;
+  onClick?: () => void;
+  data: CicSettingsUpdate | null;
 }
 
 function InstallationDetailSettingsItem({
-  settingsUpdate,
+  isLoading,
+  createdAt,
+  updatedBy,
+  isUnconfirmed,
+  onClick,
+  data,
 }: InstallationDetailSettingsItemProps) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const settings = settingsUpdate.settings.toString();
-  const settinsJson = JSON.parse(settings);
+  const dataJson = data ?? [];
+  const settings = data?.settings.toString();
+  const settinsJson = settings ? JSON.parse(settings) : {};
 
   const excludedKeys = ["settings"];
   const datesKeys = ["createdAt", "updatedAt", "confirmedAt", "cancelledAt"];
   const listOfSettings = [
-    ...Object.entries(settingsUpdate)
+    ...Object.entries(dataJson)
       .filter(([key]) => !excludedKeys.includes(key))
       .map(([key, value]) => [
         key,
@@ -69,42 +118,49 @@ function InstallationDetailSettingsItem({
 
   return (
     <AccordionItem
-      title={formatDateTime(settingsUpdate.createdAt) || "No date"}
+      title={formatDateTime(createdAt) || "No date"}
       additionalInfo={
         <>
-          <div>Updated by: {settingsUpdate.updatedBy ?? "-"}</div>
-          <div>Is Confirmed: {settingsUpdate.isUnconfirmed ? "❌" : "✅"}</div>
+          <div>Updated by: {updatedBy ?? "-"}</div>
+          <div>Is Confirmed: {isUnconfirmed ? "❌" : "✅"}</div>
         </>
       }
       isOpen={isOpen}
-      onChangeIsOpen={() => setIsOpen(!isOpen)}
+      onChangeIsOpen={() => {
+        setIsOpen(!isOpen);
+        onClick?.();
+      }}
     >
-      <div>
-        <div className={classes["settings-history-card"]}>
-          <ul className={classes["settings-history-bullet"]}>
-            {listOfSettings.map(([key, value]) => (
-              <li key={key}>
-                <>
-                  <b>{key}:</b> {value}
-                </>
+      {isLoading ? (
+        <div>is Loading....</div>
+      ) : (
+        <div>
+          <div className={classes["settings-history-card"]}>
+            <ul className={classes["settings-history-bullet"]}>
+              {listOfSettings.map(([key, value]) => (
+                <li key={key}>
+                  <>
+                    <b>{key}:</b> {value}
+                  </>
+                </li>
+              ))}
+              <li>
+                <b>settings:</b>
               </li>
-            ))}
-            <li>
-              <b>settings:</b>
-            </li>
-            {settingsColumn.map(([key, value]) => (
-              <li
-                className={classes["settings-history-child-setting"]}
-                key={key}
-              >
-                <>
-                  <b>{key}:</b> {value}
-                </>
-              </li>
-            ))}
-          </ul>
+              {settingsColumn.map(([key, value]) => (
+                <li
+                  className={classes["settings-history-child-setting"]}
+                  key={key}
+                >
+                  <>
+                    <b>{key}:</b> {value}
+                  </>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
+      )}
     </AccordionItem>
   );
 }
