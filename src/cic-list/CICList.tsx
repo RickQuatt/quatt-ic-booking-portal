@@ -17,7 +17,10 @@ import { filterCICList } from "./filters/filterCICList";
 import { ButtonLink } from "../ui-components/button/Button";
 import { AdminCic, ConnectionStatus } from "../api-client/models";
 import { formatDate, formatDateDistance } from "../utils/formatDate";
-import { getGrafanaLink, getMenderLink } from "../cic-detail/getLinks";
+import {
+  getGrafanaDataPerCICLink,
+  getMenderLink,
+} from "../cic-detail/getLinks";
 import {
   TBody,
   THead,
@@ -182,7 +185,10 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
         )}
       </Td>
       <Td>
-        <ButtonLink href={getGrafanaLink(cicEntry.id)} target="_blank">
+        <ButtonLink
+          href={getGrafanaDataPerCICLink(cicEntry.id)}
+          target="_blank"
+        >
           Grafana
         </ButtonLink>
       </Td>

@@ -11,7 +11,10 @@ import {
 import classes from "./InstallationList.module.css";
 import { formatDate } from "../utils/formatDate";
 import { ButtonLink } from "../ui-components/button/Button";
-import { getGrafanaLink, getMenderLink } from "../cic-detail/getLinks";
+import {
+  getGrafanaDataPerCICLink,
+  getMenderLink,
+} from "../cic-detail/getLinks";
 import { Link } from "wouter";
 import React from "react";
 import { InstallationFilters } from "./filters/types";
@@ -162,7 +165,10 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
           )}
         </Td>
         <Td>
-          <ButtonLink href={getGrafanaLink(installation.cicId)} target="_blank">
+          <ButtonLink
+            href={getGrafanaDataPerCICLink(installation.cicId)}
+            target="_blank"
+          >
             Grafana
           </ButtonLink>
         </Td>

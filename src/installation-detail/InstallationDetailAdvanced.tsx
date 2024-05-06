@@ -1,7 +1,8 @@
 import { AdminInstallationDetail } from "../api-client/models";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import {
-  getGrafanaLink,
+  getGrafanaDataPerCICLink,
+  getGrafanaDiagnosticsLink,
   getHubspotSearchOrderLink,
   getMenderLink,
 } from "../cic-detail/getLinks";
@@ -38,10 +39,16 @@ export function InstallationDetailAdvanced({
           </ButtonLink>
         )}
         <ButtonLink
-          href={getGrafanaLink(installation.activeCic)}
+          href={getGrafanaDataPerCICLink(installation.activeCic)}
           target="_blank"
         >
-          Grafana
+          Grafana - Data per CIC
+        </ButtonLink>
+        <ButtonLink
+          href={getGrafanaDiagnosticsLink(installation.activeCic)}
+          target="_blank"
+        >
+          Grafana - Diagnostics
         </ButtonLink>
       </FormSection>
     </div>

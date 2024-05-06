@@ -13,7 +13,7 @@ import { AdvancedSettingsModal } from "./AdvancedSettingsModal";
 import classes from "./CICDetail.module.css";
 import { DetailSectionHeader } from "./CICDetailSectionHeader";
 import {
-  getGrafanaLink,
+  getGrafanaDataPerCICLink,
   getHubspotSearchOrderLink,
   getMenderLink,
 } from "./getLinks";
@@ -76,7 +76,7 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
             Mender
           </ButtonLink>
         )}
-        <ButtonLink href={getGrafanaLink(cicData.id)} target="_blank">
+        <ButtonLink href={getGrafanaDataPerCICLink(cicData.id)} target="_blank">
           Grafana
         </ButtonLink>
         <FormField>
