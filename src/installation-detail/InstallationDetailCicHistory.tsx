@@ -31,9 +31,6 @@ export function InstallationDetailCicHistory({
                 <Th>
                   <TdText>Starts at</TdText>
                 </Th>
-                <Th>
-                  <TdText>Status</TdText>
-                </Th>
               </Tr>
             </THead>
             <TBody>
@@ -44,9 +41,6 @@ export function InstallationDetailCicHistory({
                   </Td>
                   <Td>
                     <TdText>{formatDateTime(state.startAt)}</TdText>
-                  </Td>
-                  <Td>
-                    <TdText>{state.status}</TdText>
                   </Td>
                 </Tr>
               ))}

@@ -44,6 +44,16 @@ export function InstallationDetailExtraInformation({
             }
           />
         </FormField>
+        <FormField>
+          <FormFieldTitle>Installation type</FormFieldTitle>
+          <FormFieldValue
+            value={
+              installation.installationType === "hybrid"
+                ? "Quatt Hybrid"
+                : "Quatt Hybrid Duo"
+            }
+          />
+        </FormField>
       </FormSection>
     </div>
   );

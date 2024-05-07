@@ -71,8 +71,28 @@ const DimmerOverlay = ({ children }: React.PropsWithChildren) => {
   return <div className={classes["dimmer-overlay"]}>{children}</div>;
 };
 
-export const ModalHeader = ({ children }: { children: React.ReactNode }) => (
-  <div className={classes["modal-header"]}>{children}</div>
+export const ModalHeader = ({
+  children,
+  closeModal,
+}: {
+  children: React.ReactNode;
+  closeModal?: () => void;
+}) => (
+  <div className={classes["modal-header"]}>
+    <div className={classes["modal-title"]}>{children}</div>
+    {closeModal && (
+      <div className={classes["modal-close"]}>
+        <span
+          onClick={closeModal}
+          style={{
+            cursor: "pointer",
+          }}
+        >
+          X
+        </span>
+      </div>
+    )}
+  </div>
 );
 export const ModalContent = ({
   children,

@@ -9,7 +9,7 @@ export function getGrafanaDataPerCICLink(id: string) {
     return `https://g-d4ebd27178.grafana-workspace.eu-west-1.amazonaws.com/d/2iE68EiSkB/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
   }
 
-  return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/2iE68EiSkB/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
+  return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/clickhouse-data-per-cic/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
 }
 
 export function getGrafanaDiagnosticsLink(id: string) {
