@@ -202,7 +202,7 @@ export function TariffsModal({
 
   return (
     <Modal isOpen={isOpen} closeModal={closeModal}>
-      <ModalHeader>Edit tariff data</ModalHeader>
+      <ModalHeader closeModal={closeModal}>Edit tariff data</ModalHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <ModalContent>
           <FormSection>
