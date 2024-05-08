@@ -65,8 +65,8 @@ export function InstallationDetailTickets({ installationId }: CICDetailProps) {
                       </div>
                       <div>{`Owner: ${getTicketOwner(ticket)}`}</div>
                       <div>{`Status: ${ticket.hs_pipeline_stage.label}`}</div>
-                      <div>{`Last activity: ${formatDateTime(
-                        ticket.hs_lastactivitydate,
+                      <div>{`Created at: ${formatDateTime(
+                        ticket.createdate,
                       )}`}</div>
                     </div>
                   ))}

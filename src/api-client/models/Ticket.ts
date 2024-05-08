@@ -67,7 +67,7 @@ export interface Ticket {
    * @type {Date}
    * @memberof Ticket
    */
-  hs_lastactivitydate: Date;
+  createdate: Date;
 }
 
 /**
@@ -80,7 +80,7 @@ export function instanceOfTicket(value: object): boolean {
   isInstance = isInstance && "subject" in value;
   isInstance = isInstance && "hubspot_owner_id" in value;
   isInstance = isInstance && "hs_object_id" in value;
-  isInstance = isInstance && "hs_lastactivitydate" in value;
+  isInstance = isInstance && "createdate" in value;
 
   return isInstance;
 }
@@ -102,7 +102,7 @@ export function TicketFromJSONTyped(
     subject: json["subject"],
     hubspot_owner_id: TicketHubspotOwnerIdFromJSON(json["hubspot_owner_id"]),
     hs_object_id: json["hs_object_id"],
-    hs_lastactivitydate: new Date(json["hs_lastactivitydate"]),
+    createdate: new Date(json["createdate"]),
   };
 }
 
@@ -119,6 +119,6 @@ export function TicketToJSON(value?: Ticket | null): any {
     subject: value.subject,
     hubspot_owner_id: TicketHubspotOwnerIdToJSON(value.hubspot_owner_id),
     hs_object_id: value.hs_object_id,
-    hs_lastactivitydate: value.hs_lastactivitydate.toISOString(),
+    createdate: value.createdate.toISOString(),
   };
 }
