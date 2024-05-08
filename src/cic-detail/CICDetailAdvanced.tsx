@@ -47,7 +47,13 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
       return;
     }
 
-    await apiClient.adminRebootCIC({ cicId: cicData.id });
+    const response = await apiClient.adminRebootCIC({ cicId: cicData.id });
+
+    if (response.meta.status === 200) {
+      alert("Reboot request sent successfully.");
+    } else {
+      alert("Failed to send reboot request.");
+    }
   }, [apiClient, cicData.id]);
 
   return (
