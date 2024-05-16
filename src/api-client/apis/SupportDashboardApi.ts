@@ -92,6 +92,10 @@ export interface AdminCicCicIdCancelCommissioningOptionsRequest {
   cicId: string;
 }
 
+export interface AdminCicCicIdCompleteCommissioningOptionsRequest {
+  cicId: string;
+}
+
 export interface AdminCicCicIdForgetWifiOptionsRequest {
   cicId: string;
 }
@@ -101,6 +105,10 @@ export interface AdminCicCicIdOptionsRequest {
 }
 
 export interface AdminCicCicIdRebootOptionsRequest {
+  cicId: string;
+}
+
+export interface AdminCompleteCommissioningRequest {
   cicId: string;
 }
 
@@ -338,6 +346,54 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
+  async adminCicCicIdCompleteCommissioningOptionsRaw(
+    requestParameters: AdminCicCicIdCompleteCommissioningOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCicCicIdCompleteCommissioningOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/completeCommissioning`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminCicCicIdCompleteCommissioningOptions(
+    requestParameters: AdminCicCicIdCompleteCommissioningOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminCicCicIdCompleteCommissioningOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
   async adminCicCicIdForgetWifiOptionsRaw(
     requestParameters: AdminCicCicIdForgetWifiOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
@@ -532,6 +588,67 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminCicListOptionsRaw(initOverrides);
+  }
+
+  /**
+   * Complete commissioning
+   */
+  async adminCompleteCommissioningRaw(
+    requestParameters: AdminCompleteCommissioningRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<GetInstallerCic200Response>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCompleteCommissioning.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/completeCommissioning`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      GetInstallerCic200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Complete commissioning
+   */
+  async adminCompleteCommissioning(
+    requestParameters: AdminCompleteCommissioningRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<GetInstallerCic200Response> {
+    const response = await this.adminCompleteCommissioningRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
   }
 
   /**

@@ -213,6 +213,12 @@ export interface CicCommissioning {
    */
   commissioningMode: CicCommissioningCommissioningModeEnum;
   /**
+   * Whether the commissioning is forced
+   * @type {boolean}
+   * @memberof CicCommissioning
+   */
+  isForced: boolean;
+  /**
    *
    * @type {Date}
    * @memberof CicCommissioning
@@ -329,6 +335,7 @@ export function instanceOfCicCommissioning(value: object): boolean {
   isInstance = isInstance && "heatPumpTestStoppableAt" in value;
   isInstance = isInstance && "boilerTestStatus" in value;
   isInstance = isInstance && "commissioningMode" in value;
+  isInstance = isInstance && "isForced" in value;
   isInstance = isInstance && "completedAt" in value;
   isInstance = isInstance && "createdAt" in value;
   isInstance = isInstance && "updatedAt" in value;
@@ -422,6 +429,7 @@ export function CicCommissioningFromJSONTyped(
       : HeatPumpTestLevelFromJSON(json["heatPumpTestLevel"]),
     boilerTestStatus: json["boilerTestStatus"],
     commissioningMode: json["commissioningMode"],
+    isForced: json["isForced"],
     completedAt:
       json["completedAt"] === null ? null : new Date(json["completedAt"]),
     createdAt: json["createdAt"] === null ? null : new Date(json["createdAt"]),
@@ -508,6 +516,7 @@ export function CicCommissioningToJSON(value?: CicCommissioning | null): any {
     heatPumpTestLevel: HeatPumpTestLevelToJSON(value.heatPumpTestLevel),
     boilerTestStatus: value.boilerTestStatus,
     commissioningMode: value.commissioningMode,
+    isForced: value.isForced,
     completedAt:
       value.completedAt === null ? null : value.completedAt.toISOString(),
     createdAt: value.createdAt === null ? null : value.createdAt.toISOString(),
