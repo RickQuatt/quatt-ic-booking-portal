@@ -76,6 +76,26 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
     }
   }, [apiClient, cicData.id]);
 
+  const completeCommissioning = React.useCallback(async () => {
+    if (
+      !window.confirm(
+        "Are you sure you would like to complete the commissioning process?",
+      )
+    ) {
+      return;
+    }
+
+    const response = await apiClient.adminCompleteCommissioning({
+      cicId: cicData.id,
+    });
+
+    if (response.meta.status === 200) {
+      alert("Commissioning process completed successfully.");
+    } else {
+      alert("Failed to complete commissioning process.");
+    }
+  }, [apiClient, cicData.id]);
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="Advanced details" />
@@ -115,6 +135,7 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         <Button onClick={resetWifiNetwork}>Forget WiFi network</Button>
         <Button onClick={rebootCic}>Reboot CIC</Button>
         <Button onClick={cancelCommissioning}>Cancel commissioning</Button>
+        <Button onClick={completeCommissioning}>Force commissioning</Button>
       </FormSection>
     </div>
   );
