@@ -100,8 +100,9 @@ function InstallationDetailCommissioningItem({
   return (
     <AccordionItem
       title={
-        `${formatDateTime(createdAt)} - (Forced ${isForced && "⛔️"})` ||
-        "No date"
+        `${formatDateTime(createdAt)} ${
+          isForced ? `- (Forced ${isForced && "⛔️"})` : ""
+        }` || "No date"
       }
       isOpen={isOpen}
       onChangeIsOpen={() => {
