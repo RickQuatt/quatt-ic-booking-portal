@@ -65,13 +65,15 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
       return;
     }
 
-    const response = await apiClient.adminCancelCommissioning({
-      cicId: cicData.id,
-    });
+    try {
+      const response = await apiClient.adminCancelCommissioning({
+        cicId: cicData.id,
+      });
 
-    if (response.meta.status === 200) {
-      alert("Commissioning process cancelled successfully.");
-    } else {
+      if (response.meta.status === 200) {
+        alert("Commissioning process cancelled successfully.");
+      }
+    } catch (error) {
       alert("Failed to cancel commissioning process.");
     }
   }, [apiClient, cicData.id]);
