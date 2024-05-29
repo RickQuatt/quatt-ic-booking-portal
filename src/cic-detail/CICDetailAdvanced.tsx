@@ -74,7 +74,7 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         alert("Commissioning process cancelled successfully.");
       }
     } catch (error) {
-      alert("Failed to cancel commissioning process.");
+        alert("No commissioning is ongoing.");
     }
   }, [apiClient, cicData.id]);
 
