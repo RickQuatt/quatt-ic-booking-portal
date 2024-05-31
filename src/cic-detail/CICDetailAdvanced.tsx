@@ -74,7 +74,7 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         alert("Commissioning process cancelled successfully.");
       }
     } catch (error) {
-        alert("No commissioning is ongoing.");
+      alert("No commissioning is ongoing.");
     }
   }, [apiClient, cicData.id]);
 
@@ -87,14 +87,16 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
       return;
     }
 
-    const response = await apiClient.adminCompleteCommissioning({
-      cicId: cicData.id,
-    });
+    try {
+      const response = await apiClient.adminCompleteCommissioning({
+        cicId: cicData.id,
+      });
 
-    if (response.meta.status === 200) {
-      alert("Commissioning process completed successfully.");
-    } else {
-      alert("Failed to complete commissioning process.");
+      if (response.meta.status === 200) {
+        alert("Commissioning process completed successfully.");
+      }
+    } catch (error) {
+      alert("No commissioning is ongoing.");
     }
   }, [apiClient, cicData.id]);
 
