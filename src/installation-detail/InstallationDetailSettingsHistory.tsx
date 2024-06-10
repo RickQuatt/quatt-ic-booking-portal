@@ -108,7 +108,7 @@ function InstallationDetailSettingsItem({
       .filter(([key]) => !excludedKeys.includes(key))
       .map(([key, value]) => [
         key,
-        datesKeys.includes(key) ? formatDateTime(value) : value,
+        datesKeys.includes(key) ? formatDateTime(value) : String(value),
       ]),
   ];
 
