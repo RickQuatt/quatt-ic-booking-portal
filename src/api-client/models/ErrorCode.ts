@@ -83,6 +83,11 @@ export const ErrorCode = {
   OrderNumberNotFound: "ORDER_NUMBER_NOT_FOUND",
   CommissioningNotFound: "COMMISSIONING_NOT_FOUND",
   SettingsUpdateNotFound: "SETTINGS_UPDATE_NOT_FOUND",
+  CommissioningIsForced: "COMMISSIONING_IS_FORCED",
+  ForceCommissioningNotAvailable: "FORCE_COMMISSIONING_NOT_AVAILABLE",
+  CancelCommissioningNotAvailable: "CANCEL_COMMISSIONING_NOT_AVAILABLE",
+  RebootCicNotAvailable: "REBOOT_CIC_NOT_AVAILABLE",
+  ForgetWifiNotAvailable: "FORGET_WIFI_NOT_AVAILABLE",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

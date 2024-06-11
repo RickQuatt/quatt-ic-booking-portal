@@ -8,7 +8,7 @@ models/AdminGetInstallationClickhouseData200Response.ts
 models/AdminGetInstallationCommissioning200Response.ts
 models/AdminGetInstallationSetting200Response.ts
 models/AdminGetInstallationTickets200Response.ts
-models/AdminGetInstallationTicketsZuper200Response.ts
+models/AdminGetInstallationZuperJobs200Response.ts
 models/AdminInstallationDetail.ts
 models/AdminInstallationDetailAllOfCicCommissioning.ts
 models/AdminInstallationsList.ts
@@ -84,7 +84,6 @@ models/Range.ts
 models/ReferralMember.ts
 models/RequestPairInstallerCicRequest.ts
 models/ResponseMeta.ts
-models/ServiceJob.ts
 models/SettingsHeader.ts
 models/SilentMode.ts
 models/StartHeatPumpTestRequest.ts
@@ -102,5 +101,6 @@ models/UpdateInstallerCic.ts
 models/UpdateMeCic.ts
 models/UpdateMeUser.ts
 models/UserRole.ts
+models/ZuperJob.ts
 models/index.ts
 runtime.ts

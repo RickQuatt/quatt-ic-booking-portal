@@ -18,6 +18,7 @@
  */
 export const FlowRateTestStatus = {
   Finished: "finished",
+  MinimumReachedPending: "minimum_reached_pending",
   MinimumReached: "minimum_reached",
   MinimumNotReached: "minimum_not_reached",
   Cancelled: "cancelled",

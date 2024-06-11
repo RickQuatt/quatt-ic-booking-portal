@@ -22,7 +22,7 @@ import type {
   AdminGetInstallationCommissioning200Response,
   AdminGetInstallationSetting200Response,
   AdminGetInstallationTickets200Response,
-  AdminGetInstallationTicketsZuper200Response,
+  AdminGetInstallationZuperJobs200Response,
   AdminInstallationsList200Response,
   AdminListCics200Response,
   AdminListInstallers200Response,
@@ -54,8 +54,8 @@ import {
   AdminGetInstallationSetting200ResponseToJSON,
   AdminGetInstallationTickets200ResponseFromJSON,
   AdminGetInstallationTickets200ResponseToJSON,
-  AdminGetInstallationTicketsZuper200ResponseFromJSON,
-  AdminGetInstallationTicketsZuper200ResponseToJSON,
+  AdminGetInstallationZuperJobs200ResponseFromJSON,
+  AdminGetInstallationZuperJobs200ResponseToJSON,
   AdminInstallationsList200ResponseFromJSON,
   AdminInstallationsList200ResponseToJSON,
   AdminListCics200ResponseFromJSON,
@@ -165,7 +165,7 @@ export interface AdminGetInstallationTicketsRequest {
   installationId: string;
 }
 
-export interface AdminGetInstallationTicketsZuperRequest {
+export interface AdminGetInstallationZuperJobsRequest {
   installationId: string;
 }
 
@@ -201,7 +201,7 @@ export interface AdminInstallationInstallationIdTariffTariffIdOptionsRequest {
   installationId: string;
 }
 
-export interface AdminInstallationInstallationIdZuperOptionsRequest {
+export interface AdminInstallationInstallationIdZuperJobsOptionsRequest {
   installationId: string;
 }
 
@@ -1467,19 +1467,19 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Get installation tickets from zuper
+   * Get service jobs from zuper for installation
    */
-  async adminGetInstallationTicketsZuperRaw(
-    requestParameters: AdminGetInstallationTicketsZuperRequest,
+  async adminGetInstallationZuperJobsRaw(
+    requestParameters: AdminGetInstallationZuperJobsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<AdminGetInstallationTicketsZuper200Response>> {
+  ): Promise<runtime.ApiResponse<AdminGetInstallationZuperJobs200Response>> {
     if (
       requestParameters.installationId === null ||
       requestParameters.installationId === undefined
     ) {
       throw new runtime.RequiredError(
         "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationTicketsZuper.",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationZuperJobs.",
       );
     }
 
@@ -1497,7 +1497,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     }
     const response = await this.request(
       {
-        path: `/admin/installation/{installationId}/zuper`.replace(
+        path: `/admin/installation/{installationId}/zuper/jobs`.replace(
           `{${"installationId"}}`,
           encodeURIComponent(String(requestParameters.installationId)),
         ),
@@ -1509,18 +1509,18 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     );
 
     return new runtime.JSONApiResponse(response, (jsonValue) =>
-      AdminGetInstallationTicketsZuper200ResponseFromJSON(jsonValue),
+      AdminGetInstallationZuperJobs200ResponseFromJSON(jsonValue),
     );
   }
 
   /**
-   * Get installation tickets from zuper
+   * Get service jobs from zuper for installation
    */
-  async adminGetInstallationTicketsZuper(
-    requestParameters: AdminGetInstallationTicketsZuperRequest,
+  async adminGetInstallationZuperJobs(
+    requestParameters: AdminGetInstallationZuperJobsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<AdminGetInstallationTicketsZuper200Response> {
-    const response = await this.adminGetInstallationTicketsZuperRaw(
+  ): Promise<AdminGetInstallationZuperJobs200Response> {
+    const response = await this.adminGetInstallationZuperJobsRaw(
       requestParameters,
       initOverrides,
     );
@@ -1926,8 +1926,8 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
-  async adminInstallationInstallationIdZuperOptionsRaw(
-    requestParameters: AdminInstallationInstallationIdZuperOptionsRequest,
+  async adminInstallationInstallationIdZuperJobsOptionsRaw(
+    requestParameters: AdminInstallationInstallationIdZuperJobsOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<void>> {
     if (
@@ -1936,7 +1936,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     ) {
       throw new runtime.RequiredError(
         "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdZuperOptions.",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdZuperJobsOptions.",
       );
     }
 
@@ -1946,7 +1946,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const response = await this.request(
       {
-        path: `/admin/installation/{installationId}/zuper`.replace(
+        path: `/admin/installation/{installationId}/zuper/jobs`.replace(
           `{${"installationId"}}`,
           encodeURIComponent(String(requestParameters.installationId)),
         ),
@@ -1962,11 +1962,11 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
-  async adminInstallationInstallationIdZuperOptions(
-    requestParameters: AdminInstallationInstallationIdZuperOptionsRequest,
+  async adminInstallationInstallationIdZuperJobsOptions(
+    requestParameters: AdminInstallationInstallationIdZuperJobsOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
-    await this.adminInstallationInstallationIdZuperOptionsRaw(
+    await this.adminInstallationInstallationIdZuperJobsOptionsRaw(
       requestParameters,
       initOverrides,
     );

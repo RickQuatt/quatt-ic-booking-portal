@@ -429,6 +429,12 @@ export interface AdminCic {
    */
   waterTemperature: number | null;
   /**
+   * CIC supports the forget wifi feature
+   * @type {boolean}
+   * @memberof AdminCic
+   */
+  supportsForgetWifi: boolean;
+  /**
    *
    * @type {Array<HeatDeliverySystem>}
    * @memberof AdminCic
@@ -483,6 +489,12 @@ export interface AdminCic {
    */
   lastCommissioning: CicCommissioning;
   /**
+   * ISO timestamp of last stat update
+   * @type {string}
+   * @memberof AdminCic
+   */
+  lastStatUpdate?: string | null;
+  /**
    *
    * @type {string}
    * @memberof AdminCic
@@ -536,6 +548,18 @@ export interface AdminCic {
    * @memberof AdminCic
    */
   settingsUpdates: Array<CicSettingsUpdate>;
+  /**
+   * CIC supports the reboot and the forget wifi features
+   * @type {boolean}
+   * @memberof AdminCic
+   */
+  supportsRebootAndForget: boolean;
+  /**
+   * CIC supports the force and cancel commissioning features
+   * @type {boolean}
+   * @memberof AdminCic
+   */
+  supportsForceAndCancelCommissioning: boolean;
 }
 
 /**
@@ -618,6 +642,7 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "nightMaxSoundLevel" in value;
   isInstance = isInstance && "temperatureOutside" in value;
   isInstance = isInstance && "waterTemperature" in value;
+  isInstance = isInstance && "supportsForgetWifi" in value;
   isInstance = isInstance && "heatDeliverySystems" in value;
   isInstance = isInstance && "thermostatType" in value;
   isInstance = isInstance && "boilerType" in value;
@@ -636,6 +661,8 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "stateHistory" in value;
   isInstance = isInstance && "commissioningHistory" in value;
   isInstance = isInstance && "settingsUpdates" in value;
+  isInstance = isInstance && "supportsRebootAndForget" in value;
+  isInstance = isInstance && "supportsForceAndCancelCommissioning" in value;
 
   return isInstance;
 }
@@ -736,6 +763,7 @@ export function AdminCicFromJSONTyped(
     nightMaxSoundLevel: MaxSoundLevelFromJSON(json["nightMaxSoundLevel"]),
     temperatureOutside: json["temperatureOutside"],
     waterTemperature: json["waterTemperature"],
+    supportsForgetWifi: json["supportsForgetWifi"],
     heatDeliverySystems:
       json["heatDeliverySystems"] === null
         ? null
@@ -750,6 +778,9 @@ export function AdminCicFromJSONTyped(
     ratedMaximumHousePower: json["ratedMaximumHousePower"],
     maximumHeatingOutdoorTemperature: json["maximumHeatingOutdoorTemperature"],
     lastCommissioning: CicCommissioningFromJSON(json["lastCommissioning"]),
+    lastStatUpdate: !exists(json, "lastStatUpdate")
+      ? undefined
+      : json["lastStatUpdate"],
     menderId: json["menderId"],
     createdAt: new Date(json["createdAt"]),
     lastConnectionStatusUpdatedAt:
@@ -768,6 +799,9 @@ export function AdminCicFromJSONTyped(
     settingsUpdates: (json["settingsUpdates"] as Array<any>).map(
       CicSettingsUpdateFromJSON,
     ),
+    supportsRebootAndForget: json["supportsRebootAndForget"],
+    supportsForceAndCancelCommissioning:
+      json["supportsForceAndCancelCommissioning"],
   };
 }
 
@@ -844,6 +878,7 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     nightMaxSoundLevel: MaxSoundLevelToJSON(value.nightMaxSoundLevel),
     temperatureOutside: value.temperatureOutside,
     waterTemperature: value.waterTemperature,
+    supportsForgetWifi: value.supportsForgetWifi,
     heatDeliverySystems:
       value.heatDeliverySystems === null
         ? null
@@ -858,6 +893,7 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     ratedMaximumHousePower: value.ratedMaximumHousePower,
     maximumHeatingOutdoorTemperature: value.maximumHeatingOutdoorTemperature,
     lastCommissioning: CicCommissioningToJSON(value.lastCommissioning),
+    lastStatUpdate: value.lastStatUpdate,
     menderId: value.menderId,
     createdAt: value.createdAt.toISOString(),
     lastConnectionStatusUpdatedAt:
@@ -876,5 +912,8 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     settingsUpdates: (value.settingsUpdates as Array<any>).map(
       CicSettingsUpdateToJSON,
     ),
+    supportsRebootAndForget: value.supportsRebootAndForget,
+    supportsForceAndCancelCommissioning:
+      value.supportsForceAndCancelCommissioning,
   };
 }

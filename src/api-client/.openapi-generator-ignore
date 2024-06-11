@@ -150,6 +150,8 @@ models/*
 !models/InstallationType.ts
 !models/SettingsHeader.ts
 !models/UserRole.ts
+!models/AdminGetInstallationZuperJobs200Response.ts
+!models/ZuperJob.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

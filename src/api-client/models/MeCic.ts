@@ -374,6 +374,12 @@ export interface MeCic {
    * @memberof MeCic
    */
   waterTemperature: number | null;
+  /**
+   * CIC supports the forget wifi feature
+   * @type {boolean}
+   * @memberof MeCic
+   */
+  supportsForgetWifi: boolean;
 }
 
 /**
@@ -445,6 +451,7 @@ export function instanceOfMeCic(value: object): boolean {
   isInstance = isInstance && "nightMaxSoundLevel" in value;
   isInstance = isInstance && "temperatureOutside" in value;
   isInstance = isInstance && "waterTemperature" in value;
+  isInstance = isInstance && "supportsForgetWifi" in value;
 
   return isInstance;
 }
@@ -545,6 +552,7 @@ export function MeCicFromJSONTyped(
     nightMaxSoundLevel: MaxSoundLevelFromJSON(json["nightMaxSoundLevel"]),
     temperatureOutside: json["temperatureOutside"],
     waterTemperature: json["waterTemperature"],
+    supportsForgetWifi: json["supportsForgetWifi"],
   };
 }
 
@@ -621,5 +629,6 @@ export function MeCicToJSON(value?: MeCic | null): any {
     nightMaxSoundLevel: MaxSoundLevelToJSON(value.nightMaxSoundLevel),
     temperatureOutside: value.temperatureOutside,
     waterTemperature: value.waterTemperature,
+    supportsForgetWifi: value.supportsForgetWifi,
   };
 }

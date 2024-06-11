@@ -136,10 +136,18 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         <Button color="danger" onClick={openAdvancedSettingsModal}>
           Advanced settings
         </Button>
-        <Button onClick={resetWifiNetwork}>Forget WiFi network</Button>
-        <Button onClick={rebootCic}>Reboot CIC</Button>
-        <Button onClick={cancelCommissioning}>Cancel commissioning</Button>
-        <Button onClick={completeCommissioning}>Force commissioning</Button>
+        {cicData.supportsForgetWifi && (
+          <Button onClick={resetWifiNetwork}>Forget WiFi network</Button>
+        )}
+        {cicData.supportsRebootAndForget && (
+          <Button onClick={rebootCic}>Reboot CIC</Button>
+        )}
+        {cicData.supportsForceAndCancelCommissioning && (
+          <Button onClick={cancelCommissioning}>Cancel commissioning</Button>
+        )}
+        {cicData.supportsForceAndCancelCommissioning && (
+          <Button onClick={completeCommissioning}>Force commissioning</Button>
+        )}
       </FormSection>
     </div>
   );
