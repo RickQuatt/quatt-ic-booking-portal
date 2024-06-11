@@ -103,3 +103,4 @@ export * from "./UpdateMeCic";
 export * from "./UpdateMeUser";
 export * from "./UserRole";
 export * from "./ZuperJob";
+export * from "./ZuperService";

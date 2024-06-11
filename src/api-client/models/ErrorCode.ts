@@ -33,6 +33,7 @@ export const ErrorCode = {
   UserHasNoPermission: "USER_HAS_NO_PERMISSION",
   OneUserPerInstaller: "ONE_USER_PER_INSTALLER",
   CommissioningNotAllFinished: "COMMISSIONING_NOT_ALL_FINISHED",
+  CommissioningFinished: "COMMISSIONING_FINISHED",
   CommissioningInOtherMode: "COMMISSIONING_IN_OTHER_MODE",
   PublishError: "PUBLISH_ERROR",
   CommissioningIdentificationWrongBoilerType:

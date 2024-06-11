@@ -152,6 +152,7 @@ models/*
 !models/UserRole.ts
 !models/AdminGetInstallationZuperJobs200Response.ts
 !models/ZuperJob.ts
+!models/ZuperService.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

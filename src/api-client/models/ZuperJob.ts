@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from "../runtime";
+import type { ZuperService } from "./ZuperService";
+import {
+  ZuperServiceFromJSON,
+  ZuperServiceFromJSONTyped,
+  ZuperServiceToJSON,
+} from "./ZuperService";
+
 /**
  *
  * @export
@@ -27,34 +34,10 @@ export interface ZuperJob {
   job_uid: string;
   /**
    *
-   * @type {string}
+   * @type {Array<ZuperService>}
    * @memberof ZuperJob
    */
-  job_title: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ZuperJob
-   */
-  installer: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof ZuperJob
-   */
-  status_name: string;
-  /**
-   *
-   * @type {Date}
-   * @memberof ZuperJob
-   */
-  updated_at: Date;
-  /**
-   *
-   * @type {Array<ZuperJob>}
-   * @memberof ZuperJob
-   */
-  services: Array<ZuperJob>;
+  services: Array<ZuperService>;
 }
 
 /**
@@ -63,10 +46,6 @@ export interface ZuperJob {
 export function instanceOfZuperJob(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "job_uid" in value;
-  isInstance = isInstance && "job_title" in value;
-  isInstance = isInstance && "installer" in value;
-  isInstance = isInstance && "status_name" in value;
-  isInstance = isInstance && "updated_at" in value;
   isInstance = isInstance && "services" in value;
 
   return isInstance;
@@ -85,11 +64,7 @@ export function ZuperJobFromJSONTyped(
   }
   return {
     job_uid: json["job_uid"],
-    job_title: json["job_title"],
-    installer: json["installer"],
-    status_name: json["status_name"],
-    updated_at: new Date(json["updated_at"]),
-    services: (json["services"] as Array<any>).map(ZuperJobFromJSON),
+    services: (json["services"] as Array<any>).map(ZuperServiceFromJSON),
   };
 }
 
@@ -102,10 +77,6 @@ export function ZuperJobToJSON(value?: ZuperJob | null): any {
   }
   return {
     job_uid: value.job_uid,
-    job_title: value.job_title,
-    installer: value.installer,
-    status_name: value.status_name,
-    updated_at: value.updated_at.toISOString(),
-    services: (value.services as Array<any>).map(ZuperJobToJSON),
+    services: (value.services as Array<any>).map(ZuperServiceToJSON),
   };
 }

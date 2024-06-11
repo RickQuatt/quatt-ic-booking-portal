@@ -10,8 +10,7 @@ import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { InstallationDetailSettings } from "./InstallationDetailSettings";
 import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
 import { InstallationDetailTickets } from "./InstallationDetailTickets";
-import { InstallationDetailTariff } from "./InstallationDetailTariff";
-import { InstallationDetailService } from "./InstallationDetailService";
+import { InstallationDetailZuperService } from "./InstallationDetailZuperService";
 import { InstallationHealthChecks } from "./InstallationHealthChecks";
 
 interface InstallationDetailProps {
@@ -62,7 +61,7 @@ export function InstallationDetail({ data, tariff }: InstallationDetailProps) {
 
       <div className={classes["detail-sections-api"]}>
         <InstallationDetailTickets installationId={installationId} />
-        <InstallationDetailService installationId={installationId} />
+        <InstallationDetailZuperService installationId={installationId} />
         {/* TODO Uncomment when feature is live on production
         https://linear.app/quatt/issue/SUP-122/enable-historic-tariffs-when-the-feature-is-live-on-production
         */}

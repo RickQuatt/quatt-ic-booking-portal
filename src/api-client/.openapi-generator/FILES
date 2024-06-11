@@ -102,5 +102,6 @@ models/UpdateMeCic.ts
 models/UpdateMeUser.ts
 models/UserRole.ts
 models/ZuperJob.ts
+models/ZuperService.ts
 models/index.ts
 runtime.ts

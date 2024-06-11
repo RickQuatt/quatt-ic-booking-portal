@@ -11,7 +11,7 @@ interface InstallationDetailServiceProps {
   installationId: string;
 }
 
-export function InstallationDetailService({
+export function InstallationDetailZuperService({
   installationId,
 }: InstallationDetailServiceProps) {
   const apiClient = useApiClient();
