@@ -399,6 +399,12 @@ export interface InstallerCic {
    */
   waterTemperature: number | null;
   /**
+   * CIC supports the forget wifi feature
+   * @type {boolean}
+   * @memberof InstallerCic
+   */
+  supportsForgetWifi: boolean;
+  /**
    *
    * @type {Array<HeatDeliverySystem>}
    * @memberof InstallerCic
@@ -452,6 +458,12 @@ export interface InstallerCic {
    * @memberof InstallerCic
    */
   lastCommissioning: CicCommissioning;
+  /**
+   * ISO timestamp of last stat update
+   * @type {string}
+   * @memberof InstallerCic
+   */
+  lastStatUpdate?: string | null;
 }
 
 /**
@@ -534,6 +546,7 @@ export function instanceOfInstallerCic(value: object): boolean {
   isInstance = isInstance && "nightMaxSoundLevel" in value;
   isInstance = isInstance && "temperatureOutside" in value;
   isInstance = isInstance && "waterTemperature" in value;
+  isInstance = isInstance && "supportsForgetWifi" in value;
   isInstance = isInstance && "heatDeliverySystems" in value;
   isInstance = isInstance && "thermostatType" in value;
   isInstance = isInstance && "boilerType" in value;
@@ -643,6 +656,7 @@ export function InstallerCicFromJSONTyped(
     nightMaxSoundLevel: MaxSoundLevelFromJSON(json["nightMaxSoundLevel"]),
     temperatureOutside: json["temperatureOutside"],
     waterTemperature: json["waterTemperature"],
+    supportsForgetWifi: json["supportsForgetWifi"],
     heatDeliverySystems:
       json["heatDeliverySystems"] === null
         ? null
@@ -657,6 +671,9 @@ export function InstallerCicFromJSONTyped(
     ratedMaximumHousePower: json["ratedMaximumHousePower"],
     maximumHeatingOutdoorTemperature: json["maximumHeatingOutdoorTemperature"],
     lastCommissioning: CicCommissioningFromJSON(json["lastCommissioning"]),
+    lastStatUpdate: !exists(json, "lastStatUpdate")
+      ? undefined
+      : json["lastStatUpdate"],
   };
 }
 
@@ -733,6 +750,7 @@ export function InstallerCicToJSON(value?: InstallerCic | null): any {
     nightMaxSoundLevel: MaxSoundLevelToJSON(value.nightMaxSoundLevel),
     temperatureOutside: value.temperatureOutside,
     waterTemperature: value.waterTemperature,
+    supportsForgetWifi: value.supportsForgetWifi,
     heatDeliverySystems:
       value.heatDeliverySystems === null
         ? null
@@ -747,5 +765,6 @@ export function InstallerCicToJSON(value?: InstallerCic | null): any {
     ratedMaximumHousePower: value.ratedMaximumHousePower,
     maximumHeatingOutdoorTemperature: value.maximumHeatingOutdoorTemperature,
     lastCommissioning: CicCommissioningToJSON(value.lastCommissioning),
+    lastStatUpdate: value.lastStatUpdate,
   };
 }

@@ -11,7 +11,7 @@ interface InstallationDetailServiceProps {
   installationId: string;
 }
 
-export function InstallationDetailService({
+export function InstallationDetailZuperService({
   installationId,
 }: InstallationDetailServiceProps) {
   const apiClient = useApiClient();
@@ -19,7 +19,7 @@ export function InstallationDetailService({
   const { data: zuperData, status: zuperStatus } = useQuery(
     ["installationZuperJobs", installationId],
     () => {
-      return apiClient.adminGetInstallationTicketsZuper({
+      return apiClient.adminGetInstallationZuperJobs({
         installationId: installationId,
       });
     },
@@ -40,7 +40,7 @@ export function InstallationDetailService({
             ) : (
               <>
                 {zuperJobs &&
-                  zuperJobs.map((service) => (
+                  zuperJobs.services.map((service) => (
                     <div
                       style={{ cursor: "pointer" }}
                       className={classes["detail-section"]}
@@ -61,7 +61,7 @@ export function InstallationDetailService({
                       }`}</div>
                     </div>
                   ))}
-                {zuperJobs && zuperJobs.length === 0 && (
+                {zuperJobs && zuperJobs.services.length === 0 && (
                   <div style={{ textAlign: "center" }}>No services 👍</div>
                 )}
               </>

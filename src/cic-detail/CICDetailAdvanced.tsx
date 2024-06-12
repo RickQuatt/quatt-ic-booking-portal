@@ -47,7 +47,57 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
       return;
     }
 
-    await apiClient.adminRebootCIC({ cicId: cicData.id });
+    const response = await apiClient.adminRebootCIC({ cicId: cicData.id });
+
+    if (response.meta.status === 200) {
+      alert("Reboot request sent successfully.");
+    } else {
+      alert("Failed to send reboot request.");
+    }
+  }, [apiClient, cicData.id]);
+
+  const cancelCommissioning = React.useCallback(async () => {
+    if (
+      !window.confirm(
+        "Are you sure you would like to cancel the commissioning process?",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await apiClient.adminCancelCommissioning({
+        cicId: cicData.id,
+      });
+
+      if (response.meta.status === 200) {
+        alert("Commissioning process cancelled successfully.");
+      }
+    } catch (error) {
+      alert("No commissioning is ongoing.");
+    }
+  }, [apiClient, cicData.id]);
+
+  const completeCommissioning = React.useCallback(async () => {
+    if (
+      !window.confirm(
+        "Are you sure you would like to complete the commissioning process?",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await apiClient.adminCompleteCommissioning({
+        cicId: cicData.id,
+      });
+
+      if (response.meta.status === 200) {
+        alert("Commissioning process completed successfully.");
+      }
+    } catch (error) {
+      alert("No commissioning is ongoing.");
+    }
   }, [apiClient, cicData.id]);
 
   return (
@@ -86,8 +136,18 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         <Button color="danger" onClick={openAdvancedSettingsModal}>
           Advanced settings
         </Button>
-        <Button onClick={resetWifiNetwork}>Forget WiFi network</Button>
-        <Button onClick={rebootCic}>Reboot CIC</Button>
+        {cicData.supportsForgetWifi && (
+          <Button onClick={resetWifiNetwork}>Forget WiFi network</Button>
+        )}
+        {cicData.supportsRebootAndForget && (
+          <Button onClick={rebootCic}>Reboot CIC</Button>
+        )}
+        {cicData.supportsForceAndCancelCommissioning && (
+          <Button onClick={cancelCommissioning}>Cancel commissioning</Button>
+        )}
+        {cicData.supportsForceAndCancelCommissioning && (
+          <Button onClick={completeCommissioning}>Force commissioning</Button>
+        )}
       </FormSection>
     </div>
   );

@@ -63,7 +63,13 @@ function CICDetailCommissioningItem({
 
   return (
     <AccordionItem
-      title={formatDateTime(commissioning.createdAt) || "No date"}
+      title={
+        `${formatDateTime(commissioning.createdAt)} ${
+          commissioning.isForced
+            ? `- (Forced ${commissioning.isForced && "⛔️"})`
+            : ""
+        }` || "No date"
+      }
       isOpen={isOpen}
       onChangeIsOpen={() => setIsOpen(!isOpen)}
     >

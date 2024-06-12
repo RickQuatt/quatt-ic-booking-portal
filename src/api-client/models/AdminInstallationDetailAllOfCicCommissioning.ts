@@ -27,6 +27,12 @@ export interface AdminInstallationDetailAllOfCicCommissioning {
   id: number;
   /**
    *
+   * @type {boolean}
+   * @memberof AdminInstallationDetailAllOfCicCommissioning
+   */
+  isForced: boolean;
+  /**
+   *
    * @type {Date}
    * @memberof AdminInstallationDetailAllOfCicCommissioning
    */
@@ -41,6 +47,7 @@ export function instanceOfAdminInstallationDetailAllOfCicCommissioning(
 ): boolean {
   let isInstance = true;
   isInstance = isInstance && "id" in value;
+  isInstance = isInstance && "isForced" in value;
   isInstance = isInstance && "createdAt" in value;
 
   return isInstance;
@@ -61,6 +68,7 @@ export function AdminInstallationDetailAllOfCicCommissioningFromJSONTyped(
   }
   return {
     id: json["id"],
+    isForced: json["isForced"],
     createdAt: new Date(json["createdAt"]),
   };
 }
@@ -76,6 +84,7 @@ export function AdminInstallationDetailAllOfCicCommissioningToJSON(
   }
   return {
     id: value.id,
+    isForced: value.isForced,
     createdAt: value.createdAt.toISOString(),
   };
 }

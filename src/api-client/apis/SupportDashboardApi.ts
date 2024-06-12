@@ -22,7 +22,7 @@ import type {
   AdminGetInstallationCommissioning200Response,
   AdminGetInstallationSetting200Response,
   AdminGetInstallationTickets200Response,
-  AdminGetInstallationTicketsZuper200Response,
+  AdminGetInstallationZuperJobs200Response,
   AdminInstallationsList200Response,
   AdminListCics200Response,
   AdminListInstallers200Response,
@@ -33,6 +33,7 @@ import type {
   ErrorResponse,
   ForgetWifiMeCicRequest,
   GetAllTariffs200Response,
+  GetInstallerCic200Response,
   UpdateAdminCic,
   UpdateAdminInstallation,
 } from "../models/index";
@@ -53,8 +54,8 @@ import {
   AdminGetInstallationSetting200ResponseToJSON,
   AdminGetInstallationTickets200ResponseFromJSON,
   AdminGetInstallationTickets200ResponseToJSON,
-  AdminGetInstallationTicketsZuper200ResponseFromJSON,
-  AdminGetInstallationTicketsZuper200ResponseToJSON,
+  AdminGetInstallationZuperJobs200ResponseFromJSON,
+  AdminGetInstallationZuperJobs200ResponseToJSON,
   AdminInstallationsList200ResponseFromJSON,
   AdminInstallationsList200ResponseToJSON,
   AdminListCics200ResponseFromJSON,
@@ -75,11 +76,25 @@ import {
   ForgetWifiMeCicRequestToJSON,
   GetAllTariffs200ResponseFromJSON,
   GetAllTariffs200ResponseToJSON,
+  GetInstallerCic200ResponseFromJSON,
+  GetInstallerCic200ResponseToJSON,
   UpdateAdminCicFromJSON,
   UpdateAdminCicToJSON,
   UpdateAdminInstallationFromJSON,
   UpdateAdminInstallationToJSON,
 } from "../models/index";
+
+export interface AdminCancelCommissioningRequest {
+  cicId: string;
+}
+
+export interface AdminCicCicIdCancelCommissioningOptionsRequest {
+  cicId: string;
+}
+
+export interface AdminCicCicIdCompleteCommissioningOptionsRequest {
+  cicId: string;
+}
 
 export interface AdminCicCicIdForgetWifiOptionsRequest {
   cicId: string;
@@ -90,6 +105,10 @@ export interface AdminCicCicIdOptionsRequest {
 }
 
 export interface AdminCicCicIdRebootOptionsRequest {
+  cicId: string;
+}
+
+export interface AdminCompleteCommissioningRequest {
   cicId: string;
 }
 
@@ -146,7 +165,7 @@ export interface AdminGetInstallationTicketsRequest {
   installationId: string;
 }
 
-export interface AdminGetInstallationTicketsZuperRequest {
+export interface AdminGetInstallationZuperJobsRequest {
   installationId: string;
 }
 
@@ -182,7 +201,7 @@ export interface AdminInstallationInstallationIdTariffTariffIdOptionsRequest {
   installationId: string;
 }
 
-export interface AdminInstallationInstallationIdZuperOptionsRequest {
+export interface AdminInstallationInstallationIdZuperJobsOptionsRequest {
   installationId: string;
 }
 
@@ -216,6 +235,163 @@ export interface AdminUpdateInstallerRequest {
  *
  */
 export class SupportDashboardApi extends runtime.BaseAPI {
+  /**
+   * Cancel commissioning
+   */
+  async adminCancelCommissioningRaw(
+    requestParameters: AdminCancelCommissioningRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<GetInstallerCic200Response>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCancelCommissioning.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/cancelCommissioning`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      GetInstallerCic200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Cancel commissioning
+   */
+  async adminCancelCommissioning(
+    requestParameters: AdminCancelCommissioningRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<GetInstallerCic200Response> {
+    const response = await this.adminCancelCommissioningRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   */
+  async adminCicCicIdCancelCommissioningOptionsRaw(
+    requestParameters: AdminCicCicIdCancelCommissioningOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCicCicIdCancelCommissioningOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/cancelCommissioning`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminCicCicIdCancelCommissioningOptions(
+    requestParameters: AdminCicCicIdCancelCommissioningOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminCicCicIdCancelCommissioningOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
+  async adminCicCicIdCompleteCommissioningOptionsRaw(
+    requestParameters: AdminCicCicIdCompleteCommissioningOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCicCicIdCompleteCommissioningOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/completeCommissioning`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminCicCicIdCompleteCommissioningOptions(
+    requestParameters: AdminCicCicIdCompleteCommissioningOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminCicCicIdCompleteCommissioningOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
   /**
    */
   async adminCicCicIdForgetWifiOptionsRaw(
@@ -412,6 +588,67 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminCicListOptionsRaw(initOverrides);
+  }
+
+  /**
+   * Complete commissioning
+   */
+  async adminCompleteCommissioningRaw(
+    requestParameters: AdminCompleteCommissioningRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<GetInstallerCic200Response>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCompleteCommissioning.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/completeCommissioning`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      GetInstallerCic200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Complete commissioning
+   */
+  async adminCompleteCommissioning(
+    requestParameters: AdminCompleteCommissioningRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<GetInstallerCic200Response> {
+    const response = await this.adminCompleteCommissioningRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
   }
 
   /**
@@ -1230,19 +1467,19 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Get installation tickets from zuper
+   * Get service jobs from zuper for installation
    */
-  async adminGetInstallationTicketsZuperRaw(
-    requestParameters: AdminGetInstallationTicketsZuperRequest,
+  async adminGetInstallationZuperJobsRaw(
+    requestParameters: AdminGetInstallationZuperJobsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<AdminGetInstallationTicketsZuper200Response>> {
+  ): Promise<runtime.ApiResponse<AdminGetInstallationZuperJobs200Response>> {
     if (
       requestParameters.installationId === null ||
       requestParameters.installationId === undefined
     ) {
       throw new runtime.RequiredError(
         "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationTicketsZuper.",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationZuperJobs.",
       );
     }
 
@@ -1260,7 +1497,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     }
     const response = await this.request(
       {
-        path: `/admin/installation/{installationId}/zuper`.replace(
+        path: `/admin/installation/{installationId}/zuper/jobs`.replace(
           `{${"installationId"}}`,
           encodeURIComponent(String(requestParameters.installationId)),
         ),
@@ -1272,18 +1509,18 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     );
 
     return new runtime.JSONApiResponse(response, (jsonValue) =>
-      AdminGetInstallationTicketsZuper200ResponseFromJSON(jsonValue),
+      AdminGetInstallationZuperJobs200ResponseFromJSON(jsonValue),
     );
   }
 
   /**
-   * Get installation tickets from zuper
+   * Get service jobs from zuper for installation
    */
-  async adminGetInstallationTicketsZuper(
-    requestParameters: AdminGetInstallationTicketsZuperRequest,
+  async adminGetInstallationZuperJobs(
+    requestParameters: AdminGetInstallationZuperJobsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<AdminGetInstallationTicketsZuper200Response> {
-    const response = await this.adminGetInstallationTicketsZuperRaw(
+  ): Promise<AdminGetInstallationZuperJobs200Response> {
+    const response = await this.adminGetInstallationZuperJobsRaw(
       requestParameters,
       initOverrides,
     );
@@ -1689,8 +1926,8 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
-  async adminInstallationInstallationIdZuperOptionsRaw(
-    requestParameters: AdminInstallationInstallationIdZuperOptionsRequest,
+  async adminInstallationInstallationIdZuperJobsOptionsRaw(
+    requestParameters: AdminInstallationInstallationIdZuperJobsOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<void>> {
     if (
@@ -1699,7 +1936,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     ) {
       throw new runtime.RequiredError(
         "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdZuperOptions.",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdZuperJobsOptions.",
       );
     }
 
@@ -1709,7 +1946,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const response = await this.request(
       {
-        path: `/admin/installation/{installationId}/zuper`.replace(
+        path: `/admin/installation/{installationId}/zuper/jobs`.replace(
           `{${"installationId"}}`,
           encodeURIComponent(String(requestParameters.installationId)),
         ),
@@ -1725,11 +1962,11 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
-  async adminInstallationInstallationIdZuperOptions(
-    requestParameters: AdminInstallationInstallationIdZuperOptionsRequest,
+  async adminInstallationInstallationIdZuperJobsOptions(
+    requestParameters: AdminInstallationInstallationIdZuperJobsOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
-    await this.adminInstallationInstallationIdZuperOptionsRaw(
+    await this.adminInstallationInstallationIdZuperJobsOptionsRaw(
       requestParameters,
       initOverrides,
     );

@@ -68,6 +68,7 @@ export function InstallationDetailCommissioningHistory({
                   isLoading={isLoading}
                   data={commissioningData}
                   createdAt={commissioning.createdAt}
+                  isForced={commissioning.isForced}
                   onClick={() => getCommissioningDetails(commissioning.id)}
                 />
               ))}
@@ -81,6 +82,7 @@ export function InstallationDetailCommissioningHistory({
 
 interface InstallationDetailCommissioningItemProps {
   createdAt: Date;
+  isForced: boolean;
   isLoading: boolean;
   onClick?: () => void;
   data: CicCommissioning | null;
@@ -89,6 +91,7 @@ interface InstallationDetailCommissioningItemProps {
 function InstallationDetailCommissioningItem({
   data,
   onClick,
+  isForced,
   isLoading,
   createdAt,
 }: InstallationDetailCommissioningItemProps) {
@@ -96,7 +99,11 @@ function InstallationDetailCommissioningItem({
 
   return (
     <AccordionItem
-      title={formatDateTime(createdAt) || "No date"}
+      title={
+        `${formatDateTime(createdAt)} ${
+          isForced ? `- (Forced ${isForced && "⛔️"})` : ""
+        }` || "No date"
+      }
       isOpen={isOpen}
       onChangeIsOpen={() => {
         setIsOpen(!isOpen);

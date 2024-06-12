@@ -33,6 +33,7 @@ export const ErrorCode = {
   UserHasNoPermission: "USER_HAS_NO_PERMISSION",
   OneUserPerInstaller: "ONE_USER_PER_INSTALLER",
   CommissioningNotAllFinished: "COMMISSIONING_NOT_ALL_FINISHED",
+  CommissioningFinished: "COMMISSIONING_FINISHED",
   CommissioningInOtherMode: "COMMISSIONING_IN_OTHER_MODE",
   PublishError: "PUBLISH_ERROR",
   CommissioningIdentificationWrongBoilerType:
@@ -83,6 +84,11 @@ export const ErrorCode = {
   OrderNumberNotFound: "ORDER_NUMBER_NOT_FOUND",
   CommissioningNotFound: "COMMISSIONING_NOT_FOUND",
   SettingsUpdateNotFound: "SETTINGS_UPDATE_NOT_FOUND",
+  CommissioningIsForced: "COMMISSIONING_IS_FORCED",
+  ForceCommissioningNotAvailable: "FORCE_COMMISSIONING_NOT_AVAILABLE",
+  CancelCommissioningNotAvailable: "CANCEL_COMMISSIONING_NOT_AVAILABLE",
+  RebootCicNotAvailable: "REBOOT_CIC_NOT_AVAILABLE",
+  ForgetWifiNotAvailable: "FORGET_WIFI_NOT_AVAILABLE",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
