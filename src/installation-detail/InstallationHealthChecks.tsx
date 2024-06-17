@@ -164,7 +164,7 @@ export function InstallationHealthChecks({
               </h2>
             </div>
             <div>
-              <h3 style={{ margin: "0" }}>Mode repartitiion</h3>
+              <h3 style={{ margin: "0" }}>Mode repartition</h3>
               {!emptyModeReperation && chResults?.modeReparation ? (
                 <div style={{ height: "100px", width: "100px" }}>
                   <Pie ref={chartRef} data={chartData} options={options} />
