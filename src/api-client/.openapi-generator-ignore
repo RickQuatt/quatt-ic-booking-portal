@@ -153,6 +153,12 @@ models/*
 !models/AdminGetInstallationZuperJobs200Response.ts
 !models/ZuperJob.ts
 !models/ZuperService.ts
+!models/AdminAddInstallationNote200Response.ts
+!models/AdminGetInstallationNotes200Response.ts
+!models/AdminUpdateInstallationNote200Response.ts
+!models/CreateUpdateNote.ts
+!models/Note.ts
+!models/UpdatedNote.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

@@ -1,4 +1,5 @@
 apis/SupportDashboardApi.ts
+models/AdminAddInstallationNote200Response.ts
 models/AdminCic.ts
 models/AdminCreateInstaller200Response.ts
 models/AdminDashboardCics200Response.ts
@@ -6,6 +7,7 @@ models/AdminGetCic200Response.ts
 models/AdminGetInstallation200Response.ts
 models/AdminGetInstallationClickhouseData200Response.ts
 models/AdminGetInstallationCommissioning200Response.ts
+models/AdminGetInstallationNotes200Response.ts
 models/AdminGetInstallationSetting200Response.ts
 models/AdminGetInstallationTickets200Response.ts
 models/AdminGetInstallationZuperJobs200Response.ts
@@ -15,6 +17,7 @@ models/AdminInstallationsList.ts
 models/AdminInstallationsList200Response.ts
 models/AdminListCics200Response.ts
 models/AdminListInstallers200Response.ts
+models/AdminUpdateInstallationNote200Response.ts
 models/AppCompatibilityGet200Response.ts
 models/AppCompatibilityGet200ResponseResult.ts
 models/AppSettingsGet200Response.ts
@@ -44,6 +47,7 @@ models/CreateTariff200Response.ts
 models/CreateTariffRequest.ts
 models/CreateUpdateDoubleTariff.ts
 models/CreateUpdateInstaller.ts
+models/CreateUpdateNote.ts
 models/CreateUpdateSingleTariff.ts
 models/ErrorCode.ts
 models/ErrorResponse.ts
@@ -79,6 +83,7 @@ models/MaxSoundLevel.ts
 models/MeCic.ts
 models/MeUser.ts
 models/MeUserClient.ts
+models/Note.ts
 models/PostReferralRequest.ts
 models/Range.ts
 models/ReferralMember.ts
@@ -100,6 +105,7 @@ models/UpdateCic.ts
 models/UpdateInstallerCic.ts
 models/UpdateMeCic.ts
 models/UpdateMeUser.ts
+models/UpdatedNote.ts
 models/UserRole.ts
 models/ZuperJob.ts
 models/ZuperService.ts

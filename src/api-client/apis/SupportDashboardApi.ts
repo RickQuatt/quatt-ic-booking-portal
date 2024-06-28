@@ -14,22 +14,26 @@
 
 import * as runtime from "../runtime";
 import type {
+  AdminAddInstallationNote200Response,
   AdminCreateInstaller200Response,
   AdminDashboardCics200Response,
   AdminGetCic200Response,
   AdminGetInstallation200Response,
   AdminGetInstallationClickhouseData200Response,
   AdminGetInstallationCommissioning200Response,
+  AdminGetInstallationNotes200Response,
   AdminGetInstallationSetting200Response,
   AdminGetInstallationTickets200Response,
   AdminGetInstallationZuperJobs200Response,
   AdminInstallationsList200Response,
   AdminListCics200Response,
   AdminListInstallers200Response,
+  AdminUpdateInstallationNote200Response,
   CompleteCommissioning200Response,
   CreateTariff200Response,
   CreateTariffRequest,
   CreateUpdateInstaller,
+  CreateUpdateNote,
   ErrorResponse,
   ForgetWifiMeCicRequest,
   GetAllTariffs200Response,
@@ -38,6 +42,8 @@ import type {
   UpdateAdminInstallation,
 } from "../models/index";
 import {
+  AdminAddInstallationNote200ResponseFromJSON,
+  AdminAddInstallationNote200ResponseToJSON,
   AdminCreateInstaller200ResponseFromJSON,
   AdminCreateInstaller200ResponseToJSON,
   AdminDashboardCics200ResponseFromJSON,
@@ -50,6 +56,8 @@ import {
   AdminGetInstallationClickhouseData200ResponseToJSON,
   AdminGetInstallationCommissioning200ResponseFromJSON,
   AdminGetInstallationCommissioning200ResponseToJSON,
+  AdminGetInstallationNotes200ResponseFromJSON,
+  AdminGetInstallationNotes200ResponseToJSON,
   AdminGetInstallationSetting200ResponseFromJSON,
   AdminGetInstallationSetting200ResponseToJSON,
   AdminGetInstallationTickets200ResponseFromJSON,
@@ -62,6 +70,8 @@ import {
   AdminListCics200ResponseToJSON,
   AdminListInstallers200ResponseFromJSON,
   AdminListInstallers200ResponseToJSON,
+  AdminUpdateInstallationNote200ResponseFromJSON,
+  AdminUpdateInstallationNote200ResponseToJSON,
   CompleteCommissioning200ResponseFromJSON,
   CompleteCommissioning200ResponseToJSON,
   CreateTariff200ResponseFromJSON,
@@ -70,6 +80,8 @@ import {
   CreateTariffRequestToJSON,
   CreateUpdateInstallerFromJSON,
   CreateUpdateInstallerToJSON,
+  CreateUpdateNoteFromJSON,
+  CreateUpdateNoteToJSON,
   ErrorResponseFromJSON,
   ErrorResponseToJSON,
   ForgetWifiMeCicRequestFromJSON,
@@ -83,6 +95,11 @@ import {
   UpdateAdminInstallationFromJSON,
   UpdateAdminInstallationToJSON,
 } from "../models/index";
+
+export interface AdminAddInstallationNoteRequest {
+  installationId: string;
+  createUpdateNote?: CreateUpdateNote;
+}
 
 export interface AdminCancelCommissioningRequest {
   cicId: string;
@@ -121,6 +138,11 @@ export interface AdminCreateInstallerRequest {
   createUpdateInstaller?: CreateUpdateInstaller;
 }
 
+export interface AdminDeleteInstallationNoteRequest {
+  installationId: string;
+  noteId: string;
+}
+
 export interface AdminDeleteInstallationTariffRequest {
   installationId: string;
   tariffId: string;
@@ -150,6 +172,10 @@ export interface AdminGetInstallationClickhouseDataRequest {
 export interface AdminGetInstallationCommissioningRequest {
   installationId: string;
   commissioningId: number;
+}
+
+export interface AdminGetInstallationNotesRequest {
+  installationId: string;
 }
 
 export interface AdminGetInstallationSettingRequest {
@@ -182,6 +208,14 @@ export interface AdminInstallationInstallationIdCommissioningCommissioningIdOpti
 }
 
 export interface AdminInstallationInstallationIdHubspotOptionsRequest {
+  installationId: string;
+}
+
+export interface AdminInstallationInstallationIdNotesNoteIdOptionsRequest {
+  installationId: string;
+}
+
+export interface AdminInstallationInstallationIdNotesOptionsRequest {
   installationId: string;
 }
 
@@ -220,6 +254,12 @@ export interface AdminUpdateInstallationRequest {
   updateAdminInstallation?: UpdateAdminInstallation;
 }
 
+export interface AdminUpdateInstallationNoteRequest {
+  installationId: string;
+  noteId: string;
+  createUpdateNote?: CreateUpdateNote;
+}
+
 export interface AdminUpdateInstallationTariffRequest {
   installationId: string;
   tariffId: string;
@@ -235,6 +275,70 @@ export interface AdminUpdateInstallerRequest {
  *
  */
 export class SupportDashboardApi extends runtime.BaseAPI {
+  /**
+   * Add note to installation
+   */
+  async adminAddInstallationNoteRaw(
+    requestParameters: AdminAddInstallationNoteRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<AdminAddInstallationNote200Response>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminAddInstallationNote.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/notes`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: CreateUpdateNoteToJSON(requestParameters.createUpdateNote),
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminAddInstallationNote200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Add note to installation
+   */
+  async adminAddInstallationNote(
+    requestParameters: AdminAddInstallationNoteRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminAddInstallationNote200Response> {
+    const response = await this.adminAddInstallationNoteRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
   /**
    * Cancel commissioning
    */
@@ -812,6 +916,76 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   * Delete note for installation
+   */
+  async adminDeleteInstallationNoteRaw(
+    requestParameters: AdminDeleteInstallationNoteRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminDeleteInstallationNote.",
+      );
+    }
+
+    if (
+      requestParameters.noteId === null ||
+      requestParameters.noteId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "noteId",
+        "Required parameter requestParameters.noteId was null or undefined when calling adminDeleteInstallationNote.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/notes/{noteId}`
+          .replace(
+            `{${"installationId"}}`,
+            encodeURIComponent(String(requestParameters.installationId)),
+          )
+          .replace(
+            `{${"noteId"}}`,
+            encodeURIComponent(String(requestParameters.noteId)),
+          ),
+        method: "DELETE",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   * Delete note for installation
+   */
+  async adminDeleteInstallationNote(
+    requestParameters: AdminDeleteInstallationNoteRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminDeleteInstallationNoteRaw(requestParameters, initOverrides);
+  }
+
+  /**
    * Delete a tariff for a given installation
    */
   async adminDeleteInstallationTariffRaw(
@@ -1262,6 +1436,67 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminGetInstallationCommissioning200Response> {
     const response = await this.adminGetInstallationCommissioningRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   * Get notes for installation
+   */
+  async adminGetInstallationNotesRaw(
+    requestParameters: AdminGetInstallationNotesRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<AdminGetInstallationNotes200Response>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationNotes.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/notes`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminGetInstallationNotes200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Get notes for installation
+   */
+  async adminGetInstallationNotes(
+    requestParameters: AdminGetInstallationNotesRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminGetInstallationNotes200Response> {
+    const response = await this.adminGetInstallationNotesRaw(
       requestParameters,
       initOverrides,
     );
@@ -1734,8 +1969,8 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
-  async adminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRaw(
-    requestParameters: AdminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRequest,
+  async adminInstallationInstallationIdNotesNoteIdOptionsRaw(
+    requestParameters: AdminInstallationInstallationIdNotesNoteIdOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<void>> {
     if (
@@ -1744,7 +1979,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     ) {
       throw new runtime.RequiredError(
         "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdSettingsUpdateSettingsIdOptions.",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdNotesNoteIdOptions.",
       );
     }
 
@@ -1754,7 +1989,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const response = await this.request(
       {
-        path: `/admin/installation/{installationId}/settingsUpdate/{settingsId}`.replace(
+        path: `/admin/installation/{installationId}/notes/{noteId}`.replace(
           `{${"installationId"}}`,
           encodeURIComponent(String(requestParameters.installationId)),
         ),
@@ -1770,11 +2005,59 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
-  async adminInstallationInstallationIdSettingsUpdateSettingsIdOptions(
-    requestParameters: AdminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRequest,
+  async adminInstallationInstallationIdNotesNoteIdOptions(
+    requestParameters: AdminInstallationInstallationIdNotesNoteIdOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
-    await this.adminInstallationInstallationIdSettingsUpdateSettingsIdOptionsRaw(
+    await this.adminInstallationInstallationIdNotesNoteIdOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
+  async adminInstallationInstallationIdNotesOptionsRaw(
+    requestParameters: AdminInstallationInstallationIdNotesOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdNotesOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/notes`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationInstallationIdNotesOptions(
+    requestParameters: AdminInstallationInstallationIdNotesOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationIdNotesOptionsRaw(
       requestParameters,
       initOverrides,
     );
@@ -1926,16 +2209,30 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
-  async adminInstallationListOptionsRaw(
+  async adminInstallationInstallationIdZuperJobsOptionsRaw(
+    requestParameters: AdminInstallationInstallationIdZuperJobsOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminInstallationInstallationIdZuperJobsOptions.",
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     const response = await this.request(
       {
-        path: `/admin/installation/list`,
+        path: `/admin/installation/{installationId}/zuper/jobs`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
         method: "OPTIONS",
         headers: headerParameters,
         query: queryParameters,
@@ -1948,7 +2245,56 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
-  async adminInstallationListOptions(
+  async adminInstallationInstallationIdZuperJobsOptions(
+    requestParameters: AdminInstallationInstallationIdZuperJobsOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationIdZuperJobsOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
+  async adminInstallationOrderNumberOptionsRaw(
+    requestParameters: AdminInstallationOrderNumberOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.orderNumber === null ||
+      requestParameters.orderNumber === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "orderNumber",
+        "Required parameter requestParameters.orderNumber was null or undefined when calling adminInstallationOrderNumberOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{orderNumber}`.replace(
+          `{${"orderNumber"}}`,
+          encodeURIComponent(String(requestParameters.orderNumber)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationOrderNumberOptions(
+    requestParameters: AdminInstallationOrderNumberOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminInstallationListOptionsRaw(initOverrides);
@@ -2409,6 +2755,85 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminGetInstallation200Response> {
     const response = await this.adminUpdateInstallationRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   * Update note for installation
+   */
+  async adminUpdateInstallationNoteRaw(
+    requestParameters: AdminUpdateInstallationNoteRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<AdminUpdateInstallationNote200Response>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminUpdateInstallationNote.",
+      );
+    }
+
+    if (
+      requestParameters.noteId === null ||
+      requestParameters.noteId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "noteId",
+        "Required parameter requestParameters.noteId was null or undefined when calling adminUpdateInstallationNote.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/notes/{noteId}`
+          .replace(
+            `{${"installationId"}}`,
+            encodeURIComponent(String(requestParameters.installationId)),
+          )
+          .replace(
+            `{${"noteId"}}`,
+            encodeURIComponent(String(requestParameters.noteId)),
+          ),
+        method: "PUT",
+        headers: headerParameters,
+        query: queryParameters,
+        body: CreateUpdateNoteToJSON(requestParameters.createUpdateNote),
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminUpdateInstallationNote200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Update note for installation
+   */
+  async adminUpdateInstallationNote(
+    requestParameters: AdminUpdateInstallationNoteRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminUpdateInstallationNote200Response> {
+    const response = await this.adminUpdateInstallationNoteRaw(
       requestParameters,
       initOverrides,
     );
