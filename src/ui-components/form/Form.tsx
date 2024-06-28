@@ -4,6 +4,7 @@ import classes from "./Form.module.css";
 import { FieldError } from "react-hook-form";
 import { Input, InputProps } from "../input/Input";
 import { Select, SelectProps } from "../select/Select";
+import { Textarea, TextareaProps } from "../textarea/Textarea";
 
 export function FormSection({ children }: React.PropsWithChildren) {
   return <div className={classes["form-section"]}>{children}</div>;
@@ -70,6 +71,21 @@ export const FormSelectInput = React.forwardRef<
     <div>
       <Select ref={ref} {...selectProps} />
       {error && <FormFieldError>{error.message}</FormFieldError>}
+    </div>
+  );
+});
+
+interface FormFieldTextareaProps extends TextareaProps {
+  error?: FieldError;
+}
+
+export const FormFieldTextarea = React.forwardRef<
+  HTMLTextAreaElement,
+  FormFieldTextareaProps
+>(function FormFieldTextarea(inputProps, ref) {
+  return (
+    <div>
+      <Textarea ref={ref} {...inputProps} />
     </div>
   );
 });
