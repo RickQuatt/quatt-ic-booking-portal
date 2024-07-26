@@ -36,20 +36,24 @@ const options = {
   maintainAspectRatio: false,
 } as const;
 
+const stylesMarginZero = { margin: "0" };
+
 export function InstallationHealthChecks({
-  installationId,
+  orderNumber,
+  cicId,
 }: {
-  installationId: string;
+  orderNumber: string;
+  cicId: string;
 }) {
   const apiClient = useApiClient();
 
   const { data: chData, status: chStatus } = useQuery(
-    ["installationClickHouseData", installationId],
-    () => {
-      return apiClient.adminGetInstallationClickhouseData({
-        installationId: installationId,
-      });
-    },
+    ["installationHealthCheck", orderNumber, cicId],
+    () =>
+      apiClient.adminGetInstallationHealthCheck({
+        orderNumber,
+        cicId,
+      }),
   );
   const chResults = chData?.result;
 
@@ -140,38 +144,44 @@ export function InstallationHealthChecks({
             }}
           >
             <div style={{ marginBottom: "20px" }}>
-              <h3 style={{ margin: "0" }}>Room temperature</h3>
-              <h2 style={{ margin: "0" }}>
+              <h3 style={stylesMarginZero}>Room temperature</h3>
+              <h2 style={stylesMarginZero}>
                 {chResults?.roomTemperature
                   ? `${chResults.roomTemperature} °C`
                   : "N/A"}
               </h2>
             </div>
             <div>
-              <h3 style={{ margin: "0" }}>Room setpoint</h3>
-              <h2 style={{ margin: "0" }}>
+              <h3 style={stylesMarginZero}>Room setpoint</h3>
+              <h2 style={stylesMarginZero}>
                 {chResults?.roomSetpoint
                   ? `${chResults.roomSetpoint} °C`
                   : "N/A"}
               </h2>
             </div>
             <div>
-              <h3 style={{ margin: "0" }}>Setpoint reached</h3>
-              <h2 style={{ margin: "0" }}>
+              <h3 style={stylesMarginZero}>Setpoint reached</h3>
+              <h2 style={stylesMarginZero}>
                 {chResults?.setpointAdherence
                   ? `${roundNumber(chResults.setpointAdherence, 1)}%`
                   : "N/A"}
               </h2>
             </div>
             <div>
-              <h3 style={{ margin: "0" }}>Mode repartition</h3>
+              <h3 style={stylesMarginZero}>Mode repartition</h3>
               {!emptyModeReperation && chResults?.modeReparation ? (
                 <div style={{ height: "100px", width: "100px" }}>
                   <Pie ref={chartRef} data={chartData} options={options} />
                 </div>
               ) : (
-                <h2 style={{ margin: "0" }}>N/A</h2>
+                <h2 style={stylesMarginZero}>N/A</h2>
               )}
+            </div>
+            <div>
+              <h3 style={stylesMarginZero}>Supervisory control mode</h3>
+              <h2 style={stylesMarginZero}>
+                {chResults?.supervisoryControlMode || "N/A"}
+              </h2>
             </div>
           </div>
         </>

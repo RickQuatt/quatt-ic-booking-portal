@@ -44,7 +44,10 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
 
         <div className={classes["detail-section"]}>
           <DetailSectionHeader title="🏥 Health checks" />
-          <InstallationHealthChecks installationId={installationId} />
+          <InstallationHealthChecks
+            orderNumber={orderNumber}
+            cicId={installationDetails.activeCic}
+          />
         </div>
 
         <InstallationDetailNotes installationId={installationId} />

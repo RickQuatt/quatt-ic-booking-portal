@@ -19,8 +19,8 @@ import type {
   AdminDashboardCics200Response,
   AdminGetCic200Response,
   AdminGetInstallation200Response,
-  AdminGetInstallationClickhouseData200Response,
   AdminGetInstallationCommissioning200Response,
+  AdminGetInstallationHealthCheck200Response,
   AdminGetInstallationNotes200Response,
   AdminGetInstallationSetting200Response,
   AdminGetInstallationTickets200Response,
@@ -53,10 +53,10 @@ import {
   AdminGetCic200ResponseToJSON,
   AdminGetInstallation200ResponseFromJSON,
   AdminGetInstallation200ResponseToJSON,
-  AdminGetInstallationClickhouseData200ResponseFromJSON,
-  AdminGetInstallationClickhouseData200ResponseToJSON,
   AdminGetInstallationCommissioning200ResponseFromJSON,
   AdminGetInstallationCommissioning200ResponseToJSON,
+  AdminGetInstallationHealthCheck200ResponseFromJSON,
+  AdminGetInstallationHealthCheck200ResponseToJSON,
   AdminGetInstallationNotes200ResponseFromJSON,
   AdminGetInstallationNotes200ResponseToJSON,
   AdminGetInstallationSetting200ResponseFromJSON,
@@ -177,6 +177,11 @@ export interface AdminGetInstallationCommissioningRequest {
   commissioningId: number;
 }
 
+export interface AdminGetInstallationHealthCheckRequest {
+  orderNumber: string;
+  cicId: string;
+}
+
 export interface AdminGetInstallationNotesRequest {
   installationId: string;
 }
@@ -245,6 +250,11 @@ export interface AdminInstallationInstallationIdZuperJobsOptionsRequest {
 export interface AdminInstallationListOptionsRequest {
   orderNumber?: string;
   cicId?: string;
+}
+
+export interface AdminInstallationOrderNumberHealthCheckCicIdOptionsRequest {
+  orderNumber: string;
+  cicId: string;
 }
 
 export interface AdminInstallationOrderNumberOptionsRequest {
@@ -1328,9 +1338,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   async adminGetInstallationClickhouseDataRaw(
     requestParameters: AdminGetInstallationClickhouseDataRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<
-    runtime.ApiResponse<AdminGetInstallationClickhouseData200Response>
-  > {
+  ): Promise<runtime.ApiResponse<AdminGetInstallationHealthCheck200Response>> {
     if (
       requestParameters.installationId === null ||
       requestParameters.installationId === undefined
@@ -1367,7 +1375,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     );
 
     return new runtime.JSONApiResponse(response, (jsonValue) =>
-      AdminGetInstallationClickhouseData200ResponseFromJSON(jsonValue),
+      AdminGetInstallationHealthCheck200ResponseFromJSON(jsonValue),
     );
   }
 
@@ -1377,7 +1385,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   async adminGetInstallationClickhouseData(
     requestParameters: AdminGetInstallationClickhouseDataRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<AdminGetInstallationClickhouseData200Response> {
+  ): Promise<AdminGetInstallationHealthCheck200Response> {
     const response = await this.adminGetInstallationClickhouseDataRaw(
       requestParameters,
       initOverrides,
@@ -1457,6 +1465,82 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminGetInstallationCommissioning200Response> {
     const response = await this.adminGetInstallationCommissioningRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   * Get health check data for selected installation by CIC id
+   */
+  async adminGetInstallationHealthCheckRaw(
+    requestParameters: AdminGetInstallationHealthCheckRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<AdminGetInstallationHealthCheck200Response>> {
+    if (
+      requestParameters.orderNumber === null ||
+      requestParameters.orderNumber === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "orderNumber",
+        "Required parameter requestParameters.orderNumber was null or undefined when calling adminGetInstallationHealthCheck.",
+      );
+    }
+
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminGetInstallationHealthCheck.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{orderNumber}/health-check/{cicId}`
+          .replace(
+            `{${"orderNumber"}}`,
+            encodeURIComponent(String(requestParameters.orderNumber)),
+          )
+          .replace(
+            `{${"cicId"}}`,
+            encodeURIComponent(String(requestParameters.cicId)),
+          ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminGetInstallationHealthCheck200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Get health check data for selected installation by CIC id
+   */
+  async adminGetInstallationHealthCheck(
+    requestParameters: AdminGetInstallationHealthCheckRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminGetInstallationHealthCheck200Response> {
+    const response = await this.adminGetInstallationHealthCheckRaw(
       requestParameters,
       initOverrides,
     );
@@ -2375,6 +2459,69 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminInstallationListOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
+  async adminInstallationOrderNumberHealthCheckCicIdOptionsRaw(
+    requestParameters: AdminInstallationOrderNumberHealthCheckCicIdOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.orderNumber === null ||
+      requestParameters.orderNumber === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "orderNumber",
+        "Required parameter requestParameters.orderNumber was null or undefined when calling adminInstallationOrderNumberHealthCheckCicIdOptions.",
+      );
+    }
+
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminInstallationOrderNumberHealthCheckCicIdOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{orderNumber}/health-check/{cicId}`
+          .replace(
+            `{${"orderNumber"}}`,
+            encodeURIComponent(String(requestParameters.orderNumber)),
+          )
+          .replace(
+            `{${"cicId"}}`,
+            encodeURIComponent(String(requestParameters.cicId)),
+          ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationOrderNumberHealthCheckCicIdOptions(
+    requestParameters: AdminInstallationOrderNumberHealthCheckCicIdOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationOrderNumberHealthCheckCicIdOptionsRaw(
       requestParameters,
       initOverrides,
     );

@@ -85,6 +85,7 @@ models/*
 !models/CicCommissioning.ts
 !models/CicState.ts
 !models/AdminGetInstallation200Response.ts
+!models/AdminGetInstallationHealthCheck200Response.ts
 !models/AdminInstallationDetail.ts
 !models/AdminInstallationsList.ts
 !models/AdminInstallationsList200Response.ts
@@ -141,8 +142,8 @@ models/*
 !models/TicketHsPipelineStage.ts
 !models/TicketHubspotOwnerId.ts
 !models/AdminGetInstallationClickhouseData200Response.ts
-!models/ClickhouseData.ts
-!models/ClickhouseDataModeReparation.ts
+!models/InstallationHealthCheck.ts
+!models/InstallationHealthCheckModeReparation.ts
 !models/TarrifsResult.ts
 !models/ForgetWifiMeCicRequest.ts
 !models/AdminGetInstallationCommissioning200Response.ts
