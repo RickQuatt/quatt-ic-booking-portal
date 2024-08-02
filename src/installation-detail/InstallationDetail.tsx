@@ -12,6 +12,7 @@ import { InstallationDetailTickets } from "./InstallationDetailTickets";
 import { InstallationDetailZuperService } from "./InstallationDetailZuperService";
 import { InstallationHealthChecks } from "./InstallationHealthChecks";
 import { InstallationDetailNotes } from "./installationDetailNotes";
+import { InstallationDetailCICQR } from "./InstallationDetailCICQR";
 import { Loader } from "../ui-components/loader/Loader";
 import { useGetInstallationDetails } from "./hooks/useGetInstallationDetails";
 import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
@@ -88,6 +89,7 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
           tariff={tariff}
           installationId={installationId}
         /> */}
+        <InstallationDetailCICQR cicId={installationDetails.activeCic} />
       </div>
 
       <BackButton />
