@@ -14,48 +14,40 @@ import { ButtonLink } from "../ui-components/button/Button";
 import { Link } from "wouter";
 import React from "react";
 import { InstallationFilters } from "./filters/types";
-import { filterInstallationList } from "./filters/filterInstallationList";
 import { usePaginate } from "../ui-components/pagination/usePaginate";
-import {
-  ActiveCicFilter,
-  CreatedAtFilter,
-  OrderNumberFilter,
-  UpdatedAtFilter,
-} from "./filters/Filters";
+import { CreatedAtFilter, UpdatedAtFilter } from "./filters/Filters";
 import { Pagination } from "../ui-components/pagination/Pagination";
+import { TextFilter } from "../ui-components/filter/TextFilter";
+import { useGetInstallationsList } from "./hooks/useGetInstallationsList";
+import { Loader } from "../ui-components/loader/Loader";
+import ErrorText from "../ui-components/error-text/ErrorText";
 
-export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
-  const [filters, doSetFilters] = React.useState<InstallationFilters>({});
-
-  const hasFilters = React.useMemo(() => {
-    return Object.values(filters).length;
-  }, [filters]);
-
-  const filteredItems = React.useMemo(
-    () => filterInstallationList(data, filters),
-    [data, filters],
+export function InstallationList() {
+  const [filters, setFilters] = React.useState<InstallationFilters>({});
+  const { installations, isLoading, error } = useGetInstallationsList(
+    filters.cicId,
+    filters.orderNumber,
   );
 
   const { paginatedItems, paginationRange, currentPage, changePage } =
     usePaginate({
-      items: filteredItems,
+      items: installations || [],
       pageSize: 50,
     });
 
-  const setFilters = React.useCallback(
-    (filters: React.SetStateAction<InstallationFilters>) => {
-      doSetFilters(filters);
-      changePage(1);
-    },
-    [changePage],
-  );
+  const noInstallationsFound = installations && installations.length === 0;
 
   return (
     <div className={classes.page}>
-      <h2 className={classes["page-title"]}>
-        🛠️ Installations list: {filteredItems.length}{" "}
-        {hasFilters ? "filtered " : ""} results
-      </h2>
+      <div className={classes["page-title-container"]}>
+        <h2 className={classes["page-title"]}>🛠️ Installations list</h2>
+        {isLoading && (
+          // TODO: Remove the div wrapper and pass styles directly to the Loader component
+          <div className={classes["loader-container"]}>
+            <Loader />
+          </div>
+        )}
+      </div>
       <Table gridClass={classes["table-grid"]}>
         <THead>
           <Tr>
@@ -77,10 +69,10 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
           </Tr>
           <Tr>
             <Th>
-              <OrderNumberFilter setFilters={setFilters} />
+              <TextFilter filterKey="orderNumber" setFilters={setFilters} />
             </Th>
             <Th>
-              <ActiveCicFilter setFilters={setFilters} />
+              <TextFilter filterKey="cicId" setFilters={setFilters} />
             </Th>
             <Th>
               <CreatedAtFilter setFilters={setFilters} />
@@ -97,6 +89,18 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
           ))}
         </TBody>
       </Table>
+      {noInstallationsFound && (
+        <p className={classes["info-text"]}>
+          No installations found with the given order number or CIC id
+        </p>
+      )}
+      {!!error && (
+        <ErrorText
+          text="An error occurred while fetching the installations. You can try
+          searching again."
+          error={error}
+        />
+      )}
       <Pagination
         paginationRange={paginationRange}
         currentPage={currentPage}

@@ -3,28 +3,22 @@ import { FormField, FormSection } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import zuperLogo from "../../images/ZuperPro.webp";
-import { useQuery } from "react-query";
-import { useApiClient } from "../api-client/context";
 import { Loader } from "../ui-components/loader/Loader";
+import { ZuperService } from "../api-client/models";
 
 interface InstallationDetailServiceProps {
-  installationId: string;
+  zuperServiceJobs?: ZuperService[];
+  isLoadingJobs: boolean;
+  zuperJobsError?: unknown;
 }
 
 export function InstallationDetailZuperService({
-  installationId,
+  zuperServiceJobs,
+  isLoadingJobs,
+  zuperJobsError,
 }: InstallationDetailServiceProps) {
-  const apiClient = useApiClient();
-
-  const { data: zuperData, status: zuperStatus } = useQuery(
-    ["installationZuperJobs", installationId],
-    () => {
-      return apiClient.adminGetInstallationZuperJobs({
-        installationId: installationId,
-      });
-    },
-  );
-  const zuperJobs = zuperData?.result;
+  const noServiceJobsToShow =
+    !isLoadingJobs && (!zuperServiceJobs?.length || !!zuperJobsError);
 
   return (
     <div className={classes["detail-section"]}>
@@ -32,15 +26,15 @@ export function InstallationDetailZuperService({
       <FormSection>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
-            {zuperStatus === "error" && (
+            {noServiceJobsToShow && (
               <div style={{ textAlign: "center" }}>No services 👍</div>
             )}
-            {zuperStatus === "loading" ? (
+            {isLoadingJobs ? (
               <Loader />
             ) : (
               <>
-                {zuperJobs &&
-                  zuperJobs.services.map((service) => (
+                {zuperServiceJobs &&
+                  zuperServiceJobs.map((service) => (
                     <div
                       style={{ cursor: "pointer" }}
                       className={classes["detail-section"]}
@@ -61,9 +55,6 @@ export function InstallationDetailZuperService({
                       }`}</div>
                     </div>
                   ))}
-                {zuperJobs && zuperJobs.services.length === 0 && (
-                  <div style={{ textAlign: "center" }}>No services 👍</div>
-                )}
               </>
             )}
           </div>

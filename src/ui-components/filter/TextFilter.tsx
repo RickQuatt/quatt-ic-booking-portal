@@ -26,7 +26,7 @@ export function TextFilter<T extends object>({
   );
 
   const debouncedSetFilters = React.useMemo(
-    () => debounce(doSetFilters, 100),
+    () => debounce(doSetFilters, 450),
     [doSetFilters],
   );
 

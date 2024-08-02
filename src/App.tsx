@@ -58,7 +58,7 @@ function App() {
               <CICListRenderer />
             </Route>
             <Route path="/installations">
-              <InstallationListRenderer />
+              <InstallationList />
             </Route>
             <Route path="/cicHealth">
               <CICHealthListRenderer />
@@ -69,13 +69,11 @@ function App() {
               }}
             </Route>
             <Route path="/installations/:orderNumber">
-              {(params) => {
-                return (
-                  <InstallationDetailRenderer
-                    orderNumber={params.orderNumber}
-                  />
-                );
-              }}
+              {(params) => (
+                <InstallationDetail
+                  orderNumber={params.orderNumber.toUpperCase()}
+                />
+              )}
             </Route>
           </ApiClientProvider>
         </QueryClientProvider>
@@ -123,38 +121,6 @@ const CICDetailRenderer = ({ cicId }: { cicId: string }) => {
   return <CICDetail data={data.result} />;
 };
 
-const InstallationDetailRenderer = ({
-  orderNumber,
-}: {
-  orderNumber: string;
-}) => {
-  const apiClient = useApiClient();
-
-  const {
-    data: installationData,
-    status: installationStatus,
-    error,
-  } = useQuery(["installationDetail", orderNumber], () => {
-    return apiClient.adminGetInstallation({ orderNumber });
-  });
-
-  // const { data: tariffData, status: tariffStatus } = useQuery(
-  //   ["installationTariffs", installationId],
-  //   () => {
-  //     return apiClient.adminGetInstallationTariff({ installationId });
-  //   },
-  // );
-
-  if (installationStatus !== "success") return <Loader />;
-
-  return (
-    <InstallationDetail
-      data={installationData.result}
-      // tariff={tariffData.result}
-    />
-  );
-};
-
 const InstallerListRenderer = () => {
   const apiClient = useApiClient();
   const { data, status, error, refetch } = useQuery(
@@ -189,23 +155,6 @@ const CICListRenderer = () => {
   if (status !== "success") return <Loader />;
 
   return <CICList data={data.result} />;
-};
-
-const InstallationListRenderer = () => {
-  const apiClient = useApiClient();
-  const { data, status, error } = useQuery(
-    "installationList",
-    () => {
-      return apiClient.adminInstallationsList();
-    },
-    {
-      refetchOnWindowFocus: false,
-    },
-  );
-
-  if (status !== "success") return <Loader />;
-
-  return <InstallationList data={data.result} />;
 };
 
 const CICHealthListRenderer = () => {

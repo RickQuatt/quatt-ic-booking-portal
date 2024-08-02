@@ -13,55 +13,55 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { ClickhouseDataModeReparation } from "./ClickhouseDataModeReparation";
+import type { InstallationHealthCheckModeReparation } from "./InstallationHealthCheckModeReparation";
 import {
-  ClickhouseDataModeReparationFromJSON,
-  ClickhouseDataModeReparationFromJSONTyped,
-  ClickhouseDataModeReparationToJSON,
-} from "./ClickhouseDataModeReparation";
+  InstallationHealthCheckModeReparationFromJSON,
+  InstallationHealthCheckModeReparationFromJSONTyped,
+  InstallationHealthCheckModeReparationToJSON,
+} from "./InstallationHealthCheckModeReparation";
 
 /**
  *
  * @export
- * @interface ClickhouseData
+ * @interface InstallationHealthCheck
  */
-export interface ClickhouseData {
+export interface InstallationHealthCheck {
   /**
    *
    * @type {number}
-   * @memberof ClickhouseData
+   * @memberof InstallationHealthCheck
    */
   roomTemperature: number | null;
   /**
    *
    * @type {number}
-   * @memberof ClickhouseData
+   * @memberof InstallationHealthCheck
    */
   roomSetpoint: number | null;
   /**
    *
    * @type {number}
-   * @memberof ClickhouseData
+   * @memberof InstallationHealthCheck
    */
   setpointAdherence: number | null;
   /**
    *
-   * @type {ClickhouseDataModeReparation}
-   * @memberof ClickhouseData
+   * @type {InstallationHealthCheckModeReparation}
+   * @memberof InstallationHealthCheck
    */
-  modeReparation: ClickhouseDataModeReparation | null;
+  modeReparation: InstallationHealthCheckModeReparation | null;
   /**
    *
-   * @type {number}
-   * @memberof ClickhouseData
+   * @type {string}
+   * @memberof InstallationHealthCheck
    */
-  supervisoryControlMode: number | null;
+  supervisoryControlMode: string;
 }
 
 /**
- * Check if a given object implements the ClickhouseData interface.
+ * Check if a given object implements the InstallationHealthCheck interface.
  */
-export function instanceOfClickhouseData(value: object): boolean {
+export function instanceOfInstallationHealthCheck(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "roomTemperature" in value;
   isInstance = isInstance && "roomSetpoint" in value;
@@ -72,14 +72,16 @@ export function instanceOfClickhouseData(value: object): boolean {
   return isInstance;
 }
 
-export function ClickhouseDataFromJSON(json: any): ClickhouseData {
-  return ClickhouseDataFromJSONTyped(json, false);
+export function InstallationHealthCheckFromJSON(
+  json: any,
+): InstallationHealthCheck {
+  return InstallationHealthCheckFromJSONTyped(json, false);
 }
 
-export function ClickhouseDataFromJSONTyped(
+export function InstallationHealthCheckFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): ClickhouseData {
+): InstallationHealthCheck {
   if (json === undefined || json === null) {
     return json;
   }
@@ -87,14 +89,16 @@ export function ClickhouseDataFromJSONTyped(
     roomTemperature: json["roomTemperature"],
     roomSetpoint: json["roomSetpoint"],
     setpointAdherence: json["setpointAdherence"],
-    modeReparation: ClickhouseDataModeReparationFromJSON(
+    modeReparation: InstallationHealthCheckModeReparationFromJSON(
       json["modeReparation"],
     ),
     supervisoryControlMode: json["supervisoryControlMode"],
   };
 }
 
-export function ClickhouseDataToJSON(value?: ClickhouseData | null): any {
+export function InstallationHealthCheckToJSON(
+  value?: InstallationHealthCheck | null,
+): any {
   if (value === undefined) {
     return undefined;
   }
@@ -105,7 +109,9 @@ export function ClickhouseDataToJSON(value?: ClickhouseData | null): any {
     roomTemperature: value.roomTemperature,
     roomSetpoint: value.roomSetpoint,
     setpointAdherence: value.setpointAdherence,
-    modeReparation: ClickhouseDataModeReparationToJSON(value.modeReparation),
+    modeReparation: InstallationHealthCheckModeReparationToJSON(
+      value.modeReparation,
+    ),
     supervisoryControlMode: value.supervisoryControlMode,
   };
 }

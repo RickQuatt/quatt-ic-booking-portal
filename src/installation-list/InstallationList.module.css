@@ -2,11 +2,19 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 20px;
+  padding: 0 20px 20px 20px;
 }
 
 .page-title {
   margin-left: var(--table-side-padding);
+  margin-right: var(--table-side-padding);
+  align-content: center;
+}
+
+.page-title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .table-grid {
@@ -15,4 +23,17 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   overflow: hidden;
+}
+
+.loader-container {
+  width: 4rem;
+}
+
+.info-text {
+  padding: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #666;
+  width: 100%;
 }
