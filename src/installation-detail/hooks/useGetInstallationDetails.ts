@@ -7,6 +7,7 @@ export const useGetInstallationDetails = (orderNumber: string) => {
     data: installationDetailsResponse,
     isLoading: isLoadingInstallationDetails,
     error: installationDetailsError,
+    refetch: refetchInstallationDetails,
   } = useQuery({
     queryKey: ["installationDetail", orderNumber],
     queryFn: () => apiClient.adminGetInstallation({ orderNumber }),
@@ -18,5 +19,6 @@ export const useGetInstallationDetails = (orderNumber: string) => {
     installationDetails,
     isLoadingInstallationDetails,
     installationDetailsError,
+    refetchInstallationDetails,
   };
 };

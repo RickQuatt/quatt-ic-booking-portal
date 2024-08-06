@@ -1,5 +1,6 @@
 import React from "react";
 
+import classNames from "classnames";
 import classes from "./InstallationDetail.module.css";
 import { AdminInstallationDetail } from "../api-client/models";
 import { FormField, FormSection } from "../ui-components/form/Form";
@@ -8,6 +9,7 @@ import { formatDateTime } from "../utils/formatDate";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { useApiClient } from "../api-client/context";
 import { useQuery } from "@tanstack/react-query";
+import ErrorText from "../ui-components/error-text/ErrorText";
 
 interface InstallationDetailProps {
   installation: AdminInstallationDetail;
@@ -16,6 +18,7 @@ interface InstallationDetailProps {
 export function InstallationDetailSettingsHistory({
   installation,
 }: InstallationDetailProps) {
+  const { settingsUpdates } = installation;
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="👀 Settings history" />
@@ -23,7 +26,7 @@ export function InstallationDetailSettingsHistory({
         <FormField>
           <div className={classes["detail-section-commissioning"]}>
             <Accordion>
-              {installation.settingsUpdates.map((setting, index) => (
+              {settingsUpdates.map((setting, index) => (
                 <InstallationDetailSettingsItem
                   key={index}
                   installationId={installation.externalId}
@@ -35,7 +38,7 @@ export function InstallationDetailSettingsHistory({
               ))}
             </Accordion>
           </div>
-          {installation.settingsUpdates.length === 0 && (
+          {settingsUpdates.length === 0 && (
             <div style={{ textAlign: "center" }}>No settings updates 👍</div>
           )}
         </FormField>
@@ -61,7 +64,7 @@ function InstallationDetailSettingsItem({
 }: InstallationDetailSettingsItemProps) {
   const apiClient = useApiClient();
   const [isOpen, setIsOpen] = React.useState(false);
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["installationSettings", installationId, settingsId],
     queryFn: () =>
       apiClient.adminGetInstallationSetting({
@@ -77,29 +80,36 @@ function InstallationDetailSettingsItem({
 
   const excludedKeys = ["settings"];
   const datesKeys = ["createdAt", "updatedAt", "confirmedAt", "cancelledAt"];
-  const listOfSettings = [
-    ...Object.entries(dataJson)
-      .filter(([key]) => !excludedKeys.includes(key))
-      .map(([key, value]) => [
-        key,
-        datesKeys.includes(key) ? formatDateTime(value) : String(value),
-      ]),
-  ];
+  const listOfSettings = Object.entries(dataJson)
+    .filter(([key]) => !excludedKeys.includes(key))
+    .map(([key, value]) => [
+      key,
+      datesKeys.includes(key) ? formatDateTime(value) : String(value),
+    ]);
 
-  const settingsColumn = [
-    ...Object.entries(settings).filter(([key]) => key !== "settingsId"),
-  ];
+  const settingsColumn = Object.entries(settings).filter(
+    ([key]) => key !== "settingsId",
+  );
 
   const toggleOpen = () => {
     setIsOpen((prevValue) => !prevValue);
   };
+
+  if (isError) {
+    return (
+      <ErrorText
+        text={`Failed to fetch settings update with settings id ${settingsId}.`}
+        retry={refetch}
+      />
+    );
+  }
 
   return (
     <AccordionItem
       title={formatDateTime(createdAt) || "No date"}
       additionalInfo={
         <>
-          <div>Updated by: {updatedBy ?? "-"}</div>
+          <span>Updated by: {updatedBy ?? "-"}</span>
           <div>Is Confirmed: {isUnconfirmed ? "❌" : "✅"}</div>
         </>
       }
@@ -107,34 +117,30 @@ function InstallationDetailSettingsItem({
       onChangeIsOpen={toggleOpen}
     >
       {isPending ? (
-        <div>is Loading....</div>
+        <span>is Loading....</span>
       ) : (
-        <div>
-          <div className={classes["settings-history-card"]}>
-            <ul className={classes["settings-history-bullet"]}>
-              {listOfSettings.map(([key, value]) => (
-                <li key={key}>
-                  <>
-                    <b>{key}:</b> {value}
-                  </>
-                </li>
-              ))}
-              <li>
-                <b>settings:</b>
-              </li>
-              {settingsColumn.map(([key, value]) => (
-                <li
-                  className={classes["settings-history-child-setting"]}
-                  key={key}
-                >
-                  <>
-                    <b>{key}:</b> {value}
-                  </>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <ul
+          className={classNames(
+            classes["settings-history-card"],
+            classes["settings-history-bullet"],
+          )}
+        >
+          {listOfSettings.map(([key, value]) => (
+            <li key={key}>
+              <b>{key}:</b> {value}
+            </li>
+          ))}
+          <li>
+            <b>settings:</b>
+          </li>
+          {settingsColumn.map(([key, value]) => (
+            <li className={classes["settings-history-child-setting"]} key={key}>
+              <>
+                <b>{key}:</b> {value}
+              </>
+            </li>
+          ))}
+        </ul>
       )}
     </AccordionItem>
   );

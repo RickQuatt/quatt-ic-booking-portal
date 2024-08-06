@@ -24,10 +24,8 @@ import ErrorText from "../ui-components/error-text/ErrorText";
 
 export function InstallationList() {
   const [filters, setFilters] = React.useState<InstallationFilters>({});
-  const { installations, isLoading, error } = useGetInstallationsList(
-    filters.cicId,
-    filters.orderNumber,
-  );
+  const { installations, isLoading, error, refetchInstallations } =
+    useGetInstallationsList(filters.cicId, filters.orderNumber);
 
   const { paginatedItems, paginationRange, currentPage, changePage } =
     usePaginate({
@@ -96,9 +94,9 @@ export function InstallationList() {
       )}
       {!!error && (
         <ErrorText
-          text="An error occurred while fetching the installations. You can try
-          searching again."
+          text="An error occurred while fetching the installations."
           error={error}
+          retry={refetchInstallations}
         />
       )}
       <Pagination

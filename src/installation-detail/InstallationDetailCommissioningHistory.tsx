@@ -13,6 +13,7 @@ import { formatDateTime } from "../utils/formatDate";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { useApiClient } from "../api-client/context";
 import { useQuery } from "@tanstack/react-query";
+import ErrorText from "../ui-components/error-text/ErrorText";
 
 interface InstallationDetailCommissioningHistoryProps {
   installation: AdminInstallationDetail;
@@ -63,7 +64,7 @@ function InstallationDetailCommissioningItem({
   const apiClient = useApiClient();
   const installationId = externalId || "";
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["installationCommissioning", installationId, commissioningId],
     queryFn: () =>
       apiClient.adminGetInstallationCommissioning({
@@ -79,6 +80,10 @@ function InstallationDetailCommissioningItem({
     setIsOpen((prevValue) => !prevValue);
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <AccordionItem
       title={
@@ -89,8 +94,11 @@ function InstallationDetailCommissioningItem({
       isOpen={isOpen}
       onChangeIsOpen={toggleOpen}
     >
-      {isLoading ? (
-        <div>is Loading....</div>
+      {isError ? (
+        <ErrorText
+          text={`Failed to fetch commisioning with id ${commissioningId}.`}
+          retry={refetch}
+        />
       ) : (
         data && <FormFieldJson value={commissioningData} />
       )}

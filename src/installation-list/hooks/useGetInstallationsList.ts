@@ -18,7 +18,12 @@ export const useGetInstallationsList = (
 
   const cicIdWithPrefix = cicId ? prependPrefixIfMissing("CIC-", cicId) : cicId;
 
-  const { data, isLoading, error } = useQuery({
+  const {
+    data,
+    isLoading,
+    error,
+    refetch: refetchInstallations,
+  } = useQuery({
     queryKey: ["installationList", { cicId, orderNumber }],
     queryFn: () =>
       apiClient.adminInstallationsList({
@@ -31,5 +36,5 @@ export const useGetInstallationsList = (
 
   const installations = data?.result;
 
-  return { installations, isLoading, error };
+  return { installations, isLoading, error, refetchInstallations };
 };

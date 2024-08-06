@@ -21,6 +21,8 @@ import { CICHealthList } from "./cic-health-list/CICHealthList";
 import { Sidebar } from "./sidebar/Sidebar";
 import { InstallationList } from "./installation-list/InstallationList";
 import { InstallationDetail } from "./installation-detail/InstallationDetail";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import ErrorText from "./ui-components/error-text/ErrorText";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +82,7 @@ function App() {
               )}
             </Route>
           </ApiClientProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </div>
     </div>
@@ -97,81 +100,108 @@ const SignIn = () => {
 
 const CicDashboardRenderer = () => {
   const apiClient = useApiClient();
-  const { data, status, error } = useQuery({
+  const { data, isLoading, isError, isSuccess, refetch } = useQuery({
     queryKey: ["cicDashboard"],
-    queryFn: () => {
-      return apiClient.adminDashboardCics();
-    },
+    queryFn: () => apiClient.adminDashboardCics(),
     refetchOnWindowFocus: false,
   });
 
-  // TODO: Render a spinner and handle errors - 2023-06-19
-  if (status !== "success") return <Loader />;
+  if (isError) {
+    return (
+      <ErrorText
+        text="Failed to fetch CIC data for the dashboard."
+        retry={refetch}
+      />
+    );
+  }
 
-  return <CicDashboard data={data.result} />;
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  return isSuccess ? (
+    <CicDashboard data={data.result} />
+  ) : (
+    <ErrorText text="No CIC data found" />
+  );
 };
 
 const CICDetailRenderer = ({ cicId }: { cicId: string }) => {
   const apiClient = useApiClient();
-  const { data, status, error } = useQuery({
+  const { data, isLoading, isError, isSuccess, refetch } = useQuery({
     queryKey: ["cicDetail", cicId],
-    queryFn: () => {
-      return apiClient.adminGetCic({ cicId });
-    },
+    queryFn: () => apiClient.adminGetCic({ cicId }),
   });
 
-  // TODO: Render a spinner and handle errors - 2023-06-19
-  if (status !== "success") return <Loader />;
+  if (isError) {
+    return (
+      <ErrorText
+        text={`Failed to fetch CIC details for CIC id ${cicId}.`}
+        retry={refetch}
+      />
+    );
+  }
 
-  return <CICDetail data={data.result} />;
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  return isSuccess ? (
+    <CICDetail data={data?.result} />
+  ) : (
+    <ErrorText text="No CIC data found" />
+  );
 };
 
 const InstallerListRenderer = () => {
   const apiClient = useApiClient();
-  const { data, status, error, refetch } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["installerList"],
-    queryFn: () => {
-      return apiClient.adminListInstallers();
-    },
+    queryFn: () => apiClient.adminListInstallers(),
     refetchOnWindowFocus: false,
   });
 
-  // TODO: Render a spinner and handle errors - 2023-06-19
-  if (status !== "success") return <Loader />;
+  if (isError) {
+    return <ErrorText text="Failed to fetch installers." retry={refetch} />;
+  }
 
-  return <InstallerList data={data.result} refetch={refetch} />;
+  return isLoading ? (
+    <Loader />
+  ) : (
+    <InstallerList data={data?.result || []} refetch={refetch} />
+  );
 };
 
 const CICListRenderer = () => {
   const apiClient = useApiClient();
-  const { data, status, error } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["cicList"],
-    queryFn: () => {
-      return apiClient.adminListCics();
-    },
+    queryFn: () => apiClient.adminListCics(),
     refetchOnWindowFocus: false,
   });
 
-  // TODO: Render a spinner and handle errors - 2023-06-19
-  if (status !== "success") return <Loader />;
+  if (isError) {
+    return <ErrorText text="Failed to fetch CICs." retry={refetch} />;
+  }
 
-  return <CICList data={data.result} />;
+  return isLoading ? <Loader /> : <CICList data={data?.result || []} />;
 };
 
 const CICHealthListRenderer = () => {
   const apiClient = useApiClient();
-  const { data, status, error } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["cicList"],
-    queryFn: () => {
-      return apiClient.adminListCics();
-    },
+    queryFn: () => apiClient.adminListCics(),
     refetchOnWindowFocus: false,
   });
 
-  // TODO: Render a spinner and handle errors - 2023-06-19
-  if (status !== "success") return <Loader />;
+  if (isError) {
+    return (
+      <ErrorText text="Failed to fetch CIC health list." retry={refetch} />
+    );
+  }
 
-  return <CICHealthList data={data.result} />;
+  return isLoading ? <Loader /> : <CICHealthList data={data?.result || []} />;
 };
 
 export default App;

@@ -7,6 +7,7 @@ export const useGetZuperJobs = (orderNumber: string) => {
     data: zuperJobsResponse,
     isLoading: isLoadingZuperJobs,
     error: zuperJobsError,
+    refetch: refetchZuperJobs,
   } = useQuery({
     queryKey: ["zuperJobs", orderNumber],
     queryFn: () => apiClient.adminGetZuperJobsByOrderNumber({ orderNumber }),
@@ -18,5 +19,6 @@ export const useGetZuperJobs = (orderNumber: string) => {
     zuperJobs,
     isLoadingZuperJobs,
     zuperJobsError,
+    refetchZuperJobs,
   };
 };

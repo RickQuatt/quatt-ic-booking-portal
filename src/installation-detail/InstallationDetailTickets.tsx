@@ -7,6 +7,7 @@ import classes from "./InstallationDetail.module.css";
 import { Loader } from "../ui-components/loader/Loader";
 import { FormField, FormSection } from "../ui-components/form/Form";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import ErrorText from "../ui-components/error-text/ErrorText";
 
 interface CICDetailProps {
   installationId: string;
@@ -17,8 +18,9 @@ export function InstallationDetailTickets({ installationId }: CICDetailProps) {
 
   const {
     data: hubspotData,
-    isError,
+    error,
     isPending,
+    refetch,
   } = useQuery({
     queryKey: ["installationHubspotTickets", installationId],
     queryFn: () => {
@@ -30,14 +32,17 @@ export function InstallationDetailTickets({ installationId }: CICDetailProps) {
 
   const hubspotTickets = hubspotData?.result;
 
-  const getTicketOwner = (ticket: Ticket | null): string => {
-    return [
-      ticket?.hubspot_owner_id.firstname,
-      ticket?.hubspot_owner_id.lastname,
-    ]
-      .join(" ")
-      .trim();
-  };
+  const getTicketOwner = (ticket: Ticket | null): string =>
+    `${ticket?.hubspot_owner_id.firstname} ${ticket?.hubspot_owner_id.lastname}`;
+
+  if (error) {
+    return (
+      <ErrorText
+        text="Failed to fetch Hubspot tickets for the installation."
+        retry={refetch}
+      />
+    );
+  }
 
   return (
     <div className={classes["detail-section"]}>
@@ -45,9 +50,6 @@ export function InstallationDetailTickets({ installationId }: CICDetailProps) {
       <FormSection>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
-            {isError && (
-              <div style={{ textAlign: "center" }}>No tickets 👍</div>
-            )}
             {isPending ? (
               <Loader />
             ) : (
