@@ -109,7 +109,7 @@ function InstallationDetailSettingsItem({
       title={formatDateTime(createdAt) || "No date"}
       additionalInfo={
         <>
-          <span>Updated by: {updatedBy ?? "-"}</span>
+          <span>Updated by: {updatedBy ?? "System"}</span>
           <div>Is Confirmed: {isUnconfirmed ? "❌" : "✅"}</div>
         </>
       }
