@@ -26,6 +26,12 @@ export function getHubspotSearchOrderLink(orderNumber: string) {
   return `https://app-eu1.hubspot.com/contacts/25848718/objects/0-3/views/all/list?query="${orderNumber}"`;
 }
 
+export function getHubspotDealLink(hubspotDealId: string | null) {
+  return hubspotDealId
+    ? `https://app-eu1.hubspot.com/contacts/25848718/record/0-3/${hubspotDealId}`
+    : undefined;
+}
+
 export function getZuperJobLink(jobUid: string) {
   return `https://app.zuperpro.com/jobs/${jobUid}/details`;
 }

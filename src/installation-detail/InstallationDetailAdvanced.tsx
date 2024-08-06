@@ -3,7 +3,7 @@ import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import {
   getGrafanaDataPerCICLink,
   getGrafanaDiagnosticsLink,
-  getHubspotSearchOrderLink,
+  getHubspotDealLink,
   getMenderLink,
 } from "../cic-detail/getLinks";
 import { ButtonLink } from "../ui-components/button/Button";
@@ -20,14 +20,17 @@ export function InstallationDetailAdvanced({
   zuperInstallationJobs?: ZuperService[];
   isLoadingZuperJobs: boolean;
 }) {
+  const { activeCic, hubspotDealId, menderId } = installation;
+  const hubspotDealLink = getHubspotDealLink(hubspotDealId);
+  const hubspotDealText = hubspotDealLink
+    ? "Hubspot - Deal"
+    : "Hubspot - No deal";
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="📊 Advanced insights" />
       <FormSection>
-        <ButtonLink
-          href={getGrafanaDiagnosticsLink(installation.activeCic)}
-          target="_blank"
-        >
+        <ButtonLink href={getGrafanaDiagnosticsLink(activeCic)} target="_blank">
           Grafana - Diagnostics
         </ButtonLink>
         <InstallationDetailZuperButtonGroup
@@ -35,27 +38,17 @@ export function InstallationDetailAdvanced({
           isLoadingJobs={isLoadingZuperJobs}
         />
         <ButtonLink
-          href={
-            installation.orderNumber
-              ? getHubspotSearchOrderLink(installation.orderNumber)
-              : undefined
-          }
+          href={hubspotDealLink}
           target="_blank"
-          disabled={!installation.orderNumber}
+          disabled={!hubspotDealLink}
         >
-          Hubspot - Deals
+          {hubspotDealText}
         </ButtonLink>
-        <ButtonLink
-          href={getGrafanaDataPerCICLink(installation.activeCic)}
-          target="_blank"
-        >
+        <ButtonLink href={getGrafanaDataPerCICLink(activeCic)} target="_blank">
           Grafana - Data per CIC
         </ButtonLink>
-        {installation.menderId && (
-          <ButtonLink
-            href={getMenderLink(installation.menderId)}
-            target="_blank"
-          >
+        {menderId && (
+          <ButtonLink href={getMenderLink(menderId)} target="_blank">
             Mender
           </ButtonLink>
         )}
