@@ -16,6 +16,7 @@ import { Button } from "../ui-components/button/Button";
 import classes from "./CICDetail.module.css";
 import { formatDate, formatDateDistance } from "../utils/formatDate";
 import { DetailSectionHeader } from "./CICDetailSectionHeader";
+import { Link } from "wouter";
 
 const requiredFieldText = "This field is required";
 // required for inputs of type="number"
@@ -96,58 +97,60 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="Main CIC details" />
       <FormSection>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <FormField>
-            <FormFieldTitle>ID</FormFieldTitle>
-            <FormFieldValue value={cicData.id} />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Order number</FormFieldTitle>
-            <FormFieldValue value={cicData.orderNumber} />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Quatt build</FormFieldTitle>
-            <FormFieldValue value={cicData.quattBuild} />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Last connection status updated at</FormFieldTitle>
-            <FormFieldValue
-              value={formatDateDistance(cicData.lastConnectionStatusUpdatedAt)}
-            />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Status</FormFieldTitle>
-            <FormFieldValue value={cicData.status} />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Mender ID</FormFieldTitle>
-            <FormFieldValue value={cicData.menderId} />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Number of heat pumps</FormFieldTitle>
-            <FormFieldValue value={cicData.numberOfHeatPumps} />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Created at</FormFieldTitle>
-            <FormFieldValue value={formatDate(cicData.createdAt)} />
-          </FormField>
-          {cicData.hasSoundSlider ? (
-            <>
-              <FormField>
-                <FormFieldTitle>Day max sound level</FormFieldTitle>
-                <FormFieldValue value={cicData.dayMaxSoundLevel} />
-              </FormField>
-              <FormField>
-                <FormFieldTitle>Night max sound level</FormFieldTitle>
-                <FormFieldValue value={cicData.nightMaxSoundLevel} />
-              </FormField>
-            </>
-          ) : (
+        <FormField>
+          <FormFieldTitle>ID</FormFieldTitle>
+          <FormFieldValue value={cicData.id} />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>Order number</FormFieldTitle>
+          <Link href={`/installations/${cicData.orderNumber}`}>
+            {cicData.orderNumber}
+          </Link>
+        </FormField>
+        <FormField>
+          <FormFieldTitle>Quatt build</FormFieldTitle>
+          <FormFieldValue value={cicData.quattBuild} />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>Last connection status updated at</FormFieldTitle>
+          <FormFieldValue
+            value={formatDateDistance(cicData.lastConnectionStatusUpdatedAt)}
+          />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>Status</FormFieldTitle>
+          <FormFieldValue value={cicData.status} />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>Mender ID</FormFieldTitle>
+          <FormFieldValue value={cicData.menderId} />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>Number of heat pumps</FormFieldTitle>
+          <FormFieldValue value={cicData.numberOfHeatPumps} />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>Created at</FormFieldTitle>
+          <FormFieldValue value={formatDate(cicData.createdAt)} />
+        </FormField>
+        {cicData.hasSoundSlider ? (
+          <>
             <FormField>
-              <FormFieldTitle>Silent mode status</FormFieldTitle>
-              <FormFieldValue value={cicData.silentMode} />
+              <FormFieldTitle>Day max sound level</FormFieldTitle>
+              <FormFieldValue value={cicData.dayMaxSoundLevel} />
             </FormField>
-          )}
+            <FormField>
+              <FormFieldTitle>Night max sound level</FormFieldTitle>
+              <FormFieldValue value={cicData.nightMaxSoundLevel} />
+            </FormField>
+          </>
+        ) : (
+          <FormField>
+            <FormFieldTitle>Silent mode status</FormFieldTitle>
+            <FormFieldValue value={cicData.silentMode} />
+          </FormField>
+        )}
+        <form onSubmit={handleSubmit(onSubmit)}>
           <FormField>
             <FormFieldTitle>Electricity price</FormFieldTitle>
             <FormFieldInput

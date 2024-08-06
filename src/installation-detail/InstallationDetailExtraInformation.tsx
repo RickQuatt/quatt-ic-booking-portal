@@ -9,6 +9,7 @@ import {
 import classes from "./InstallationDetail.module.css";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { formatDateDistance, formatDateTimeString } from "../utils/formatDate";
+import { Link } from "wouter";
 
 export function InstallationDetailExtraInformation({
   installation,
@@ -34,7 +35,7 @@ export function InstallationDetailExtraInformation({
       <FormSection>
         <FormField>
           <FormFieldTitle>Active CIC</FormFieldTitle>
-          <FormFieldValue value={activeCic} />
+          <Link href={`/cics/${activeCic}`}>{activeCic}</Link>
         </FormField>
         <FormField>
           <FormFieldTitle>Quatt build</FormFieldTitle>
