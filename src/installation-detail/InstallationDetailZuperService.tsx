@@ -3,28 +3,35 @@ import { FormField, FormSection } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import zuperLogo from "../../images/ZuperPro.webp";
-import { useQuery } from "react-query";
-import { useApiClient } from "../api-client/context";
 import { Loader } from "../ui-components/loader/Loader";
+import { ZuperService } from "../api-client/models";
+import { QueryObserverResult } from "@tanstack/react-query";
+import ErrorText from "../ui-components/error-text/ErrorText";
 
 interface InstallationDetailServiceProps {
-  installationId: string;
+  zuperServiceJobs?: ZuperService[];
+  isLoadingJobs: boolean;
+  zuperJobsError?: unknown;
+  refetch: () => Promise<QueryObserverResult<unknown, Error>>;
 }
 
 export function InstallationDetailZuperService({
-  installationId,
+  zuperServiceJobs,
+  isLoadingJobs,
+  zuperJobsError,
+  refetch,
 }: InstallationDetailServiceProps) {
-  const apiClient = useApiClient();
+  const noServiceJobsToShow =
+    !isLoadingJobs && (!zuperServiceJobs?.length || !!zuperJobsError);
 
-  const { data: zuperData, status: zuperStatus } = useQuery(
-    ["installationZuperJobs", installationId],
-    () => {
-      return apiClient.adminGetInstallationZuperJobs({
-        installationId: installationId,
-      });
-    },
-  );
-  const zuperJobs = zuperData?.result;
+  if (zuperJobsError) {
+    return (
+      <ErrorText
+        text="Failed to fetch Zuper services for the installation."
+        retry={refetch}
+      />
+    );
+  }
 
   return (
     <div className={classes["detail-section"]}>
@@ -32,38 +39,34 @@ export function InstallationDetailZuperService({
       <FormSection>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
-            {zuperStatus === "error" && (
+            {noServiceJobsToShow && (
               <div style={{ textAlign: "center" }}>No services 👍</div>
             )}
-            {zuperStatus === "loading" ? (
+            {isLoadingJobs ? (
               <Loader />
             ) : (
               <>
-                {zuperJobs &&
-                  zuperJobs.services.map((service) => (
-                    <div
-                      style={{ cursor: "pointer" }}
-                      className={classes["detail-section"]}
-                      key={service.job_uid}
-                      onClick={() =>
-                        window.open(
-                          `https://app.zuperpro.com/jobs/${service.job_uid}/details`,
-                        )
-                      }
-                    >
-                      <div className={classes["detail-section-bold"]}>
-                        {service.job_title}
-                      </div>
-                      <div>{`Installer: ${service.installer}`}</div>
-                      <div>{`Status: ${service.status_name}`}</div>
-                      <div>{`Updated at: ${
-                        formatDateTime(service.updated_at) || "N/A"
-                      }`}</div>
+                {zuperServiceJobs?.map((service) => (
+                  <div
+                    style={{ cursor: "pointer" }}
+                    className={classes["detail-section"]}
+                    key={service.job_uid}
+                    onClick={() =>
+                      window.open(
+                        `https://app.zuperpro.com/jobs/${service.job_uid}/details`,
+                      )
+                    }
+                  >
+                    <div className={classes["detail-section-bold"]}>
+                      {service.job_title}
                     </div>
-                  ))}
-                {zuperJobs && zuperJobs.services.length === 0 && (
-                  <div style={{ textAlign: "center" }}>No services 👍</div>
-                )}
+                    <div>{`Installer: ${service.installer}`}</div>
+                    <div>{`Status: ${service.status_name}`}</div>
+                    <div>{`Updated at: ${
+                      formatDateTime(service.updated_at) || "N/A"
+                    }`}</div>
+                  </div>
+                ))}
               </>
             )}
           </div>

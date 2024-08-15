@@ -56,7 +56,7 @@ export function CICDetail({ data }: CICDetailProps) {
 
 function BackButton() {
   return (
-    <Link href={`/cicHealth`} className={classes["back-button"]}>
+    <Link asChild href="/cicHealth">
       <ButtonLink className={classes["back-button"]}>← Back to list</ButtonLink>
     </Link>
   );

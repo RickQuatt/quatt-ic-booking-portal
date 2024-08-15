@@ -5,12 +5,13 @@ models/AdminCreateInstaller200Response.ts
 models/AdminDashboardCics200Response.ts
 models/AdminGetCic200Response.ts
 models/AdminGetInstallation200Response.ts
-models/AdminGetInstallationClickhouseData200Response.ts
 models/AdminGetInstallationCommissioning200Response.ts
+models/AdminGetInstallationHealthCheck200Response.ts
 models/AdminGetInstallationNotes200Response.ts
 models/AdminGetInstallationSetting200Response.ts
 models/AdminGetInstallationTickets200Response.ts
 models/AdminGetInstallationZuperJobs200Response.ts
+models/AdminGetZuperJobsByOrderNumber200Response.ts
 models/AdminInstallationDetail.ts
 models/AdminInstallationDetailAllOfCicCommissioning.ts
 models/AdminInstallationsList.ts
@@ -39,8 +40,6 @@ models/CicHealthChecksByKpi.ts
 models/CicSettingsUpdate.ts
 models/CicState.ts
 models/CicStatus.ts
-models/ClickhouseData.ts
-models/ClickhouseDataModeReparation.ts
 models/CompleteCommissioning200Response.ts
 models/ConnectionStatus.ts
 models/CreateTariff200Response.ts
@@ -73,6 +72,8 @@ models/HeatPumpTestLevel.ts
 models/IdentificationStatus.ts
 models/IdentificationTestStatus.ts
 models/Installation.ts
+models/InstallationHealthCheck.ts
+models/InstallationHealthCheckModeReparation.ts
 models/InstallationStatus.ts
 models/InstallationType.ts
 models/Installer.ts
@@ -108,6 +109,7 @@ models/UpdateMeUser.ts
 models/UpdatedNote.ts
 models/UserRole.ts
 models/ZuperJob.ts
+models/ZuperJobs.ts
 models/ZuperService.ts
 models/index.ts
 runtime.ts

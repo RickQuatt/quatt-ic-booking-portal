@@ -10,52 +10,52 @@ import {
 } from "../ui-components/table/Table";
 import classes from "./InstallationList.module.css";
 import { formatDate } from "../utils/formatDate";
-import { ButtonLink } from "../ui-components/button/Button";
 import { Link } from "wouter";
 import React from "react";
 import { InstallationFilters } from "./filters/types";
-import { filterInstallationList } from "./filters/filterInstallationList";
 import { usePaginate } from "../ui-components/pagination/usePaginate";
-import {
-  ActiveCicFilter,
-  CreatedAtFilter,
-  OrderNumberFilter,
-  UpdatedAtFilter,
-} from "./filters/Filters";
+import { CreatedAtFilter, UpdatedAtFilter } from "./filters/Filters";
 import { Pagination } from "../ui-components/pagination/Pagination";
+import { TextFilter } from "../ui-components/filter/TextFilter";
+import { useGetInstallationsList } from "./hooks/useGetInstallationsList";
+import { Loader } from "../ui-components/loader/Loader";
+import ErrorText from "../ui-components/error-text/ErrorText";
 
-export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
-  const [filters, doSetFilters] = React.useState<InstallationFilters>({});
-
-  const hasFilters = React.useMemo(() => {
-    return Object.values(filters).length;
-  }, [filters]);
-
-  const filteredItems = React.useMemo(
-    () => filterInstallationList(data, filters),
-    [data, filters],
-  );
+export function InstallationList() {
+  const [filters, setFilters] = React.useState<InstallationFilters>({});
+  const { installations, isLoading, error, refetchInstallations } =
+    useGetInstallationsList(filters.cicId, filters.orderNumber);
 
   const { paginatedItems, paginationRange, currentPage, changePage } =
     usePaginate({
-      items: filteredItems,
+      items: installations || [],
       pageSize: 50,
     });
 
-  const setFilters = React.useCallback(
-    (filters: React.SetStateAction<InstallationFilters>) => {
-      doSetFilters(filters);
-      changePage(1);
-    },
-    [changePage],
-  );
+  const noInstallationsFound = installations && installations.length === 0;
+
+  const isDirty = filters.cicId || filters.orderNumber;
+  const orderNumberPlaceholder = isDirty ? "" : "Enter an order number";
+  const cicIdPlaceholder = isDirty ? "" : "or a CIC id";
 
   return (
     <div className={classes.page}>
-      <h2 className={classes["page-title"]}>
-        🛠️ Installations list: {filteredItems.length}{" "}
-        {hasFilters ? "filtered " : ""} results
-      </h2>
+      <div className={classes["page-title-container"]}>
+        <h2 className={classes["page-title"]}>
+          🛠️ Installations
+          {!isDirty && (
+            <span className={classes["instruction-text"]}>
+              Search with an order number or a CIC id
+            </span>
+          )}
+        </h2>
+        {isLoading && (
+          // TODO: Remove the div wrapper and pass styles directly to the Loader component
+          <div className={classes["loader-container"]}>
+            <Loader />
+          </div>
+        )}
+      </div>
       <Table gridClass={classes["table-grid"]}>
         <THead>
           <Tr>
@@ -71,16 +71,21 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
             <Th>
               <TdText>Updated at</TdText>
             </Th>
-            <Th>
-              <TdText>Details</TdText>
-            </Th>
           </Tr>
           <Tr>
             <Th>
-              <OrderNumberFilter setFilters={setFilters} />
+              <TextFilter
+                filterKey="orderNumber"
+                placeholder={orderNumberPlaceholder}
+                setFilters={setFilters}
+              />
             </Th>
             <Th>
-              <ActiveCicFilter setFilters={setFilters} />
+              <TextFilter
+                filterKey="cicId"
+                placeholder={cicIdPlaceholder}
+                setFilters={setFilters}
+              />
             </Th>
             <Th>
               <CreatedAtFilter setFilters={setFilters} />
@@ -88,7 +93,6 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
             <Th>
               <UpdatedAtFilter setFilters={setFilters} />
             </Th>
-            <Th></Th>
           </Tr>
         </THead>
         <TBody>
@@ -97,6 +101,18 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
           ))}
         </TBody>
       </Table>
+      {noInstallationsFound && (
+        <p className={classes["info-text"]}>
+          No installations found with the given order number or CIC id
+        </p>
+      )}
+      {!!error && (
+        <ErrorText
+          text="An error occurred while fetching the installations."
+          error={error}
+          retry={refetchInstallations}
+        />
+      )}
       <Pagination
         paginationRange={paginationRange}
         currentPage={currentPage}
@@ -114,13 +130,7 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
     return (
       <Tr>
         <Td>
-          <TdText>
-            <span title={installation.orderNumber || ""}>
-              <Link to={installationDetailLink}>
-                {installation.orderNumber}
-              </Link>
-            </span>
-          </TdText>
+          <Link to={installationDetailLink}>{installation.orderNumber}</Link>
         </Td>
         <Td>
           <TdText>{installation.cicId}</TdText>
@@ -130,11 +140,6 @@ export function InstallationList({ data }: { data: AdminInstallationsList[] }) {
         </Td>
         <Td>
           <TdText>{formatDate(installation.updatedAt)}</TdText>
-        </Td>
-        <Td>
-          <Link to={installationDetailLink}>
-            <ButtonLink>Details</ButtonLink>
-          </Link>
         </Td>
       </Tr>
     );

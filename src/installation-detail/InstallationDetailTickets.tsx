@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Ticket } from "../api-client/models";
 import hubspotLogo from "../../images/hubspot.svg";
 import { formatDateTime } from "../utils/formatDate";
@@ -7,6 +7,7 @@ import classes from "./InstallationDetail.module.css";
 import { Loader } from "../ui-components/loader/Loader";
 import { FormField, FormSection } from "../ui-components/form/Form";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
+import ErrorText from "../ui-components/error-text/ErrorText";
 
 interface CICDetailProps {
   installationId: string;
@@ -15,25 +16,33 @@ interface CICDetailProps {
 export function InstallationDetailTickets({ installationId }: CICDetailProps) {
   const apiClient = useApiClient();
 
-  const { data: hubspotData, status: hubspotStatus } = useQuery(
-    ["installationHubspotTickets", installationId],
-    () => {
+  const {
+    data: hubspotData,
+    error,
+    isPending,
+    refetch,
+  } = useQuery({
+    queryKey: ["installationHubspotTickets", installationId],
+    queryFn: () => {
       return apiClient.adminGetInstallationTickets({
         installationId: installationId,
       });
     },
-  );
+  });
 
   const hubspotTickets = hubspotData?.result;
 
-  const getTicketOwner = (ticket: Ticket | null): string => {
-    return [
-      ticket?.hubspot_owner_id.firstname,
-      ticket?.hubspot_owner_id.lastname,
-    ]
-      .join(" ")
-      .trim();
-  };
+  const getTicketOwner = (ticket: Ticket | null): string =>
+    `${ticket?.hubspot_owner_id.firstname} ${ticket?.hubspot_owner_id.lastname}`;
+
+  if (error) {
+    return (
+      <ErrorText
+        text="Failed to fetch Hubspot tickets for the installation."
+        retry={refetch}
+      />
+    );
+  }
 
   return (
     <div className={classes["detail-section"]}>
@@ -41,10 +50,7 @@ export function InstallationDetailTickets({ installationId }: CICDetailProps) {
       <FormSection>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
-            {hubspotStatus === "error" && (
-              <div style={{ textAlign: "center" }}>No tickets 👍</div>
-            )}
-            {hubspotStatus === "loading" ? (
+            {isPending ? (
               <Loader />
             ) : (
               <>

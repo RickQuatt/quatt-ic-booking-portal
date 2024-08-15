@@ -30,7 +30,7 @@ import {
   warningColor,
 } from "./colors";
 import { getKeys, getValues } from "../utils/object";
-import { navigate } from "wouter/use-location";
+import { useLocation } from "wouter";
 import { stringifyCICFilters } from "../cic-list/filters/url";
 import { CICFilters } from "../cic-list/filters/types";
 import { kpiToLabel, labelToKpi } from "../constants";
@@ -106,6 +106,7 @@ export function CicHealthByKpiChart({
 }: {
   data: CicDashboardAggregate["aggregateByKpi"];
 }) {
+  const [, navigate] = useLocation();
   const chartRef = React.useRef();
 
   const kpis = React.useMemo(() => getKeys(data), [data]);

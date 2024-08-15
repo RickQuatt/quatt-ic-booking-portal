@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { NotesModal } from "./NoteModal";
 import { Note } from "../api-client/models/Note";
@@ -10,6 +10,7 @@ import { FormField, FormSection } from "../ui-components/form/Form";
 import { useModalState } from "../ui-components/modal/useModalState";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { formatDateTime } from "../utils/formatDate";
+import ErrorText from "../ui-components/error-text/ErrorText";
 
 export function InstallationDetailNotes({
   installationId,
@@ -31,23 +32,39 @@ export function InstallationDetailNotes({
 
   const {
     data: notesData,
-    status: notesStatus,
+    isPending,
     refetch,
-  } = useQuery(["installationNotes", installationId], () => {
-    return apiClient.adminGetInstallationNotes({
-      installationId,
-    });
+    isError,
+  } = useQuery({
+    queryKey: ["installationNotes", installationId],
+    queryFn: () =>
+      apiClient.adminGetInstallationNotes({
+        installationId,
+      }),
   });
   const notes = notesData?.result;
 
+  const handleNoteClick = (note: Note) => {
+    setNoteData(note);
+    openNoteModal();
+  };
+
+  if (isPending) {
+    return <Loader />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorText
+        text="Failed to fetch notes for the installation."
+        retry={refetch}
+      />
+    );
+  }
+
   return (
     <div className={classes["detail-section"]}>
-      <DetailSectionHeader
-        title="📝 Notes"
-        onClick={() => {
-          createNewNote();
-        }}
-      />
+      <DetailSectionHeader title="📝 Notes" onClick={createNewNote} />
       <NotesModal
         isOpen={isNoteModalOpen}
         closeModal={closeNoteModal}
@@ -57,43 +74,39 @@ export function InstallationDetailNotes({
       />
       <FormSection>
         <FormField>
-          <div className={classes["detail-section-api-cards"]}>
-            {notesStatus === "loading" ? (
-              <Loader />
-            ) : (
-              <>
-                {notes &&
-                  notes.map((note) => (
+          <div
+            style={{ display: "flex" }}
+            className={classes["detail-section-api-cards"]}
+          >
+            <>
+              {notes &&
+                notes.map((note) => (
+                  <div
+                    style={{ cursor: "pointer", flex: 1 }}
+                    className={classes["detail-section"]}
+                    key={note.id}
+                    onClick={() => handleNoteClick(note)}
+                  >
                     <div
-                      style={{ cursor: "pointer" }}
-                      className={classes["detail-section"]}
-                      key={note.id}
-                      onClick={() => {
-                        setNoteData(note);
-                        openNoteModal();
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "0.5rem",
                       }}
                     >
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: "0.5rem",
-                        }}
-                      >
-                        <div className={classes["detail-section-bold"]}>
-                          👤 {note.updatedBy}
-                        </div>
-                        <div style={{ fontStyle: "italic" }}>
-                          {formatDateTime(note.createdAt ?? null)}
-                        </div>
-                      </div>
-                      <div>{note.note}</div>
+                      <span className={classes["detail-section-bold"]}>
+                        👤 {note.updatedBy}
+                      </span>
+                      <span style={{ fontStyle: "italic" }}>
+                        {formatDateTime(note.createdAt ?? null)}
+                      </span>
                     </div>
-                  ))}
-              </>
-            )}
+                    <span>{note.note}</span>
+                  </div>
+                ))}
+            </>
             {notes && notes.length === 0 && (
-              <div style={{ textAlign: "center" }}>No notes 👍</div>
+              <span style={{ margin: "auto" }}>No notes 👍</span>
             )}
           </div>
         </FormField>

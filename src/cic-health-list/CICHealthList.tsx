@@ -17,7 +17,7 @@ import { Pagination } from "../ui-components/pagination/Pagination";
 import type { CICFilters } from "../cic-list/filters/types";
 import { filterCICList } from "../cic-list/filters/filterCICList";
 import { IDFilter, OrderNumberFilter } from "../cic-list/filters/Filters";
-import { navigate, useSearch } from "wouter/use-location";
+import { useLocation, useSearch } from "wouter";
 import {
   parseCICFiltersString,
   stringifyCICFilters,
@@ -25,6 +25,7 @@ import {
 import { HealthCheckCircle } from "./HealthCheckCircle";
 
 export function CICHealthList({ data }: { data: AdminCic[] }) {
+  const [, navigate] = useLocation();
   const queryParams = useSearch();
   const filters = React.useMemo(() => {
     return parseCICFiltersString(queryParams.substring(1));

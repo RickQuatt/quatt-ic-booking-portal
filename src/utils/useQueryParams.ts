@@ -1,5 +1,5 @@
 import React from "react";
-import { useSearch } from "wouter/use-location";
+import { useSearch } from "wouter";
 
 export const useQueryParams = () => {
   const location = useSearch();

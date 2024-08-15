@@ -193,7 +193,7 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
         </ButtonLink>
       </Td>
       <Td>
-        <Link href={cicDetailLink}>
+        <Link asChild href={cicDetailLink}>
           <ButtonLink>Detail</ButtonLink>
         </Link>
       </Td>

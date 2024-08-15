@@ -26,33 +26,23 @@ export function Sidebar() {
         )}
       >
         <div className={classes["sidebar-content"]}>
-          <Link href={`/dashboard`}>
-            <SidebarButton>CIC Dashboard</SidebarButton>
+          <Link href="/dashboard" className={classes["sidebar-button"]}>
+            CIC Dashboard
           </Link>
-          <Link href={`/cicHealth`}>
-            <SidebarButton>CIC Health Check List</SidebarButton>
+          <Link href="/cicHealth" className={classes["sidebar-button"]}>
+            CIC Health Check List
           </Link>
-          <Link href={`/cics`}>
-            <SidebarButton>CIC List</SidebarButton>
+          <Link href="/cics" className={classes["sidebar-button"]}>
+            CIC List
           </Link>
-          <Link href={`/installers`}>
-            <SidebarButton>Installers</SidebarButton>
+          <Link href="/installers" className={classes["sidebar-button"]}>
+            Installers
           </Link>
-          <Link href={`/installations`}>
-            <SidebarButton>Installations List</SidebarButton>
+          <Link href="/installations" className={classes["sidebar-button"]}>
+            Installations List
           </Link>
         </div>
       </div>
     </>
-  );
-}
-
-function SidebarButton(
-  props: React.PropsWithChildren<{ onClick?: () => void }>,
-) {
-  return (
-    <div className={classes["sidebar-button"]} onClick={props.onClick}>
-      {props.children}
-    </div>
   );
 }

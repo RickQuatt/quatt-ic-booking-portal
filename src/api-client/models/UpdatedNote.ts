@@ -79,8 +79,8 @@ export function UpdatedNoteFromJSONTyped(
     completedAt: !exists(json, "completedAt")
       ? undefined
       : json["completedAt"] === null
-      ? null
-      : new Date(json["completedAt"]),
+        ? null
+        : new Date(json["completedAt"]),
     createdAt: !exists(json, "createdAt")
       ? undefined
       : new Date(json["createdAt"]),
@@ -102,8 +102,8 @@ export function UpdatedNoteToJSON(value?: UpdatedNote | null): any {
       value.completedAt === undefined
         ? undefined
         : value.completedAt === null
-        ? null
-        : value.completedAt.toISOString(),
+          ? null
+          : value.completedAt.toISOString(),
     createdAt:
       value.createdAt === undefined ? undefined : value.createdAt.toISOString(),
     updatedBy: value.updatedBy,

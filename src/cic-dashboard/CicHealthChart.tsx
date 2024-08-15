@@ -13,7 +13,7 @@ import {
 } from "./colors";
 import { CicDashboardAggregate } from "../api-client/models";
 import { stringifyCICFilters } from "../cic-list/filters/url";
-import { navigate } from "wouter/use-location";
+import { useLocation } from "wouter";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -36,6 +36,7 @@ export function CicHealthAggregateChart({
 }: {
   data: CicDashboardAggregate["aggregate"];
 }) {
+  const [, navigate] = useLocation();
   const chartRef = React.useRef();
   const chartData = React.useMemo(() => {
     return {

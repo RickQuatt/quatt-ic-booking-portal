@@ -43,7 +43,6 @@ export function InstallerList({
 
   const installerListData = filterInstallerList(data, filters);
 
-  const [modalId, setModalId] = React.useState<string | undefined>();
   const {
     isOpen: isInstallerModalOpen,
     open: openInstallerModal,

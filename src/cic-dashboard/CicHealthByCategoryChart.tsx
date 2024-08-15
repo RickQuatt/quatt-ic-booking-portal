@@ -32,7 +32,7 @@ import {
 import { getKeys, getValues } from "../utils/object";
 import { CICFilters } from "../cic-list/filters/types";
 import { stringifyCICFilters } from "../cic-list/filters/url";
-import { navigate } from "wouter/use-location";
+import { useLocation } from "wouter";
 import {
   categoryToLabel,
   labelToCategory,
@@ -76,6 +76,7 @@ export function CicHealthByCategoryChart({
 }: {
   data: CicDashboardAggregate["aggregateByCategory"];
 }) {
+  const [, navigate] = useLocation();
   const chartRef = React.useRef();
 
   const categories = React.useMemo(() => getKeys(data), [data]);

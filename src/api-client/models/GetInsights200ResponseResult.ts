@@ -221,24 +221,24 @@ export function GetInsights200ResponseResultFromJSONTyped(
     outsideTemperatureGraph: !exists(json, "outsideTemperatureGraph")
       ? undefined
       : json["outsideTemperatureGraph"] === null
-      ? null
-      : (json["outsideTemperatureGraph"] as Array<any>).map(
-          GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSON,
-        ),
+        ? null
+        : (json["outsideTemperatureGraph"] as Array<any>).map(
+            GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSON,
+          ),
     waterTemperatureGraph: !exists(json, "waterTemperatureGraph")
       ? undefined
       : json["waterTemperatureGraph"] === null
-      ? null
-      : (json["waterTemperatureGraph"] as Array<any>).map(
-          GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSON,
-        ),
+        ? null
+        : (json["waterTemperatureGraph"] as Array<any>).map(
+            GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSON,
+          ),
     roomTemperatureGraph: !exists(json, "roomTemperatureGraph")
       ? undefined
       : json["roomTemperatureGraph"] === null
-      ? null
-      : (json["roomTemperatureGraph"] as Array<any>).map(
-          GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSON,
-        ),
+        ? null
+        : (json["roomTemperatureGraph"] as Array<any>).map(
+            GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSON,
+          ),
   };
 }
 
@@ -277,25 +277,25 @@ export function GetInsights200ResponseResultToJSON(
       value.outsideTemperatureGraph === undefined
         ? undefined
         : value.outsideTemperatureGraph === null
-        ? null
-        : (value.outsideTemperatureGraph as Array<any>).map(
-            GetInsights200ResponseResultOutsideTemperatureGraphInnerToJSON,
-          ),
+          ? null
+          : (value.outsideTemperatureGraph as Array<any>).map(
+              GetInsights200ResponseResultOutsideTemperatureGraphInnerToJSON,
+            ),
     waterTemperatureGraph:
       value.waterTemperatureGraph === undefined
         ? undefined
         : value.waterTemperatureGraph === null
-        ? null
-        : (value.waterTemperatureGraph as Array<any>).map(
-            GetInsights200ResponseResultWaterTemperatureGraphInnerToJSON,
-          ),
+          ? null
+          : (value.waterTemperatureGraph as Array<any>).map(
+              GetInsights200ResponseResultWaterTemperatureGraphInnerToJSON,
+            ),
     roomTemperatureGraph:
       value.roomTemperatureGraph === undefined
         ? undefined
         : value.roomTemperatureGraph === null
-        ? null
-        : (value.roomTemperatureGraph as Array<any>).map(
-            GetInsights200ResponseResultRoomTemperatureGraphInnerToJSON,
-          ),
+          ? null
+          : (value.roomTemperatureGraph as Array<any>).map(
+              GetInsights200ResponseResultRoomTemperatureGraphInnerToJSON,
+            ),
   };
 }

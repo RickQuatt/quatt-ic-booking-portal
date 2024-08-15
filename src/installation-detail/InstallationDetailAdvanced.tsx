@@ -1,73 +1,54 @@
-import { useQuery } from "react-query";
-import { AdminInstallationDetail } from "../api-client/models";
+import { AdminInstallationDetail, ZuperService } from "../api-client/models";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import {
   getGrafanaDataPerCICLink,
   getGrafanaDiagnosticsLink,
-  getHubspotSearchOrderLink,
+  getHubspotDealLink,
   getMenderLink,
-  getZuperJobLink,
 } from "../cic-detail/getLinks";
 import { ButtonLink } from "../ui-components/button/Button";
 import { FormSection } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
-import { useApiClient } from "../api-client/context";
+import { InstallationDetailZuperButtonGroup } from "./InstallationDetailZuperButtonGroup";
 
 export function InstallationDetailAdvanced({
   installation,
+  zuperInstallationJobs,
+  isLoadingZuperJobs,
 }: {
   installation: AdminInstallationDetail;
+  zuperInstallationJobs?: ZuperService[];
+  isLoadingZuperJobs: boolean;
 }) {
-  const apiClient = useApiClient();
-  const { data: zuperData } = useQuery(
-    ["installationZuperServices", installation],
-    () => {
-      return apiClient.adminGetInstallationZuperJobs({
-        installationId: installation.externalId as string,
-      });
-    },
-  );
-  const zuperJobs = zuperData?.result;
+  const { activeCic, hubspotDealId, menderId } = installation;
+  const hubspotDealLink = getHubspotDealLink(hubspotDealId);
+  const hubspotDealText = hubspotDealLink
+    ? "Hubspot - Deal"
+    : "Hubspot - No deal";
 
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="📊 Advanced insights" />
       <FormSection>
-        <ButtonLink
-          href={getGrafanaDiagnosticsLink(installation.activeCic)}
-          target="_blank"
-        >
+        <ButtonLink href={getGrafanaDiagnosticsLink(activeCic)} target="_blank">
           Grafana - Diagnostics
         </ButtonLink>
+        <InstallationDetailZuperButtonGroup
+          zuperInstallationJobs={zuperInstallationJobs}
+          isLoadingJobs={isLoadingZuperJobs}
+        />
         <ButtonLink
-          href={zuperJobs?.job_uid && getZuperJobLink(zuperJobs?.job_uid)}
+          href={hubspotDealLink}
           target="_blank"
-          disabled={!zuperJobs?.job_uid}
+          disabled={!hubspotDealLink}
         >
-          Zuper - Job
+          {hubspotDealText}
         </ButtonLink>
-        <ButtonLink
-          href={
-            installation.orderNumber
-              ? getHubspotSearchOrderLink(installation.orderNumber)
-              : undefined
-          }
-          target="_blank"
-          disabled={!installation.orderNumber}
-        >
-          Hubspot - Deals
-        </ButtonLink>
-        <ButtonLink
-          href={getGrafanaDataPerCICLink(installation.activeCic)}
-          target="_blank"
-        >
+        <ButtonLink href={getGrafanaDataPerCICLink(activeCic)} target="_blank">
           Grafana - Data per CIC
         </ButtonLink>
-        {installation.menderId && (
-          <ButtonLink
-            href={getMenderLink(installation.menderId)}
-            target="_blank"
-          >
+        {menderId && (
+          <ButtonLink href={getMenderLink(menderId)} target="_blank">
             Mender
           </ButtonLink>
         )}

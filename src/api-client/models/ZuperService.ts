@@ -49,6 +49,12 @@ export interface ZuperService {
    * @memberof ZuperService
    */
   updated_at: Date;
+  /**
+   *
+   * @type {string}
+   * @memberof ZuperService
+   */
+  job_category_name: string;
 }
 
 /**
@@ -61,6 +67,7 @@ export function instanceOfZuperService(value: object): boolean {
   isInstance = isInstance && "installer" in value;
   isInstance = isInstance && "status_name" in value;
   isInstance = isInstance && "updated_at" in value;
+  isInstance = isInstance && "job_category_name" in value;
 
   return isInstance;
 }
@@ -82,6 +89,7 @@ export function ZuperServiceFromJSONTyped(
     installer: json["installer"],
     status_name: json["status_name"],
     updated_at: new Date(json["updated_at"]),
+    job_category_name: json["job_category_name"],
   };
 }
 
@@ -98,5 +106,6 @@ export function ZuperServiceToJSON(value?: ZuperService | null): any {
     installer: value.installer,
     status_name: value.status_name,
     updated_at: value.updated_at.toISOString(),
+    job_category_name: value.job_category_name,
   };
 }
