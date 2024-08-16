@@ -73,43 +73,36 @@ export function InstallationDetailNotes({
         onSuccess={refetch}
       />
       <FormSection>
-        <FormField>
-          <div
-            style={{ display: "flex" }}
-            className={classes["detail-section-api-cards"]}
-          >
-            <>
-              {notes &&
-                notes.map((note) => (
-                  <div
-                    style={{ cursor: "pointer", flex: 1 }}
-                    className={classes["detail-section"]}
-                    key={note.id}
-                    onClick={() => handleNoteClick(note)}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: "0.5rem",
-                      }}
-                    >
-                      <span className={classes["detail-section-bold"]}>
-                        👤 {note.updatedBy}
-                      </span>
-                      <span style={{ fontStyle: "italic" }}>
-                        {formatDateTime(note.createdAt ?? null)}
-                      </span>
-                    </div>
-                    <span>{note.note}</span>
-                  </div>
-                ))}
-            </>
-            {notes && notes.length === 0 && (
-              <span style={{ margin: "auto" }}>No notes 👍</span>
-            )}
-          </div>
-        </FormField>
+        <div className={classes["detail-section-api-cards"]}>
+          {notes &&
+            notes.map((note) => (
+              <div
+                style={{ cursor: "pointer", flex: 1 }}
+                className={classes["detail-section"]}
+                key={note.id}
+                onClick={() => handleNoteClick(note)}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <span className={classes["detail-section-bold"]}>
+                    👤 {note.updatedBy}
+                  </span>
+                  <span style={{ fontStyle: "italic" }}>
+                    {formatDateTime(note.createdAt ?? null)}
+                  </span>
+                </div>
+                <span>{note.note}</span>
+              </div>
+            ))}
+          {notes && notes.length === 0 && (
+            <span style={{ margin: "auto" }}>No notes 👍</span>
+          )}
+        </div>
       </FormSection>
     </div>
   );
