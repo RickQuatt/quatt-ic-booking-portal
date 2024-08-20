@@ -13,6 +13,17 @@ interface CICDetailProps {
   installationId: string;
 }
 
+const getTicketOwner = (ticket: Ticket | null): string => {
+  const ticketOwner = [
+    ticket?.hubspot_owner_id.firstname,
+    ticket?.hubspot_owner_id.lastname,
+  ]
+    .join(" ")
+    .trim();
+
+  return ticketOwner || "Missing owner";
+};
+
 export function InstallationDetailTickets({ installationId }: CICDetailProps) {
   const apiClient = useApiClient();
 
@@ -31,9 +42,6 @@ export function InstallationDetailTickets({ installationId }: CICDetailProps) {
   });
 
   const hubspotTickets = hubspotData?.result;
-
-  const getTicketOwner = (ticket: Ticket | null): string =>
-    `${ticket?.hubspot_owner_id.firstname} ${ticket?.hubspot_owner_id.lastname}`;
 
   if (error) {
     return (
