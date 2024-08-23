@@ -13,6 +13,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader } from "../ui-components/loader/Loader";
 import { roundNumber } from "../utils/number";
 import ErrorText from "../ui-components/error-text/ErrorText";
+import { ThermostatType } from "../api-client/models";
+import DetailBlock from "../ui-components/detail-block/DetailBlock";
+import InstallationDetailTemperatureDetails from "./InstallationDetailTemperatureDetails";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -37,15 +40,17 @@ const options = {
   maintainAspectRatio: false,
 } as const;
 
-const stylesMarginZero = { margin: "0" };
+interface InstallationHealthCheckProps {
+  orderNumber: string;
+  cicId: string;
+  thermostatType: ThermostatType | null;
+}
 
 export function InstallationHealthChecks({
   orderNumber,
   cicId,
-}: {
-  orderNumber: string;
-  cicId: string;
-}) {
+  thermostatType,
+}: InstallationHealthCheckProps) {
   const apiClient = useApiClient();
 
   const {
@@ -130,7 +135,7 @@ export function InstallationHealthChecks({
     };
   }, [chResults, total]);
 
-  const emptyModeReperation = Object.values(
+  const emptyModeReparation = Object.values(
     chResults?.modeReparation || {},
   ).every((value) => value === "0");
 
@@ -152,44 +157,21 @@ export function InstallationHealthChecks({
             gridTemplateColumns: "2fr 2fr",
           }}
         >
-          <div style={{ marginBottom: "20px" }}>
-            <h3 style={stylesMarginZero}>Room temperature</h3>
-            <h2 style={stylesMarginZero}>
-              {chResults?.roomTemperature
-                ? `${chResults.roomTemperature} °C`
-                : "N/A"}
-            </h2>
-          </div>
-          <div>
-            <h3 style={stylesMarginZero}>Room setpoint</h3>
-            <h2 style={stylesMarginZero}>
-              {chResults?.roomSetpoint ? `${chResults.roomSetpoint} °C` : "N/A"}
-            </h2>
-          </div>
-          <div>
-            <h3 style={stylesMarginZero}>Setpoint reached</h3>
-            <h2 style={stylesMarginZero}>
-              {chResults?.setpointAdherence
-                ? `${roundNumber(chResults.setpointAdherence, 1)}%`
-                : "N/A"}
-            </h2>
-          </div>
-          <div>
-            <h3 style={stylesMarginZero}>Mode repartition</h3>
-            {!emptyModeReperation && chResults?.modeReparation ? (
+          <InstallationDetailTemperatureDetails
+            chResults={chResults}
+            thermostatType={thermostatType}
+          />
+          <DetailBlock title="Mode reparation">
+            {!emptyModeReparation && chResults?.modeReparation && (
               <div style={{ height: "100px", width: "100px" }}>
                 <Pie ref={chartRef} data={chartData} options={options} />
               </div>
-            ) : (
-              <h2 style={stylesMarginZero}>N/A</h2>
             )}
-          </div>
-          <div>
-            <h3 style={stylesMarginZero}>Supervisory control mode</h3>
-            <h2 style={stylesMarginZero}>
-              {chResults?.supervisoryControlMode || "N/A"}
-            </h2>
-          </div>
+          </DetailBlock>
+          <DetailBlock
+            title="Supervisory control mode"
+            value={chResults?.supervisoryControlMode}
+          />
         </div>
       )}
     </>

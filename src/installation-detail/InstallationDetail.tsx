@@ -66,6 +66,7 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
           <InstallationHealthChecks
             orderNumber={orderNumber}
             cicId={installationDetails.activeCic}
+            thermostatType={installationDetails.thermostatType}
           />
         </div>
 
