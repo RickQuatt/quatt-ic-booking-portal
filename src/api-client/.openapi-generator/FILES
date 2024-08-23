@@ -48,6 +48,7 @@ models/CreateUpdateDoubleTariff.ts
 models/CreateUpdateInstaller.ts
 models/CreateUpdateNote.ts
 models/CreateUpdateSingleTariff.ts
+models/DeviceConnectionStatuses.ts
 models/ErrorCode.ts
 models/ErrorResponse.ts
 models/ErrorResponseResult.ts

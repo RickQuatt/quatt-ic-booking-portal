@@ -49,6 +49,7 @@ export * from "./CreateUpdateDoubleTariff";
 export * from "./CreateUpdateInstaller";
 export * from "./CreateUpdateNote";
 export * from "./CreateUpdateSingleTariff";
+export * from "./DeviceConnectionStatuses";
 export * from "./ErrorCode";
 export * from "./ErrorResponse";
 export * from "./ErrorResponseResult";
