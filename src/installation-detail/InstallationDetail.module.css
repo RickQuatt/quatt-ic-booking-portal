@@ -1,11 +1,7 @@
 .detail-sections {
-  padding: 0 1rem;
+  padding: 1rem;
 
   display: grid;
-  grid-template-columns: minmax(400px, 600px) minmax(300px, 400px) minmax(
-      300px,
-      400px
-    );
   align-items: start;
   grid-template-areas: "sections-health sections-insights sections-api";
   gap: 22px;
@@ -24,6 +20,20 @@
 
 .detail-section-bold {
   font-weight: bold;
+}
+
+.order-number {
+  display: flex;
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  background: var(--box-background);
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: center;
+  justify-content: center;
 }
 
 .detail-section-header {

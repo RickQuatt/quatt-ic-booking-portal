@@ -55,6 +55,12 @@ import {
   InstallationTypeFromJSONTyped,
   InstallationTypeToJSON,
 } from "./InstallationType";
+import type { InternetConnectionStatuses } from "./InternetConnectionStatuses";
+import {
+  InternetConnectionStatusesFromJSON,
+  InternetConnectionStatusesFromJSONTyped,
+  InternetConnectionStatusesToJSON,
+} from "./InternetConnectionStatuses";
 import type { MaxSoundLevel } from "./MaxSoundLevel";
 import {
   MaxSoundLevelFromJSON,
@@ -332,6 +338,12 @@ export interface AdminInstallationDetail {
    * @memberof AdminInstallationDetail
    */
   deviceConnectionStatuses: DeviceConnectionStatuses;
+  /**
+   *
+   * @type {InternetConnectionStatuses}
+   * @memberof AdminInstallationDetail
+   */
+  internetConnectionStatuses: InternetConnectionStatuses;
 }
 
 /**
@@ -380,6 +392,7 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "cicCommissioning" in value;
   isInstance = isInstance && "settingsUpdates" in value;
   isInstance = isInstance && "deviceConnectionStatuses" in value;
+  isInstance = isInstance && "internetConnectionStatuses" in value;
 
   return isInstance;
 }
@@ -457,6 +470,9 @@ export function AdminInstallationDetailFromJSONTyped(
     deviceConnectionStatuses: DeviceConnectionStatusesFromJSON(
       json["deviceConnectionStatuses"],
     ),
+    internetConnectionStatuses: InternetConnectionStatusesFromJSON(
+      json["internetConnectionStatuses"],
+    ),
   };
 }
 
@@ -528,6 +544,9 @@ export function AdminInstallationDetailToJSON(
     ),
     deviceConnectionStatuses: DeviceConnectionStatusesToJSON(
       value.deviceConnectionStatuses,
+    ),
+    internetConnectionStatuses: InternetConnectionStatusesToJSON(
+      value.internetConnectionStatuses,
     ),
   };
 }

@@ -16,7 +16,6 @@ import { useGetInstallationDetails } from "./hooks/useGetInstallationDetails";
 import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 import ErrorText from "../ui-components/error-text/ErrorText";
 import { ResponseError } from "../api-client/runtime";
-import InstallationDetailTopBar from "./InstallationDetailTopBar";
 
 interface InstallationDetailProps {
   orderNumber: string;
@@ -56,65 +55,63 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
   const installationId = installationDetails.externalId || "";
 
   return (
-    <>
-      <InstallationDetailTopBar
-        orderNumber={orderNumber}
-        deviceConnectionStatuses={installationDetails.deviceConnectionStatuses}
-        boilerType={installationDetails.boilerType}
-        numberOfHeatPumps={installationDetails.numberOfHeatPumps}
-        thermostatType={installationDetails.thermostatType}
-      />
-      <div className={classes["detail-sections"]}>
-        <div className={classes["detail-sections-health"]}>
-          <div className={classes["detail-section"]}>
-            <DetailSectionHeader title="🏥 Health checks" />
-            <InstallationHealthChecks
-              orderNumber={orderNumber}
-              cicId={installationDetails.activeCic}
-              thermostatType={installationDetails.thermostatType}
-            />
-          </div>
-
-          <InstallationDetailNotes installationId={installationId} />
-          <InstallationDetailExtraInformation
-            installation={installationDetails}
-          />
-          <InstallationDetailCicHistory installation={installationDetails} />
-          <InstallationDetailCommissioningHistory
-            installation={installationDetails}
+    <div className={classes["detail-sections"]}>
+      <div className={classes["detail-sections-health"]}>
+        <span className={classes["order-number"]}>{orderNumber}</span>
+        <div className={classes["detail-section"]}>
+          <DetailSectionHeader title="🏥 Health checks" />
+          <InstallationHealthChecks
+            orderNumber={orderNumber}
+            cicId={installationDetails.activeCic}
+            thermostatType={installationDetails.thermostatType}
+            deviceConnectionStatuses={
+              installationDetails.deviceConnectionStatuses
+            }
+            internetConnectionStatuses={
+              installationDetails.internetConnectionStatuses
+            }
+            boilerType={installationDetails.boilerType}
+            numberOfHeatPumps={installationDetails.numberOfHeatPumps}
           />
         </div>
 
-        <div className={classes["detail-sections-insights"]}>
-          <InstallationDetailAdvanced
-            installation={installationDetails}
-            zuperInstallationJobs={zuperJobs?.installations}
-            isLoadingZuperJobs={isLoadingZuperJobs}
-          />
-          <InstallationDetailSettingsHistory
-            installation={installationDetails}
-          />
-          <InstallationDetailSettings installation={installationDetails} />
-        </div>
+        <InstallationDetailNotes installationId={installationId} />
+        <InstallationDetailExtraInformation
+          installation={installationDetails}
+        />
+        <InstallationDetailCicHistory installation={installationDetails} />
+        <InstallationDetailCommissioningHistory
+          installation={installationDetails}
+        />
+      </div>
 
-        <div className={classes["detail-sections-api"]}>
-          <InstallationDetailTickets installationId={installationId} />
-          <InstallationDetailZuperService
-            zuperServiceJobs={zuperJobs?.services}
-            isLoadingJobs={isLoadingZuperJobs}
-            zuperJobsError={zuperJobsError}
-            refetch={refetchZuperJobs}
-          />
-          {/* TODO Uncomment when feature is live on production
+      <div className={classes["detail-sections-insights"]}>
+        <InstallationDetailAdvanced
+          installation={installationDetails}
+          zuperInstallationJobs={zuperJobs?.installations}
+          isLoadingZuperJobs={isLoadingZuperJobs}
+        />
+        <InstallationDetailSettingsHistory installation={installationDetails} />
+        <InstallationDetailSettings installation={installationDetails} />
+      </div>
+
+      <div className={classes["detail-sections-api"]}>
+        <InstallationDetailTickets installationId={installationId} />
+        <InstallationDetailZuperService
+          zuperServiceJobs={zuperJobs?.services}
+          isLoadingJobs={isLoadingZuperJobs}
+          zuperJobsError={zuperJobsError}
+          refetch={refetchZuperJobs}
+        />
+        {/* TODO Uncomment when feature is live on production
         https://linear.app/quatt/issue/SUP-122/enable-historic-tariffs-when-the-feature-is-live-on-production
         */}
-          {/* <InstallationDetailTariff
+        {/* <InstallationDetailTariff
           tariff={tariff}
           installationId={installationId}
         /> */}
-          <InstallationDetailCICQR cicId={installationDetails.activeCic} />
-        </div>
+        <InstallationDetailCICQR cicId={installationDetails.activeCic} />
       </div>
-    </>
+    </div>
   );
 }

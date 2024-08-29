@@ -79,6 +79,7 @@ models/InstallationStatus.ts
 models/InstallationType.ts
 models/Installer.ts
 models/InstallerCic.ts
+models/InternetConnectionStatuses.ts
 models/LinkHubspotInstallerCicRequest.ts
 models/LinkInstallerRequest.ts
 models/MaxSoundLevel.ts

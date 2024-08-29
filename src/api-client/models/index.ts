@@ -80,6 +80,7 @@ export * from "./InstallationStatus";
 export * from "./InstallationType";
 export * from "./Installer";
 export * from "./InstallerCic";
+export * from "./InternetConnectionStatuses";
 export * from "./LinkHubspotInstallerCicRequest";
 export * from "./LinkInstallerRequest";
 export * from "./MaxSoundLevel";

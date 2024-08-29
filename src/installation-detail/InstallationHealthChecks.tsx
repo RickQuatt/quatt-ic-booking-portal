@@ -1,4 +1,5 @@
 import React from "react";
+import classes from "./InstallationHealthChecks.module.css";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import {
@@ -13,9 +14,15 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader } from "../ui-components/loader/Loader";
 import { roundNumber } from "../utils/number";
 import ErrorText from "../ui-components/error-text/ErrorText";
-import { ThermostatType } from "../api-client/models";
+import {
+  BoilerType,
+  DeviceConnectionStatuses,
+  InternetConnectionStatuses,
+  ThermostatType,
+} from "../api-client/models";
 import DetailBlock from "../ui-components/detail-block/DetailBlock";
 import InstallationDetailTemperatureDetails from "./InstallationDetailTemperatureDetails";
+import HealthCheckText from "../ui-components/health-check-text/HealthCheckText";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -44,12 +51,20 @@ interface InstallationHealthCheckProps {
   orderNumber: string;
   cicId: string;
   thermostatType: ThermostatType | null;
+  deviceConnectionStatuses: DeviceConnectionStatuses;
+  internetConnectionStatuses: InternetConnectionStatuses;
+  boilerType: BoilerType | null;
+  numberOfHeatPumps: number | null;
 }
 
 export function InstallationHealthChecks({
   orderNumber,
   cicId,
   thermostatType,
+  deviceConnectionStatuses,
+  internetConnectionStatuses,
+  boilerType,
+  numberOfHeatPumps,
 }: InstallationHealthCheckProps) {
   const apiClient = useApiClient();
 
@@ -143,6 +158,17 @@ export function InstallationHealthChecks({
     return <Loader />;
   }
 
+  const isOpenthermBoiler = boilerType === BoilerType.Opentherm;
+  const heatPumpErrorText =
+    numberOfHeatPumps === 1
+      ? "Heat pump not connected"
+      : "At least one heat pump disconnected";
+
+  const tempControlErrorText =
+    thermostatType === ThermostatType.OpenthermRoomTemperature
+      ? "The latest update did not include the room temperature or setpoint"
+      : "The latest update did not include the water temperature value";
+
   return (
     <>
       {isError ? (
@@ -174,6 +200,46 @@ export function InstallationHealthChecks({
           />
         </div>
       )}
+      <p className={classes["sub-header"]}>Peripheral devices connection</p>
+      <HealthCheckText
+        title="Heat pump(s)"
+        status={deviceConnectionStatuses.heatPumpsConnected}
+        errorStatusText={heatPumpErrorText}
+      />
+      <HealthCheckText
+        title="Thermostat"
+        status={deviceConnectionStatuses.thermostatConnected}
+        errorStatusText="Thermostat not connected"
+      />
+      <HealthCheckText
+        title="Temperature control"
+        status={deviceConnectionStatuses.temperatureControlConnected}
+        errorStatusText={tempControlErrorText}
+      />
+      {isOpenthermBoiler && (
+        <HealthCheckText
+          title="Boiler"
+          status={deviceConnectionStatuses.openthermBoilerConnected}
+          errorStatusText="Opentherm boiler not connected"
+        />
+      )}
+      <p className={classes["sub-header"]}>Connectivity</p>
+      <HealthCheckText
+        title="WiFi"
+        status={internetConnectionStatuses.connectionToWifi}
+        errorStatusText="WiFi not connected"
+        notApplicableStatusText="WiFi connection status not available"
+      />
+      <HealthCheckText
+        title="Ethernet"
+        status={internetConnectionStatuses.connectionToEthernet}
+        errorStatusText="Ethernet not connected"
+      />
+      <HealthCheckText
+        title="Internet"
+        status={internetConnectionStatuses.isInternetReachable}
+        errorStatusText="The CIC does not have internet access"
+      />
     </>
   );
 }
