@@ -239,7 +239,12 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
-                    error={errors.electricityPrice}
+                    error={
+                      errors.electricityPrice && {
+                        message: "Electricity tariff is required",
+                        type: "required",
+                      }
+                    }
                     {...register("electricityPrice")}
                   />
                 </FormField>
@@ -251,7 +256,12 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
-                    error={errors.dayElectricityPrice}
+                    error={
+                      errors.dayElectricityPrice && {
+                        message: "Day electricity tariff is required",
+                        type: "required",
+                      }
+                    }
                     {...register("dayElectricityPrice")}
                   />
                 </FormField>
@@ -262,7 +272,12 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
-                    error={errors.nightElectricityPrice}
+                    error={
+                      errors.nightElectricityPrice && {
+                        message: "Night electricity tariff is required",
+                        type: "required",
+                      }
+                    }
                     {...register("nightElectricityPrice")}
                   />
                 </FormField>
@@ -273,7 +288,12 @@ export function TariffsModal({
               <FormFieldInput
                 type="number"
                 step="0.00001"
-                error={errors.gasPrice}
+                error={
+                  errors.gasPrice && {
+                    message: "Gas tariff is required",
+                    type: "required",
+                  }
+                }
                 {...register("gasPrice")}
               />
             </FormField>
