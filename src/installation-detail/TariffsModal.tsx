@@ -239,6 +239,8 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
+                    min={0.01}
+                    max={10}
                     error={
                       errors.electricityPrice && {
                         message: "Electricity tariff is required",
@@ -256,6 +258,8 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
+                    min={0.01}
+                    max={10}
                     error={
                       errors.dayElectricityPrice && {
                         message: "Day electricity tariff is required",
@@ -272,6 +276,8 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
+                    min={0.01}
+                    max={10}
                     error={
                       errors.nightElectricityPrice && {
                         message: "Night electricity tariff is required",
@@ -288,6 +294,8 @@ export function TariffsModal({
               <FormFieldInput
                 type="number"
                 step="0.00001"
+                min={0.01}
+                max={10}
                 error={
                   errors.gasPrice && {
                     message: "Gas tariff is required",
