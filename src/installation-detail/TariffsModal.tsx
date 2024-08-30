@@ -38,10 +38,37 @@ interface Props extends ModalProps {
 
 const TariffFormSchema = yup.object({
   tariffType: yup.string().required(),
-  electricityPrice: yup.number().nullable(),
-  dayElectricityPrice: yup.number().nullable(),
-  nightElectricityPrice: yup.number().nullable(),
-  gasPrice: yup.number().nullable(),
+  electricityPrice: yup
+    .number()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .when("tariffType", {
+      is: "single",
+      then: (schema) => schema.required("Electricity tariff is required"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  dayElectricityPrice: yup
+    .number()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .when("tariffType", {
+      is: "double",
+      then: (schema) => schema.required("Day electricity tariff is required"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  nightElectricityPrice: yup
+    .number()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .when("tariffType", {
+      is: "double",
+      then: (schema) => schema.required("Night electricity tariff is required"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  gasPrice: yup
+    .number()
+    .required("Gas price is required")
+    .transform((value, originalValue) => (originalValue === "" ? null : value)),
   validFrom: yup.date().required(),
 });
 
@@ -64,9 +91,9 @@ export function TariffsModal({
   const defaultValues = React.useMemo(() => {
     return {
       tariffType: selectedTariff,
-      electricityPrice: tariffData?.electricityPrice,
-      dayElectricityPrice: tariffData?.dayElectricityPrice,
-      nightElectricityPrice: tariffData?.nightElectricityPrice,
+      electricityPrice: tariffData?.electricityPrice || undefined,
+      dayElectricityPrice: tariffData?.dayElectricityPrice || undefined,
+      nightElectricityPrice: tariffData?.nightElectricityPrice || undefined,
       gasPrice: tariffData?.gasPrice,
       validFrom: tariffData?.validFrom,
     };
@@ -241,12 +268,7 @@ export function TariffsModal({
                     step="0.00001"
                     min={0.01}
                     max={10}
-                    error={
-                      errors.electricityPrice && {
-                        message: "Electricity tariff is required",
-                        type: "required",
-                      }
-                    }
+                    error={errors.electricityPrice}
                     {...register("electricityPrice")}
                   />
                 </FormField>
@@ -260,12 +282,7 @@ export function TariffsModal({
                     step="0.00001"
                     min={0.01}
                     max={10}
-                    error={
-                      errors.dayElectricityPrice && {
-                        message: "Day electricity tariff is required",
-                        type: "required",
-                      }
-                    }
+                    error={errors.dayElectricityPrice}
                     {...register("dayElectricityPrice")}
                   />
                 </FormField>
@@ -278,12 +295,7 @@ export function TariffsModal({
                     step="0.00001"
                     min={0.01}
                     max={10}
-                    error={
-                      errors.nightElectricityPrice && {
-                        message: "Night electricity tariff is required",
-                        type: "required",
-                      }
-                    }
+                    error={errors.nightElectricityPrice}
                     {...register("nightElectricityPrice")}
                   />
                 </FormField>
@@ -296,12 +308,7 @@ export function TariffsModal({
                 step="0.00001"
                 min={0.01}
                 max={10}
-                error={
-                  errors.gasPrice && {
-                    message: "Gas tariff is required",
-                    type: "required",
-                  }
-                }
+                error={errors.gasPrice}
                 {...register("gasPrice")}
               />
             </FormField>
