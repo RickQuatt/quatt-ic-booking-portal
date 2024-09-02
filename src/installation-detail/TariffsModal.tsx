@@ -161,6 +161,7 @@ export function TariffsModal({
             createTariffRequest: tariffBody,
           });
           reset({}, { keepValues: true });
+          setStartDate(undefined);
           closeModal();
           onSuccess();
         } catch (error: Error | any) {
@@ -190,6 +191,7 @@ export function TariffsModal({
         }
         if (response.meta.status === 200) {
           reset({}, { keepValues: true });
+          setStartDate(undefined);
           closeModal();
           onSuccess();
         }
