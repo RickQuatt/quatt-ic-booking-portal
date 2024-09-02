@@ -124,6 +124,15 @@ export function TariffsModal({
     };
   }, [reset, defaultValues, selectedTariff, tariffData]);
 
+  const emptyTariffState = React.useCallback(() => {
+    if (tariffType === "single") {
+      setValue("dayElectricityPrice", undefined);
+      setValue("nightElectricityPrice", undefined);
+    } else {
+      setValue("electricityPrice", undefined);
+    }
+  }, [tariffType, setValue]);
+
   const apiClient = useApiClient();
   const onSubmit = React.useCallback(
     async (data: TariffFormData) => {
@@ -160,10 +169,11 @@ export function TariffsModal({
             installationId: installationId,
             createTariffRequest: tariffBody,
           });
-          reset({}, { keepValues: true });
-          setStartDate(undefined);
+          reset({}, { keepValues: false });
           closeModal();
           onSuccess();
+          emptyTariffState();
+          setStartDate(undefined);
         } catch (error: Error | any) {
           if (error.response?.status === 409) {
             window.alert("Tariff data already exists for this date");
@@ -191,22 +201,24 @@ export function TariffsModal({
         }
         if (response.meta.status === 200) {
           reset({}, { keepValues: true });
-          setStartDate(undefined);
           closeModal();
           onSuccess();
+          emptyTariffState();
+          setStartDate(undefined);
         }
       }
     },
 
     [
-      apiClient,
-      closeModal,
-      reset,
-      tariffData,
-      installationId,
-      tariffType,
       startDate,
+      tariffType,
+      tariffData,
+      apiClient,
+      installationId,
+      reset,
+      closeModal,
       onSuccess,
+      emptyTariffState,
     ],
   );
 
@@ -233,16 +245,17 @@ export function TariffsModal({
     reset({}, { keepValues: true });
     closeModal();
     onSuccess();
-  }, [apiClient, closeModal, reset, installationId, tariffData, onSuccess]);
-
-  const emptyTariffState = () => {
-    if (tariffType === "single") {
-      setValue("dayElectricityPrice", undefined);
-      setValue("nightElectricityPrice", undefined);
-    } else {
-      setValue("electricityPrice", undefined);
-    }
-  };
+    emptyTariffState();
+    setStartDate(undefined);
+  }, [
+    apiClient,
+    closeModal,
+    reset,
+    installationId,
+    tariffData,
+    onSuccess,
+    emptyTariffState,
+  ]);
 
   const closeTariffsModal = () => {
     setStartDate(undefined);
