@@ -33,14 +33,42 @@ import { formatAsDate } from "../utils/formatDate";
 interface Props extends ModalProps {
   installationId: string;
   tariffData: Tariff | null;
+  onSuccess: () => void;
 }
 
 const TariffFormSchema = yup.object({
   tariffType: yup.string().required(),
-  electricityPrice: yup.number().nullable(),
-  dayElectricityPrice: yup.number().nullable(),
-  nightElectricityPrice: yup.number().nullable(),
-  gasPrice: yup.number().nullable(),
+  electricityPrice: yup
+    .number()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .when("tariffType", {
+      is: "single",
+      then: (schema) => schema.required("Electricity tariff is required"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  dayElectricityPrice: yup
+    .number()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .when("tariffType", {
+      is: "double",
+      then: (schema) => schema.required("Day electricity tariff is required"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  nightElectricityPrice: yup
+    .number()
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
+    .when("tariffType", {
+      is: "double",
+      then: (schema) => schema.required("Night electricity tariff is required"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  gasPrice: yup
+    .number()
+    .required("Gas price is required")
+    .transform((value, originalValue) => (originalValue === "" ? null : value)),
   validFrom: yup.date().required(),
 });
 
@@ -51,6 +79,7 @@ export function TariffsModal({
   closeModal,
   tariffData,
   installationId,
+  onSuccess,
 }: Props) {
   const selectedTariff =
     tariffData?.dayElectricityPrice && tariffData?.nightElectricityPrice
@@ -62,9 +91,9 @@ export function TariffsModal({
   const defaultValues = React.useMemo(() => {
     return {
       tariffType: selectedTariff,
-      electricityPrice: tariffData?.electricityPrice,
-      dayElectricityPrice: tariffData?.dayElectricityPrice,
-      nightElectricityPrice: tariffData?.nightElectricityPrice,
+      electricityPrice: tariffData?.electricityPrice || undefined,
+      dayElectricityPrice: tariffData?.dayElectricityPrice || undefined,
+      nightElectricityPrice: tariffData?.nightElectricityPrice || undefined,
       gasPrice: tariffData?.gasPrice,
       validFrom: tariffData?.validFrom,
     };
@@ -94,6 +123,15 @@ export function TariffsModal({
       reset();
     };
   }, [reset, defaultValues, selectedTariff, tariffData]);
+
+  const emptyTariffState = React.useCallback(() => {
+    if (tariffType === "single") {
+      setValue("dayElectricityPrice", undefined);
+      setValue("nightElectricityPrice", undefined);
+    } else {
+      setValue("electricityPrice", undefined);
+    }
+  }, [tariffType, setValue]);
 
   const apiClient = useApiClient();
   const onSubmit = React.useCallback(
@@ -126,17 +164,25 @@ export function TariffsModal({
 
       // If there is no tariff data, create a new tariff
       if (!tariffData) {
-        const response = await apiClient.adminCreateInstallationTariff({
-          installationId: installationId,
-          createTariffRequest: tariffBody,
-        });
-        if (response.meta.status === 200) {
-          reset({}, { keepValues: true });
+        try {
+          await apiClient.adminCreateInstallationTariff({
+            installationId: installationId,
+            createTariffRequest: tariffBody,
+          });
+          reset({}, { keepValues: false });
           closeModal();
-        }
-        if (response.meta.status !== 200) {
-          console.error("Failed to create tariff data");
-          return;
+          onSuccess();
+          emptyTariffState();
+          setStartDate(undefined);
+        } catch (error: Error | any) {
+          if (error.response?.status === 409) {
+            window.alert("Tariff data already exists for this date");
+            return;
+          }
+          if (error.response.status !== 200) {
+            console.error("Failed to create tariff data");
+            return;
+          }
         }
       } else {
         if (!tariffData?.id) {
@@ -156,18 +202,23 @@ export function TariffsModal({
         if (response.meta.status === 200) {
           reset({}, { keepValues: true });
           closeModal();
+          onSuccess();
+          emptyTariffState();
+          setStartDate(undefined);
         }
       }
     },
 
     [
-      apiClient,
-      closeModal,
-      reset,
-      tariffData,
-      installationId,
-      tariffType,
       startDate,
+      tariffType,
+      tariffData,
+      apiClient,
+      installationId,
+      reset,
+      closeModal,
+      onSuccess,
+      emptyTariffState,
     ],
   );
 
@@ -182,27 +233,42 @@ export function TariffsModal({
       return;
     }
 
-    await apiClient.adminDeleteInstallationTariff({
-      installationId: installationId,
-      tariffId: tariffData.id,
-    });
+    await apiClient
+      .adminDeleteInstallationTariff({
+        installationId: installationId,
+        tariffId: tariffData.id,
+      })
+      .catch(() => {
+        window.alert("Failed to delete tariff data");
+      });
 
     reset({}, { keepValues: true });
     closeModal();
-  }, [apiClient, closeModal, reset, installationId, tariffData]);
+    onSuccess();
+    emptyTariffState();
+    setStartDate(undefined);
+  }, [
+    apiClient,
+    closeModal,
+    reset,
+    installationId,
+    tariffData,
+    onSuccess,
+    emptyTariffState,
+  ]);
 
-  const emptyTariffState = () => {
-    if (tariffType === "single") {
-      setValue("dayElectricityPrice", undefined);
-      setValue("nightElectricityPrice", undefined);
-    } else {
-      setValue("electricityPrice", undefined);
-    }
+  const closeTariffsModal = () => {
+    setStartDate(undefined);
+    emptyTariffState();
+    closeModal();
   };
 
+  const isTariffNotDeletable = tariffData?.isDeletable === false;
+  const isTariffDateNotEditable = tariffData?.isDateEditable === false;
+
   return (
-    <Modal isOpen={isOpen} closeModal={closeModal}>
-      <ModalHeader closeModal={closeModal}>Edit tariff data</ModalHeader>
+    <Modal isOpen={isOpen} closeModal={closeTariffsModal}>
+      <ModalHeader closeModal={closeTariffsModal}>Edit tariff data</ModalHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <ModalContent>
           <FormSection>
@@ -226,6 +292,8 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
+                    min={0.01}
+                    max={10}
                     error={errors.electricityPrice}
                     {...register("electricityPrice")}
                   />
@@ -238,6 +306,8 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
+                    min={0.01}
+                    max={10}
                     error={errors.dayElectricityPrice}
                     {...register("dayElectricityPrice")}
                   />
@@ -249,6 +319,8 @@ export function TariffsModal({
                   <FormFieldInput
                     type="number"
                     step="0.00001"
+                    min={0.01}
+                    max={10}
                     error={errors.nightElectricityPrice}
                     {...register("nightElectricityPrice")}
                   />
@@ -260,6 +332,8 @@ export function TariffsModal({
               <FormFieldInput
                 type="number"
                 step="0.00001"
+                min={0.01}
+                max={10}
                 error={errors.gasPrice}
                 {...register("gasPrice")}
               />
@@ -271,7 +345,20 @@ export function TariffsModal({
                 name="validFrom"
                 render={({ field }) => (
                   <DatePicker
-                    selected={field.value || startDate}
+                    customInput={
+                      <FormFieldInput
+                        disabled={isTariffDateNotEditable}
+                        style={{
+                          cursor: isTariffDateNotEditable
+                            ? "not-allowed"
+                            : "pointer",
+                        }}
+                        type="text"
+                        error={errors.validFrom}
+                      />
+                    }
+                    selected={startDate}
+                    disabled={isTariffDateNotEditable}
                     onSelect={(date) => {
                       field.onChange(date);
                       setStartDate(date);
@@ -290,7 +377,11 @@ export function TariffsModal({
         </ModalContent>
         <ModalActions>
           {tariffData && (
-            <ModalDeleteButton color="danger" onClick={onDelete}>
+            <ModalDeleteButton
+              disabled={isTariffNotDeletable}
+              color="danger"
+              onClick={onDelete}
+            >
               Delete
             </ModalDeleteButton>
           )}

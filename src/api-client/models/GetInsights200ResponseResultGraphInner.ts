@@ -45,6 +45,12 @@ export interface GetInsights200ResponseResultGraphInner {
   boilerGas: number;
   /**
    *
+   * @type {number}
+   * @memberof GetInsights200ResponseResultGraphInner
+   */
+  cop: number | null;
+  /**
+   *
    * @type {Date}
    * @memberof GetInsights200ResponseResultGraphInner
    */
@@ -62,6 +68,7 @@ export function instanceOfGetInsights200ResponseResultGraphInner(
   isInstance = isInstance && "hpHeat" in value;
   isInstance = isInstance && "boilerHeat" in value;
   isInstance = isInstance && "boilerGas" in value;
+  isInstance = isInstance && "cop" in value;
   isInstance = isInstance && "timestamp" in value;
 
   return isInstance;
@@ -85,6 +92,7 @@ export function GetInsights200ResponseResultGraphInnerFromJSONTyped(
     hpHeat: json["hpHeat"],
     boilerHeat: json["boilerHeat"],
     boilerGas: json["boilerGas"],
+    cop: json["cop"],
     timestamp: new Date(json["timestamp"]),
   };
 }
@@ -103,6 +111,7 @@ export function GetInsights200ResponseResultGraphInnerToJSON(
     hpHeat: value.hpHeat,
     boilerHeat: value.boilerHeat,
     boilerGas: value.boilerGas,
+    cop: value.cop,
     timestamp: value.timestamp.toISOString(),
   };
 }

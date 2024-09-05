@@ -43,7 +43,25 @@ export interface InstallationHealthCheck {
    * @type {number}
    * @memberof InstallationHealthCheck
    */
+  waterTemperature: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof InstallationHealthCheck
+   */
+  waterSetpoint: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof InstallationHealthCheck
+   */
   setpointAdherence: number | null;
+  /**
+   *
+   * @type {number}
+   * @memberof InstallationHealthCheck
+   */
+  waterTemperatureSetpointAdherence: number | null;
   /**
    *
    * @type {InstallationHealthCheckModeReparation}
@@ -65,7 +83,10 @@ export function instanceOfInstallationHealthCheck(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "roomTemperature" in value;
   isInstance = isInstance && "roomSetpoint" in value;
+  isInstance = isInstance && "waterTemperature" in value;
+  isInstance = isInstance && "waterSetpoint" in value;
   isInstance = isInstance && "setpointAdherence" in value;
+  isInstance = isInstance && "waterTemperatureSetpointAdherence" in value;
   isInstance = isInstance && "modeReparation" in value;
   isInstance = isInstance && "supervisoryControlMode" in value;
 
@@ -88,7 +109,11 @@ export function InstallationHealthCheckFromJSONTyped(
   return {
     roomTemperature: json["roomTemperature"],
     roomSetpoint: json["roomSetpoint"],
+    waterTemperature: json["waterTemperature"],
+    waterSetpoint: json["waterSetpoint"],
     setpointAdherence: json["setpointAdherence"],
+    waterTemperatureSetpointAdherence:
+      json["waterTemperatureSetpointAdherence"],
     modeReparation: InstallationHealthCheckModeReparationFromJSON(
       json["modeReparation"],
     ),
@@ -108,7 +133,10 @@ export function InstallationHealthCheckToJSON(
   return {
     roomTemperature: value.roomTemperature,
     roomSetpoint: value.roomSetpoint,
+    waterTemperature: value.waterTemperature,
+    waterSetpoint: value.waterSetpoint,
     setpointAdherence: value.setpointAdherence,
+    waterTemperatureSetpointAdherence: value.waterTemperatureSetpointAdherence,
     modeReparation: InstallationHealthCheckModeReparationToJSON(
       value.modeReparation,
     ),

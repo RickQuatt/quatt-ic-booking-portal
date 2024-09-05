@@ -1,7 +1,5 @@
-import { Link } from "wouter";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import classes from "./InstallationDetail.module.css";
-import { ButtonLink } from "../ui-components/button/Button";
 import { InstallationDetailExtraInformation } from "./InstallationDetailExtraInformation";
 import { InstallationDetailCicHistory } from "./InstallationDetailCicHistory";
 import { InstallationDetailCommissioningHistory } from "./InstallationDetailCommissioningHistory";
@@ -18,6 +16,7 @@ import { useGetInstallationDetails } from "./hooks/useGetInstallationDetails";
 import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 import ErrorText from "../ui-components/error-text/ErrorText";
 import { ResponseError } from "../api-client/runtime";
+import { InstallationDetailTariff } from "./InstallationDetailTariff";
 
 interface InstallationDetailProps {
   orderNumber: string;
@@ -59,13 +58,21 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
-        <div className={classes["detail-section-header"]}>{orderNumber}</div>
-
+        <span className={classes["order-number"]}>{orderNumber}</span>
         <div className={classes["detail-section"]}>
           <DetailSectionHeader title="🏥 Health checks" />
           <InstallationHealthChecks
             orderNumber={orderNumber}
             cicId={installationDetails.activeCic}
+            thermostatType={installationDetails.thermostatType}
+            deviceConnectionStatuses={
+              installationDetails.deviceConnectionStatuses
+            }
+            internetConnectionStatuses={
+              installationDetails.internetConnectionStatuses
+            }
+            boilerType={installationDetails.boilerType}
+            numberOfHeatPumps={installationDetails.numberOfHeatPumps}
           />
         </div>
 
@@ -78,7 +85,6 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
           installation={installationDetails}
         />
       </div>
-
       <div className={classes["detail-sections-insights"]}>
         <InstallationDetailAdvanced
           installation={installationDetails}
@@ -97,27 +103,9 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
           zuperJobsError={zuperJobsError}
           refetch={refetchZuperJobs}
         />
-        {/* TODO Uncomment when feature is live on production
-        https://linear.app/quatt/issue/SUP-122/enable-historic-tariffs-when-the-feature-is-live-on-production
-        */}
-        {/* <InstallationDetailTariff
-          tariff={tariff}
-          installationId={installationId}
-        /> */}
+        <InstallationDetailTariff installationId={installationId} />
         <InstallationDetailCICQR cicId={installationDetails.activeCic} />
       </div>
-
-      <BackButton />
     </div>
-  );
-}
-
-function BackButton() {
-  return (
-    <Link asChild href="/installations">
-      <ButtonLink className={classes["back-button"]}>
-        ← Back to installations
-      </ButtonLink>
-    </Link>
   );
 }

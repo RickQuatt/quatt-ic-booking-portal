@@ -7,20 +7,25 @@ import {
 } from "../ui-components/form/Form";
 import { TariffsModal } from "./TariffsModal";
 import classes from "./InstallationDetail.module.css";
-import { Tariff, TarrifsResult } from "../api-client/models";
+import { Tariff } from "../api-client/models";
 import { formatDateShortAsString } from "../utils/formatDate";
 import { useModalState } from "../ui-components/modal/useModalState";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { roundNumber } from "../utils/number";
+import { useGetInstallationTariffs } from "./hooks/useGetInstallationTariffs";
+import { Loader } from "../ui-components/loader/Loader";
+import { ResponseError } from "../api-client/runtime";
+import ErrorText from "../ui-components/error-text/ErrorText";
 interface InstallationDetailTariffProps {
   installationId: string;
-  tariff?: TarrifsResult | null;
 }
 
 export function InstallationDetailTariff({
   installationId,
-  tariff,
 }: InstallationDetailTariffProps) {
+  const { tariffs, tariffsError, isLoadingTariffs, refetchTariffs } =
+    useGetInstallationTariffs(installationId);
+
   const [tariffData, setTariffData] = React.useState<Tariff | null>(null);
   const {
     isOpen: isTariffModalOpen,
@@ -32,6 +37,32 @@ export function InstallationDetailTariff({
     setTariffData(null);
     openTariffsModal();
   };
+
+  if (isLoadingTariffs) {
+    return <Loader />;
+  }
+
+  if (!tariffs || tariffsError) {
+    const tariffsNotFound =
+      tariffsError instanceof ResponseError &&
+      tariffsError?.response?.status === 404;
+
+    const errorDescription = tariffsNotFound
+      ? `No tariffs found for installation: ${installationId}`
+      : `Failed to fetch installation tariffs for installation: ${installationId}.`;
+
+    const refetchInstallationTariffs = tariffsNotFound
+      ? undefined
+      : refetchTariffs;
+
+    return (
+      <ErrorText text={errorDescription} retry={refetchInstallationTariffs} />
+    );
+  }
+
+  const hasFutureTariffs =
+    tariffs.futureTariffs && tariffs.futureTariffs.length > 0;
+  const hasPastTariffs = tariffs.pastTariffs && tariffs.pastTariffs.length > 0;
 
   return (
     <div className={classes["detail-section"]}>
@@ -46,29 +77,28 @@ export function InstallationDetailTariff({
         closeModal={closeTariffsModal}
         tariffData={tariffData}
         installationId={installationId}
+        onSuccess={refetchTariffs}
       />
       <FormSection>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
-            {/* Current Tariffs */}
-            {tariff?.currentTariff && (
+            {tariffs?.currentTariff && (
               <>
                 <FormFieldTitle>Current tariff</FormFieldTitle>
                 <InstallationDetailTariffItem
-                  tariff={tariff.currentTariff}
+                  tariff={tariffs.currentTariff}
                   onClick={() => {
-                    setTariffData(tariff.currentTariff);
+                    setTariffData(tariffs.currentTariff);
                     openTariffsModal();
                   }}
                 />
               </>
             )}
 
-            {/* Future Tariffs */}
-            {tariff?.futureTariffs && tariff.futureTariffs.length !== 0 && (
+            {hasFutureTariffs && (
               <>
                 <FormFieldTitle>Upcoming tariffs</FormFieldTitle>
-                {tariff.futureTariffs.map((tariff, index) => (
+                {tariffs.futureTariffs.map((tariff, index) => (
                   <div key={index}>
                     <InstallationDetailTariffItem
                       tariff={tariff}
@@ -82,11 +112,10 @@ export function InstallationDetailTariff({
               </>
             )}
 
-            {/* Past Tariffs */}
-            {tariff?.pastTariffs && tariff.pastTariffs.length !== 0 && (
+            {hasPastTariffs && (
               <>
                 <FormFieldTitle>Past tariffs</FormFieldTitle>
-                {tariff.pastTariffs.map((tariff, index) => (
+                {tariffs.pastTariffs.map((tariff, index) => (
                   <div key={index}>
                     <InstallationDetailTariffItem
                       tariff={tariff}
@@ -100,7 +129,7 @@ export function InstallationDetailTariff({
               </>
             )}
 
-            {tariff?.currentTariff === null && (
+            {tariffs?.currentTariff === null && (
               <div style={{ textAlign: "center" }}>No tariffs set 😴</div>
             )}
           </div>

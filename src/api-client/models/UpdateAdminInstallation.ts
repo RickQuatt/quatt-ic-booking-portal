@@ -45,30 +45,6 @@ import {
  */
 export interface UpdateAdminInstallation {
   /**
-   *
-   * @type {number}
-   * @memberof UpdateAdminInstallation
-   */
-  electricityPrice?: number | null;
-  /**
-   *
-   * @type {number}
-   * @memberof UpdateAdminInstallation
-   */
-  dayElectricityPrice?: number | null;
-  /**
-   *
-   * @type {number}
-   * @memberof UpdateAdminInstallation
-   */
-  nightElectricityPrice?: number | null;
-  /**
-   *
-   * @type {number}
-   * @memberof UpdateAdminInstallation
-   */
-  gasPrice?: number | null;
-  /**
    * Rated maximum house power in watt
    * @type {number}
    * @memberof UpdateAdminInstallation
@@ -141,16 +117,6 @@ export function UpdateAdminInstallationFromJSONTyped(
     return json;
   }
   return {
-    electricityPrice: !exists(json, "electricityPrice")
-      ? undefined
-      : json["electricityPrice"],
-    dayElectricityPrice: !exists(json, "dayElectricityPrice")
-      ? undefined
-      : json["dayElectricityPrice"],
-    nightElectricityPrice: !exists(json, "nightElectricityPrice")
-      ? undefined
-      : json["nightElectricityPrice"],
-    gasPrice: !exists(json, "gasPrice") ? undefined : json["gasPrice"],
     ratedMaximumHousePower: !exists(json, "ratedMaximumHousePower")
       ? undefined
       : json["ratedMaximumHousePower"],
@@ -191,10 +157,6 @@ export function UpdateAdminInstallationToJSON(
     return null;
   }
   return {
-    electricityPrice: value.electricityPrice,
-    dayElectricityPrice: value.dayElectricityPrice,
-    nightElectricityPrice: value.nightElectricityPrice,
-    gasPrice: value.gasPrice,
     ratedMaximumHousePower: value.ratedMaximumHousePower,
     maximumHeatingOutdoorTemperature: value.maximumHeatingOutdoorTemperature,
     dayMaxSoundLevel: MaxSoundLevelToJSON(value.dayMaxSoundLevel),

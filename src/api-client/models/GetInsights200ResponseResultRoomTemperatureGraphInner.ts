@@ -24,13 +24,13 @@ export interface GetInsights200ResponseResultRoomTemperatureGraphInner {
    * @type {number}
    * @memberof GetInsights200ResponseResultRoomTemperatureGraphInner
    */
-  roomTemperature: number;
+  roomTemperature: number | null;
   /**
    *
    * @type {number}
    * @memberof GetInsights200ResponseResultRoomTemperatureGraphInner
    */
-  roomSetpoint: number;
+  roomSetpoint: number | null;
   /**
    *
    * @type {Date}

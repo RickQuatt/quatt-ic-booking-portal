@@ -25,26 +25,6 @@ export function InstallationDetailSettings({
   const transformNaN = (value: unknown) => (Number.isNaN(value) ? null : value);
 
   const InstallationDetailFormSchema = yup.object({
-    electricityPrice: yup
-      .number()
-      .transform(transformNaN)
-      .required(requiredFieldText)
-      .nullable(requiredFieldText),
-    dayElectricityPrice: yup
-      .number()
-      .transform(transformNaN)
-      .required(requiredFieldText)
-      .nullable(requiredFieldText),
-    nightElectricityPrice: yup
-      .number()
-      .transform(transformNaN)
-      .required(requiredFieldText)
-      .nullable(requiredFieldText),
-    gasPrice: yup
-      .number()
-      .transform(transformNaN)
-      .required(requiredFieldText)
-      .nullable(requiredFieldText),
     ratedMaximumHousePower: yup
       .number()
       .transform(transformNaN)
@@ -94,10 +74,6 @@ export function InstallationDetailSettings({
     typeof InstallationDetailFormSchema
   >;
   type CICAdvancedFormDataActual = {
-    electricityPrice: AdminInstallationDetail["electricityPrice"];
-    dayElectricityPrice: AdminInstallationDetail["dayElectricityPrice"];
-    nightElectricityPrice: AdminInstallationDetail["nightElectricityPrice"];
-    gasPrice: AdminInstallationDetail["gasPrice"];
     ratedMaximumHousePower: AdminInstallationDetail["ratedMaximumHousePower"];
     maximumHeatingOutdoorTemperature: AdminInstallationDetail["maximumHeatingOutdoorTemperature"];
     dayMaxSoundLevel?: AdminInstallationDetail["dayMaxSoundLevel"];
@@ -117,10 +93,6 @@ export function InstallationDetailSettings({
   } = useForm<InstallationDetailFormData>({
     resolver: yupResolver(InstallationDetailFormSchema),
     defaultValues: {
-      electricityPrice: installation.electricityPrice,
-      dayElectricityPrice: installation.dayElectricityPrice,
-      nightElectricityPrice: installation.nightElectricityPrice,
-      gasPrice: installation.gasPrice,
       ratedMaximumHousePower: installation.ratedMaximumHousePower,
       maximumHeatingOutdoorTemperature:
         installation.maximumHeatingOutdoorTemperature === null
@@ -155,50 +127,6 @@ export function InstallationDetailSettings({
       <DetailSectionHeader title="🪛 Settings" />
       <FormSection>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormField>
-            <FormFieldTitle>Electricity price</FormFieldTitle>
-            <FormFieldInput
-              type="number"
-              step="0.00001"
-              error={errors.electricityPrice}
-              {...register("electricityPrice", {
-                valueAsNumber: true,
-              })}
-            />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Day electricity price</FormFieldTitle>
-            <FormFieldInput
-              type="number"
-              step="0.00001"
-              error={errors.dayElectricityPrice}
-              {...register("dayElectricityPrice", {
-                valueAsNumber: true,
-              })}
-            />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Night electricity price</FormFieldTitle>
-            <FormFieldInput
-              type="number"
-              step="0.00001"
-              error={errors.nightElectricityPrice}
-              {...register("nightElectricityPrice", {
-                valueAsNumber: true,
-              })}
-            />
-          </FormField>
-          <FormField>
-            <FormFieldTitle>Gas price</FormFieldTitle>
-            <FormFieldInput
-              type="number"
-              step="0.00001"
-              error={errors.gasPrice}
-              {...register("gasPrice", {
-                valueAsNumber: true,
-              })}
-            />
-          </FormField>
           <FormField>
             <FormFieldTitle>Rated maximum house power</FormFieldTitle>
             <FormFieldInput

@@ -162,6 +162,8 @@ models/*
 !models/CreateUpdateNote.ts
 !models/Note.ts
 !models/UpdatedNote.ts
+!models/DeviceConnectionStatuses.ts
+!models/InternetConnectionStatuses.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

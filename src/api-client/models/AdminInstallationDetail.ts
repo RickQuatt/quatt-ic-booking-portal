@@ -31,6 +31,12 @@ import {
   CicStateFromJSONTyped,
   CicStateToJSON,
 } from "./CicState";
+import type { DeviceConnectionStatuses } from "./DeviceConnectionStatuses";
+import {
+  DeviceConnectionStatusesFromJSON,
+  DeviceConnectionStatusesFromJSONTyped,
+  DeviceConnectionStatusesToJSON,
+} from "./DeviceConnectionStatuses";
 import type { HeatDeliverySystem } from "./HeatDeliverySystem";
 import {
   HeatDeliverySystemFromJSON,
@@ -49,6 +55,12 @@ import {
   InstallationTypeFromJSONTyped,
   InstallationTypeToJSON,
 } from "./InstallationType";
+import type { InternetConnectionStatuses } from "./InternetConnectionStatuses";
+import {
+  InternetConnectionStatusesFromJSON,
+  InternetConnectionStatusesFromJSONTyped,
+  InternetConnectionStatusesToJSON,
+} from "./InternetConnectionStatuses";
 import type { MaxSoundLevel } from "./MaxSoundLevel";
 import {
   MaxSoundLevelFromJSON,
@@ -320,6 +332,18 @@ export interface AdminInstallationDetail {
    * @memberof AdminInstallationDetail
    */
   settingsUpdates: Array<SettingsHeader>;
+  /**
+   *
+   * @type {DeviceConnectionStatuses}
+   * @memberof AdminInstallationDetail
+   */
+  deviceConnectionStatuses: DeviceConnectionStatuses;
+  /**
+   *
+   * @type {InternetConnectionStatuses}
+   * @memberof AdminInstallationDetail
+   */
+  internetConnectionStatuses: InternetConnectionStatuses;
 }
 
 /**
@@ -367,6 +391,8 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "cicState" in value;
   isInstance = isInstance && "cicCommissioning" in value;
   isInstance = isInstance && "settingsUpdates" in value;
+  isInstance = isInstance && "deviceConnectionStatuses" in value;
+  isInstance = isInstance && "internetConnectionStatuses" in value;
 
   return isInstance;
 }
@@ -441,6 +467,12 @@ export function AdminInstallationDetailFromJSONTyped(
     settingsUpdates: (json["settingsUpdates"] as Array<any>).map(
       SettingsHeaderFromJSON,
     ),
+    deviceConnectionStatuses: DeviceConnectionStatusesFromJSON(
+      json["deviceConnectionStatuses"],
+    ),
+    internetConnectionStatuses: InternetConnectionStatusesFromJSON(
+      json["internetConnectionStatuses"],
+    ),
   };
 }
 
@@ -509,6 +541,12 @@ export function AdminInstallationDetailToJSON(
     ),
     settingsUpdates: (value.settingsUpdates as Array<any>).map(
       SettingsHeaderToJSON,
+    ),
+    deviceConnectionStatuses: DeviceConnectionStatusesToJSON(
+      value.deviceConnectionStatuses,
+    ),
+    internetConnectionStatuses: InternetConnectionStatusesToJSON(
+      value.internetConnectionStatuses,
     ),
   };
 }

@@ -1,51 +1,38 @@
-import React from "react";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Pie } from "react-chartjs-2";
-import {
-  antiFreezeProtectionColor,
-  boilerColor,
-  comboColor,
-  idleColor,
-  quattColor,
-} from "../cic-dashboard/colors";
+import classes from "./InstallationHealthChecks.module.css";
 import { useApiClient } from "../api-client/context";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "../ui-components/loader/Loader";
-import { roundNumber } from "../utils/number";
 import ErrorText from "../ui-components/error-text/ErrorText";
+import {
+  BoilerType,
+  DeviceConnectionStatuses,
+  InternetConnectionStatuses,
+  ThermostatType,
+} from "../api-client/models";
+import DetailBlock from "../ui-components/detail-block/DetailBlock";
+import InstallationDetailTemperatureDetails from "./InstallationDetailTemperatureDetails";
+import HealthCheckText from "../ui-components/health-check-text/HealthCheckText";
+import InstallationModeReparation from "./InstallationModeReparation";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
-
-const options = {
-  plugins: {
-    title: {
-      display: false,
-      text: "Health checks",
-    },
-    legend: { display: false },
-    tooltip: {
-      mode: "index",
-      callbacks: {
-        label: function (context: any) {
-          const value = context.dataset.data[context.dataIndex].value;
-          return `${value} %`;
-        },
-      },
-    },
-  },
-  responsive: true,
-  maintainAspectRatio: false,
-} as const;
-
-const stylesMarginZero = { margin: "0" };
+interface InstallationHealthCheckProps {
+  orderNumber: string;
+  cicId: string;
+  thermostatType: ThermostatType | null;
+  deviceConnectionStatuses: DeviceConnectionStatuses;
+  internetConnectionStatuses: InternetConnectionStatuses;
+  boilerType: BoilerType | null;
+  numberOfHeatPumps: number | null;
+}
 
 export function InstallationHealthChecks({
   orderNumber,
   cicId,
-}: {
-  orderNumber: string;
-  cicId: string;
-}) {
+  thermostatType,
+  deviceConnectionStatuses,
+  internetConnectionStatuses,
+  boilerType,
+  numberOfHeatPumps,
+}: InstallationHealthCheckProps) {
   const apiClient = useApiClient();
 
   const {
@@ -63,80 +50,20 @@ export function InstallationHealthChecks({
   });
   const chResults = healthCheckData?.result;
 
-  const total = Object.values(chResults?.modeReparation || {}).reduce(
-    (acc, value) => acc + Number(value),
-    0,
-  );
-
-  const chartRef = React.useRef();
-  const chartData = React.useMemo(() => {
-    return {
-      labels: ["Quatt", "Idle", "Combo", "Boiler", "AntiFreezeProtection"],
-      datasets: [
-        {
-          data: [
-            {
-              status: "Quatt",
-              label: "Quatt",
-              value: roundNumber(
-                ((chResults?.modeReparation?.quatt as number) / total) * 100,
-                0,
-              ),
-            },
-            {
-              status: "Idle" as const,
-              label: "Idle",
-              value: roundNumber(
-                ((chResults?.modeReparation?.idle as number) / total) * 100,
-                0,
-              ),
-            },
-            {
-              status: "Combo" as const,
-              label: "Combo",
-              value: roundNumber(
-                ((chResults?.modeReparation?.combo as number) / total) * 100,
-                0,
-              ),
-            },
-            {
-              status: "Boiler" as const,
-              label: "Boiler",
-              value: roundNumber(
-                ((chResults?.modeReparation?.boiler as number) / total) * 100,
-                0,
-              ),
-            },
-            {
-              status: "AntiFreezeProtection" as const,
-              label: "AntiFreezeProtection",
-              value: roundNumber(
-                ((chResults?.modeReparation?.antiFreezeProtection as number) /
-                  total) *
-                  100,
-                0,
-              ),
-            },
-          ],
-          backgroundColor: [
-            quattColor,
-            idleColor,
-            comboColor,
-            boilerColor,
-            antiFreezeProtectionColor,
-          ],
-        },
-      ],
-    };
-  }, [chResults, total]);
-
-  const emptyModeReperation = Object.values(
-    chResults?.modeReparation || {},
-  ).every((value) => value === "0");
-
   if (isPending) {
     return <Loader />;
   }
+
+  const isOpenthermBoiler = boilerType === BoilerType.Opentherm;
+  const heatPumpErrorText =
+    numberOfHeatPumps === 1
+      ? "Heat pump not connected"
+      : "At least one heat pump disconnected";
+
+  const tempControlErrorText =
+    thermostatType === ThermostatType.OpenthermRoomTemperature
+      ? "The latest update did not include the room temperature or setpoint"
+      : "The latest update did not include the water temperature value";
 
   return (
     <>
@@ -152,46 +79,59 @@ export function InstallationHealthChecks({
             gridTemplateColumns: "2fr 2fr",
           }}
         >
-          <div style={{ marginBottom: "20px" }}>
-            <h3 style={stylesMarginZero}>Room temperature</h3>
-            <h2 style={stylesMarginZero}>
-              {chResults?.roomTemperature
-                ? `${chResults.roomTemperature} °C`
-                : "N/A"}
-            </h2>
-          </div>
-          <div>
-            <h3 style={stylesMarginZero}>Room setpoint</h3>
-            <h2 style={stylesMarginZero}>
-              {chResults?.roomSetpoint ? `${chResults.roomSetpoint} °C` : "N/A"}
-            </h2>
-          </div>
-          <div>
-            <h3 style={stylesMarginZero}>Setpoint reached</h3>
-            <h2 style={stylesMarginZero}>
-              {chResults?.setpointAdherence
-                ? `${roundNumber(chResults.setpointAdherence, 1)}%`
-                : "N/A"}
-            </h2>
-          </div>
-          <div>
-            <h3 style={stylesMarginZero}>Mode repartition</h3>
-            {!emptyModeReperation && chResults?.modeReparation ? (
-              <div style={{ height: "100px", width: "100px" }}>
-                <Pie ref={chartRef} data={chartData} options={options} />
-              </div>
-            ) : (
-              <h2 style={stylesMarginZero}>N/A</h2>
-            )}
-          </div>
-          <div>
-            <h3 style={stylesMarginZero}>Supervisory control mode</h3>
-            <h2 style={stylesMarginZero}>
-              {chResults?.supervisoryControlMode || "N/A"}
-            </h2>
-          </div>
+          <InstallationDetailTemperatureDetails
+            chResults={chResults}
+            thermostatType={thermostatType}
+          />
+          <InstallationModeReparation
+            modeReparation={chResults?.modeReparation}
+          />
+          <DetailBlock
+            title="Supervisory control mode"
+            value={chResults?.supervisoryControlMode}
+          />
         </div>
       )}
+      <p className={classes["sub-header"]}>Peripheral devices connection</p>
+      <HealthCheckText
+        title="Heat pump(s)"
+        status={deviceConnectionStatuses.heatPumpsConnected}
+        errorStatusText={heatPumpErrorText}
+      />
+      <HealthCheckText
+        title="Thermostat"
+        status={deviceConnectionStatuses.thermostatConnected}
+        errorStatusText="Thermostat not connected"
+      />
+      <HealthCheckText
+        title="Temperature control"
+        status={deviceConnectionStatuses.temperatureControlConnected}
+        errorStatusText={tempControlErrorText}
+      />
+      {isOpenthermBoiler && (
+        <HealthCheckText
+          title="Boiler"
+          status={deviceConnectionStatuses.openthermBoilerConnected}
+          errorStatusText="Opentherm boiler not connected"
+        />
+      )}
+      <p className={classes["sub-header"]}>Connectivity</p>
+      <HealthCheckText
+        title="WiFi"
+        status={internetConnectionStatuses.connectionToWifi}
+        errorStatusText="WiFi not connected"
+        notApplicableStatusText="WiFi connection status not available"
+      />
+      <HealthCheckText
+        title="Ethernet"
+        status={internetConnectionStatuses.connectionToEthernet}
+        errorStatusText="Ethernet not connected"
+      />
+      <HealthCheckText
+        title="Internet"
+        status={internetConnectionStatuses.isInternetReachable}
+        errorStatusText="The CIC does not have internet access"
+      />
     </>
   );
 }

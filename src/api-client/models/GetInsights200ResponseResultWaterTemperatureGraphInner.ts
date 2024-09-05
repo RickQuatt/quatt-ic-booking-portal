@@ -24,7 +24,7 @@ export interface GetInsights200ResponseResultWaterTemperatureGraphInner {
    * @type {number}
    * @memberof GetInsights200ResponseResultWaterTemperatureGraphInner
    */
-  waterTemperature: number;
+  waterTemperature: number | null;
   /**
    *
    * @type {Date}

@@ -1,0 +1,13 @@
+.health-check-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.health-check-title {
+  margin: 0 0.5rem 0 0;
+}
+
+span {
+  font-weight: 600;
+}
