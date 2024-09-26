@@ -60,11 +60,6 @@ export function InstallationHealthChecks({
       ? "Heat pump not connected"
       : "At least one heat pump disconnected";
 
-  const tempControlErrorText =
-    thermostatType === ThermostatType.OpenthermRoomTemperature
-      ? "The latest update did not include the room temperature or setpoint"
-      : "The latest update did not include the water temperature value";
-
   return (
     <>
       {isError ? (
@@ -102,11 +97,6 @@ export function InstallationHealthChecks({
         title="Thermostat"
         status={deviceConnectionStatuses.thermostatConnected}
         errorStatusText="Thermostat not connected"
-      />
-      <HealthCheckText
-        title="Temperature control"
-        status={deviceConnectionStatuses.temperatureControlConnected}
-        errorStatusText={tempControlErrorText}
       />
       {isOpenthermBoiler && (
         <HealthCheckText
