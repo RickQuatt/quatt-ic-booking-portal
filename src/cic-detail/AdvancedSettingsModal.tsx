@@ -11,7 +11,14 @@ import {
   ModalHeader,
   ModalProps,
 } from "../ui-components/modal/Modal";
-import { AdminCic } from "../api-client/models";
+import {
+  AdminCic,
+  BoilerType,
+  CicStatus,
+  MaxSoundLevel,
+  SilentMode,
+  ThermostatType,
+} from "../api-client/models";
 import { useApiClient } from "../api-client/context";
 import {
   FormField,
@@ -21,6 +28,7 @@ import {
   FormSection,
   FormSelectInput,
 } from "../ui-components/form/Form";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Props extends ModalProps {
   cicId: string;
@@ -31,60 +39,47 @@ const requiredFieldText = "This field is required";
 // required for inputs of type="number"
 const transformNaN = (value: unknown) => (Number.isNaN(value) ? null : value);
 
+const maxSoundLevels = Object.values(MaxSoundLevel);
 const CICAdvancedFormSchema = yup.object({
-  dayMaxSoundLevel: yup
-    .string()
-    .optional()
-    .nullable()
-    .oneOf(["normal", "library", "silent", "building87"]),
+  dayMaxSoundLevel: yup.mixed<MaxSoundLevel>().oneOf(maxSoundLevels).optional(),
   nightMaxSoundLevel: yup
-    .string()
-    .optional()
-    .nullable()
-    .oneOf(["normal", "library", "silent", "building87"]),
+    .mixed<MaxSoundLevel>()
+    .oneOf(maxSoundLevels)
+    .optional(),
   silentMode: yup
-    .string()
-    .optional()
-    .nullable()
-    .oneOf(["never", "night", "always"]),
+    .mixed<SilentMode>()
+    .oneOf(Object.values(SilentMode))
+    .optional(),
   boilerType: yup
-    .string()
+    .mixed<BoilerType>()
+    .oneOf(Object.values(BoilerType))
     .required(requiredFieldText)
-    .nullable(requiredFieldText)
-    .oneOf(["opentherm", "on_off"]),
+    .nullable(),
   thermostatType: yup
-    .string()
+    .mixed<ThermostatType>()
+    .oneOf(Object.values(ThermostatType))
     .required(requiredFieldText)
-    .nullable(requiredFieldText)
-    .oneOf([
-      "opentherm_room_temperature",
-      "opentherm_without_room_temperature",
-    ]),
+    .nullable(),
   numberOfHeatPumps: yup
     .number()
     .transform(transformNaN)
     .required(requiredFieldText)
     .min(1)
     .max(2),
+  status: yup
+    .mixed<CicStatus>()
+    .oneOf(Object.values(CicStatus))
+    .required(requiredFieldText),
 });
 
-// TODO: get yup to infer the right type (the enums)? - 2023-07-14
 type CICAdvancedFormData = yup.InferType<typeof CICAdvancedFormSchema>;
-type CICAdvancedFormDataActual = {
-  dayMaxSoundLevel?: AdminCic["dayMaxSoundLevel"];
-  nightMaxSoundLevel?: AdminCic["nightMaxSoundLevel"];
-  silentMode?: AdminCic["silentMode"];
-  boilerType: AdminCic["boilerType"];
-  thermostatType: AdminCic["thermostatType"];
-  numberOfHeatPumps: NonNullable<AdminCic["numberOfHeatPumps"]>;
-};
-
 export function AdvancedSettingsModal({
   isOpen,
   closeModal,
   cicId,
   cicData,
 }: Props) {
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
@@ -99,6 +94,7 @@ export function AdvancedSettingsModal({
         cicData.numberOfHeatPumps === null
           ? undefined
           : cicData.numberOfHeatPumps,
+      status: cicData.status,
     },
   });
 
@@ -115,15 +111,16 @@ export function AdvancedSettingsModal({
 
       const response = await apiClient.adminUpdateCic({
         cicId,
-        updateAdminCic: data as unknown as CICAdvancedFormDataActual,
+        updateAdminCic: data,
       });
       if (response.meta.status === 200) {
+        queryClient.invalidateQueries({ queryKey: ["cicDetail", cicId] });
         // this sets isDirty back to false
         reset({}, { keepValues: true });
         closeModal();
       }
     },
-    [apiClient, cicId, closeModal, reset],
+    [apiClient, cicId, closeModal, queryClient, reset],
   );
 
   return (
@@ -205,6 +202,14 @@ export function AdvancedSettingsModal({
                   valueAsNumber: true,
                 })}
               />
+            </FormField>
+            <FormField>
+              <FormFieldTitle>CIC Status</FormFieldTitle>
+              <FormSelectInput {...register("status")}>
+                <option value={CicStatus.Active}>Active</option>
+                <option value={CicStatus.Service}>Service</option>
+                <option value={CicStatus.Dead}>Dead</option>
+              </FormSelectInput>
             </FormField>
           </FormSection>
         </ModalContent>
