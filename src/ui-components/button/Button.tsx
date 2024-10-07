@@ -11,16 +11,19 @@ export interface ButtonProps
 
 export const Button = ({
   color,
+  disabled,
   type = "button",
   ...restProps
 }: ButtonProps) => {
   return (
     <button
       {...restProps}
+      disabled={disabled}
       type={type}
       className={classNames(
         classes.button,
         color && classes[color],
+        disabled && classes.disabled,
         restProps.className,
       )}
     />

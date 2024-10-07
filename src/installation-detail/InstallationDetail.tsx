@@ -17,6 +17,7 @@ import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 import ErrorText from "../ui-components/error-text/ErrorText";
 import { ResponseError } from "../api-client/runtime";
 import { InstallationDetailTariff } from "./InstallationDetailTariff";
+import { InstallationDetailActions } from "./InstallationDetailActions";
 
 interface InstallationDetailProps {
   orderNumber: string;
@@ -90,6 +91,10 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
           installation={installationDetails}
           zuperInstallationJobs={zuperJobs?.installations}
           isLoadingZuperJobs={isLoadingZuperJobs}
+        />
+        <InstallationDetailActions
+          cicId={installationDetails.activeCic}
+          quattBuild={installationDetails.quattBuild}
         />
         <InstallationDetailSettingsHistory installation={installationDetails} />
         <InstallationDetailSettings installation={installationDetails} />

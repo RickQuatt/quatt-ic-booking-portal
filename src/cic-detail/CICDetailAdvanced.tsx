@@ -17,6 +17,7 @@ import {
   getHubspotSearchOrderLink,
   getMenderLink,
 } from "./getLinks";
+import useRebootCic from "../installation-detail/hooks/useRebootCic";
 
 export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
   const {
@@ -24,7 +25,7 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
     open: openAdvancedSettingsModal,
     close: closeAdvancedSettingsModal,
   } = useModalState();
-
+  const rebootCic = useRebootCic(cicData.id);
   const apiClient = useApiClient();
 
   const resetWifiNetwork = React.useCallback(async () => {
@@ -41,20 +42,6 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
       forgetWifiMeCicRequest: { ssid: cicData.wifiSSID as string },
     });
   }, [apiClient, cicData.id, cicData.wifiSSID]);
-
-  const rebootCic = React.useCallback(async () => {
-    if (!window.confirm("Are you sure you would like to reboot the CIC?")) {
-      return;
-    }
-
-    const response = await apiClient.adminRebootCIC({ cicId: cicData.id });
-
-    if (response.meta.status === 200) {
-      alert("Reboot request sent successfully.");
-    } else {
-      alert("Failed to send reboot request.");
-    }
-  }, [apiClient, cicData.id]);
 
   const cancelCommissioning = React.useCallback(async () => {
     if (
