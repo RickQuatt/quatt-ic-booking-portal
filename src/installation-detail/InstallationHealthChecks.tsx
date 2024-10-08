@@ -13,6 +13,8 @@ import DetailBlock from "../ui-components/detail-block/DetailBlock";
 import InstallationDetailTemperatureDetails from "./InstallationDetailTemperatureDetails";
 import HealthCheckText from "../ui-components/health-check-text/HealthCheckText";
 import InstallationModeReparation from "./InstallationModeReparation";
+import { roundNumber } from "../utils/number";
+import ThresholdCheck from "../ui-components/threshold-check/ThresholdCheck";
 
 interface InstallationHealthCheckProps {
   orderNumber: string;
@@ -60,6 +62,8 @@ export function InstallationHealthChecks({
       ? "Heat pump not connected"
       : "At least one heat pump disconnected";
 
+  const pressureChange = roundNumber(chResults?.pressureChange ?? undefined, 1);
+
   return (
     <>
       {isError ? (
@@ -84,6 +88,13 @@ export function InstallationHealthChecks({
           <DetailBlock
             title="Supervisory control mode"
             value={chResults?.supervisoryControlMode}
+          />
+          <ThresholdCheck
+            title="Pressure change"
+            displayValue={pressureChange}
+            lowerThreshold={-0.5}
+            upperThreshold={0.5}
+            lowerThresholdMessage="Unexpected pressure change"
           />
         </div>
       )}

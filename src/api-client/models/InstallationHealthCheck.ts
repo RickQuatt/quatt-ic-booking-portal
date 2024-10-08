@@ -74,6 +74,12 @@ export interface InstallationHealthCheck {
    * @memberof InstallationHealthCheck
    */
   supervisoryControlMode: string;
+  /**
+   *
+   * @type {number}
+   * @memberof InstallationHealthCheck
+   */
+  pressureChange: number | null;
 }
 
 /**
@@ -89,6 +95,7 @@ export function instanceOfInstallationHealthCheck(value: object): boolean {
   isInstance = isInstance && "waterTemperatureSetpointAdherence" in value;
   isInstance = isInstance && "modeReparation" in value;
   isInstance = isInstance && "supervisoryControlMode" in value;
+  isInstance = isInstance && "pressureChange" in value;
 
   return isInstance;
 }
@@ -118,6 +125,7 @@ export function InstallationHealthCheckFromJSONTyped(
       json["modeReparation"],
     ),
     supervisoryControlMode: json["supervisoryControlMode"],
+    pressureChange: json["pressureChange"],
   };
 }
 
@@ -141,5 +149,6 @@ export function InstallationHealthCheckToJSON(
       value.modeReparation,
     ),
     supervisoryControlMode: value.supervisoryControlMode,
+    pressureChange: value.pressureChange,
   };
 }
