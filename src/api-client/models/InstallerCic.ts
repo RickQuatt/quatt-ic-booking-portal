@@ -133,31 +133,45 @@ export interface InstallerCic {
    * @type {string}
    * @memberof InstallerCic
    */
-  boilerDemand: InstallerCicBoilerDemandEnum;
+  boilerDemand?: InstallerCicBoilerDemandEnum;
   /**
    * Amount of power in watt
    * @type {number}
    * @memberof InstallerCic
    */
-  boilerPower: number | null;
+  boilerPower?: number | null;
+  /**
+   * Temperature in degrees celcius of the water flowing in. Use heatingWaterTemperatureIn instead
+   * @type {number}
+   * @memberof InstallerCic
+   * @deprecated
+   */
+  boilerWaterTemperatureIn?: number | null;
+  /**
+   * Temperature in degrees celcius of the water flowing out. Use heatingWaterTemperatureOut instead
+   * @type {number}
+   * @memberof InstallerCic
+   * @deprecated
+   */
+  boilerWaterTemperatureOut?: number | null;
+  /**
+   * Temperature in degrees celcius of the water flowing in
+   * @type {number}
+   * @memberof InstallerCic
+   */
+  heatingWaterTemperatureIn?: number | null;
   /**
    * Temperature in degrees celcius of the water flowing out
    * @type {number}
    * @memberof InstallerCic
    */
-  boilerWaterTemperatureIn: number | null;
-  /**
-   * Temperature in degrees celcius of the water flowing out
-   * @type {number}
-   * @memberof InstallerCic
-   */
-  boilerWaterTemperatureOut: number | null;
+  heatingWaterTemperatureOut?: number | null;
   /**
    * Boiler pressure in bar
    * @type {number}
    * @memberof InstallerCic
    */
-  boilerPressure: number | null;
+  boilerPressure?: number | null;
   /**
    *
    * @type {string}
@@ -193,7 +207,7 @@ export interface InstallerCic {
    * @type {boolean}
    * @memberof InstallerCic
    */
-  boilerOn: boolean;
+  boilerOn?: boolean;
   /**
    * Temperature in degrees celcius set point of the control
    * @type {number}
@@ -421,7 +435,7 @@ export interface InstallerCic {
    * @type {BoilerType}
    * @memberof InstallerCic
    */
-  boilerType: BoilerType | null;
+  boilerType?: BoilerType | null;
   /**
    * The minimal image version the CIC needs to be updated to to install
    * @type {string}
@@ -508,17 +522,11 @@ export function instanceOfInstallerCic(value: object): boolean {
   isInstance = isInstance && "availableWifiNetworks" in value;
   isInstance = isInstance && "lastScannedForWifi" in value;
   isInstance = isInstance && "isScanningForWifi" in value;
-  isInstance = isInstance && "boilerDemand" in value;
-  isInstance = isInstance && "boilerPower" in value;
-  isInstance = isInstance && "boilerWaterTemperatureIn" in value;
-  isInstance = isInstance && "boilerWaterTemperatureOut" in value;
-  isInstance = isInstance && "boilerPressure" in value;
   isInstance = isInstance && "thermostatDemand" in value;
   isInstance = isInstance && "thermostatRoomTemperature" in value;
   isInstance = isInstance && "thermostatRoomTemperatureSetPoint" in value;
   isInstance = isInstance && "thermostatFlameOn" in value;
   isInstance = isInstance && "showThermostatTemperatures" in value;
-  isInstance = isInstance && "boilerOn" in value;
   isInstance = isInstance && "thermostatControlTemperatureSetPoint" in value;
   isInstance = isInstance && "status" in value;
   isInstance = isInstance && "serial" in value;
@@ -549,7 +557,6 @@ export function instanceOfInstallerCic(value: object): boolean {
   isInstance = isInstance && "supportsForgetWifi" in value;
   isInstance = isInstance && "heatDeliverySystems" in value;
   isInstance = isInstance && "thermostatType" in value;
-  isInstance = isInstance && "boilerType" in value;
   isInstance = isInstance && "quattBuildRequired" in value;
   isInstance = isInstance && "needsUpdate" in value;
   isInstance = isInstance && "menderUpdateState" in value;
@@ -592,18 +599,32 @@ export function InstallerCicFromJSONTyped(
         ? null
         : new Date(json["lastScannedForWifi"]),
     isScanningForWifi: json["isScanningForWifi"],
-    boilerDemand: json["boilerDemand"],
-    boilerPower: json["boilerPower"],
-    boilerWaterTemperatureIn: json["boilerWaterTemperatureIn"],
-    boilerWaterTemperatureOut: json["boilerWaterTemperatureOut"],
-    boilerPressure: json["boilerPressure"],
+    boilerDemand: !exists(json, "boilerDemand")
+      ? undefined
+      : json["boilerDemand"],
+    boilerPower: !exists(json, "boilerPower") ? undefined : json["boilerPower"],
+    boilerWaterTemperatureIn: !exists(json, "boilerWaterTemperatureIn")
+      ? undefined
+      : json["boilerWaterTemperatureIn"],
+    boilerWaterTemperatureOut: !exists(json, "boilerWaterTemperatureOut")
+      ? undefined
+      : json["boilerWaterTemperatureOut"],
+    heatingWaterTemperatureIn: !exists(json, "heatingWaterTemperatureIn")
+      ? undefined
+      : json["heatingWaterTemperatureIn"],
+    heatingWaterTemperatureOut: !exists(json, "heatingWaterTemperatureOut")
+      ? undefined
+      : json["heatingWaterTemperatureOut"],
+    boilerPressure: !exists(json, "boilerPressure")
+      ? undefined
+      : json["boilerPressure"],
     thermostatDemand: json["thermostatDemand"],
     thermostatRoomTemperature: json["thermostatRoomTemperature"],
     thermostatRoomTemperatureSetPoint:
       json["thermostatRoomTemperatureSetPoint"],
     thermostatFlameOn: json["thermostatFlameOn"],
     showThermostatTemperatures: json["showThermostatTemperatures"],
-    boilerOn: json["boilerOn"],
+    boilerOn: !exists(json, "boilerOn") ? undefined : json["boilerOn"],
     thermostatControlTemperatureSetPoint:
       json["thermostatControlTemperatureSetPoint"],
     status: CicStatusFromJSON(json["status"]),
@@ -664,7 +685,9 @@ export function InstallerCicFromJSONTyped(
             HeatDeliverySystemFromJSON,
           ),
     thermostatType: ThermostatTypeFromJSON(json["thermostatType"]),
-    boilerType: BoilerTypeFromJSON(json["boilerType"]),
+    boilerType: !exists(json, "boilerType")
+      ? undefined
+      : BoilerTypeFromJSON(json["boilerType"]),
     quattBuildRequired: json["quattBuildRequired"],
     needsUpdate: json["needsUpdate"],
     menderUpdateState: json["menderUpdateState"],
@@ -705,6 +728,8 @@ export function InstallerCicToJSON(value?: InstallerCic | null): any {
     boilerPower: value.boilerPower,
     boilerWaterTemperatureIn: value.boilerWaterTemperatureIn,
     boilerWaterTemperatureOut: value.boilerWaterTemperatureOut,
+    heatingWaterTemperatureIn: value.heatingWaterTemperatureIn,
+    heatingWaterTemperatureOut: value.heatingWaterTemperatureOut,
     boilerPressure: value.boilerPressure,
     thermostatDemand: value.thermostatDemand,
     thermostatRoomTemperature: value.thermostatRoomTemperature,

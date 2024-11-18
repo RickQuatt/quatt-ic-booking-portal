@@ -217,7 +217,7 @@ export interface AdminInstallationDetail {
    * @type {BoilerType}
    * @memberof AdminInstallationDetail
    */
-  boilerType: BoilerType | null;
+  boilerType?: BoilerType | null;
   /**
    *
    * @type {SilentMode}
@@ -371,7 +371,6 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "maximumHeatingOutdoorTemperature" in value;
   isInstance = isInstance && "numberOfHeatPumps" in value;
   isInstance = isInstance && "thermostatType" in value;
-  isInstance = isInstance && "boilerType" in value;
   isInstance = isInstance && "silentMode" in value;
   isInstance = isInstance && "dayMaxSoundLevel" in value;
   isInstance = isInstance && "nightMaxSoundLevel" in value;
@@ -436,7 +435,9 @@ export function AdminInstallationDetailFromJSONTyped(
     maximumHeatingOutdoorTemperature: json["maximumHeatingOutdoorTemperature"],
     numberOfHeatPumps: json["numberOfHeatPumps"],
     thermostatType: ThermostatTypeFromJSON(json["thermostatType"]),
-    boilerType: BoilerTypeFromJSON(json["boilerType"]),
+    boilerType: !exists(json, "boilerType")
+      ? undefined
+      : BoilerTypeFromJSON(json["boilerType"]),
     silentMode: SilentModeFromJSON(json["silentMode"]),
     dayMaxSoundLevel: MaxSoundLevelFromJSON(json["dayMaxSoundLevel"]),
     nightMaxSoundLevel: MaxSoundLevelFromJSON(json["nightMaxSoundLevel"]),

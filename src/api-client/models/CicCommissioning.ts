@@ -61,7 +61,7 @@ export interface CicCommissioning {
    * @type {IdentificationStatus}
    * @memberof CicCommissioning
    */
-  boilerIdentificationStatus: IdentificationStatus | null;
+  boilerIdentificationStatus?: IdentificationStatus | null;
   /**
    *
    * @type {IdentificationStatus}
@@ -97,13 +97,13 @@ export interface CicCommissioning {
    * @type {number}
    * @memberof CicCommissioning
    */
-  boilerPowerOnTestStop: number | null;
+  boilerPowerOnTestStop?: number | null;
   /**
    *
    * @type {Date}
    * @memberof CicCommissioning
    */
-  boilerTestStoppableAt: Date | null;
+  boilerTestStoppableAt?: Date | null;
   /**
    * When test is stopped and the minimum test period has been past, the cloud will set the deaerationTestStatus to finished. Else cancelled.
    * @type {string}
@@ -205,7 +205,7 @@ export interface CicCommissioning {
    * @type {string}
    * @memberof CicCommissioning
    */
-  boilerTestStatus: CicCommissioningBoilerTestStatusEnum;
+  boilerTestStatus?: CicCommissioningBoilerTestStatusEnum;
   /**
    *
    * @type {string}
@@ -318,15 +318,12 @@ export type CicCommissioningCommissioningModeEnum =
 export function instanceOfCicCommissioning(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "thermostatIdentificationStatus" in value;
-  isInstance = isInstance && "boilerIdentificationStatus" in value;
   isInstance = isInstance && "heatPumpIdentificationStatus" in value;
   isInstance = isInstance && "heatPump1IdentificationStatus" in value;
   isInstance = isInstance && "heatPump2IdentificationStatus" in value;
   isInstance =
     isInstance && "flowTemperatureSensorIdentificationStatus" in value;
   isInstance = isInstance && "identificationTestStatus" in value;
-  isInstance = isInstance && "boilerPowerOnTestStop" in value;
-  isInstance = isInstance && "boilerTestStoppableAt" in value;
   isInstance = isInstance && "deaerationTestStatus" in value;
   isInstance = isInstance && "deaerationStoppableAt" in value;
   isInstance = isInstance && "flowRateTestStatus" in value;
@@ -339,7 +336,6 @@ export function instanceOfCicCommissioning(value: object): boolean {
   isInstance = isInstance && "flowRateOnTestStop" in value;
   isInstance = isInstance && "heatPumpTestStatus" in value;
   isInstance = isInstance && "heatPumpTestStoppableAt" in value;
-  isInstance = isInstance && "boilerTestStatus" in value;
   isInstance = isInstance && "commissioningMode" in value;
   isInstance = isInstance && "isForced" in value;
   isInstance = isInstance && "isCancelled" in value;
@@ -366,9 +362,9 @@ export function CicCommissioningFromJSONTyped(
     thermostatIdentificationStatus: IdentificationStatusFromJSON(
       json["thermostatIdentificationStatus"],
     ),
-    boilerIdentificationStatus: IdentificationStatusFromJSON(
-      json["boilerIdentificationStatus"],
-    ),
+    boilerIdentificationStatus: !exists(json, "boilerIdentificationStatus")
+      ? undefined
+      : IdentificationStatusFromJSON(json["boilerIdentificationStatus"]),
     heatPumpIdentificationStatus: IdentificationStatusFromJSON(
       json["heatPumpIdentificationStatus"],
     ),
@@ -384,9 +380,12 @@ export function CicCommissioningFromJSONTyped(
     identificationTestStatus: IdentificationTestStatusFromJSON(
       json["identificationTestStatus"],
     ),
-    boilerPowerOnTestStop: json["boilerPowerOnTestStop"],
-    boilerTestStoppableAt:
-      json["boilerTestStoppableAt"] === null
+    boilerPowerOnTestStop: !exists(json, "boilerPowerOnTestStop")
+      ? undefined
+      : json["boilerPowerOnTestStop"],
+    boilerTestStoppableAt: !exists(json, "boilerTestStoppableAt")
+      ? undefined
+      : json["boilerTestStoppableAt"] === null
         ? null
         : new Date(json["boilerTestStoppableAt"]),
     deaerationTestStatus: json["deaerationTestStatus"],
@@ -434,7 +433,9 @@ export function CicCommissioningFromJSONTyped(
     heatPumpTestLevel: !exists(json, "heatPumpTestLevel")
       ? undefined
       : HeatPumpTestLevelFromJSON(json["heatPumpTestLevel"]),
-    boilerTestStatus: json["boilerTestStatus"],
+    boilerTestStatus: !exists(json, "boilerTestStatus")
+      ? undefined
+      : json["boilerTestStatus"],
     commissioningMode: json["commissioningMode"],
     isForced: json["isForced"],
     isCancelled: json["isCancelled"],
@@ -482,9 +483,11 @@ export function CicCommissioningToJSON(value?: CicCommissioning | null): any {
     ),
     boilerPowerOnTestStop: value.boilerPowerOnTestStop,
     boilerTestStoppableAt:
-      value.boilerTestStoppableAt === null
-        ? null
-        : value.boilerTestStoppableAt.toISOString(),
+      value.boilerTestStoppableAt === undefined
+        ? undefined
+        : value.boilerTestStoppableAt === null
+          ? null
+          : value.boilerTestStoppableAt.toISOString(),
     deaerationTestStatus: value.deaerationTestStatus,
     deaerationStoppableAt:
       value.deaerationStoppableAt === null

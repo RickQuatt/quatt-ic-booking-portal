@@ -176,6 +176,9 @@ models/*
 !models/UpdatedNote.ts
 !models/DeviceConnectionStatuses.ts
 !models/InternetConnectionStatuses.ts
+!models/CicHealthCheckNumberOfRestart.ts
+!models/CicHealthCheck.ts
+!models/InstallationHealthCheckHealthchecksInner.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

@@ -42,7 +42,7 @@ export interface InstallationHealthCheckModeReparation {
    * @type {number}
    * @memberof InstallationHealthCheckModeReparation
    */
-  boiler: number;
+  boiler?: number;
   /**
    *
    * @type {number}
@@ -61,7 +61,6 @@ export function instanceOfInstallationHealthCheckModeReparation(
   isInstance = isInstance && "idle" in value;
   isInstance = isInstance && "quatt" in value;
   isInstance = isInstance && "combo" in value;
-  isInstance = isInstance && "boiler" in value;
   isInstance = isInstance && "antiFreezeProtection" in value;
 
   return isInstance;
@@ -84,7 +83,7 @@ export function InstallationHealthCheckModeReparationFromJSONTyped(
     idle: json["idle"],
     quatt: json["quatt"],
     combo: json["combo"],
-    boiler: json["boiler"],
+    boiler: !exists(json, "boiler") ? undefined : json["boiler"],
     antiFreezeProtection: json["antiFreezeProtection"],
   };
 }

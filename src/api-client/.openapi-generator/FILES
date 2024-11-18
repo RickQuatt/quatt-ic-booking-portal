@@ -32,8 +32,10 @@ models/CicAggregateByKpi.ts
 models/CicAvailableWifiNetworksInner.ts
 models/CicCommissioning.ts
 models/CicDashboardAggregate.ts
+models/CicHealthCheck.ts
 models/CicHealthCheckCategory.ts
 models/CicHealthCheckEntry.ts
+models/CicHealthCheckNumberOfRestart.ts
 models/CicHealthCheckStatus.ts
 models/CicHealthChecksByCategory.ts
 models/CicHealthChecksByKpi.ts
@@ -83,6 +85,7 @@ models/IdentificationStatus.ts
 models/IdentificationTestStatus.ts
 models/Installation.ts
 models/InstallationHealthCheck.ts
+models/InstallationHealthCheckHealthchecksInner.ts
 models/InstallationHealthCheckModeReparation.ts
 models/InstallationStatus.ts
 models/InstallationType.ts

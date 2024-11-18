@@ -36,13 +36,13 @@ export interface GetInsights200ResponseResultGraphInner {
    * @type {number}
    * @memberof GetInsights200ResponseResultGraphInner
    */
-  boilerHeat: number;
+  boilerHeat?: number;
   /**
    *
    * @type {number}
    * @memberof GetInsights200ResponseResultGraphInner
    */
-  boilerGas: number;
+  boilerGas?: number;
   /**
    *
    * @type {number}
@@ -66,8 +66,6 @@ export function instanceOfGetInsights200ResponseResultGraphInner(
   let isInstance = true;
   isInstance = isInstance && "hpElectric" in value;
   isInstance = isInstance && "hpHeat" in value;
-  isInstance = isInstance && "boilerHeat" in value;
-  isInstance = isInstance && "boilerGas" in value;
   isInstance = isInstance && "cop" in value;
   isInstance = isInstance && "timestamp" in value;
 
@@ -90,8 +88,8 @@ export function GetInsights200ResponseResultGraphInnerFromJSONTyped(
   return {
     hpElectric: json["hpElectric"],
     hpHeat: json["hpHeat"],
-    boilerHeat: json["boilerHeat"],
-    boilerGas: json["boilerGas"],
+    boilerHeat: !exists(json, "boilerHeat") ? undefined : json["boilerHeat"],
+    boilerGas: !exists(json, "boilerGas") ? undefined : json["boilerGas"],
     cop: json["cop"],
     timestamp: new Date(json["timestamp"]),
   };

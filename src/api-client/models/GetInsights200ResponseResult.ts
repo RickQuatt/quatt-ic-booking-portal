@@ -73,13 +73,13 @@ export interface GetInsights200ResponseResult {
    * @type {number}
    * @memberof GetInsights200ResponseResult
    */
-  totalBoilerHeat: number;
+  totalBoilerHeat?: number;
   /**
    *
    * @type {number}
    * @memberof GetInsights200ResponseResult
    */
-  totalBoilerGas: number;
+  totalBoilerGas?: number;
   /**
    *
    * @type {number}
@@ -169,8 +169,6 @@ export function instanceOfGetInsights200ResponseResult(value: object): boolean {
   isInstance = isInstance && "to" in value;
   isInstance = isInstance && "totalHpHeat" in value;
   isInstance = isInstance && "totalHpElectric" in value;
-  isInstance = isInstance && "totalBoilerHeat" in value;
-  isInstance = isInstance && "totalBoilerGas" in value;
   isInstance = isInstance && "savingsCo2" in value;
   isInstance = isInstance && "savingsGas" in value;
   isInstance = isInstance && "savingsMoney" in value;
@@ -202,8 +200,12 @@ export function GetInsights200ResponseResultFromJSONTyped(
     to: new Date(json["to"]),
     totalHpHeat: json["totalHpHeat"],
     totalHpElectric: json["totalHpElectric"],
-    totalBoilerHeat: json["totalBoilerHeat"],
-    totalBoilerGas: json["totalBoilerGas"],
+    totalBoilerHeat: !exists(json, "totalBoilerHeat")
+      ? undefined
+      : json["totalBoilerHeat"],
+    totalBoilerGas: !exists(json, "totalBoilerGas")
+      ? undefined
+      : json["totalBoilerGas"],
     savingsCo2: json["savingsCo2"],
     savingsGas: json["savingsGas"],
     savingsMoney: json["savingsMoney"],

@@ -91,31 +91,45 @@ export interface Cic {
    * @type {string}
    * @memberof Cic
    */
-  boilerDemand: CicBoilerDemandEnum;
+  boilerDemand?: CicBoilerDemandEnum;
   /**
    * Amount of power in watt
    * @type {number}
    * @memberof Cic
    */
-  boilerPower: number | null;
+  boilerPower?: number | null;
+  /**
+   * Temperature in degrees celcius of the water flowing in. Use heatingWaterTemperatureIn instead
+   * @type {number}
+   * @memberof Cic
+   * @deprecated
+   */
+  boilerWaterTemperatureIn?: number | null;
+  /**
+   * Temperature in degrees celcius of the water flowing out. Use heatingWaterTemperatureOut instead
+   * @type {number}
+   * @memberof Cic
+   * @deprecated
+   */
+  boilerWaterTemperatureOut?: number | null;
+  /**
+   * Temperature in degrees celcius of the water flowing in
+   * @type {number}
+   * @memberof Cic
+   */
+  heatingWaterTemperatureIn?: number | null;
   /**
    * Temperature in degrees celcius of the water flowing out
    * @type {number}
    * @memberof Cic
    */
-  boilerWaterTemperatureIn: number | null;
-  /**
-   * Temperature in degrees celcius of the water flowing out
-   * @type {number}
-   * @memberof Cic
-   */
-  boilerWaterTemperatureOut: number | null;
+  heatingWaterTemperatureOut?: number | null;
   /**
    * Boiler pressure in bar
    * @type {number}
    * @memberof Cic
    */
-  boilerPressure: number | null;
+  boilerPressure?: number | null;
   /**
    *
    * @type {string}
@@ -151,7 +165,7 @@ export interface Cic {
    * @type {boolean}
    * @memberof Cic
    */
-  boilerOn: boolean;
+  boilerOn?: boolean;
   /**
    * Temperature in degrees celcius set point of the control
    * @type {number}
@@ -215,17 +229,11 @@ export function instanceOfCic(value: object): boolean {
   isInstance = isInstance && "availableWifiNetworks" in value;
   isInstance = isInstance && "lastScannedForWifi" in value;
   isInstance = isInstance && "isScanningForWifi" in value;
-  isInstance = isInstance && "boilerDemand" in value;
-  isInstance = isInstance && "boilerPower" in value;
-  isInstance = isInstance && "boilerWaterTemperatureIn" in value;
-  isInstance = isInstance && "boilerWaterTemperatureOut" in value;
-  isInstance = isInstance && "boilerPressure" in value;
   isInstance = isInstance && "thermostatDemand" in value;
   isInstance = isInstance && "thermostatRoomTemperature" in value;
   isInstance = isInstance && "thermostatRoomTemperatureSetPoint" in value;
   isInstance = isInstance && "thermostatFlameOn" in value;
   isInstance = isInstance && "showThermostatTemperatures" in value;
-  isInstance = isInstance && "boilerOn" in value;
   isInstance = isInstance && "thermostatControlTemperatureSetPoint" in value;
   isInstance = isInstance && "status" in value;
   isInstance = isInstance && "serial" in value;
@@ -264,18 +272,32 @@ export function CicFromJSONTyped(json: any, ignoreDiscriminator: boolean): Cic {
         ? null
         : new Date(json["lastScannedForWifi"]),
     isScanningForWifi: json["isScanningForWifi"],
-    boilerDemand: json["boilerDemand"],
-    boilerPower: json["boilerPower"],
-    boilerWaterTemperatureIn: json["boilerWaterTemperatureIn"],
-    boilerWaterTemperatureOut: json["boilerWaterTemperatureOut"],
-    boilerPressure: json["boilerPressure"],
+    boilerDemand: !exists(json, "boilerDemand")
+      ? undefined
+      : json["boilerDemand"],
+    boilerPower: !exists(json, "boilerPower") ? undefined : json["boilerPower"],
+    boilerWaterTemperatureIn: !exists(json, "boilerWaterTemperatureIn")
+      ? undefined
+      : json["boilerWaterTemperatureIn"],
+    boilerWaterTemperatureOut: !exists(json, "boilerWaterTemperatureOut")
+      ? undefined
+      : json["boilerWaterTemperatureOut"],
+    heatingWaterTemperatureIn: !exists(json, "heatingWaterTemperatureIn")
+      ? undefined
+      : json["heatingWaterTemperatureIn"],
+    heatingWaterTemperatureOut: !exists(json, "heatingWaterTemperatureOut")
+      ? undefined
+      : json["heatingWaterTemperatureOut"],
+    boilerPressure: !exists(json, "boilerPressure")
+      ? undefined
+      : json["boilerPressure"],
     thermostatDemand: json["thermostatDemand"],
     thermostatRoomTemperature: json["thermostatRoomTemperature"],
     thermostatRoomTemperatureSetPoint:
       json["thermostatRoomTemperatureSetPoint"],
     thermostatFlameOn: json["thermostatFlameOn"],
     showThermostatTemperatures: json["showThermostatTemperatures"],
-    boilerOn: json["boilerOn"],
+    boilerOn: !exists(json, "boilerOn") ? undefined : json["boilerOn"],
     thermostatControlTemperatureSetPoint:
       json["thermostatControlTemperatureSetPoint"],
     status: CicStatusFromJSON(json["status"]),
@@ -313,6 +335,8 @@ export function CicToJSON(value?: Cic | null): any {
     boilerPower: value.boilerPower,
     boilerWaterTemperatureIn: value.boilerWaterTemperatureIn,
     boilerWaterTemperatureOut: value.boilerWaterTemperatureOut,
+    heatingWaterTemperatureIn: value.heatingWaterTemperatureIn,
+    heatingWaterTemperatureOut: value.heatingWaterTemperatureOut,
     boilerPressure: value.boilerPressure,
     thermostatDemand: value.thermostatDemand,
     thermostatRoomTemperature: value.thermostatRoomTemperature,

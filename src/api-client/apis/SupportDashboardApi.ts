@@ -129,6 +129,10 @@ export interface AdminCicCicIdForgetWifiOptionsRequest {
   cicId: string;
 }
 
+export interface AdminCicCicIdHealthchecksOptionsRequest {
+  cicId: string;
+}
+
 export interface AdminCicCicIdOptionsRequest {
   cicId: string;
 }
@@ -170,6 +174,10 @@ export interface AdminForgetWifiRequest {
 }
 
 export interface AdminGetCicRequest {
+  cicId: string;
+}
+
+export interface AdminGetCicHealthCheckRequest {
   cicId: string;
 }
 
@@ -579,6 +587,54 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminCicCicIdForgetWifiOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
+  async adminCicCicIdHealthchecksOptionsRaw(
+    requestParameters: AdminCicCicIdHealthchecksOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCicCicIdHealthchecksOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/healthchecks`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminCicCicIdHealthchecksOptions(
+    requestParameters: AdminCicCicIdHealthchecksOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminCicCicIdHealthchecksOptionsRaw(
       requestParameters,
       initOverrides,
     );
@@ -1281,6 +1337,67 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   * Get healthchecks for a CIC
+   */
+  async adminGetCicHealthCheckRaw(
+    requestParameters: AdminGetCicHealthCheckRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<AdminGetInstallationHealthCheck200Response>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminGetCicHealthCheck.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/healthchecks`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminGetInstallationHealthCheck200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Get healthchecks for a CIC
+   */
+  async adminGetCicHealthCheck(
+    requestParameters: AdminGetCicHealthCheckRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminGetInstallationHealthCheck200Response> {
+    const response = await this.adminGetCicHealthCheckRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
    * Get installation
    */
   async adminGetInstallationRaw(
@@ -1343,6 +1460,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    * Get installation data from clickhouse
+   * @deprecated
    */
   async adminGetInstallationClickhouseDataRaw(
     requestParameters: AdminGetInstallationClickhouseDataRequest,
@@ -1390,6 +1508,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    * Get installation data from clickhouse
+   * @deprecated
    */
   async adminGetInstallationClickhouseData(
     requestParameters: AdminGetInstallationClickhouseDataRequest,
@@ -1482,6 +1601,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    * Get health check data for selected installation by CIC id
+   * @deprecated
    */
   async adminGetInstallationHealthCheckRaw(
     requestParameters: AdminGetInstallationHealthCheckRequest,
@@ -1544,6 +1664,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    * Get health check data for selected installation by CIC id
+   * @deprecated
    */
   async adminGetInstallationHealthCheck(
     requestParameters: AdminGetInstallationHealthCheckRequest,
