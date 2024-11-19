@@ -58,7 +58,7 @@ function InstallationModeReparation({
 
   const boilerChartData =
     modeReparation &&
-    getChartDataElementForStatus("Boiler", modeReparation.boiler, total);
+    getChartDataElementForStatus("Boiler", modeReparation.boiler || 0, total);
 
   const chartData = {
     labels: ["Quatt", "Idle", "Combo", "Boiler", "AntiFreezeProtection"],

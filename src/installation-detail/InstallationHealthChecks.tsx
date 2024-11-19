@@ -26,7 +26,7 @@ interface InstallationHealthCheckProps {
   thermostatType: ThermostatType | null;
   deviceConnectionStatuses: DeviceConnectionStatuses;
   internetConnectionStatuses: InternetConnectionStatuses;
-  boilerType: BoilerType | null;
+  boilerType?: BoilerType | null;
   numberOfHeatPumps: number | null;
 }
 
