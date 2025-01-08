@@ -52,22 +52,13 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <ApiClientProvider>
             <Route path="/">
-              <Redirect to="/dashboard" replace />
-            </Route>
-            <Route path="/dashboard">
-              <CicDashboardRenderer />
+              <Redirect to="/installers" replace />
             </Route>
             <Route path="/installers">
               <InstallerListRenderer />
             </Route>
-            <Route path="/cics">
-              <CICListRenderer />
-            </Route>
             <Route path="/installations">
               <InstallationList />
-            </Route>
-            <Route path="/cicHealth">
-              <CICHealthListRenderer />
             </Route>
             <Route path="/cics/:cicId">
               {(params) => {
