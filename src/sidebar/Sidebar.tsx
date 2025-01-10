@@ -26,6 +26,9 @@ export function Sidebar() {
         )}
       >
         <div className={classes["sidebar-content"]}>
+          <Link href="/dashboard" className={classes["sidebar-button"]}>
+            CIC Dashboard
+          </Link>
           <Link href="/installers" className={classes["sidebar-button"]}>
             Installers
           </Link>
