@@ -54,6 +54,9 @@ function App() {
             <Route path="/">
               <Redirect to="/dashboard" replace />
             </Route>
+            <Route path="/cics">
+              <CICListRenderer />
+            </Route>
             <Route path="/dashboard">
               <CicDashboardRenderer />
             </Route>
@@ -62,6 +65,9 @@ function App() {
             </Route>
             <Route path="/installations">
               <InstallationList />
+            </Route>
+            <Route path="/cicHealth">
+              <CICHealthListRenderer />
             </Route>
             <Route path="/cics/:cicId">
               {(params) => {
@@ -168,13 +174,14 @@ const InstallerListRenderer = () => {
 
 const CICListRenderer = () => {
   const apiClient = useApiClient();
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, refetch, error } = useQuery({
     queryKey: ["cicList"],
     queryFn: () => apiClient.adminListCics(),
     refetchOnWindowFocus: false,
   });
 
   if (isError) {
+    console.log({ error });
     return <ErrorText text="Failed to fetch CICs." retry={refetch} />;
   }
 
