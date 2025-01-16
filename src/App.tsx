@@ -54,6 +54,9 @@ function App() {
             <Route path="/">
               <Redirect to="/dashboard" replace />
             </Route>
+            <Route path="/cics">
+              <CICListRenderer />
+            </Route>
             <Route path="/dashboard">
               <CicDashboardRenderer />
             </Route>
