@@ -63,9 +63,6 @@ function App() {
             <Route path="/installers">
               <InstallerListRenderer />
             </Route>
-            <Route path="/cics">
-              <CICListRenderer />
-            </Route>
             <Route path="/installations">
               <InstallationList />
             </Route>
