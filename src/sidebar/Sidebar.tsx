@@ -29,6 +29,9 @@ export function Sidebar() {
           <Link href="/dashboard" className={classes["sidebar-button"]}>
             CIC Dashboard
           </Link>
+          <Link href="/cicHealth" className={classes["sidebar-button"]}>
+            CIC Health Check List
+          </Link>
           <Link href="/cics" className={classes["sidebar-button"]}>
             CIC List
           </Link>
