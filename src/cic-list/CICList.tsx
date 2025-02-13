@@ -106,10 +106,14 @@ export function CICList() {
     return <ErrorText text="Failed to fetch CICs." retry={refetch} />;
   }
 
+  const currentPageAmount =
+    currentPage < totalPages ? pageSize * currentPage : total;
+
   return (
     <div className={classes.page}>
       <h2 className={classes["page-title"]}>
-        CIC List, {filteredItems.length} {hasFilters ? "filtered " : ""}results
+        CIC List, {currentPageAmount} {hasFilters ? "filtered " : ""} of {total}{" "}
+        results
       </h2>
       <Table gridClass={classes["table-grid"]}>
         <THead>
