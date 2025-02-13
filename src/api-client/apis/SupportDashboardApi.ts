@@ -110,7 +110,7 @@ import {
 
 export interface AdminAddInstallationNoteRequest {
   installationId: string;
-  createUpdateNote?: CreateUpdateNote;
+  createUpdateNote: CreateUpdateNote;
 }
 
 export interface AdminCancelCommissioningRequest {
@@ -147,11 +147,11 @@ export interface AdminCompleteCommissioningRequest {
 
 export interface AdminCreateInstallationTariffRequest {
   installationId: string;
-  createTariffRequest?: CreateTariffRequest;
+  createTariffRequest: CreateTariffRequest;
 }
 
 export interface AdminCreateInstallerRequest {
-  createUpdateInstaller?: CreateUpdateInstaller;
+  createUpdateInstaller: CreateUpdateInstaller;
 }
 
 export interface AdminDeleteInstallationNoteRequest {
@@ -170,7 +170,7 @@ export interface AdminDeleteInstallerRequest {
 
 export interface AdminForgetWifiRequest {
   cicId: string;
-  forgetWifiMeCicRequest?: ForgetWifiMeCicRequest;
+  forgetWifiMeCicRequest: ForgetWifiMeCicRequest;
 }
 
 export interface AdminGetCicRequest {
@@ -287,36 +287,45 @@ export interface AdminInstallationsListRequest {
   cicId?: string;
 }
 
+export interface AdminListCicsRequest {
+  orderNumber?: string;
+  cicId?: string;
+  createdAtStart?: Date;
+  createdAtEnd?: Date;
+  page?: number;
+  pageSize?: number;
+}
+
 export interface AdminRebootCICRequest {
   cicId: string;
-  body?: object;
+  body: object;
 }
 
 export interface AdminUpdateCicRequest {
   cicId: string;
-  updateAdminCic?: UpdateAdminCic;
+  updateAdminCic: UpdateAdminCic;
 }
 
 export interface AdminUpdateInstallationRequest {
   orderNumber: string;
-  updateAdminInstallation?: UpdateAdminInstallation;
+  updateAdminInstallation: UpdateAdminInstallation;
 }
 
 export interface AdminUpdateInstallationNoteRequest {
   installationId: string;
   noteId: string;
-  createUpdateNote?: CreateUpdateNote;
+  createUpdateNote: CreateUpdateNote;
 }
 
 export interface AdminUpdateInstallationTariffRequest {
   installationId: string;
   tariffId: string;
-  createTariffRequest?: CreateTariffRequest;
+  createTariffRequest: CreateTariffRequest;
 }
 
 export interface AdminUpdateInstallerRequest {
   installerId: string;
-  createUpdateInstaller?: CreateUpdateInstaller;
+  createUpdateInstaller: CreateUpdateInstaller;
 }
 
 /**
@@ -337,6 +346,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       throw new runtime.RequiredError(
         "installationId",
         "Required parameter requestParameters.installationId was null or undefined when calling adminAddInstallationNote.",
+      );
+    }
+
+    if (
+      requestParameters.createUpdateNote === null ||
+      requestParameters.createUpdateNote === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "createUpdateNote",
+        "Required parameter requestParameters.createUpdateNote was null or undefined when calling adminAddInstallationNote.",
       );
     }
 
@@ -868,6 +887,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       );
     }
 
+    if (
+      requestParameters.createTariffRequest === null ||
+      requestParameters.createTariffRequest === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "createTariffRequest",
+        "Required parameter requestParameters.createTariffRequest was null or undefined when calling adminCreateInstallationTariff.",
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
@@ -922,6 +951,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     requestParameters: AdminCreateInstallerRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<AdminCreateInstaller200Response>> {
+    if (
+      requestParameters.createUpdateInstaller === null ||
+      requestParameters.createUpdateInstaller === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "createUpdateInstaller",
+        "Required parameter requestParameters.createUpdateInstaller was null or undefined when calling adminCreateInstaller.",
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
@@ -958,7 +997,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
    * Create installer
    */
   async adminCreateInstaller(
-    requestParameters: AdminCreateInstallerRequest = {},
+    requestParameters: AdminCreateInstallerRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminCreateInstaller200Response> {
     const response = await this.adminCreateInstallerRaw(
@@ -1229,6 +1268,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       throw new runtime.RequiredError(
         "cicId",
         "Required parameter requestParameters.cicId was null or undefined when calling adminForgetWifi.",
+      );
+    }
+
+    if (
+      requestParameters.forgetWifiMeCicRequest === null ||
+      requestParameters.forgetWifiMeCicRequest === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "forgetWifiMeCicRequest",
+        "Required parameter requestParameters.forgetWifiMeCicRequest was null or undefined when calling adminForgetWifi.",
       );
     }
 
@@ -2903,9 +2952,38 @@ export class SupportDashboardApi extends runtime.BaseAPI {
    * List cics
    */
   async adminListCicsRaw(
+    requestParameters: AdminListCicsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<AdminListCics200Response>> {
     const queryParameters: any = {};
+
+    if (requestParameters.orderNumber !== undefined) {
+      queryParameters["orderNumber"] = requestParameters.orderNumber;
+    }
+
+    if (requestParameters.cicId !== undefined) {
+      queryParameters["cicId"] = requestParameters.cicId;
+    }
+
+    if (requestParameters.createdAtStart !== undefined) {
+      queryParameters["createdAtStart"] = (
+        requestParameters.createdAtStart as any
+      ).toISOString();
+    }
+
+    if (requestParameters.createdAtEnd !== undefined) {
+      queryParameters["createdAtEnd"] = (
+        requestParameters.createdAtEnd as any
+      ).toISOString();
+    }
+
+    if (requestParameters.page !== undefined) {
+      queryParameters["page"] = requestParameters.page;
+    }
+
+    if (requestParameters.pageSize !== undefined) {
+      queryParameters["pageSize"] = requestParameters.pageSize;
+    }
 
     const headerParameters: runtime.HTTPHeaders = {};
 
@@ -2936,9 +3014,13 @@ export class SupportDashboardApi extends runtime.BaseAPI {
    * List cics
    */
   async adminListCics(
+    requestParameters: AdminListCicsRequest = {},
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminListCics200Response> {
-    const response = await this.adminListCicsRaw(initOverrides);
+    const response = await this.adminListCicsRaw(
+      requestParameters,
+      initOverrides,
+    );
     return await response.value();
   }
 
@@ -2999,6 +3081,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       throw new runtime.RequiredError(
         "cicId",
         "Required parameter requestParameters.cicId was null or undefined when calling adminRebootCIC.",
+      );
+    }
+
+    if (
+      requestParameters.body === null ||
+      requestParameters.body === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "body",
+        "Required parameter requestParameters.body was null or undefined when calling adminRebootCIC.",
       );
     }
 
@@ -3066,6 +3158,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       );
     }
 
+    if (
+      requestParameters.updateAdminCic === null ||
+      requestParameters.updateAdminCic === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "updateAdminCic",
+        "Required parameter requestParameters.updateAdminCic was null or undefined when calling adminUpdateCic.",
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
@@ -3127,6 +3229,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       throw new runtime.RequiredError(
         "orderNumber",
         "Required parameter requestParameters.orderNumber was null or undefined when calling adminUpdateInstallation.",
+      );
+    }
+
+    if (
+      requestParameters.updateAdminInstallation === null ||
+      requestParameters.updateAdminInstallation === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "updateAdminInstallation",
+        "Required parameter requestParameters.updateAdminInstallation was null or undefined when calling adminUpdateInstallation.",
       );
     }
 
@@ -3203,6 +3315,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       throw new runtime.RequiredError(
         "noteId",
         "Required parameter requestParameters.noteId was null or undefined when calling adminUpdateInstallationNote.",
+      );
+    }
+
+    if (
+      requestParameters.createUpdateNote === null ||
+      requestParameters.createUpdateNote === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "createUpdateNote",
+        "Required parameter requestParameters.createUpdateNote was null or undefined when calling adminUpdateInstallationNote.",
       );
     }
 
@@ -3285,6 +3407,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       );
     }
 
+    if (
+      requestParameters.createTariffRequest === null ||
+      requestParameters.createTariffRequest === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "createTariffRequest",
+        "Required parameter requestParameters.createTariffRequest was null or undefined when calling adminUpdateInstallationTariff.",
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
@@ -3351,6 +3483,16 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       throw new runtime.RequiredError(
         "installerId",
         "Required parameter requestParameters.installerId was null or undefined when calling adminUpdateInstaller.",
+      );
+    }
+
+    if (
+      requestParameters.createUpdateInstaller === null ||
+      requestParameters.createUpdateInstaller === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "createUpdateInstaller",
+        "Required parameter requestParameters.createUpdateInstaller was null or undefined when calling adminUpdateInstaller.",
       );
     }
 

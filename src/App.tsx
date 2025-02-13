@@ -17,7 +17,6 @@ import { Button } from "./ui-components/button/Button";
 import { InstallerList } from "./installer-list/InstallerList";
 import { Loader } from "./ui-components/loader/Loader";
 import { CicDashboard } from "./cic-dashboard/CicDashboard";
-import { CICHealthList } from "./cic-health-list/CICHealthList";
 import { Sidebar } from "./sidebar/Sidebar";
 import { InstallationList } from "./installation-list/InstallationList";
 import { InstallationDetail } from "./installation-detail/InstallationDetail";
@@ -65,9 +64,6 @@ function App() {
             </Route>
             <Route path="/installations">
               <InstallationList />
-            </Route>
-            <Route path="/cicHealth">
-              <CICHealthListRenderer />
             </Route>
             <Route path="/cics/:cicId">
               {(params) => {
@@ -173,36 +169,7 @@ const InstallerListRenderer = () => {
 };
 
 const CICListRenderer = () => {
-  const apiClient = useApiClient();
-  const { data, isLoading, isError, refetch, error } = useQuery({
-    queryKey: ["cicList"],
-    queryFn: () => apiClient.adminListCics(),
-    refetchOnWindowFocus: false,
-  });
-
-  if (isError) {
-    console.log({ error });
-    return <ErrorText text="Failed to fetch CICs." retry={refetch} />;
-  }
-
-  return isLoading ? <Loader /> : <CICList data={data?.result || []} />;
-};
-
-const CICHealthListRenderer = () => {
-  const apiClient = useApiClient();
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["cicList"],
-    queryFn: () => apiClient.adminListCics(),
-    refetchOnWindowFocus: false,
-  });
-
-  if (isError) {
-    return (
-      <ErrorText text="Failed to fetch CIC health list." retry={refetch} />
-    );
-  }
-
-  return isLoading ? <Loader /> : <CICHealthList data={data?.result || []} />;
+  return <CICList />;
 };
 
 export default App;

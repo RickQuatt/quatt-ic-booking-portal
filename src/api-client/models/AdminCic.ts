@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
+import type { AllEStatus } from "./AllEStatus";
+import {
+  AllEStatusFromJSON,
+  AllEStatusFromJSONTyped,
+  AllEStatusToJSON,
+} from "./AllEStatus";
 import type { BoilerType } from "./BoilerType";
 import {
   BoilerTypeFromJSON,
@@ -73,6 +79,12 @@ import {
   ConnectionStatusFromJSONTyped,
   ConnectionStatusToJSON,
 } from "./ConnectionStatus";
+import type { Country } from "./Country";
+import {
+  CountryFromJSON,
+  CountryFromJSONTyped,
+  CountryToJSON,
+} from "./Country";
 import type { HeatDeliverySystem } from "./HeatDeliverySystem";
 import {
   HeatDeliverySystemFromJSON,
@@ -97,6 +109,12 @@ import {
   SilentModeFromJSONTyped,
   SilentModeToJSON,
 } from "./SilentMode";
+import type { TariffType } from "./TariffType";
+import {
+  TariffTypeFromJSON,
+  TariffTypeFromJSONTyped,
+  TariffTypeToJSON,
+} from "./TariffType";
 import type { ThermostatType } from "./ThermostatType";
 import {
   ThermostatTypeFromJSON,
@@ -279,7 +297,7 @@ export interface AdminCic {
    * @type {Date}
    * @memberof AdminCic
    */
-  installedAt: Date;
+  installedAt: Date | null;
   /**
    * The amount (liter) of water flowing per hour
    * @type {number}
@@ -316,6 +334,30 @@ export interface AdminCic {
    * @memberof AdminCic
    */
   electricityNightTimeEndHour: number;
+  /**
+   * Night time quiet hour start value for the sound slider
+   * @type {number}
+   * @memberof AdminCic
+   */
+  soundNightTimeStartHour: number;
+  /**
+   * Night time quiet hour end value for the sound slider
+   * @type {number}
+   * @memberof AdminCic
+   */
+  soundNightTimeEndHour: number;
+  /**
+   * Night time quiet minute start value for the sound slider
+   * @type {number}
+   * @memberof AdminCic
+   */
+  soundNightTimeStartMin: number;
+  /**
+   * Night time quiet minute end value for the sound slider
+   * @type {number}
+   * @memberof AdminCic
+   */
+  soundNightTimeEndMin: number;
   /**
    * Gas price
    * @type {number}
@@ -396,10 +438,22 @@ export interface AdminCic {
   zipCode: string | null;
   /**
    *
+   * @type {Country}
+   * @memberof AdminCic
+   */
+  country: Country;
+  /**
+   * The supported tariff types
+   * @type {Set<TariffType>}
+   * @memberof AdminCic
+   */
+  supportedTariffTypes: Set<TariffType>;
+  /**
+   *
    * @type {string}
    * @memberof AdminCic
    */
-  orderNumber: string;
+  orderNumber: string | null;
   /**
    *
    * @type {boolean}
@@ -448,6 +502,30 @@ export interface AdminCic {
    * @memberof AdminCic
    */
   supportsForgetWifi: boolean;
+  /**
+   * Is the Quatt Hybrid or All-E currently heating the house
+   * @type {boolean}
+   * @memberof AdminCic
+   */
+  isCentralHeatingOn: boolean | null;
+  /**
+   * The amount of heat currently produced by the Quatt Hybrid or All-E, in watts
+   * @type {number}
+   * @memberof AdminCic
+   */
+  quattHeatingProductionAmount: number | null;
+  /**
+   * The amount of electricity currently consumed by the Quatt Hybrid or All-E, in watts
+   * @type {number}
+   * @memberof AdminCic
+   */
+  electricityConsumptionAmount: number | null;
+  /**
+   *
+   * @type {AllEStatus}
+   * @memberof AdminCic
+   */
+  allEStatus: AllEStatus | null;
   /**
    *
    * @type {Array<HeatDeliverySystem>}
@@ -508,6 +586,12 @@ export interface AdminCic {
    * @memberof AdminCic
    */
   lastStatUpdate?: string | null;
+  /**
+   * Whether the cic can start commissioning. Not application for the identification test
+   * @type {boolean}
+   * @memberof AdminCic
+   */
+  canStartCommissioning: boolean;
   /**
    *
    * @type {string}
@@ -636,12 +720,18 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "nightElectricityPrice" in value;
   isInstance = isInstance && "electricityNightTimeStartHour" in value;
   isInstance = isInstance && "electricityNightTimeEndHour" in value;
+  isInstance = isInstance && "soundNightTimeStartHour" in value;
+  isInstance = isInstance && "soundNightTimeEndHour" in value;
+  isInstance = isInstance && "soundNightTimeStartMin" in value;
+  isInstance = isInstance && "soundNightTimeEndMin" in value;
   isInstance = isInstance && "gasPrice" in value;
   isInstance = isInstance && "usePricingToLimitHeatPump" in value;
   isInstance = isInstance && "silentMode" in value;
   isInstance = isInstance && "heatPumps" in value;
   isInstance = isInstance && "name" in value;
   isInstance = isInstance && "zipCode" in value;
+  isInstance = isInstance && "country" in value;
+  isInstance = isInstance && "supportedTariffTypes" in value;
   isInstance = isInstance && "orderNumber" in value;
   isInstance = isInstance && "wifiEnabled" in value;
   isInstance = isInstance && "insightsStartAt" in value;
@@ -651,6 +741,10 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "temperatureOutside" in value;
   isInstance = isInstance && "waterTemperature" in value;
   isInstance = isInstance && "supportsForgetWifi" in value;
+  isInstance = isInstance && "isCentralHeatingOn" in value;
+  isInstance = isInstance && "quattHeatingProductionAmount" in value;
+  isInstance = isInstance && "electricityConsumptionAmount" in value;
+  isInstance = isInstance && "allEStatus" in value;
   isInstance = isInstance && "heatDeliverySystems" in value;
   isInstance = isInstance && "thermostatType" in value;
   isInstance = isInstance && "quattBuildRequired" in value;
@@ -659,6 +753,7 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "ratedMaximumHousePower" in value;
   isInstance = isInstance && "maximumHeatingOutdoorTemperature" in value;
   isInstance = isInstance && "lastCommissioning" in value;
+  isInstance = isInstance && "canStartCommissioning" in value;
   isInstance = isInstance && "menderId" in value;
   isInstance = isInstance && "createdAt" in value;
   isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
@@ -739,13 +834,18 @@ export function AdminCicFromJSONTyped(
     numberOfHeatPumps: json["numberOfHeatPumps"],
     quattBuild: json["quattBuild"],
     installationId: json["installationId"],
-    installedAt: new Date(json["installedAt"]),
+    installedAt:
+      json["installedAt"] === null ? null : new Date(json["installedAt"]),
     flowRate: json["flowRate"],
     electricityPrice: json["electricityPrice"],
     dayElectricityPrice: json["dayElectricityPrice"],
     nightElectricityPrice: json["nightElectricityPrice"],
     electricityNightTimeStartHour: json["electricityNightTimeStartHour"],
     electricityNightTimeEndHour: json["electricityNightTimeEndHour"],
+    soundNightTimeStartHour: json["soundNightTimeStartHour"],
+    soundNightTimeEndHour: json["soundNightTimeEndHour"],
+    soundNightTimeStartMin: json["soundNightTimeStartMin"],
+    soundNightTimeEndMin: json["soundNightTimeEndMin"],
     gasPrice: json["gasPrice"],
     usePricingToLimitHeatPump: json["usePricingToLimitHeatPump"],
     silentMode: SilentModeFromJSON(json["silentMode"]),
@@ -773,6 +873,10 @@ export function AdminCicFromJSONTyped(
       : json["isControllerAlive"],
     name: json["name"],
     zipCode: json["zipCode"],
+    country: CountryFromJSON(json["country"]),
+    supportedTariffTypes: new Set(
+      (json["supportedTariffTypes"] as Array<any>).map(TariffTypeFromJSON),
+    ),
     orderNumber: json["orderNumber"],
     wifiEnabled: json["wifiEnabled"],
     insightsStartAt:
@@ -785,6 +889,10 @@ export function AdminCicFromJSONTyped(
     temperatureOutside: json["temperatureOutside"],
     waterTemperature: json["waterTemperature"],
     supportsForgetWifi: json["supportsForgetWifi"],
+    isCentralHeatingOn: json["isCentralHeatingOn"],
+    quattHeatingProductionAmount: json["quattHeatingProductionAmount"],
+    electricityConsumptionAmount: json["electricityConsumptionAmount"],
+    allEStatus: AllEStatusFromJSON(json["allEStatus"]),
     heatDeliverySystems:
       json["heatDeliverySystems"] === null
         ? null
@@ -804,6 +912,7 @@ export function AdminCicFromJSONTyped(
     lastStatUpdate: !exists(json, "lastStatUpdate")
       ? undefined
       : json["lastStatUpdate"],
+    canStartCommissioning: json["canStartCommissioning"],
     menderId: json["menderId"],
     createdAt: new Date(json["createdAt"]),
     lastConnectionStatusUpdatedAt:
@@ -872,13 +981,18 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     numberOfHeatPumps: value.numberOfHeatPumps,
     quattBuild: value.quattBuild,
     installationId: value.installationId,
-    installedAt: value.installedAt.toISOString(),
+    installedAt:
+      value.installedAt === null ? null : value.installedAt.toISOString(),
     flowRate: value.flowRate,
     electricityPrice: value.electricityPrice,
     dayElectricityPrice: value.dayElectricityPrice,
     nightElectricityPrice: value.nightElectricityPrice,
     electricityNightTimeStartHour: value.electricityNightTimeStartHour,
     electricityNightTimeEndHour: value.electricityNightTimeEndHour,
+    soundNightTimeStartHour: value.soundNightTimeStartHour,
+    soundNightTimeEndHour: value.soundNightTimeEndHour,
+    soundNightTimeStartMin: value.soundNightTimeStartMin,
+    soundNightTimeEndMin: value.soundNightTimeEndMin,
     gasPrice: value.gasPrice,
     usePricingToLimitHeatPump: value.usePricingToLimitHeatPump,
     silentMode: SilentModeToJSON(value.silentMode),
@@ -892,6 +1006,10 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     isControllerAlive: value.isControllerAlive,
     name: value.name,
     zipCode: value.zipCode,
+    country: CountryToJSON(value.country),
+    supportedTariffTypes: Array.from(
+      value.supportedTariffTypes as Set<any>,
+    ).map(TariffTypeToJSON),
     orderNumber: value.orderNumber,
     wifiEnabled: value.wifiEnabled,
     insightsStartAt:
@@ -904,6 +1022,10 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     temperatureOutside: value.temperatureOutside,
     waterTemperature: value.waterTemperature,
     supportsForgetWifi: value.supportsForgetWifi,
+    isCentralHeatingOn: value.isCentralHeatingOn,
+    quattHeatingProductionAmount: value.quattHeatingProductionAmount,
+    electricityConsumptionAmount: value.electricityConsumptionAmount,
+    allEStatus: AllEStatusToJSON(value.allEStatus),
     heatDeliverySystems:
       value.heatDeliverySystems === null
         ? null
@@ -919,6 +1041,7 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     maximumHeatingOutdoorTemperature: value.maximumHeatingOutdoorTemperature,
     lastCommissioning: CicCommissioningToJSON(value.lastCommissioning),
     lastStatUpdate: value.lastStatUpdate,
+    canStartCommissioning: value.canStartCommissioning,
     menderId: value.menderId,
     createdAt: value.createdAt.toISOString(),
     lastConnectionStatusUpdatedAt:

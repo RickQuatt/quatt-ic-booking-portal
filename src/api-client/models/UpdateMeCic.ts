@@ -81,12 +81,6 @@ export interface UpdateMeCic {
    */
   silentMode?: SilentMode;
   /**
-   * Name of the CIC (max 100 characters) for the user
-   * @type {string}
-   * @memberof UpdateMeCic
-   */
-  name?: string | null;
-  /**
    *
    * @type {MaxSoundLevel}
    * @memberof UpdateMeCic
@@ -98,6 +92,12 @@ export interface UpdateMeCic {
    * @memberof UpdateMeCic
    */
   nightMaxSoundLevel?: MaxSoundLevel;
+  /**
+   * Name of the CIC (max 100 characters) for the user
+   * @type {string}
+   * @memberof UpdateMeCic
+   */
+  name?: string | null;
 }
 
 /**
@@ -141,13 +141,13 @@ export function UpdateMeCicFromJSONTyped(
     silentMode: !exists(json, "silentMode")
       ? undefined
       : SilentModeFromJSON(json["silentMode"]),
-    name: !exists(json, "name") ? undefined : json["name"],
     dayMaxSoundLevel: !exists(json, "dayMaxSoundLevel")
       ? undefined
       : MaxSoundLevelFromJSON(json["dayMaxSoundLevel"]),
     nightMaxSoundLevel: !exists(json, "nightMaxSoundLevel")
       ? undefined
       : MaxSoundLevelFromJSON(json["nightMaxSoundLevel"]),
+    name: !exists(json, "name") ? undefined : json["name"],
   };
 }
 
@@ -167,8 +167,8 @@ export function UpdateMeCicToJSON(value?: UpdateMeCic | null): any {
     gasPrice: value.gasPrice,
     usePricingToLimitHeatPump: value.usePricingToLimitHeatPump,
     silentMode: SilentModeToJSON(value.silentMode),
-    name: value.name,
     dayMaxSoundLevel: MaxSoundLevelToJSON(value.dayMaxSoundLevel),
     nightMaxSoundLevel: MaxSoundLevelToJSON(value.nightMaxSoundLevel),
+    name: value.name,
   };
 }

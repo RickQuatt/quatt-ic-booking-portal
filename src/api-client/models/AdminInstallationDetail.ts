@@ -31,6 +31,12 @@ import {
   CicStateFromJSONTyped,
   CicStateToJSON,
 } from "./CicState";
+import type { Country } from "./Country";
+import {
+  CountryFromJSON,
+  CountryFromJSONTyped,
+  CountryToJSON,
+} from "./Country";
 import type { DeviceConnectionStatuses } from "./DeviceConnectionStatuses";
 import {
   DeviceConnectionStatusesFromJSON,
@@ -109,7 +115,7 @@ export interface AdminInstallationDetail {
    * @type {string}
    * @memberof AdminInstallationDetail
    */
-  activeCic: string;
+  activeCic: string | null;
   /**
    *
    * @type {number}
@@ -140,6 +146,12 @@ export interface AdminInstallationDetail {
    * @memberof AdminInstallationDetail
    */
   zipCode: string | null;
+  /**
+   *
+   * @type {Country}
+   * @memberof AdminInstallationDetail
+   */
+  country: Country;
   /**
    *
    * @type {string}
@@ -187,7 +199,7 @@ export interface AdminInstallationDetail {
    * @type {string}
    * @memberof AdminInstallationDetail
    */
-  orderNumber: string;
+  orderNumber: string | null;
   /**
    *
    * @type {string}
@@ -359,6 +371,7 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "nightElectricityPrice" in value;
   isInstance = isInstance && "gasPrice" in value;
   isInstance = isInstance && "zipCode" in value;
+  isInstance = isInstance && "country" in value;
   isInstance = isInstance && "name" in value;
   isInstance = isInstance && "ratedMaximumHousePower" in value;
   isInstance = isInstance && "usePricingToLimitHeatPump" in value;
@@ -418,6 +431,7 @@ export function AdminInstallationDetailFromJSONTyped(
     nightElectricityPrice: json["nightElectricityPrice"],
     gasPrice: json["gasPrice"],
     zipCode: json["zipCode"],
+    country: CountryFromJSON(json["country"]),
     name: json["name"],
     ratedMaximumHousePower: json["ratedMaximumHousePower"],
     usePricingToLimitHeatPump: json["usePricingToLimitHeatPump"],
@@ -495,6 +509,7 @@ export function AdminInstallationDetailToJSON(
     nightElectricityPrice: value.nightElectricityPrice,
     gasPrice: value.gasPrice,
     zipCode: value.zipCode,
+    country: CountryToJSON(value.country),
     name: value.name,
     ratedMaximumHousePower: value.ratedMaximumHousePower,
     usePricingToLimitHeatPump: value.usePricingToLimitHeatPump,

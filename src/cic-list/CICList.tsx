@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "wouter";
 
 import classes from "./CICList.module.css";
@@ -32,22 +32,60 @@ import {
 } from "../ui-components/table/Table";
 import { usePaginate } from "../ui-components/pagination/usePaginate";
 import { Pagination } from "../ui-components/pagination/Pagination";
+import ErrorText from "../ui-components/error-text/ErrorText";
+import { useApiClient } from "../api-client/context";
+import { useQuery } from "@tanstack/react-query";
+import { Loader } from "../ui-components/loader/Loader";
 
-export function CICList({ data }: { data: AdminCic[] }) {
+export function CICList() {
+  const apiClient = useApiClient();
+
   const [filters, doSetFilters] = React.useState<CICFilters>({});
+
+  const [pagination, setPagination] = React.useState({
+    page: 1,
+    pageSize: 50,
+  });
   const hasFilters = React.useMemo(() => {
     return Object.values(filters).length;
   }, [filters]);
 
+  const {
+    data: results,
+    isLoading,
+    isError,
+    refetch,
+    error,
+  } = useQuery({
+    queryKey: ["cicList"],
+    queryFn: () =>
+      apiClient.adminListCics({
+        cicId: filters.id,
+        orderNumber: filters.orderNumber || undefined,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        createdAtEnd: filters.maxCreatedAt,
+        createdAtStart: filters.minCreatedAt,
+      }),
+    refetchOnWindowFocus: false,
+  });
+
+  const page = results?.result;
+  const total = page?.total || 0;
+  const pageSize = page?.pageSize || 0;
+  const totalPages = page?.totalPages || 0;
+  const cics = results?.result.cics || [];
+
   const filteredItems = React.useMemo(
-    () => filterCICList(data, filters),
-    [data, filters],
+    () => filterCICList(cics, filters),
+    [cics, filters],
   );
 
   const { paginatedItems, paginationRange, currentPage, changePage } =
     usePaginate({
-      items: filteredItems,
+      items: cics,
       pageSize: 50,
+      total,
     });
 
   const setFilters = React.useCallback(
@@ -57,6 +95,16 @@ export function CICList({ data }: { data: AdminCic[] }) {
     },
     [changePage],
   );
+
+  useEffect(() => {
+    refetch();
+  }, [filters, pagination]);
+
+  if (isLoading) return <Loader />;
+
+  if (isError) {
+    return <ErrorText text="Failed to fetch CICs." retry={refetch} />;
+  }
 
   return (
     <div className={classes.page}>
@@ -105,16 +153,16 @@ export function CICList({ data }: { data: AdminCic[] }) {
               <IDFilter setFilters={setFilters} />
             </Th>
             <Th>
-              <CableConnectionStatusFilter setFilters={setFilters} />
+              {/* <CableConnectionStatusFilter setFilters={setFilters} /> */}
             </Th>
             <Th>
-              <WifiConnectionStatusFilter setFilters={setFilters} />
+              {/* <WifiConnectionStatusFilter setFilters={setFilters} /> */}
             </Th>
             <Th>
-              <LTEConnectionStatusFilter setFilters={setFilters} />
+              {/* <LTEConnectionStatusFilter setFilters={setFilters} /> */}
             </Th>
             <Th>
-              <SupervisoryControlModeFilter setFilters={setFilters} />
+              {/* <SupervisoryControlModeFilter setFilters={setFilters} /> */}
             </Th>
             <Th>
               <OrderNumberFilter setFilters={setFilters} />
@@ -123,7 +171,7 @@ export function CICList({ data }: { data: AdminCic[] }) {
               <CreatedDateFilter setFilters={setFilters} />
             </Th>
             <Th>
-              <LastConnectionStatusFilter setFilters={setFilters} />
+              {/* <LastConnectionStatusFilter setFilters={setFilters} /> */}
             </Th>
             <Th></Th>
             <Th></Th>
@@ -139,7 +187,13 @@ export function CICList({ data }: { data: AdminCic[] }) {
       <Pagination
         paginationRange={paginationRange}
         currentPage={currentPage}
-        changePage={changePage}
+        changePage={(page) => {
+          setPagination({
+            ...pagination,
+            page,
+          });
+          changePage(page);
+        }}
       />
     </div>
   );

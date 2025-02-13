@@ -43,7 +43,7 @@ export interface CicSettingsUpdate {
    * @type {string}
    * @memberof CicSettingsUpdate
    */
-  userId: string;
+  userId: string | null;
   /**
    *
    * @type {string}

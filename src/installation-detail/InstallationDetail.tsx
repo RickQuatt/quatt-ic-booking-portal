@@ -56,6 +56,10 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
 
   const installationId = installationDetails.externalId || "";
 
+  if (!installationDetails.activeCic) {
+    throw new Error("Active CIC not found");
+  }
+
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
