@@ -8,7 +8,7 @@ const useRebootCic = (cicId: string) => {
       return;
     }
 
-    const response = await apiClient.adminRebootCIC({ cicId });
+    const response = await apiClient.adminRebootCIC({ cicId, body: {} });
 
     if (response.meta.status === 200) {
       alert("Reboot request sent successfully.");

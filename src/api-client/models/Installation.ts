@@ -19,6 +19,12 @@ import {
   BoilerTypeFromJSONTyped,
   BoilerTypeToJSON,
 } from "./BoilerType";
+import type { Country } from "./Country";
+import {
+  CountryFromJSON,
+  CountryFromJSONTyped,
+  CountryToJSON,
+} from "./Country";
 import type { HeatDeliverySystem } from "./HeatDeliverySystem";
 import {
   HeatDeliverySystemFromJSON,
@@ -79,7 +85,7 @@ export interface Installation {
    * @type {string}
    * @memberof Installation
    */
-  activeCic: string;
+  activeCic: string | null;
   /**
    *
    * @type {number}
@@ -110,6 +116,12 @@ export interface Installation {
    * @memberof Installation
    */
   zipCode: string | null;
+  /**
+   *
+   * @type {Country}
+   * @memberof Installation
+   */
+  country: Country;
   /**
    *
    * @type {string}
@@ -157,7 +169,7 @@ export interface Installation {
    * @type {string}
    * @memberof Installation
    */
-  orderNumber: string;
+  orderNumber: string | null;
   /**
    *
    * @type {string}
@@ -299,6 +311,7 @@ export function instanceOfInstallation(value: object): boolean {
   isInstance = isInstance && "nightElectricityPrice" in value;
   isInstance = isInstance && "gasPrice" in value;
   isInstance = isInstance && "zipCode" in value;
+  isInstance = isInstance && "country" in value;
   isInstance = isInstance && "name" in value;
   isInstance = isInstance && "ratedMaximumHousePower" in value;
   isInstance = isInstance && "usePricingToLimitHeatPump" in value;
@@ -351,6 +364,7 @@ export function InstallationFromJSONTyped(
     nightElectricityPrice: json["nightElectricityPrice"],
     gasPrice: json["gasPrice"],
     zipCode: json["zipCode"],
+    country: CountryFromJSON(json["country"]),
     name: json["name"],
     ratedMaximumHousePower: json["ratedMaximumHousePower"],
     usePricingToLimitHeatPump: json["usePricingToLimitHeatPump"],
@@ -413,6 +427,7 @@ export function InstallationToJSON(value?: Installation | null): any {
     nightElectricityPrice: value.nightElectricityPrice,
     gasPrice: value.gasPrice,
     zipCode: value.zipCode,
+    country: CountryToJSON(value.country),
     name: value.name,
     ratedMaximumHousePower: value.ratedMaximumHousePower,
     usePricingToLimitHeatPump: value.usePricingToLimitHeatPump,

@@ -179,6 +179,15 @@ models/*
 !models/CicHealthCheckNumberOfRestart.ts
 !models/CicHealthCheck.ts
 !models/InstallationHealthCheckHealthchecksInner.ts
+!models/NullableTariff.ts
+!models/Country.ts
+!models/AdminListCics200ResponseResult.ts
+!models/AdminCicCreateInstallation409Response.ts
+!models/AdminCicCreateInstallation409ResponseAllOfResult.ts
+!models/AllEStatus.ts
+!models/TariffType.ts
+!models/UpdateCicSharedProperties.ts
+!models/UpdateCicWifiProperties.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

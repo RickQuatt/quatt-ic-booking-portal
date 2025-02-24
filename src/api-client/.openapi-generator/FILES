@@ -1,6 +1,8 @@
 apis/SupportDashboardApi.ts
 models/AdminAddInstallationNote200Response.ts
 models/AdminCic.ts
+models/AdminCicCreateInstallation409Response.ts
+models/AdminCicCreateInstallation409ResponseAllOfResult.ts
 models/AdminCreateInstaller200Response.ts
 models/AdminDashboardCics200Response.ts
 models/AdminGetCic200Response.ts
@@ -17,8 +19,10 @@ models/AdminInstallationDetailAllOfCicCommissioning.ts
 models/AdminInstallationsList.ts
 models/AdminInstallationsList200Response.ts
 models/AdminListCics200Response.ts
+models/AdminListCics200ResponseResult.ts
 models/AdminListInstallers200Response.ts
 models/AdminUpdateInstallationNote200Response.ts
+models/AllEStatus.ts
 models/AppCompatibilityGet200Response.ts
 models/AppCompatibilityGet200ResponseResult.ts
 models/AppSettingsGet200Response.ts
@@ -44,6 +48,7 @@ models/CicState.ts
 models/CicStatus.ts
 models/CompleteCommissioning200Response.ts
 models/ConnectionStatus.ts
+models/Country.ts
 models/CreateTariff200Response.ts
 models/CreateTariff409Response.ts
 models/CreateTariff409ResponseAllOfMeta.ts
@@ -99,6 +104,7 @@ models/MeCic.ts
 models/MeUser.ts
 models/MeUserClient.ts
 models/Note.ts
+models/NullableTariff.ts
 models/PostReferralRequest.ts
 models/Range.ts
 models/ReferralMember.ts
@@ -109,6 +115,7 @@ models/SilentMode.ts
 models/StartHeatPumpTestRequest.ts
 models/StopIdentificationTestRequest.ts
 models/Tariff.ts
+models/TariffType.ts
 models/TarrifsResult.ts
 models/ThermostatType.ts
 models/Ticket.ts
@@ -116,7 +123,8 @@ models/TicketHsPipelineStage.ts
 models/TicketHubspotOwnerId.ts
 models/UpdateAdminCic.ts
 models/UpdateAdminInstallation.ts
-models/UpdateCic.ts
+models/UpdateCicSharedProperties.ts
+models/UpdateCicWifiProperties.ts
 models/UpdateInstallerCic.ts
 models/UpdateMeCic.ts
 models/UpdateMeUser.ts

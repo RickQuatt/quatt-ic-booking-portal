@@ -30,7 +30,7 @@ export interface AdminInstallationsList {
    * @type {string}
    * @memberof AdminInstallationsList
    */
-  orderNumber: string;
+  orderNumber: string | null;
   /**
    *
    * @type {Date}

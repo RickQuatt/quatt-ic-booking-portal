@@ -17,6 +17,7 @@
  * @export
  */
 export const ErrorCode = {
+  CacheNotFound: "CACHE_NOT_FOUND",
   UserNotAuthorized: "USER_NOT_AUTHORIZED",
   UserNotFound: "USER_NOT_FOUND",
   UserEmailNotVerified: "USER_EMAIL_NOT_VERIFIED",
@@ -77,6 +78,7 @@ export const ErrorCode = {
   TariffValidationError: "TARIFF_VALIDATION_ERROR",
   TariffOutOfBounds: "TARIFF_OUT_OF_BOUNDS",
   InstallationDateNotToday: "INSTALLATION_DATE_NOT_TODAY",
+  InstallationCountryNotFound: "INSTALLATION_COUNTRY_NOT_FOUND",
   CicNotFactoryOrActive: "CIC_NOT_FACTORY_OR_ACTIVE",
   InstallationNotFound: "INSTALLATION_NOT_FOUND",
   InstallationUpdateError: "INSTALLATION_UPDATE_ERROR",
@@ -93,6 +95,8 @@ export const ErrorCode = {
   CancelCommissioningNotAvailable: "CANCEL_COMMISSIONING_NOT_AVAILABLE",
   RebootCicNotAvailable: "REBOOT_CIC_NOT_AVAILABLE",
   ForgetWifiNotAvailable: "FORGET_WIFI_NOT_AVAILABLE",
+  NoInstallationFoundForCic: "NO_INSTALLATION_FOUND_FOR_CIC",
+  CicHasAlreadyInstallation: "CIC_HAS_ALREADY_INSTALLATION",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

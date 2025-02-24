@@ -17,16 +17,20 @@ export function usePaginate<T>({
   items,
   pageSize = 50,
   siblingCount = 1,
+  total,
 }: {
   items: T[];
   pageSize?: number;
   siblingCount?: number;
+  total?: number;
 }) {
   const [currentPage, doChangePage] = React.useState(1);
 
+  const totalItems = total || items.length;
+
   const totalPageCount = React.useMemo(() => {
-    return Math.ceil(items.length / pageSize);
-  }, [items.length, pageSize]);
+    return Math.ceil(totalItems / pageSize);
+  }, [totalItems, pageSize]);
 
   const changePage = React.useCallback(
     (page: number) => {
@@ -87,6 +91,10 @@ export function usePaginate<T>({
   const paginatedItems = React.useMemo(() => {
     const firstPageIndex = (currentPage - 1) * pageSize;
     const lastPageIndex = firstPageIndex + pageSize;
+    if (total !== undefined) {
+      return items;
+    }
+
     return items.slice(firstPageIndex, lastPageIndex);
   }, [items, currentPage, pageSize]);
 

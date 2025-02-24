@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { AdminCic } from "./AdminCic";
+import type { AdminListCics200ResponseResult } from "./AdminListCics200ResponseResult";
 import {
-  AdminCicFromJSON,
-  AdminCicFromJSONTyped,
-  AdminCicToJSON,
-} from "./AdminCic";
+  AdminListCics200ResponseResultFromJSON,
+  AdminListCics200ResponseResultFromJSONTyped,
+  AdminListCics200ResponseResultToJSON,
+} from "./AdminListCics200ResponseResult";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -40,10 +40,10 @@ export interface AdminListCics200Response {
   meta: ResponseMeta;
   /**
    *
-   * @type {Array<AdminCic>}
+   * @type {AdminListCics200ResponseResult}
    * @memberof AdminListCics200Response
    */
-  result: Array<AdminCic>;
+  result: AdminListCics200ResponseResult;
 }
 
 /**
@@ -72,7 +72,7 @@ export function AdminListCics200ResponseFromJSONTyped(
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: (json["result"] as Array<any>).map(AdminCicFromJSON),
+    result: AdminListCics200ResponseResultFromJSON(json["result"]),
   };
 }
 
@@ -87,6 +87,6 @@ export function AdminListCics200ResponseToJSON(
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: (value.result as Array<any>).map(AdminCicToJSON),
+    result: AdminListCics200ResponseResultToJSON(value.result),
   };
 }

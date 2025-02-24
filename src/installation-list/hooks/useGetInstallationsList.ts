@@ -3,6 +3,7 @@ import { useApiClient } from "../../api-client/context";
 import { prependPrefixIfMissing } from "../../utils/string";
 
 export const useGetInstallationsList = (
+  enforce: boolean,
   cicId?: string,
   orderNumber?: string | null,
 ) => {
@@ -12,13 +13,13 @@ export const useGetInstallationsList = (
   const isFilterAtLeastThreeChars =
     cicIdOrEmptyString.length >= 3 || orderNumberOrEmptyString.length >= 3;
 
-  const orderNumberWithPrefix = orderNumber
-    ? prependPrefixIfMissing("QUATT", orderNumber.trim())
-    : orderNumber;
+  const orderNumberWithPrefix =
+    orderNumber && enforce
+      ? prependPrefixIfMissing("QUATT", orderNumber.trim())
+      : orderNumber;
 
-  const cicIdWithPrefix = cicId
-    ? prependPrefixIfMissing("CIC-", cicId.trim())
-    : cicId;
+  const cicIdWithPrefix =
+    cicId && enforce ? prependPrefixIfMissing("CIC-", cicId.trim()) : cicId;
 
   const {
     data,

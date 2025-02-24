@@ -14,15 +14,20 @@
     "preview": "vite preview",
     "tsc:watch": "tsc -w",
     "prepare": "husky install",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "export-files": "./scripts/export_codebase_to_flat_file.sh",
+    "show-file-sizes": "./scripts/show_file_sizes.sh",
+    "review-diff": "node scripts/review_diff.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@hookform/resolvers": "^3.9.0",
     "@tanstack/react-query": "^5.51.15",
     "@tanstack/react-query-devtools": "^5.51.15",
     "chart.js": "^4.4.3",
     "classnames": "^2.5.1",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.7",
     "firebase": "^9.22.2",
     "lodash-es": "^4.17.21",
     "qs": "^6.12.3",

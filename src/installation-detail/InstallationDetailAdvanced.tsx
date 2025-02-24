@@ -26,6 +26,9 @@ export function InstallationDetailAdvanced({
     ? "Hubspot - Deal"
     : "Hubspot - No deal";
 
+  if (!activeCic) {
+    throw new Error("Active CIC not found");
+  }
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="📊 Advanced insights" />

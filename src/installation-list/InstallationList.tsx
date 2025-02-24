@@ -24,7 +24,7 @@ import ErrorText from "../ui-components/error-text/ErrorText";
 export function InstallationList() {
   const [filters, setFilters] = React.useState<InstallationFilters>({});
   const { installations, isLoading, error, refetchInstallations } =
-    useGetInstallationsList(filters.cicId, filters.orderNumber);
+    useGetInstallationsList(false, filters.cicId, filters.orderNumber);
 
   const { paginatedItems, paginationRange, currentPage, changePage } =
     usePaginate({
@@ -35,8 +35,10 @@ export function InstallationList() {
   const noInstallationsFound = installations && installations.length === 0;
 
   const isDirty = filters.cicId || filters.orderNumber;
-  const orderNumberPlaceholder = isDirty ? "" : "Enter an order number";
-  const cicIdPlaceholder = isDirty ? "" : "or a CIC id";
+  const orderNumberPlaceholder = isDirty
+    ? ""
+    : "Enter an order number wildcard";
+  const cicIdPlaceholder = isDirty ? "" : "or a CIC id wildcard";
 
   return (
     <div className={classes.page}>
@@ -45,7 +47,8 @@ export function InstallationList() {
           🛠️ Installations
           {!isDirty && (
             <span className={classes["instruction-text"]}>
-              Search with an order number or a CIC id
+              Search with an order number or a CIC id (Now supports wildcard
+              search!)
             </span>
           )}
         </h2>
