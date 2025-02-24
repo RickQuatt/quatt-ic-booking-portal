@@ -40,7 +40,10 @@ export const useGetInstallationsList = (
     error,
     refetch: refetchInstallations,
   } = useQuery({
-    queryKey: ["installationList", { cicId, orderNumber }],
+    queryKey: [
+      "installationList",
+      { cicId, orderNumber, iuid, zipCode, houseNumber, houseAddition },
+    ],
     queryFn: () =>
       apiClient.adminInstallationsList({
         cicId: cicIdWithPrefix,
