@@ -111,7 +111,7 @@ export function InstallationDetailSettings({
   const onSubmit = React.useCallback(
     async (data: InstallationDetailFormData) => {
       const response = await apiClient.adminUpdateInstallation({
-        orderNumber: installation.orderNumber?.toString() as string,
+        iuid: installation.iuid?.toString() as string,
         updateAdminInstallation: data as unknown as CICAdvancedFormDataActual,
       });
       if (response.meta.status === 200) {
