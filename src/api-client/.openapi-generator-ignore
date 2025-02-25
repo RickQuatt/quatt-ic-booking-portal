@@ -24,7 +24,7 @@
 
 index.ts
 
-!models/*
+models/*
 !models/AdminListCics200Response.ts
 !models/ErrorResponse.ts
 !models/AdminListCics200ResponseFromJSON.ts
