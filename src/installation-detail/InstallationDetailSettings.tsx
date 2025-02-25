@@ -119,7 +119,7 @@ export function InstallationDetailSettings({
         reset({}, { keepValues: true });
       }
     },
-    [apiClient, installation.orderNumber, reset],
+    [apiClient, installation.iuid, reset],
   );
 
   return (
