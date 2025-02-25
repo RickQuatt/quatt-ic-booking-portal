@@ -21,7 +21,7 @@ import ThresholdCheck from "../ui-components/threshold-check/ThresholdCheck";
 import { useMemo } from "react";
 
 interface InstallationHealthCheckProps {
-  orderNumber: string;
+  iuid: string;
   cicId: string;
   thermostatType: ThermostatType | null;
   deviceConnectionStatuses: DeviceConnectionStatuses;
@@ -41,7 +41,7 @@ const healthcheckTextByStatusForConnectivity: Record<
 };
 
 export function InstallationHealthChecks({
-  orderNumber,
+  iuid,
   cicId,
   thermostatType,
   deviceConnectionStatuses,
@@ -57,7 +57,7 @@ export function InstallationHealthChecks({
     isPending,
     refetch,
   } = useQuery({
-    queryKey: ["installationHealthCheck", orderNumber, cicId],
+    queryKey: ["installationHealthCheck", iuid, cicId],
     queryFn: () =>
       apiClient.adminGetCicHealthCheck({
         cicId,

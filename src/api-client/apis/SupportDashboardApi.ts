@@ -195,7 +195,7 @@ export interface AdminGetCicHealthCheckRequest {
 }
 
 export interface AdminGetInstallationRequest {
-  orderNumber: string;
+  iuid: string;
 }
 
 export interface AdminGetInstallationClickhouseDataRequest {
@@ -272,6 +272,10 @@ export interface AdminInstallationInstallationIdZuperJobsOptionsRequest {
   installationId: string;
 }
 
+export interface AdminInstallationIuidOptionsRequest {
+  iuid: string;
+}
+
 export interface AdminInstallationListOptionsRequest {
   orderNumber?: string;
   cicId?: string;
@@ -322,7 +326,7 @@ export interface AdminUpdateCicRequest {
 }
 
 export interface AdminUpdateInstallationRequest {
-  orderNumber: string;
+  iuid: string;
   updateAdminInstallation: UpdateAdminInstallation;
 }
 
@@ -1517,12 +1521,12 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<AdminGetInstallation200Response>> {
     if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
+      requestParameters.iuid === null ||
+      requestParameters.iuid === undefined
     ) {
       throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminGetInstallation.",
+        "iuid",
+        "Required parameter requestParameters.iuid was null or undefined when calling adminGetInstallation.",
       );
     }
 
@@ -1540,9 +1544,9 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     }
     const response = await this.request(
       {
-        path: `/admin/installation/{orderNumber}`.replace(
-          `{${"orderNumber"}}`,
-          encodeURIComponent(String(requestParameters.orderNumber)),
+        path: `/admin/installation/{iuid}`.replace(
+          `{${"iuid"}}`,
+          encodeURIComponent(String(requestParameters.iuid)),
         ),
         method: "GET",
         headers: headerParameters,
@@ -2095,7 +2099,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Get installation & service jobs from Zuper by installation order number
+   * Get installation & service jobs from Zuper by order number
    */
   async adminGetZuperJobsByOrderNumberRaw(
     requestParameters: AdminGetZuperJobsByOrderNumberRequest,
@@ -2142,7 +2146,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Get installation & service jobs from Zuper by installation order number
+   * Get installation & service jobs from Zuper by order number
    */
   async adminGetZuperJobsByOrderNumber(
     requestParameters: AdminGetZuperJobsByOrderNumberRequest,
@@ -2589,6 +2593,54 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
+  async adminInstallationIuidOptionsRaw(
+    requestParameters: AdminInstallationIuidOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.iuid === null ||
+      requestParameters.iuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "iuid",
+        "Required parameter requestParameters.iuid was null or undefined when calling adminInstallationIuidOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{iuid}`.replace(
+          `{${"iuid"}}`,
+          encodeURIComponent(String(requestParameters.iuid)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationIuidOptions(
+    requestParameters: AdminInstallationIuidOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationIuidOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
   async adminInstallationListOptionsRaw(
     requestParameters: AdminInstallationListOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
@@ -2641,54 +2693,6 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminInstallationListOptionsRaw(
-      requestParameters,
-      initOverrides,
-    );
-  }
-
-  /**
-   */
-  async adminInstallationOrderNumberOptionsRaw(
-    requestParameters: AdminInstallationOrderNumberOptionsRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<void>> {
-    if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminInstallationOrderNumberOptions.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    const response = await this.request(
-      {
-        path: `/admin/installation/{orderNumber}`.replace(
-          `{${"orderNumber"}}`,
-          encodeURIComponent(String(requestParameters.orderNumber)),
-        ),
-        method: "OPTIONS",
-        headers: headerParameters,
-        query: queryParameters,
-      },
-      initOverrides,
-    );
-
-    return new runtime.VoidApiResponse(response);
-  }
-
-  /**
-   */
-  async adminInstallationOrderNumberOptions(
-    requestParameters: AdminInstallationOrderNumberOptionsRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<void> {
-    await this.adminInstallationOrderNumberOptionsRaw(
       requestParameters,
       initOverrides,
     );
@@ -3195,12 +3199,12 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<AdminGetInstallation200Response>> {
     if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
+      requestParameters.iuid === null ||
+      requestParameters.iuid === undefined
     ) {
       throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminUpdateInstallation.",
+        "iuid",
+        "Required parameter requestParameters.iuid was null or undefined when calling adminUpdateInstallation.",
       );
     }
 
@@ -3230,9 +3234,9 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     }
     const response = await this.request(
       {
-        path: `/admin/installation/{orderNumber}`.replace(
-          `{${"orderNumber"}}`,
-          encodeURIComponent(String(requestParameters.orderNumber)),
+        path: `/admin/installation/{iuid}`.replace(
+          `{${"iuid"}}`,
+          encodeURIComponent(String(requestParameters.iuid)),
         ),
         method: "PUT",
         headers: headerParameters,
