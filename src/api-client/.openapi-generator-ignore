@@ -188,13 +188,6 @@ models/*
 !models/TariffType.ts
 !models/UpdateCicSharedProperties.ts
 !models/UpdateCicWifiProperties.ts
-!models/GetInstallationInsights200Response.ts
-!models/GetInstallationInsights200ResponseResult.ts
-!models/GetInstallationInsights200ResponseResultGraphInner.ts
-!models/GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner.ts
-!models/GetInstallationInsights200ResponseResultRoomTemperatureGraphInner.ts
-!models/GetInstallationInsights200ResponseResultWaterTemperatureGraphInner.ts
-!models/AdminGetInstallationClickhouseData200Response.ts
 
 apis/*
 !apis/SupportDashboardApi.ts
