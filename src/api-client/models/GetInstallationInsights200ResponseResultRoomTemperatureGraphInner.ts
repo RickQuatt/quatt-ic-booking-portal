@@ -16,33 +16,33 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface GetInsights200ResponseResultRoomTemperatureGraphInner
+ * @interface GetInstallationInsights200ResponseResultRoomTemperatureGraphInner
  */
-export interface GetInsights200ResponseResultRoomTemperatureGraphInner {
+export interface GetInstallationInsights200ResponseResultRoomTemperatureGraphInner {
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultRoomTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultRoomTemperatureGraphInner
    */
   roomTemperature: number | null;
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultRoomTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultRoomTemperatureGraphInner
    */
   roomSetpoint: number | null;
   /**
    *
    * @type {Date}
-   * @memberof GetInsights200ResponseResultRoomTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultRoomTemperatureGraphInner
    */
   timestamp: Date;
 }
 
 /**
- * Check if a given object implements the GetInsights200ResponseResultRoomTemperatureGraphInner interface.
+ * Check if a given object implements the GetInstallationInsights200ResponseResultRoomTemperatureGraphInner interface.
  */
-export function instanceOfGetInsights200ResponseResultRoomTemperatureGraphInner(
+export function instanceOfGetInstallationInsights200ResponseResultRoomTemperatureGraphInner(
   value: object,
 ): boolean {
   let isInstance = true;
@@ -53,19 +53,19 @@ export function instanceOfGetInsights200ResponseResultRoomTemperatureGraphInner(
   return isInstance;
 }
 
-export function GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSON(
+export function GetInstallationInsights200ResponseResultRoomTemperatureGraphInnerFromJSON(
   json: any,
-): GetInsights200ResponseResultRoomTemperatureGraphInner {
-  return GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSONTyped(
+): GetInstallationInsights200ResponseResultRoomTemperatureGraphInner {
+  return GetInstallationInsights200ResponseResultRoomTemperatureGraphInnerFromJSONTyped(
     json,
     false,
   );
 }
 
-export function GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSONTyped(
+export function GetInstallationInsights200ResponseResultRoomTemperatureGraphInnerFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): GetInsights200ResponseResultRoomTemperatureGraphInner {
+): GetInstallationInsights200ResponseResultRoomTemperatureGraphInner {
   if (json === undefined || json === null) {
     return json;
   }
@@ -76,8 +76,8 @@ export function GetInsights200ResponseResultRoomTemperatureGraphInnerFromJSONTyp
   };
 }
 
-export function GetInsights200ResponseResultRoomTemperatureGraphInnerToJSON(
-  value?: GetInsights200ResponseResultRoomTemperatureGraphInner | null,
+export function GetInstallationInsights200ResponseResultRoomTemperatureGraphInnerToJSON(
+  value?: GetInstallationInsights200ResponseResultRoomTemperatureGraphInner | null,
 ): any {
   if (value === undefined) {
     return undefined;

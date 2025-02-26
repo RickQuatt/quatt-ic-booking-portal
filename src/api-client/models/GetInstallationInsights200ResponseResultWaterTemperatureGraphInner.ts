@@ -16,27 +16,27 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface GetInsights200ResponseResultWaterTemperatureGraphInner
+ * @interface GetInstallationInsights200ResponseResultWaterTemperatureGraphInner
  */
-export interface GetInsights200ResponseResultWaterTemperatureGraphInner {
+export interface GetInstallationInsights200ResponseResultWaterTemperatureGraphInner {
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultWaterTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultWaterTemperatureGraphInner
    */
   waterTemperature: number | null;
   /**
    *
    * @type {Date}
-   * @memberof GetInsights200ResponseResultWaterTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultWaterTemperatureGraphInner
    */
   timestamp: Date;
 }
 
 /**
- * Check if a given object implements the GetInsights200ResponseResultWaterTemperatureGraphInner interface.
+ * Check if a given object implements the GetInstallationInsights200ResponseResultWaterTemperatureGraphInner interface.
  */
-export function instanceOfGetInsights200ResponseResultWaterTemperatureGraphInner(
+export function instanceOfGetInstallationInsights200ResponseResultWaterTemperatureGraphInner(
   value: object,
 ): boolean {
   let isInstance = true;
@@ -46,19 +46,19 @@ export function instanceOfGetInsights200ResponseResultWaterTemperatureGraphInner
   return isInstance;
 }
 
-export function GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSON(
+export function GetInstallationInsights200ResponseResultWaterTemperatureGraphInnerFromJSON(
   json: any,
-): GetInsights200ResponseResultWaterTemperatureGraphInner {
-  return GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSONTyped(
+): GetInstallationInsights200ResponseResultWaterTemperatureGraphInner {
+  return GetInstallationInsights200ResponseResultWaterTemperatureGraphInnerFromJSONTyped(
     json,
     false,
   );
 }
 
-export function GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSONTyped(
+export function GetInstallationInsights200ResponseResultWaterTemperatureGraphInnerFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): GetInsights200ResponseResultWaterTemperatureGraphInner {
+): GetInstallationInsights200ResponseResultWaterTemperatureGraphInner {
   if (json === undefined || json === null) {
     return json;
   }
@@ -68,8 +68,8 @@ export function GetInsights200ResponseResultWaterTemperatureGraphInnerFromJSONTy
   };
 }
 
-export function GetInsights200ResponseResultWaterTemperatureGraphInnerToJSON(
-  value?: GetInsights200ResponseResultWaterTemperatureGraphInner | null,
+export function GetInstallationInsights200ResponseResultWaterTemperatureGraphInnerToJSON(
+  value?: GetInstallationInsights200ResponseResultWaterTemperatureGraphInner | null,
 ): any {
   if (value === undefined) {
     return undefined;

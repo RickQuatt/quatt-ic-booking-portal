@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { GetInsights200ResponseResult } from "./GetInsights200ResponseResult";
+import type { FindIuid200ResponseResult } from "./FindIuid200ResponseResult";
 import {
-  GetInsights200ResponseResultFromJSON,
-  GetInsights200ResponseResultFromJSONTyped,
-  GetInsights200ResponseResultToJSON,
-} from "./GetInsights200ResponseResult";
+  FindIuid200ResponseResultFromJSON,
+  FindIuid200ResponseResultFromJSONTyped,
+  FindIuid200ResponseResultToJSON,
+} from "./FindIuid200ResponseResult";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -29,27 +29,27 @@ import {
 /**
  *
  * @export
- * @interface GetInsights200Response
+ * @interface FindIuid200Response
  */
-export interface GetInsights200Response {
+export interface FindIuid200Response {
   /**
    *
    * @type {ResponseMeta}
-   * @memberof GetInsights200Response
+   * @memberof FindIuid200Response
    */
   meta: ResponseMeta;
   /**
    *
-   * @type {GetInsights200ResponseResult}
-   * @memberof GetInsights200Response
+   * @type {FindIuid200ResponseResult}
+   * @memberof FindIuid200Response
    */
-  result: GetInsights200ResponseResult;
+  result: FindIuid200ResponseResult;
 }
 
 /**
- * Check if a given object implements the GetInsights200Response interface.
+ * Check if a given object implements the FindIuid200Response interface.
  */
-export function instanceOfGetInsights200Response(value: object): boolean {
+export function instanceOfFindIuid200Response(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "meta" in value;
   isInstance = isInstance && "result" in value;
@@ -57,27 +57,25 @@ export function instanceOfGetInsights200Response(value: object): boolean {
   return isInstance;
 }
 
-export function GetInsights200ResponseFromJSON(
-  json: any,
-): GetInsights200Response {
-  return GetInsights200ResponseFromJSONTyped(json, false);
+export function FindIuid200ResponseFromJSON(json: any): FindIuid200Response {
+  return FindIuid200ResponseFromJSONTyped(json, false);
 }
 
-export function GetInsights200ResponseFromJSONTyped(
+export function FindIuid200ResponseFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): GetInsights200Response {
+): FindIuid200Response {
   if (json === undefined || json === null) {
     return json;
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: GetInsights200ResponseResultFromJSON(json["result"]),
+    result: FindIuid200ResponseResultFromJSON(json["result"]),
   };
 }
 
-export function GetInsights200ResponseToJSON(
-  value?: GetInsights200Response | null,
+export function FindIuid200ResponseToJSON(
+  value?: FindIuid200Response | null,
 ): any {
   if (value === undefined) {
     return undefined;
@@ -87,6 +85,6 @@ export function GetInsights200ResponseToJSON(
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: GetInsights200ResponseResultToJSON(value.result),
+    result: FindIuid200ResponseResultToJSON(value.result),
   };
 }

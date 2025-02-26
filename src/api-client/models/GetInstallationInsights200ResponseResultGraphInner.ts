@@ -16,51 +16,51 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface GetInsights200ResponseResultGraphInner
+ * @interface GetInstallationInsights200ResponseResultGraphInner
  */
-export interface GetInsights200ResponseResultGraphInner {
+export interface GetInstallationInsights200ResponseResultGraphInner {
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultGraphInner
+   * @memberof GetInstallationInsights200ResponseResultGraphInner
    */
   hpElectric: number;
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultGraphInner
+   * @memberof GetInstallationInsights200ResponseResultGraphInner
    */
   hpHeat: number;
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultGraphInner
+   * @memberof GetInstallationInsights200ResponseResultGraphInner
    */
   boilerHeat?: number;
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultGraphInner
+   * @memberof GetInstallationInsights200ResponseResultGraphInner
    */
   boilerGas?: number;
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultGraphInner
+   * @memberof GetInstallationInsights200ResponseResultGraphInner
    */
   cop: number | null;
   /**
    *
    * @type {Date}
-   * @memberof GetInsights200ResponseResultGraphInner
+   * @memberof GetInstallationInsights200ResponseResultGraphInner
    */
   timestamp: Date;
 }
 
 /**
- * Check if a given object implements the GetInsights200ResponseResultGraphInner interface.
+ * Check if a given object implements the GetInstallationInsights200ResponseResultGraphInner interface.
  */
-export function instanceOfGetInsights200ResponseResultGraphInner(
+export function instanceOfGetInstallationInsights200ResponseResultGraphInner(
   value: object,
 ): boolean {
   let isInstance = true;
@@ -72,16 +72,19 @@ export function instanceOfGetInsights200ResponseResultGraphInner(
   return isInstance;
 }
 
-export function GetInsights200ResponseResultGraphInnerFromJSON(
+export function GetInstallationInsights200ResponseResultGraphInnerFromJSON(
   json: any,
-): GetInsights200ResponseResultGraphInner {
-  return GetInsights200ResponseResultGraphInnerFromJSONTyped(json, false);
+): GetInstallationInsights200ResponseResultGraphInner {
+  return GetInstallationInsights200ResponseResultGraphInnerFromJSONTyped(
+    json,
+    false,
+  );
 }
 
-export function GetInsights200ResponseResultGraphInnerFromJSONTyped(
+export function GetInstallationInsights200ResponseResultGraphInnerFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): GetInsights200ResponseResultGraphInner {
+): GetInstallationInsights200ResponseResultGraphInner {
   if (json === undefined || json === null) {
     return json;
   }
@@ -95,8 +98,8 @@ export function GetInsights200ResponseResultGraphInnerFromJSONTyped(
   };
 }
 
-export function GetInsights200ResponseResultGraphInnerToJSON(
-  value?: GetInsights200ResponseResultGraphInner | null,
+export function GetInstallationInsights200ResponseResultGraphInnerToJSON(
+  value?: GetInstallationInsights200ResponseResultGraphInner | null,
 ): any {
   if (value === undefined) {
     return undefined;

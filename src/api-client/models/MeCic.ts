@@ -237,7 +237,7 @@ export interface MeCic {
    * @type {string}
    * @memberof MeCic
    */
-  installationId: string;
+  installationId: string | null;
   /**
    *
    * @type {Date}

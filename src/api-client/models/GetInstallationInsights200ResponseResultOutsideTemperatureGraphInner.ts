@@ -16,39 +16,39 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface GetInsights200ResponseResultOutsideTemperatureGraphInner
+ * @interface GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner
  */
-export interface GetInsights200ResponseResultOutsideTemperatureGraphInner {
+export interface GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner {
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultOutsideTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner
    */
   minTemperatureOutside?: number;
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultOutsideTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner
    */
   maxTemperatureOutside?: number;
   /**
    *
    * @type {number}
-   * @memberof GetInsights200ResponseResultOutsideTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner
    */
   temperatureOutside: number | null;
   /**
    *
    * @type {Date}
-   * @memberof GetInsights200ResponseResultOutsideTemperatureGraphInner
+   * @memberof GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner
    */
   timestamp: Date;
 }
 
 /**
- * Check if a given object implements the GetInsights200ResponseResultOutsideTemperatureGraphInner interface.
+ * Check if a given object implements the GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner interface.
  */
-export function instanceOfGetInsights200ResponseResultOutsideTemperatureGraphInner(
+export function instanceOfGetInstallationInsights200ResponseResultOutsideTemperatureGraphInner(
   value: object,
 ): boolean {
   let isInstance = true;
@@ -58,19 +58,19 @@ export function instanceOfGetInsights200ResponseResultOutsideTemperatureGraphInn
   return isInstance;
 }
 
-export function GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSON(
+export function GetInstallationInsights200ResponseResultOutsideTemperatureGraphInnerFromJSON(
   json: any,
-): GetInsights200ResponseResultOutsideTemperatureGraphInner {
-  return GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSONTyped(
+): GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner {
+  return GetInstallationInsights200ResponseResultOutsideTemperatureGraphInnerFromJSONTyped(
     json,
     false,
   );
 }
 
-export function GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSONTyped(
+export function GetInstallationInsights200ResponseResultOutsideTemperatureGraphInnerFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): GetInsights200ResponseResultOutsideTemperatureGraphInner {
+): GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner {
   if (json === undefined || json === null) {
     return json;
   }
@@ -86,8 +86,8 @@ export function GetInsights200ResponseResultOutsideTemperatureGraphInnerFromJSON
   };
 }
 
-export function GetInsights200ResponseResultOutsideTemperatureGraphInnerToJSON(
-  value?: GetInsights200ResponseResultOutsideTemperatureGraphInner | null,
+export function GetInstallationInsights200ResponseResultOutsideTemperatureGraphInnerToJSON(
+  value?: GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner | null,
 ): any {
   if (value === undefined) {
     return undefined;

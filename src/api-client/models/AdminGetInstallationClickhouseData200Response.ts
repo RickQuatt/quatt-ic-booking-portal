@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { ClickhouseData } from "./ClickhouseData";
+import type { InstallationHealthCheck } from "./InstallationHealthCheck";
 import {
-  ClickhouseDataFromJSON,
-  ClickhouseDataFromJSONTyped,
-  ClickhouseDataToJSON,
-} from "./ClickhouseData";
+  InstallationHealthCheckFromJSON,
+  InstallationHealthCheckFromJSONTyped,
+  InstallationHealthCheckToJSON,
+} from "./InstallationHealthCheck";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -40,10 +40,10 @@ export interface AdminGetInstallationClickhouseData200Response {
   meta: ResponseMeta;
   /**
    *
-   * @type {ClickhouseData}
+   * @type {InstallationHealthCheck}
    * @memberof AdminGetInstallationClickhouseData200Response
    */
-  result: ClickhouseData;
+  result: InstallationHealthCheck;
 }
 
 /**
@@ -77,7 +77,7 @@ export function AdminGetInstallationClickhouseData200ResponseFromJSONTyped(
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: ClickhouseDataFromJSON(json["result"]),
+    result: InstallationHealthCheckFromJSON(json["result"]),
   };
 }
 
@@ -92,6 +92,6 @@ export function AdminGetInstallationClickhouseData200ResponseToJSON(
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: ClickhouseDataToJSON(value.result),
+    result: InstallationHealthCheckToJSON(value.result),
   };
 }
