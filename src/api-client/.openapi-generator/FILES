@@ -62,10 +62,19 @@ models/DeviceConnectionStatuses.ts
 models/ErrorCode.ts
 models/ErrorResponse.ts
 models/ErrorResponseResult.ts
+models/FindIuid200Response.ts
+models/FindIuid200ResponseResult.ts
+models/FindIuidRequest.ts
 models/FinishIdentificationTestRequest.ts
 models/FlowRateTestStatus.ts
 models/ForgetWifiMeCicRequest.ts
 models/GetAllTariffs200Response.ts
+models/GetInstallationInsights200Response.ts
+models/GetInstallationInsights200ResponseResult.ts
+models/GetInstallationInsights200ResponseResultGraphInner.ts
+models/GetInstallationInsights200ResponseResultOutsideTemperatureGraphInner.ts
+models/GetInstallationInsights200ResponseResultRoomTemperatureGraphInner.ts
+models/GetInstallationInsights200ResponseResultWaterTemperatureGraphInner.ts
 models/GetInstallerCic200Response.ts
 models/GetMe200Response.ts
 models/GetMe401Response.ts
@@ -80,6 +89,7 @@ models/HeatDeliverySystem.ts
 models/HeatPump.ts
 models/HeatPumpCommissioning.ts
 models/HeatPumpTestLevel.ts
+models/HubspotHouse.ts
 models/IdentificationStatus.ts
 models/IdentificationTestStatus.ts
 models/Installation.ts
