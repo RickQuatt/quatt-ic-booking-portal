@@ -11,6 +11,18 @@ export function OrderNumberFilter({ setFilters }: FilterProps) {
   return <TextFilter setFilters={setFilters} filterKey={"orderNumber"} />;
 }
 
+export function ZipCodeFilter({ setFilters }: FilterProps) {
+  return <TextFilter setFilters={setFilters} filterKey={"zipCode"} />;
+}
+
+export function HouseNumberFilter({ setFilters }: FilterProps) {
+  return <TextFilter setFilters={setFilters} filterKey={"houseNumber"} />;
+}
+
+export function HouseAdditionNumberFilter({ setFilters }: FilterProps) {
+  return <TextFilter setFilters={setFilters} filterKey={"houseAddition"} />;
+}
+
 export function ActiveCicFilter({ setFilters }: FilterProps) {
   return <TextFilter setFilters={setFilters} filterKey={"cicId"} />;
 }

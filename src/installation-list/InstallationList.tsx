@@ -24,7 +24,15 @@ import ErrorText from "../ui-components/error-text/ErrorText";
 export function InstallationList() {
   const [filters, setFilters] = React.useState<InstallationFilters>({});
   const { installations, isLoading, error, refetchInstallations } =
-    useGetInstallationsList(false, filters.cicId, filters.orderNumber);
+    useGetInstallationsList(
+      false,
+      filters.cicId,
+      filters.orderNumber,
+      filters.iuid,
+      filters.zipCode,
+      filters.houseNumber,
+      filters.houseAddition,
+    );
 
   const { paginatedItems, paginationRange, currentPage, changePage } =
     usePaginate({
@@ -35,10 +43,14 @@ export function InstallationList() {
   const noInstallationsFound = installations && installations.length === 0;
 
   const isDirty = filters.cicId || filters.orderNumber;
-  const orderNumberPlaceholder = isDirty
+  const iuidPlaceholder = isDirty ? "" : "e.g. NL-1111AB-123-1-X";
+  const orderNumberPlaceholder = isDirty ? "" : "e.g. QUATT1513202";
+  const cicIdPlaceholder = isDirty
     ? ""
-    : "Enter an order number wildcard";
-  const cicIdPlaceholder = isDirty ? "" : "or a CIC id wildcard";
+    : "e.g. CIC-16762b7b-6977-4047-999e-5bf39226f7f5";
+  const zipCodePlaceholder = isDirty ? "" : "e.g. 1111AB";
+  const houseNumberPlaceholder = isDirty ? "" : "e.g. 123";
+  const additionPlaceholder = isDirty ? "" : "e.g. 1";
 
   return (
     <div className={classes.page}>
@@ -47,8 +59,7 @@ export function InstallationList() {
           🛠️ Installations
           {!isDirty && (
             <span className={classes["instruction-text"]}>
-              Search with an order number or a CIC id (Now supports wildcard
-              search!)
+              Search for an installation.
             </span>
           )}
         </h2>
@@ -63,7 +74,19 @@ export function InstallationList() {
         <THead>
           <Tr>
             <Th>
+              <TdText>IUID</TdText>
+            </Th>
+            <Th>
               <TdText>Order number</TdText>
+            </Th>
+            <Th>
+              <TdText>Zip code</TdText>
+            </Th>
+            <Th>
+              <TdText>House number</TdText>
+            </Th>
+            <Th>
+              <TdText>House addition</TdText>
             </Th>
             <Th>
               <TdText>Active CIC</TdText>
@@ -78,8 +101,36 @@ export function InstallationList() {
           <Tr>
             <Th>
               <TextFilter
+                filterKey="iuid"
+                placeholder={iuidPlaceholder}
+                setFilters={setFilters}
+              />
+            </Th>
+            <Th>
+              <TextFilter
                 filterKey="orderNumber"
                 placeholder={orderNumberPlaceholder}
+                setFilters={setFilters}
+              />
+            </Th>
+            <Th>
+              <TextFilter
+                filterKey="zipCode"
+                placeholder={zipCodePlaceholder}
+                setFilters={setFilters}
+              />
+            </Th>
+            <Th>
+              <TextFilter
+                filterKey="houseNumber"
+                placeholder={houseNumberPlaceholder}
+                setFilters={setFilters}
+              />
+            </Th>
+            <Th>
+              <TextFilter
+                filterKey="houseAddition"
+                placeholder={additionPlaceholder}
                 setFilters={setFilters}
               />
             </Th>
@@ -106,7 +157,7 @@ export function InstallationList() {
       </Table>
       {noInstallationsFound && (
         <p className={classes["info-text"]}>
-          No installations found with the given order number or CIC id
+          No installations found with the given parameters
         </p>
       )}
       {!!error && (
@@ -129,14 +180,27 @@ export function InstallationList() {
   }: {
     installation: AdminInstallationsList;
   }) {
-    const installationDetailLink = `/installations/${installation.orderNumber}`;
+    const installationDetailLink = `/installations/${installation.iuid}`;
+    const cicDetailLink = `/cics/${installation.cicId}`;
     return (
       <Tr>
         <Td>
-          <Link to={installationDetailLink}>{installation.orderNumber}</Link>
+          <Link to={installationDetailLink}>{installation.iuid}</Link>
         </Td>
         <Td>
-          <TdText>{installation.cicId}</TdText>
+          <TdText>{installation.orderNumber}</TdText>
+        </Td>
+        <Td>
+          <TdText>{installation.zipCode}</TdText>
+        </Td>
+        <Td>
+          <TdText>{installation.houseNumber}</TdText>
+        </Td>
+        <Td>
+          <TdText>{installation.houseAddition}</TdText>
+        </Td>
+        <Td>
+          <Link to={cicDetailLink}>{installation.cicId}</Link>
         </Td>
         <Td>
           <TdText>{formatDate(installation.createdAt)}</TdText>

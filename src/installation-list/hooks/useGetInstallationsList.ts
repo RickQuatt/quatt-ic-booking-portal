@@ -6,12 +6,25 @@ export const useGetInstallationsList = (
   enforce: boolean,
   cicId?: string,
   orderNumber?: string | null,
+  iuid?: string | null,
+  zipCode?: string | null,
+  houseNumber?: string | null,
+  houseAddition?: string | null,
 ) => {
   const apiClient = useApiClient();
   const cicIdOrEmptyString = cicId ?? "";
   const orderNumberOrEmptyString = orderNumber ?? "";
-  const isFilterAtLeastThreeChars =
-    cicIdOrEmptyString.length >= 3 || orderNumberOrEmptyString.length >= 3;
+  const iuidOrEmptyString = iuid ?? "";
+  const zipCodeOrEmptyString = zipCode ?? "";
+  const houseNumberOrEmptyString = houseNumber ?? "";
+  const houseAdditionOrEmptyString = houseAddition ?? "";
+  const doesFilterHaveMinNumberOfChars =
+    cicIdOrEmptyString.length >= 3 ||
+    orderNumberOrEmptyString.length >= 3 ||
+    iuidOrEmptyString.length >= 3 ||
+    zipCodeOrEmptyString.length >= 2 ||
+    houseNumberOrEmptyString.length >= 1 ||
+    houseAdditionOrEmptyString.length >= 1;
 
   const orderNumberWithPrefix =
     orderNumber && enforce
@@ -27,14 +40,21 @@ export const useGetInstallationsList = (
     error,
     refetch: refetchInstallations,
   } = useQuery({
-    queryKey: ["installationList", { cicId, orderNumber }],
+    queryKey: [
+      "installationList",
+      { cicId, orderNumber, iuid, zipCode, houseNumber, houseAddition },
+    ],
     queryFn: () =>
       apiClient.adminInstallationsList({
         cicId: cicIdWithPrefix,
         orderNumber: orderNumberWithPrefix ?? undefined,
+        iuid: iuid ?? undefined,
+        zipCode: zipCode ?? undefined,
+        houseNumber: houseNumber ?? undefined,
+        houseAddition: houseAddition ?? undefined,
       }),
     refetchOnWindowFocus: false,
-    enabled: isFilterAtLeastThreeChars,
+    enabled: doesFilterHaveMinNumberOfChars,
   });
 
   const installations = data?.result;
