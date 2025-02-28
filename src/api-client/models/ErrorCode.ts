@@ -97,6 +97,7 @@ export const ErrorCode = {
   ForgetWifiNotAvailable: "FORGET_WIFI_NOT_AVAILABLE",
   NoInstallationFoundForCic: "NO_INSTALLATION_FOUND_FOR_CIC",
   CicHasAlreadyInstallation: "CIC_HAS_ALREADY_INSTALLATION",
+  IuidNotFound: "IUID_NOT_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

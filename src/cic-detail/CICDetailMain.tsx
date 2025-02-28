@@ -102,10 +102,12 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
           <FormFieldValue value={cicData.id} />
         </FormField>
         <FormField>
+          <FormFieldTitle>Installation</FormFieldTitle>
+          <Link href={`/installations/${cicData.iuid}`}>{cicData.iuid}</Link>
+        </FormField>
+        <FormField>
           <FormFieldTitle>Order number</FormFieldTitle>
-          <Link href={`/installations/${cicData.orderNumber}`}>
-            {cicData.orderNumber}
-          </Link>
+          <FormFieldValue value={cicData.orderNumber} />
         </FormField>
         <FormField>
           <FormFieldTitle>Quatt build</FormFieldTitle>
