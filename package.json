@@ -8,6 +8,7 @@
     "api:generate-client": "./generate-api-client.sh ../Quatt-cloud && npm run prettier:format",
     "build": "tsc && vite build",
     "build:staging": "tsc && vite build --mode staging",
+    "build:development": "tsc && vite build --mode development",
     "prettier:format": "prettier --write .",
     "prettier:check": "prettier --check .",
     "lint": "eslint src --ext ts,tsx",
