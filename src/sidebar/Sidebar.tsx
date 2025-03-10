@@ -38,6 +38,9 @@ export function Sidebar() {
           <Link href="/installations" className={classes["sidebar-button"]}>
             Installations List
           </Link>
+          <span className={classes["sidebar-button"]}>
+            {import.meta.env.ENV}
+          </span>
         </div>
       </div>
     </>
