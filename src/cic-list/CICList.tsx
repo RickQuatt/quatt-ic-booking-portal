@@ -103,6 +103,7 @@ export function CICList() {
   if (isLoading) return <Loader />;
 
   if (isError) {
+    console.error("Failed to fetch CICs", error);
     return <ErrorText text="Failed to fetch CICs." retry={refetch} />;
   }
 
