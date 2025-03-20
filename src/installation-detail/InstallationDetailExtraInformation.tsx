@@ -38,6 +38,12 @@ export function InstallationDetailExtraInformation({
           <Link href={`/cics/${activeCic}`}>{activeCic}</Link>
         </FormField>
         <FormField>
+          <FormFieldTitle>
+            Installation Database ID (Not For Customers)
+          </FormFieldTitle>
+          <FormFieldValue value={installation.id} />
+        </FormField>
+        <FormField>
           <FormFieldTitle>Quatt build</FormFieldTitle>
           <FormFieldValue value={quattBuild} />
         </FormField>
