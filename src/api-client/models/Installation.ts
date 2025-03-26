@@ -175,12 +175,6 @@ export interface Installation {
    * @type {string}
    * @memberof Installation
    */
-  iuid: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof Installation
-   */
   hubspotDealId: string | null;
   /**
    * Temperature in degrees celcius
@@ -326,7 +320,6 @@ export function instanceOfInstallation(value: object): boolean {
   isInstance = isInstance && "wifiPassword" in value;
   isInstance = isInstance && "heatDeliverySystems" in value;
   isInstance = isInstance && "orderNumber" in value;
-  isInstance = isInstance && "iuid" in value;
   isInstance = isInstance && "hubspotDealId" in value;
   isInstance = isInstance && "maximumHeatingOutdoorTemperature" in value;
   isInstance = isInstance && "numberOfHeatPumps" in value;
@@ -385,7 +378,6 @@ export function InstallationFromJSONTyped(
             HeatDeliverySystemFromJSON,
           ),
     orderNumber: json["orderNumber"],
-    iuid: json["iuid"],
     hubspotDealId: json["hubspotDealId"],
     maximumHeatingOutdoorTemperature: json["maximumHeatingOutdoorTemperature"],
     numberOfHeatPumps: json["numberOfHeatPumps"],
@@ -449,7 +441,6 @@ export function InstallationToJSON(value?: Installation | null): any {
             HeatDeliverySystemToJSON,
           ),
     orderNumber: value.orderNumber,
-    iuid: value.iuid,
     hubspotDealId: value.hubspotDealId,
     maximumHeatingOutdoorTemperature: value.maximumHeatingOutdoorTemperature,
     numberOfHeatPumps: value.numberOfHeatPumps,

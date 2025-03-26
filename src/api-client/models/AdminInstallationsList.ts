@@ -43,30 +43,6 @@ export interface AdminInstallationsList {
    * @memberof AdminInstallationsList
    */
   updatedAt: Date;
-  /**
-   *
-   * @type {string}
-   * @memberof AdminInstallationsList
-   */
-  iuid: string;
-  /**
-   *
-   * @type {string}
-   * @memberof AdminInstallationsList
-   */
-  zipCode: string;
-  /**
-   *
-   * @type {string}
-   * @memberof AdminInstallationsList
-   */
-  houseNumber: string;
-  /**
-   *
-   * @type {string}
-   * @memberof AdminInstallationsList
-   */
-  houseAddition: string;
 }
 
 /**
@@ -78,10 +54,6 @@ export function instanceOfAdminInstallationsList(value: object): boolean {
   isInstance = isInstance && "orderNumber" in value;
   isInstance = isInstance && "createdAt" in value;
   isInstance = isInstance && "updatedAt" in value;
-  isInstance = isInstance && "iuid" in value;
-  isInstance = isInstance && "zipCode" in value;
-  isInstance = isInstance && "houseNumber" in value;
-  isInstance = isInstance && "houseAddition" in value;
 
   return isInstance;
 }
@@ -104,10 +76,6 @@ export function AdminInstallationsListFromJSONTyped(
     orderNumber: json["orderNumber"],
     createdAt: new Date(json["createdAt"]),
     updatedAt: new Date(json["updatedAt"]),
-    iuid: json["iuid"],
-    zipCode: json["zipCode"],
-    houseNumber: json["houseNumber"],
-    houseAddition: json["houseAddition"],
   };
 }
 
@@ -125,9 +93,5 @@ export function AdminInstallationsListToJSON(
     orderNumber: value.orderNumber,
     createdAt: value.createdAt.toISOString(),
     updatedAt: value.updatedAt.toISOString(),
-    iuid: value.iuid,
-    zipCode: value.zipCode,
-    houseNumber: value.houseNumber,
-    houseAddition: value.houseAddition,
   };
 }

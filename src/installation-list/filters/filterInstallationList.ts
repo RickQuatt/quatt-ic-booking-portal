@@ -26,24 +26,28 @@ export function filterInstallationList(
         return matchField(installationEntry.cicId, filters.cicId);
       }
 
-      if (filters.iuid && filterKey === "iuid") {
-        return matchField(installationEntry.iuid, filters.iuid);
-      }
+      /*
+//HAUNTED-HOUSE ignore until haunted house code is merged
 
-      if (filters.zipCode && filterKey === "zipCode") {
-        return matchField(installationEntry.zipCode, filters.zipCode);
-      }
+    if (filters.iuid && filterKey === "iuid") {
+      return matchField(installationEntry.iuid, filters.iuid);
+    }
 
-      if (filters.houseNumber && filterKey === "houseNumber") {
-        return matchField(installationEntry.houseNumber, filters.houseNumber);
-      }
+    if (filters.zipCode && filterKey === "zipCode") {
+      return matchField(installationEntry.zipCode, filters.zipCode);
+    }
 
-      if (filters.houseAddition && filterKey === "houseAddition") {
-        return matchField(
-          installationEntry.houseAddition,
-          filters.houseAddition,
-        );
-      }
+    if (filters.houseNumber && filterKey === "houseNumber") {
+      return matchField(installationEntry.houseNumber, filters.houseNumber);
+    }
+
+    if (filters.houseAddition && filterKey === "houseAddition") {
+      return matchField(
+        installationEntry.houseAddition,
+        filters.houseAddition,
+      );
+    }
+*/
 
       return (
         filterValue ===

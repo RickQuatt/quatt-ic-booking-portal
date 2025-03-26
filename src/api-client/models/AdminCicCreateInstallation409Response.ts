@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from "../runtime";
+import type { AdminCicCreateInstallation409ResponseAllOfMeta } from "./AdminCicCreateInstallation409ResponseAllOfMeta";
+import {
+  AdminCicCreateInstallation409ResponseAllOfMetaFromJSON,
+  AdminCicCreateInstallation409ResponseAllOfMetaFromJSONTyped,
+  AdminCicCreateInstallation409ResponseAllOfMetaToJSON,
+} from "./AdminCicCreateInstallation409ResponseAllOfMeta";
 import type { AdminCicCreateInstallation409ResponseAllOfResult } from "./AdminCicCreateInstallation409ResponseAllOfResult";
 import {
   AdminCicCreateInstallation409ResponseAllOfResultFromJSON,
   AdminCicCreateInstallation409ResponseAllOfResultFromJSONTyped,
   AdminCicCreateInstallation409ResponseAllOfResultToJSON,
 } from "./AdminCicCreateInstallation409ResponseAllOfResult";
-import type { CreateTariff409ResponseAllOfMeta } from "./CreateTariff409ResponseAllOfMeta";
-import {
-  CreateTariff409ResponseAllOfMetaFromJSON,
-  CreateTariff409ResponseAllOfMetaFromJSONTyped,
-  CreateTariff409ResponseAllOfMetaToJSON,
-} from "./CreateTariff409ResponseAllOfMeta";
 
 /**
  *
@@ -34,10 +34,10 @@ import {
 export interface AdminCicCreateInstallation409Response {
   /**
    *
-   * @type {CreateTariff409ResponseAllOfMeta}
+   * @type {AdminCicCreateInstallation409ResponseAllOfMeta}
    * @memberof AdminCicCreateInstallation409Response
    */
-  meta: CreateTariff409ResponseAllOfMeta;
+  meta: AdminCicCreateInstallation409ResponseAllOfMeta;
   /**
    *
    * @type {AdminCicCreateInstallation409ResponseAllOfResult}
@@ -73,7 +73,7 @@ export function AdminCicCreateInstallation409ResponseFromJSONTyped(
     return json;
   }
   return {
-    meta: CreateTariff409ResponseAllOfMetaFromJSON(json["meta"]),
+    meta: AdminCicCreateInstallation409ResponseAllOfMetaFromJSON(json["meta"]),
     result: AdminCicCreateInstallation409ResponseAllOfResultFromJSON(
       json["result"],
     ),
@@ -90,7 +90,7 @@ export function AdminCicCreateInstallation409ResponseToJSON(
     return null;
   }
   return {
-    meta: CreateTariff409ResponseAllOfMetaToJSON(value.meta),
+    meta: AdminCicCreateInstallation409ResponseAllOfMetaToJSON(value.meta),
     result: AdminCicCreateInstallation409ResponseAllOfResultToJSON(
       value.result,
     ),

@@ -1,4 +1,7 @@
-import { AdminInstallationDetail } from "../api-client/models";
+import {
+  AdminInstallationDetail,
+  InstallationType,
+} from "../api-client/models";
 import { isEmpty } from "lodash-es";
 import {
   FormField,
@@ -10,6 +13,16 @@ import classes from "./InstallationDetail.module.css";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { formatDateDistance, formatDateTimeString } from "../utils/formatDate";
 import { Link } from "wouter";
+
+const installationTypeMap: {
+  [key in InstallationType]: string;
+} = {
+  [InstallationType.Hybrid]: "Quatt Hybrid",
+  [InstallationType.HybridDuo]: "Quatt Hybrid Duo",
+  [InstallationType.AllElectric]: "Quatt All Electric",
+  [InstallationType.AllElectricDuo]: "Quatt All Electric Duo",
+  [InstallationType.Unknown]: "Unknown",
+};
 
 export function InstallationDetailExtraInformation({
   installation,
@@ -23,11 +36,6 @@ export function InstallationDetailExtraInformation({
     lastConnectionStatusUpdatedAt,
     heatDeliverySystems,
   } = installation;
-
-  const installationType =
-    installation.installationType === "hybrid"
-      ? "Quatt Hybrid"
-      : "Quatt Hybrid Duo";
 
   return (
     <div className={classes["detail-section"]}>
@@ -59,13 +67,15 @@ export function InstallationDetailExtraInformation({
         </FormField>
         <FormField>
           <FormFieldTitle>Installation type</FormFieldTitle>
-          <FormFieldValue value={installationType} />
+          <FormFieldValue
+            value={installationTypeMap[installation.installationType]}
+          />
         </FormField>
         <FormField>
           <FormFieldTitle>Heating systems</FormFieldTitle>
           {!isEmpty(heatDeliverySystems)
-            ? heatDeliverySystems?.map((system) => (
-                <FormFieldValue value={system} />
+            ? heatDeliverySystems?.map((system, index) => (
+                <FormFieldValue value={system} key={index} />
               ))
             : "No known heating systems"}
         </FormField>

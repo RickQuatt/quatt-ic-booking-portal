@@ -55,6 +55,18 @@ export interface AllEStatus {
    * @memberof AllEStatus
    */
   heatBatteryPercentage: number | null;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof AllEStatus
+   */
+  heatBatterySensorFailureFlags?: Array<string> | null;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof AllEStatus
+   */
+  heatChargerDegradationReasonFlags?: Array<string> | null;
 }
 
 /**
@@ -112,6 +124,18 @@ export function AllEStatusFromJSONTyped(
     heatBatterySize: json["heatBatterySize"],
     showerMinutes: json["showerMinutes"],
     heatBatteryPercentage: json["heatBatteryPercentage"],
+    heatBatterySensorFailureFlags: !exists(
+      json,
+      "heatBatterySensorFailureFlags",
+    )
+      ? undefined
+      : json["heatBatterySensorFailureFlags"],
+    heatChargerDegradationReasonFlags: !exists(
+      json,
+      "heatChargerDegradationReasonFlags",
+    )
+      ? undefined
+      : json["heatChargerDegradationReasonFlags"],
   };
 }
 
@@ -129,5 +153,7 @@ export function AllEStatusToJSON(value?: AllEStatus | null): any {
     heatBatterySize: value.heatBatterySize,
     showerMinutes: value.showerMinutes,
     heatBatteryPercentage: value.heatBatteryPercentage,
+    heatBatterySensorFailureFlags: value.heatBatterySensorFailureFlags,
+    heatChargerDegradationReasonFlags: value.heatChargerDegradationReasonFlags,
   };
 }

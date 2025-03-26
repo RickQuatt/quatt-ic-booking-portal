@@ -10,7 +10,7 @@ export const useGetInstallationDetails = (iuid: string) => {
     refetch: refetchInstallationDetails,
   } = useQuery({
     queryKey: ["installationDetail", iuid],
-    queryFn: () => apiClient.adminGetInstallation({ iuid }),
+    queryFn: () => apiClient.adminGetInstallation({ orderNumber: iuid }),
   });
 
   const installationDetails = installationDetailsResponse?.result;

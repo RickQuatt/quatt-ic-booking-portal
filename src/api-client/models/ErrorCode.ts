@@ -17,7 +17,6 @@
  * @export
  */
 export const ErrorCode = {
-  CacheNotFound: "CACHE_NOT_FOUND",
   UserNotAuthorized: "USER_NOT_AUTHORIZED",
   UserNotFound: "USER_NOT_FOUND",
   UserEmailNotVerified: "USER_EMAIL_NOT_VERIFIED",
@@ -97,7 +96,26 @@ export const ErrorCode = {
   ForgetWifiNotAvailable: "FORGET_WIFI_NOT_AVAILABLE",
   NoInstallationFoundForCic: "NO_INSTALLATION_FOUND_FOR_CIC",
   CicHasAlreadyInstallation: "CIC_HAS_ALREADY_INSTALLATION",
-  IuidNotFound: "IUID_NOT_FOUND",
+  InstallationCountryNotFound2: "INSTALLATION_COUNTRY_NOT_FOUND",
+  CommissioningConfigurationConflict: "COMMISSIONING_CONFIGURATION_CONFLICT",
+  DeviceAlreadyConfigured: "DEVICE_ALREADY_CONFIGURED",
+  CannotUpdateDevice: "CANNOT_UPDATE_DEVICE",
+  CommissioningNotInProgress: "COMMISSIONING_NOT_IN_PROGRESS",
+  NotAllDevicesAreIdentified: "NOT_ALL_DEVICES_ARE_IDENTIFIED",
+  CacheNotFound: "CACHE_NOT_FOUND",
+  CommissioningTestNotFound: "COMMISSIONING_TEST_NOT_FOUND",
+  CommissioningTestBadRequest: "COMMISSIONING_TEST_BAD_REQUEST",
+  CommissioningTestDetailNotFound: "COMMISSIONING_TEST_DETAIL_NOT_FOUND",
+  InvalidCommissioningTestStatus: "INVALID_COMMISSIONING_TEST_STATUS",
+  DeviceNotFound: "DEVICE_NOT_FOUND",
+  InvalidHeatBatterySerialNumber: "INVALID_HEAT_BATTERY_SERIAL_NUMBER",
+  InvalidHeatChargerSerialNumber: "INVALID_HEAT_CHARGER_SERIAL_NUMBER",
+  NoFailedDevicesFound: "NO_FAILED_DEVICES_FOUND",
+  DeviceMetadataNotFound: "DEVICE_METADATA_NOT_FOUND",
+  InvalidHeatBatterySize: "INVALID_HEAT_BATTERY_SIZE",
+  NoDevicesFound: "NO_DEVICES_FOUND",
+  InvalidSoundLevelForAllElectric: "INVALID_SOUND_LEVEL_FOR_ALL_ELECTRIC",
+  InstallationIsNotHybrid: "INSTALLATION_IS_NOT_HYBRID",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

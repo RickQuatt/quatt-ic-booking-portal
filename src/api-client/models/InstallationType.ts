@@ -19,6 +19,9 @@
 export const InstallationType = {
   Hybrid: "hybrid",
   HybridDuo: "hybrid_duo",
+  AllElectric: "all_electric",
+  AllElectricDuo: "all_electric_duo",
+  Unknown: "unknown",
 } as const;
 export type InstallationType =
   (typeof InstallationType)[keyof typeof InstallationType];

@@ -21,10 +21,10 @@ import { exists, mapValues } from "../runtime";
 export interface UpdateUserClient404ResponseAllOfMeta {
   /**
    *
-   * @type {any}
+   * @type {object}
    * @memberof UpdateUserClient404ResponseAllOfMeta
    */
-  status?: any | null;
+  status?: object;
 }
 
 /**
