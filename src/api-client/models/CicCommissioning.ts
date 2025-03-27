@@ -31,6 +31,12 @@ import {
   HeatPumpTestLevelFromJSONTyped,
   HeatPumpTestLevelToJSON,
 } from "./HeatPumpTestLevel";
+import type { HybridCommissioningMode } from "./HybridCommissioningMode";
+import {
+  HybridCommissioningModeFromJSON,
+  HybridCommissioningModeFromJSONTyped,
+  HybridCommissioningModeToJSON,
+} from "./HybridCommissioningMode";
 import type { IdentificationStatus } from "./IdentificationStatus";
 import {
   IdentificationStatusFromJSON,
@@ -208,10 +214,10 @@ export interface CicCommissioning {
   boilerTestStatus?: CicCommissioningBoilerTestStatusEnum;
   /**
    *
-   * @type {string}
+   * @type {HybridCommissioningMode}
    * @memberof CicCommissioning
    */
-  commissioningMode: CicCommissioningCommissioningModeEnum;
+  commissioningMode: HybridCommissioningMode | null;
   /**
    * Whether the commissioning is forced
    * @type {boolean}
@@ -294,23 +300,6 @@ export const CicCommissioningBoilerTestStatusEnum = {
 } as const;
 export type CicCommissioningBoilerTestStatusEnum =
   (typeof CicCommissioningBoilerTestStatusEnum)[keyof typeof CicCommissioningBoilerTestStatusEnum];
-
-/**
- * @export
- */
-export const CicCommissioningCommissioningModeEnum = {
-  Identification: "identification",
-  Deaeration: "deaeration",
-  FlowRate: "flow_rate",
-  FlowRateHp1: "flow_rate_hp1",
-  FlowRateHp2: "flow_rate_hp2",
-  FlowRateAll: "flow_rate_all",
-  HeatPump: "heat_pump",
-  Boiler: "boiler",
-  None: "none",
-} as const;
-export type CicCommissioningCommissioningModeEnum =
-  (typeof CicCommissioningCommissioningModeEnum)[keyof typeof CicCommissioningCommissioningModeEnum];
 
 /**
  * Check if a given object implements the CicCommissioning interface.
@@ -436,7 +425,9 @@ export function CicCommissioningFromJSONTyped(
     boilerTestStatus: !exists(json, "boilerTestStatus")
       ? undefined
       : json["boilerTestStatus"],
-    commissioningMode: json["commissioningMode"],
+    commissioningMode: HybridCommissioningModeFromJSON(
+      json["commissioningMode"],
+    ),
     isForced: json["isForced"],
     isCancelled: json["isCancelled"],
     completedAt:
@@ -526,7 +517,7 @@ export function CicCommissioningToJSON(value?: CicCommissioning | null): any {
         : value.heatPumpTestStoppableAt.toISOString(),
     heatPumpTestLevel: HeatPumpTestLevelToJSON(value.heatPumpTestLevel),
     boilerTestStatus: value.boilerTestStatus,
-    commissioningMode: value.commissioningMode,
+    commissioningMode: HybridCommissioningModeToJSON(value.commissioningMode),
     isForced: value.isForced,
     isCancelled: value.isCancelled,
     completedAt:

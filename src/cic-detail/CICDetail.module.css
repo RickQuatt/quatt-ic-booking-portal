@@ -79,3 +79,36 @@
 .table-grid-state-history {
   grid-template-columns: 2fr 1fr;
 }
+
+.chip-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  background-color: var(--border-color, #e0e0e0);
+  color: var(--text-color, #333);
+  width: fit-content;
+}
+
+/* Extends the base .chip class with warning styling */
+.chip-warn {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #d32f2f;
+  border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.chip-info {
+  background-color: rgba(0, 128, 0, 0.1);
+  color: #388e3c;
+  border: 1px solid rgba(0, 128, 0, 0.3);
+}

@@ -48,10 +48,13 @@ export const useGetInstallationsList = (
       apiClient.adminInstallationsList({
         cicId: cicIdWithPrefix,
         orderNumber: orderNumberWithPrefix ?? undefined,
-        iuid: iuid ?? undefined,
-        zipCode: zipCode ?? undefined,
-        houseNumber: houseNumber ?? undefined,
-        houseAddition: houseAddition ?? undefined,
+        /*
+          //HAUNTED-HOUSE Ignore until haunted house is merged
+          iuid: iuid ?? undefined,
+          zipCode: zipCode ?? undefined,
+          houseNumber: houseNumber ?? undefined,
+          houseAddition: houseAddition ?? undefined,
+        */
       }),
     refetchOnWindowFocus: false,
     enabled: doesFilterHaveMinNumberOfChars,

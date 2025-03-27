@@ -20,7 +20,7 @@ if (!apiKey) {
 // Initialize generative AI model
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash-thinking-exp-01-21",
+  model: "gemini-2.5-pro-exp-03-25",
 });
 
 // Prompt instructions
@@ -34,7 +34,7 @@ Your review should cover the following aspects:
    - Provide a concise overview of all changes made
    - Generate a commit message in the following format:
 
-     type(scope): summary
+     [TICKET-NUMBER from branch name if available] type(scope): summary
 
      - Detailed bullet points of changes
      - Impact and reasoning for changes
@@ -103,7 +103,7 @@ Your review should cover the following aspects:
 Please structure your response in this format:
 
 ## Commit Message
-[Generated commit message following the format above]
+[Generated commit message following the format above, ensuring ]
 
 ## Critical Issues
 [List any critical bugs, security issues, or major concerns that need immediate attention]
@@ -123,6 +123,7 @@ Using the provided context below, evaluate the changes while considering the exi
 
 async function reviewDiff(commitOrBranch) {
   try {
+    const currentBranch = execSync("git branch --show-current").toString();
     // Get the diff using git
     const diff = execSync(
       `git diff ${commitOrBranch} -- . ':(exclude)src/api-client'`,
@@ -164,6 +165,9 @@ async function reviewDiff(commitOrBranch) {
     // Construct the content for the API request
     const parts = [
       { text: PROMPT_INSTRUCTIONS },
+      {
+        text: `# Branch Name for Commit Message: Current Branch Name is: ${currentBranch}`,
+      },
       ...(diffContext
         ? [
             {

@@ -16,21 +16,21 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface UpdateUserClient404ResponseAllOfMeta
+ * @interface RetryDeviceIdentification403ResponseAllOfMeta
  */
-export interface UpdateUserClient404ResponseAllOfMeta {
+export interface RetryDeviceIdentification403ResponseAllOfMeta {
   /**
    *
    * @type {object}
-   * @memberof UpdateUserClient404ResponseAllOfMeta
+   * @memberof RetryDeviceIdentification403ResponseAllOfMeta
    */
   status?: object;
 }
 
 /**
- * Check if a given object implements the UpdateUserClient404ResponseAllOfMeta interface.
+ * Check if a given object implements the RetryDeviceIdentification403ResponseAllOfMeta interface.
  */
-export function instanceOfUpdateUserClient404ResponseAllOfMeta(
+export function instanceOfRetryDeviceIdentification403ResponseAllOfMeta(
   value: object,
 ): boolean {
   let isInstance = true;
@@ -38,16 +38,19 @@ export function instanceOfUpdateUserClient404ResponseAllOfMeta(
   return isInstance;
 }
 
-export function UpdateUserClient404ResponseAllOfMetaFromJSON(
+export function RetryDeviceIdentification403ResponseAllOfMetaFromJSON(
   json: any,
-): UpdateUserClient404ResponseAllOfMeta {
-  return UpdateUserClient404ResponseAllOfMetaFromJSONTyped(json, false);
+): RetryDeviceIdentification403ResponseAllOfMeta {
+  return RetryDeviceIdentification403ResponseAllOfMetaFromJSONTyped(
+    json,
+    false,
+  );
 }
 
-export function UpdateUserClient404ResponseAllOfMetaFromJSONTyped(
+export function RetryDeviceIdentification403ResponseAllOfMetaFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): UpdateUserClient404ResponseAllOfMeta {
+): RetryDeviceIdentification403ResponseAllOfMeta {
   if (json === undefined || json === null) {
     return json;
   }
@@ -56,8 +59,8 @@ export function UpdateUserClient404ResponseAllOfMetaFromJSONTyped(
   };
 }
 
-export function UpdateUserClient404ResponseAllOfMetaToJSON(
-  value?: UpdateUserClient404ResponseAllOfMeta | null,
+export function RetryDeviceIdentification403ResponseAllOfMetaToJSON(
+  value?: RetryDeviceIdentification403ResponseAllOfMeta | null,
 ): any {
   if (value === undefined) {
     return undefined;

@@ -21,10 +21,10 @@ import { exists, mapValues } from "../runtime";
 export interface GetMe500ResponseAllOfResult {
   /**
    *
-   * @type {any}
+   * @type {object}
    * @memberof GetMe500ResponseAllOfResult
    */
-  errorCode?: any | null;
+  errorCode?: object;
 }
 
 /**

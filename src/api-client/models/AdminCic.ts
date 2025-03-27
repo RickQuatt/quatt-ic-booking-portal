@@ -597,12 +597,6 @@ export interface AdminCic {
    * @type {string}
    * @memberof AdminCic
    */
-  iuid: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof AdminCic
-   */
   menderId: string | null;
   /**
    *
@@ -760,7 +754,6 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "maximumHeatingOutdoorTemperature" in value;
   isInstance = isInstance && "lastCommissioning" in value;
   isInstance = isInstance && "canStartCommissioning" in value;
-  isInstance = isInstance && "iuid" in value;
   isInstance = isInstance && "menderId" in value;
   isInstance = isInstance && "createdAt" in value;
   isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
@@ -920,7 +913,6 @@ export function AdminCicFromJSONTyped(
       ? undefined
       : json["lastStatUpdate"],
     canStartCommissioning: json["canStartCommissioning"],
-    iuid: json["iuid"],
     menderId: json["menderId"],
     createdAt: new Date(json["createdAt"]),
     lastConnectionStatusUpdatedAt:
@@ -1050,7 +1042,6 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     lastCommissioning: CicCommissioningToJSON(value.lastCommissioning),
     lastStatUpdate: value.lastStatUpdate,
     canStartCommissioning: value.canStartCommissioning,
-    iuid: value.iuid,
     menderId: value.menderId,
     createdAt: value.createdAt.toISOString(),
     lastConnectionStatusUpdatedAt:

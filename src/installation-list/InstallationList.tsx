@@ -28,10 +28,11 @@ export function InstallationList() {
       false,
       filters.cicId,
       filters.orderNumber,
-      filters.iuid,
-      filters.zipCode,
-      filters.houseNumber,
-      filters.houseAddition,
+      //HAUNTED-HOUSE
+      // filters.iuid,
+      // filters.zipCode,
+      // filters.houseNumber,
+      // filters.houseAddition,
     );
 
   const { paginatedItems, paginationRange, currentPage, changePage } =
@@ -43,7 +44,9 @@ export function InstallationList() {
   const noInstallationsFound = installations && installations.length === 0;
 
   const isDirty = filters.cicId || filters.orderNumber;
-  const iuidPlaceholder = isDirty ? "" : "e.g. NL-1111AB-123-1-X";
+  const iuidPlaceholder = isDirty
+    ? ""
+    : "e.g. INS-f804fb98-664b-4c94-ba01-38579323b34c";
   const orderNumberPlaceholder = isDirty ? "" : "e.g. QUATT1513202";
   const cicIdPlaceholder = isDirty
     ? ""
@@ -73,21 +76,13 @@ export function InstallationList() {
       <Table gridClass={classes["table-grid"]}>
         <THead>
           <Tr>
-            <Th>
-              <TdText>IUID</TdText>
-            </Th>
+            <Th>{/* <TdText>IUID</TdText> */}</Th>
             <Th>
               <TdText>Order number</TdText>
             </Th>
-            <Th>
-              <TdText>Zip code</TdText>
-            </Th>
-            <Th>
-              <TdText>House number</TdText>
-            </Th>
-            <Th>
-              <TdText>House addition</TdText>
-            </Th>
+            <Th>{/* <TdText>Zip code</TdText> */}</Th>
+            <Th>{/* <TdText>House number</TdText> */}</Th>
+            <Th>{/* <TdText>House addition</TdText> */}</Th>
             <Th>
               <TdText>Active CIC</TdText>
             </Th>
@@ -100,11 +95,11 @@ export function InstallationList() {
           </Tr>
           <Tr>
             <Th>
-              <TextFilter
+              {/* <TextFilter
                 filterKey="iuid"
                 placeholder={iuidPlaceholder}
                 setFilters={setFilters}
-              />
+              /> */}
             </Th>
             <Th>
               <TextFilter
@@ -114,25 +109,25 @@ export function InstallationList() {
               />
             </Th>
             <Th>
-              <TextFilter
+              {/* <TextFilter
                 filterKey="zipCode"
                 placeholder={zipCodePlaceholder}
                 setFilters={setFilters}
-              />
+              /> */}
             </Th>
             <Th>
-              <TextFilter
+              {/* <TextFilter
                 filterKey="houseNumber"
                 placeholder={houseNumberPlaceholder}
                 setFilters={setFilters}
-              />
+              /> */}
             </Th>
             <Th>
-              <TextFilter
+              {/* <TextFilter
                 filterKey="houseAddition"
                 placeholder={additionPlaceholder}
                 setFilters={setFilters}
-              />
+              /> */}
             </Th>
             <Th>
               <TextFilter
@@ -181,25 +176,19 @@ export function InstallationList() {
     installation: AdminInstallationsList;
   }) {
     const oldInstallationDetailLink = `/installations/${installation.orderNumber}`;
-    const installationDetailLink = `/installations/${installation.iuid}`;
+    // const installationDetailLink = `/installations/${installation.iuid}`;
     const cicDetailLink = `/cics/${installation.cicId}`;
     return (
       <Tr>
         <Td>
-          <Link to={installationDetailLink}>{installation.iuid}</Link>
+          {/* <Link to={installationDetailLink}>{installation.iuid}</Link> */}
         </Td>
         <Td>
           <Link to={oldInstallationDetailLink}>{installation.orderNumber}</Link>
         </Td>
-        <Td>
-          <TdText>{installation.zipCode}</TdText>
-        </Td>
-        <Td>
-          <TdText>{installation.houseNumber}</TdText>
-        </Td>
-        <Td>
-          <TdText>{installation.houseAddition}</TdText>
-        </Td>
+        <Td>{/* <TdText>{installation.zipCode}</TdText> */}</Td>
+        <Td>{/* <TdText>{installation.houseNumber}</TdText> */}</Td>
+        <Td>{/* <TdText>{installation.houseAddition}</TdText> */}</Td>
         <Td>
           <Link to={cicDetailLink}>{installation.cicId}</Link>
         </Td>

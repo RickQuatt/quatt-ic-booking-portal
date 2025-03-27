@@ -11,6 +11,8 @@ export function OrderNumberFilter({ setFilters }: FilterProps) {
   return <TextFilter setFilters={setFilters} filterKey={"orderNumber"} />;
 }
 
+/*
+//HAUNTED-HOUSE ignore until haunted house code is merged
 export function ZipCodeFilter({ setFilters }: FilterProps) {
   return <TextFilter setFilters={setFilters} filterKey={"zipCode"} />;
 }
@@ -22,6 +24,7 @@ export function HouseNumberFilter({ setFilters }: FilterProps) {
 export function HouseAdditionNumberFilter({ setFilters }: FilterProps) {
   return <TextFilter setFilters={setFilters} filterKey={"houseAddition"} />;
 }
+*/
 
 export function ActiveCicFilter({ setFilters }: FilterProps) {
   return <TextFilter setFilters={setFilters} filterKey={"cicId"} />;

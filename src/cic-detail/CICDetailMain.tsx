@@ -103,7 +103,9 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
         </FormField>
         <FormField>
           <FormFieldTitle>Installation</FormFieldTitle>
-          <Link href={`/installations/${cicData.iuid}`}>{cicData.iuid}</Link>
+          <Link href={`/installations/${cicData.orderNumber}`}>
+            {cicData.installationId}
+          </Link>
         </FormField>
         <FormField>
           <FormFieldTitle>Order number</FormFieldTitle>

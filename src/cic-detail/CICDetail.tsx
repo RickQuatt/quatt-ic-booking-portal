@@ -18,6 +18,7 @@ import { CICDetailHealthChecks } from "./CICDetailHealthChecks";
 import { CICDetailState } from "./CICDetailState";
 import { CICDetailCommissioning } from "./CICDetailCommissioning";
 import { CICDetailSettings } from "./CICDetailSettings";
+import { CICDetailAllE } from "./CICDetailAllE";
 
 interface CICDetailProps {
   data: AdminCic;
@@ -35,6 +36,7 @@ export function CICDetail({ data }: CICDetailProps) {
         <CICDetailMain cicData={cicData} />
         <CICDetailNetworkConnection cicData={cicData} />
         <CICDetailUpdateInfo cicData={cicData} />
+        <CICDetailAllE cicData={cicData} />
         <CICDetailBoilerInfo cicData={cicData} />
         <CICDetailThermostatInfo cicData={cicData} />
         <CICDetailHeatpumps cicData={cicData} />

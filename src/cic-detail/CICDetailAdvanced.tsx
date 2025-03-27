@@ -1,6 +1,6 @@
 import React from "react";
 import { useApiClient } from "../api-client/context";
-import { AdminCic } from "../api-client/models";
+import { AdminCic, UpdateCommissioningStatusEnum } from "../api-client/models";
 import { Button, ButtonLink } from "../ui-components/button/Button";
 import {
   FormField,
@@ -28,6 +28,9 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
   const rebootCic = useRebootCic(cicData.id);
   const apiClient = useApiClient();
 
+  const isAllE = cicData.allEStatus !== null;
+  const installationId = cicData.installationId;
+
   const resetWifiNetwork = React.useCallback(async () => {
     if (
       !window.confirm(
@@ -44,6 +47,10 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
   }, [apiClient, cicData.id, cicData.wifiSSID]);
 
   const cancelCommissioning = React.useCallback(async () => {
+    if (installationId === null) {
+      alert("No installation ID found.");
+      return;
+    }
     if (
       !window.confirm(
         "Are you sure you would like to cancel the commissioning process?",
@@ -53,19 +60,36 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
     }
 
     try {
-      const response = await apiClient.adminCancelCommissioning({
-        cicId: cicData.id,
-      });
+      if (!isAllE) {
+        const response = await apiClient.adminCancelCommissioning({
+          cicId: cicData.id,
+        });
 
-      if (response.meta.status === 200) {
+        if (response.meta.status === 200) {
+          alert("Commissioning process cancelled successfully.");
+        }
+      } else {
+        await apiClient.updateInstallationCommissioning({
+          installationId: installationId,
+          updateCommissioning: {
+            status: UpdateCommissioningStatusEnum.Cancelled,
+            forced: true,
+          },
+        });
+
         alert("Commissioning process cancelled successfully.");
       }
     } catch (error) {
       alert("No commissioning is ongoing.");
     }
-  }, [apiClient, cicData.id]);
+  }, [apiClient, cicData.id, isAllE, installationId]);
 
   const completeCommissioning = React.useCallback(async () => {
+    if (installationId === null) {
+      alert("No installation ID found.");
+      return;
+    }
+
     if (
       !window.confirm(
         "Are you sure you would like to complete the commissioning process?",
@@ -75,17 +99,30 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
     }
 
     try {
-      const response = await apiClient.adminCompleteCommissioning({
-        cicId: cicData.id,
-      });
+      if (!isAllE) {
+        // This is for non all electric installations
+        const response = await apiClient.adminCompleteCommissioning({
+          cicId: cicData.id,
+        });
 
-      if (response.meta.status === 200) {
-        alert("Commissioning process completed successfully.");
+        if (response.meta.status === 200) {
+          alert("Commissioning process completed successfully.");
+        }
+      } else {
+        await apiClient.updateInstallationCommissioning({
+          installationId: installationId,
+          updateCommissioning: {
+            status: UpdateCommissioningStatusEnum.Success,
+            forced: true,
+          },
+        });
       }
+
+      alert("Commissioning process completed successfully.");
     } catch (error) {
       alert("No commissioning is ongoing.");
     }
-  }, [apiClient, cicData.id]);
+  }, [apiClient, installationId, isAllE, cicData.id]);
 
   return (
     <div className={classes["detail-section"]}>

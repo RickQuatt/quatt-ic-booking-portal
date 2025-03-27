@@ -28,6 +28,7 @@ interface InstallationHealthCheckProps {
   internetConnectionStatuses: InternetConnectionStatuses;
   boilerType?: BoilerType | null;
   numberOfHeatPumps: number | null;
+  isAllE: boolean;
 }
 
 const healthcheckTextByStatusForConnectivity: Record<
@@ -48,6 +49,7 @@ export function InstallationHealthChecks({
   internetConnectionStatuses,
   boilerType,
   numberOfHeatPumps,
+  isAllE,
 }: InstallationHealthCheckProps) {
   const apiClient = useApiClient();
 
@@ -159,6 +161,18 @@ export function InstallationHealthChecks({
           }
         />
       )}
+      {isAllE && deviceConnectionStatuses.heatChargerConnected ? (
+        <HealthCheckText
+          title="All-E Heat Charger"
+          status={deviceConnectionStatuses.heatChargerConnected}
+          errorStatusText={heatPumpErrorText}
+          text={
+            healthcheckTextByStatusForConnectivity[
+              deviceConnectionStatuses.heatChargerConnected
+            ]
+          }
+        />
+      ) : null}
       <p className={classes["sub-header"]}>Connectivity</p>
       <HealthCheckText
         title="WiFi"

@@ -205,12 +205,6 @@ export interface AdminInstallationDetail {
    * @type {string}
    * @memberof AdminInstallationDetail
    */
-  iuid: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof AdminInstallationDetail
-   */
   hubspotDealId: string | null;
   /**
    * Temperature in degrees celcius
@@ -386,7 +380,6 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "wifiPassword" in value;
   isInstance = isInstance && "heatDeliverySystems" in value;
   isInstance = isInstance && "orderNumber" in value;
-  isInstance = isInstance && "iuid" in value;
   isInstance = isInstance && "hubspotDealId" in value;
   isInstance = isInstance && "maximumHeatingOutdoorTemperature" in value;
   isInstance = isInstance && "numberOfHeatPumps" in value;
@@ -452,7 +445,6 @@ export function AdminInstallationDetailFromJSONTyped(
             HeatDeliverySystemFromJSON,
           ),
     orderNumber: json["orderNumber"],
-    iuid: json["iuid"],
     hubspotDealId: json["hubspotDealId"],
     maximumHeatingOutdoorTemperature: json["maximumHeatingOutdoorTemperature"],
     numberOfHeatPumps: json["numberOfHeatPumps"],
@@ -531,7 +523,6 @@ export function AdminInstallationDetailToJSON(
             HeatDeliverySystemToJSON,
           ),
     orderNumber: value.orderNumber,
-    iuid: value.iuid,
     hubspotDealId: value.hubspotDealId,
     maximumHeatingOutdoorTemperature: value.maximumHeatingOutdoorTemperature,
     numberOfHeatPumps: value.numberOfHeatPumps,

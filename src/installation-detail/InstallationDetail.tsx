@@ -3,21 +3,19 @@ import classes from "./InstallationDetail.module.css";
 import { InstallationDetailExtraInformation } from "./InstallationDetailExtraInformation";
 import { InstallationDetailCicHistory } from "./InstallationDetailCicHistory";
 import { InstallationDetailCommissioningHistory } from "./InstallationDetailCommissioningHistory";
-import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { InstallationDetailSettings } from "./InstallationDetailSettings";
 import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
 import { InstallationDetailTickets } from "./InstallationDetailTickets";
-import { InstallationDetailZuperService } from "./InstallationDetailZuperService";
 import { InstallationHealthChecks } from "./InstallationHealthChecks";
 import { InstallationDetailNotes } from "./installationDetailNotes";
 import { InstallationDetailCICQR } from "./InstallationDetailCICQR";
 import { Loader } from "../ui-components/loader/Loader";
 import { useGetInstallationDetails } from "./hooks/useGetInstallationDetails";
-//import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 import ErrorText from "../ui-components/error-text/ErrorText";
 import { ResponseError } from "../api-client/runtime";
 import { InstallationDetailTariff } from "./InstallationDetailTariff";
 import { InstallationDetailActions } from "./InstallationDetailActions";
+import { InstallationType } from "../api-client/models/InstallationType";
 
 interface InstallationDetailProps {
   iuid: string;
@@ -60,7 +58,9 @@ export function InstallationDetail({ iuid }: InstallationDetailProps) {
   if (!installationDetails.activeCic) {
     throw new Error("Active CIC not found");
   }
-
+  const isAllE =
+    installationDetails.installationType === InstallationType.AllElectric ||
+    installationDetails.installationType === InstallationType.AllElectricDuo;
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
@@ -69,6 +69,7 @@ export function InstallationDetail({ iuid }: InstallationDetailProps) {
           <DetailSectionHeader title="🏥 Health checks" />
           <InstallationHealthChecks
             iuid={iuid}
+            isAllE={isAllE}
             cicId={installationDetails.activeCic}
             thermostatType={installationDetails.thermostatType}
             deviceConnectionStatuses={
