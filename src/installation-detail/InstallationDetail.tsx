@@ -64,7 +64,9 @@ export function InstallationDetail({ iuid }: InstallationDetailProps) {
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
-        <span className={classes["order-number"]}>{iuid}</span>
+        <span className={classes["order-number"]}>
+          {iuid} - {installationDetails.country}
+        </span>
         <div className={classes["detail-section"]}>
           <DetailSectionHeader title="🏥 Health checks" />
           <InstallationHealthChecks
