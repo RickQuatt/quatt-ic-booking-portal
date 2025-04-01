@@ -3,14 +3,9 @@ import { Link } from "wouter";
 
 import classes from "./CICList.module.css";
 import {
-  CableConnectionStatusFilter,
   CreatedDateFilter,
   IDFilter,
-  LTEConnectionStatusFilter,
-  LastConnectionStatusFilter,
   OrderNumberFilter,
-  SupervisoryControlModeFilter,
-  WifiConnectionStatusFilter,
 } from "./filters/Filters";
 import type { CICFilters } from "./filters/types";
 import { filterCICList } from "./filters/filterCICList";

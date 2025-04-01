@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   AdminCic,
   AllEStatusHeatBatterySizeEnum,
@@ -14,8 +14,9 @@ import {
 import classes from "./CICDetail.module.css";
 import { DetailSectionHeader } from "./CICDetailSectionHeader";
 import { useApiClient } from "../api-client/context";
-import React from "react";
-import { AdminUpdateCicRequest } from "../api-client/apis";
+
+const TIMEOUT_DURATION = 30000; // 30 seconds in milliseconds
+const POLL_INTERVAL = 2000; // Poll every 2 seconds
 
 const statusMap: {
   [key in AllEStatusHeatBatteryStatusEnum]: string;
@@ -63,6 +64,7 @@ export function CICDetailAllE({
   const [pollingMessage, setPollingMessage] = useState(
     "Waiting for confirmation...",
   );
+  const [isUpdated, setIsUpdated] = useState(false);
 
   const apiClient = useApiClient();
 
@@ -81,17 +83,17 @@ export function CICDetailAllE({
     if (response.meta.status === 200) {
       // Start polling to check emergencyBackupHeaterEnabled status
       const startTime = Date.now();
-      const timeoutDuration = 30000; // 30 seconds in milliseconds
-      const pollInterval = 2000; // Poll every 2 seconds
 
       const checkEmergencyStatus = async () => {
         try {
-          if (Date.now() - startTime > timeoutDuration) {
+          if (Date.now() - startTime > TIMEOUT_DURATION) {
             alert(
               "Polling to verify enabling of emergency backup heating timed out after 30 seconds",
             );
             setIsDisabled(false);
             setIsPolling(false);
+            setEmergencyState(emergencyState === true);
+            setIsUpdated(!isUpdated);
             return;
           }
 
@@ -105,10 +107,9 @@ export function CICDetailAllE({
             setIsPolling(false);
           } else {
             // Continue polling if not yet enabled
-            setTimeout(checkEmergencyStatus, pollInterval);
+            setTimeout(checkEmergencyStatus, POLL_INTERVAL);
           }
         } catch (e) {
-          console.error("Error checking emergency status", e);
           alert("Error checking emergency status");
           setIsDisabled(false);
           setIsPolling(false);
@@ -139,16 +140,16 @@ export function CICDetailAllE({
     if (response.meta.status === 200) {
       // Start polling to check emergencyBackupHeaterEnabled status
       const startTime = Date.now();
-      const timeoutDuration = 30000; // 30 seconds in milliseconds
-      const pollInterval = 2000; // Poll every 2 seconds
 
       const checkEmergencyStatus = async () => {
-        if (Date.now() - startTime > timeoutDuration) {
+        if (Date.now() - startTime > TIMEOUT_DURATION) {
           alert(
             "Polling to verify disabling of emergency backup heating timed out after 30 seconds",
           );
           setIsDisabled(false);
           setIsPolling(false);
+          setIsUpdated(!isUpdated);
+          setEmergencyState(emergencyState === true);
           return;
         }
 
@@ -165,7 +166,7 @@ export function CICDetailAllE({
           setIsPolling(false);
         } else {
           // Continue polling if not yet disabled
-          setTimeout(checkEmergencyStatus, pollInterval);
+          setTimeout(checkEmergencyStatus, POLL_INTERVAL);
         }
       };
 
@@ -271,6 +272,7 @@ export function CICDetailAllE({
         onEnable={async () => await onEnable()}
         onDisable={async () => await onDisable()}
         enabled={emergencyState}
+        isUpdated={isUpdated}
         disabled={isDisabled}
         isPolling={isPolling}
         pollingMessage={pollingMessage}

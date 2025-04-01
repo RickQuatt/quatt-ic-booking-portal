@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../button/Button";
 import classNames from "classnames";
-
 import classes from "./EmergencyButton.module.css";
 import Tooltip from "../tooltip/Tooltip";
 
@@ -15,6 +14,7 @@ export type NuclearButtonProps = {
   disabled?: boolean;
   isPolling?: boolean;
   pollingMessage?: string;
+  isUpdated?: boolean;
 };
 
 const EmergencyButton = ({
@@ -27,9 +27,11 @@ const EmergencyButton = ({
   onEnable,
   isPolling = false,
   pollingMessage = "Waiting for confirmation...",
+  isUpdated = false,
 }: NuclearButtonProps) => {
   const [isCoverOpen, setIsCoverOpen] = useState(enabled);
   const [isPressed, setIsPressed] = useState(enabled);
+  const [stateUpdated, setStateUpdated] = useState(isUpdated);
 
   const handleToggleCover = () => {
     setIsCoverOpen(!isCoverOpen);
@@ -61,6 +63,7 @@ const EmergencyButton = ({
   };
 
   useEffect(() => {
+    setStateUpdated(!isUpdated);
     if (enabled) {
       setIsPressed(true);
       setIsCoverOpen(true);
@@ -68,7 +71,7 @@ const EmergencyButton = ({
       setIsPressed(false);
       setIsCoverOpen(false);
     }
-  }, [enabled]);
+  }, [isUpdated, enabled]);
   return (
     <div className={classes.container}>
       <h2 className={classes.header}>{label}</h2>
