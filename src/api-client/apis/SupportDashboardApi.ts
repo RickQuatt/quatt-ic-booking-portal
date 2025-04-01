@@ -3599,6 +3599,38 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   */
+  async installerInstallationInstallationIdCommissioningLatestOptionsRaw(
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/installer/installation/{installationId}/commissioning/latest`,
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async installerInstallationInstallationIdCommissioningLatestOptions(
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.installerInstallationInstallationIdCommissioningLatestOptionsRaw(
+      initOverrides,
+    );
+  }
+
+  /**
    * Update latest commissioning of an installation
    */
   async updateInstallationCommissioningRaw(

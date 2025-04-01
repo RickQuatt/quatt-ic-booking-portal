@@ -67,6 +67,18 @@ export interface AllEStatus {
    * @memberof AllEStatus
    */
   heatChargerDegradationReasonFlags?: Array<string> | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof AllEStatus
+   */
+  heatChargerCompressorEnabled?: boolean | null;
+  /**
+   *
+   * @type {boolean}
+   * @memberof AllEStatus
+   */
+  emergencyBackupHeaterEnabled?: boolean | null;
 }
 
 /**
@@ -136,6 +148,12 @@ export function AllEStatusFromJSONTyped(
     )
       ? undefined
       : json["heatChargerDegradationReasonFlags"],
+    heatChargerCompressorEnabled: !exists(json, "heatChargerCompressorEnabled")
+      ? undefined
+      : json["heatChargerCompressorEnabled"],
+    emergencyBackupHeaterEnabled: !exists(json, "emergencyBackupHeaterEnabled")
+      ? undefined
+      : json["emergencyBackupHeaterEnabled"],
   };
 }
 
@@ -155,5 +173,7 @@ export function AllEStatusToJSON(value?: AllEStatus | null): any {
     heatBatteryPercentage: value.heatBatteryPercentage,
     heatBatterySensorFailureFlags: value.heatBatterySensorFailureFlags,
     heatChargerDegradationReasonFlags: value.heatChargerDegradationReasonFlags,
+    heatChargerCompressorEnabled: value.heatChargerCompressorEnabled,
+    emergencyBackupHeaterEnabled: value.emergencyBackupHeaterEnabled,
   };
 }

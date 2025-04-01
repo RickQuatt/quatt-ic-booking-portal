@@ -115,7 +115,9 @@ export const ErrorCode = {
   InvalidHeatBatterySize: "INVALID_HEAT_BATTERY_SIZE",
   NoDevicesFound: "NO_DEVICES_FOUND",
   InvalidSoundLevelForAllElectric: "INVALID_SOUND_LEVEL_FOR_ALL_ELECTRIC",
+  ApiResponseValidationError: "API_RESPONSE_VALIDATION_ERROR",
   InstallationIsNotHybrid: "INSTALLATION_IS_NOT_HYBRID",
+  InstallationIsNotAllElectric: "INSTALLATION_IS_NOT_ALL_ELECTRIC",
   OutdoorUnitsNotFound: "OUTDOOR_UNITS_NOT_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
