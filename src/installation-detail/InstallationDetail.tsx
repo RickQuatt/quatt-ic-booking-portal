@@ -16,6 +16,8 @@ import { ResponseError } from "../api-client/runtime";
 import { InstallationDetailTariff } from "./InstallationDetailTariff";
 import { InstallationDetailActions } from "./InstallationDetailActions";
 import { InstallationType } from "../api-client/models/InstallationType";
+import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
+import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 
 interface InstallationDetailProps {
   iuid: string;
@@ -30,8 +32,8 @@ export function InstallationDetail({ iuid }: InstallationDetailProps) {
   } = useGetInstallationDetails(iuid);
 
   // TODO: implement Zuper changes
-  // const { zuperJobs, isLoadingZuperJobs, zuperJobsError, refetchZuperJobs } =
-  //   useGetZuperJobs(iuid);
+  const { zuperJobs, isLoadingZuperJobs, zuperJobsError, refetchZuperJobs } =
+    useGetZuperJobs(iuid);
 
   if (isLoadingInstallationDetails) {
     return <Loader />;
@@ -96,11 +98,11 @@ export function InstallationDetail({ iuid }: InstallationDetailProps) {
       </div>
       <div className={classes["detail-sections-insights"]}>
         {/* TODO: implement Zuper changes */}
-        {/* <InstallationDetailAdvanced
+        <InstallationDetailAdvanced
           installation={installationDetails}
           zuperInstallationJobs={zuperJobs?.installations}
           isLoadingZuperJobs={isLoadingZuperJobs}
-        /> */}
+        />
         <InstallationDetailActions
           cicId={installationDetails.activeCic}
           quattBuild={installationDetails.quattBuild}
