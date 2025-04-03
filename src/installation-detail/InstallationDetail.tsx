@@ -18,6 +18,7 @@ import { InstallationDetailActions } from "./InstallationDetailActions";
 import { InstallationType } from "../api-client/models/InstallationType";
 import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
+import { InstallationDetailZuperService } from "./InstallationDetailZuperService";
 
 interface InstallationDetailProps {
   iuid: string;
@@ -114,12 +115,12 @@ export function InstallationDetail({ iuid }: InstallationDetailProps) {
       <div className={classes["detail-sections-api"]}>
         <InstallationDetailTickets installationId={installationId} />
         {/* TODO: implement Zuper changes */}
-        {/* <InstallationDetailZuperService
+        <InstallationDetailZuperService
           zuperServiceJobs={zuperJobs?.services}
           isLoadingJobs={isLoadingZuperJobs}
           zuperJobsError={zuperJobsError}
           refetch={refetchZuperJobs}
-        /> */}
+        />
         <InstallationDetailTariff installationId={installationId} />
         <InstallationDetailCICQR cicId={installationDetails.activeCic} />
       </div>
