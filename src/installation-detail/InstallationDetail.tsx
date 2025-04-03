@@ -3,36 +3,35 @@ import classes from "./InstallationDetail.module.css";
 import { InstallationDetailExtraInformation } from "./InstallationDetailExtraInformation";
 import { InstallationDetailCicHistory } from "./InstallationDetailCicHistory";
 import { InstallationDetailCommissioningHistory } from "./InstallationDetailCommissioningHistory";
-import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { InstallationDetailSettings } from "./InstallationDetailSettings";
 import { InstallationDetailSettingsHistory } from "./InstallationDetailSettingsHistory";
 import { InstallationDetailTickets } from "./InstallationDetailTickets";
-import { InstallationDetailZuperService } from "./InstallationDetailZuperService";
 import { InstallationHealthChecks } from "./InstallationHealthChecks";
 import { InstallationDetailNotes } from "./installationDetailNotes";
 import { InstallationDetailCICQR } from "./InstallationDetailCICQR";
 import { Loader } from "../ui-components/loader/Loader";
 import { useGetInstallationDetails } from "./hooks/useGetInstallationDetails";
-import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 import ErrorText from "../ui-components/error-text/ErrorText";
 import { ResponseError } from "../api-client/runtime";
 import { InstallationDetailTariff } from "./InstallationDetailTariff";
 import { InstallationDetailActions } from "./InstallationDetailActions";
+import { InstallationType } from "../api-client/models/InstallationType";
 
 interface InstallationDetailProps {
-  orderNumber: string;
+  iuid: string;
 }
 
-export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
+export function InstallationDetail({ iuid }: InstallationDetailProps) {
   const {
     installationDetails,
     installationDetailsError,
     isLoadingInstallationDetails,
     refetchInstallationDetails,
-  } = useGetInstallationDetails(orderNumber);
+  } = useGetInstallationDetails(iuid);
 
-  const { zuperJobs, isLoadingZuperJobs, zuperJobsError, refetchZuperJobs } =
-    useGetZuperJobs(orderNumber);
+  // TODO: implement Zuper changes
+  // const { zuperJobs, isLoadingZuperJobs, zuperJobsError, refetchZuperJobs } =
+  //   useGetZuperJobs(iuid);
 
   if (isLoadingInstallationDetails) {
     return <Loader />;
@@ -44,8 +43,8 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
       installationDetailsError?.response?.status === 404;
 
     const errorDescription = installationNotfound
-      ? `No installation found with order number ${orderNumber}`
-      : `Failed to fetch installation details for order number ${orderNumber}.`;
+      ? `No installation found with IUID ${iuid}`
+      : `Failed to fetch installation details for IUID ${iuid}.`;
 
     const refetchInstallation = installationNotfound
       ? undefined
@@ -59,15 +58,20 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
   if (!installationDetails.activeCic) {
     throw new Error("Active CIC not found");
   }
-
+  const isAllE =
+    installationDetails.installationType === InstallationType.AllElectric ||
+    installationDetails.installationType === InstallationType.AllElectricDuo;
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
-        <span className={classes["order-number"]}>{orderNumber}</span>
+        <span className={classes["order-number"]}>
+          {iuid} - {installationDetails.country}
+        </span>
         <div className={classes["detail-section"]}>
           <DetailSectionHeader title="🏥 Health checks" />
           <InstallationHealthChecks
-            orderNumber={orderNumber}
+            iuid={iuid}
+            isAllE={isAllE}
             cicId={installationDetails.activeCic}
             thermostatType={installationDetails.thermostatType}
             deviceConnectionStatuses={
@@ -91,11 +95,12 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
         />
       </div>
       <div className={classes["detail-sections-insights"]}>
-        <InstallationDetailAdvanced
+        {/* TODO: implement Zuper changes */}
+        {/* <InstallationDetailAdvanced
           installation={installationDetails}
           zuperInstallationJobs={zuperJobs?.installations}
           isLoadingZuperJobs={isLoadingZuperJobs}
-        />
+        /> */}
         <InstallationDetailActions
           cicId={installationDetails.activeCic}
           quattBuild={installationDetails.quattBuild}
@@ -106,12 +111,13 @@ export function InstallationDetail({ orderNumber }: InstallationDetailProps) {
 
       <div className={classes["detail-sections-api"]}>
         <InstallationDetailTickets installationId={installationId} />
-        <InstallationDetailZuperService
+        {/* TODO: implement Zuper changes */}
+        {/* <InstallationDetailZuperService
           zuperServiceJobs={zuperJobs?.services}
           isLoadingJobs={isLoadingZuperJobs}
           zuperJobsError={zuperJobsError}
           refetch={refetchZuperJobs}
-        />
+        /> */}
         <InstallationDetailTariff installationId={installationId} />
         <InstallationDetailCICQR cicId={installationDetails.activeCic} />
       </div>

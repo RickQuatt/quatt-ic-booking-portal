@@ -16,21 +16,21 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface UpdateUserClient404ResponseAllOfMeta
+ * @interface AdminCicCreateInstallation409ResponseAllOfMeta
  */
-export interface UpdateUserClient404ResponseAllOfMeta {
+export interface AdminCicCreateInstallation409ResponseAllOfMeta {
   /**
    *
-   * @type {object}
-   * @memberof UpdateUserClient404ResponseAllOfMeta
+   * @type {any}
+   * @memberof AdminCicCreateInstallation409ResponseAllOfMeta
    */
-  status?: object;
+  status?: any | null;
 }
 
 /**
- * Check if a given object implements the UpdateUserClient404ResponseAllOfMeta interface.
+ * Check if a given object implements the AdminCicCreateInstallation409ResponseAllOfMeta interface.
  */
-export function instanceOfUpdateUserClient404ResponseAllOfMeta(
+export function instanceOfAdminCicCreateInstallation409ResponseAllOfMeta(
   value: object,
 ): boolean {
   let isInstance = true;
@@ -38,16 +38,19 @@ export function instanceOfUpdateUserClient404ResponseAllOfMeta(
   return isInstance;
 }
 
-export function UpdateUserClient404ResponseAllOfMetaFromJSON(
+export function AdminCicCreateInstallation409ResponseAllOfMetaFromJSON(
   json: any,
-): UpdateUserClient404ResponseAllOfMeta {
-  return UpdateUserClient404ResponseAllOfMetaFromJSONTyped(json, false);
+): AdminCicCreateInstallation409ResponseAllOfMeta {
+  return AdminCicCreateInstallation409ResponseAllOfMetaFromJSONTyped(
+    json,
+    false,
+  );
 }
 
-export function UpdateUserClient404ResponseAllOfMetaFromJSONTyped(
+export function AdminCicCreateInstallation409ResponseAllOfMetaFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): UpdateUserClient404ResponseAllOfMeta {
+): AdminCicCreateInstallation409ResponseAllOfMeta {
   if (json === undefined || json === null) {
     return json;
   }
@@ -56,8 +59,8 @@ export function UpdateUserClient404ResponseAllOfMetaFromJSONTyped(
   };
 }
 
-export function UpdateUserClient404ResponseAllOfMetaToJSON(
-  value?: UpdateUserClient404ResponseAllOfMeta | null,
+export function AdminCicCreateInstallation409ResponseAllOfMetaToJSON(
+  value?: AdminCicCreateInstallation409ResponseAllOfMeta | null,
 ): any {
   if (value === undefined) {
     return undefined;

@@ -44,6 +44,12 @@ export interface DeviceConnectionStatuses {
    * @memberof DeviceConnectionStatuses
    */
   thermostatConnected: CicHealthCheckStatus;
+  /**
+   *
+   * @type {CicHealthCheckStatus}
+   * @memberof DeviceConnectionStatuses
+   */
+  heatChargerConnected?: CicHealthCheckStatus;
 }
 
 /**
@@ -81,6 +87,9 @@ export function DeviceConnectionStatusesFromJSONTyped(
     thermostatConnected: CicHealthCheckStatusFromJSON(
       json["thermostatConnected"],
     ),
+    heatChargerConnected: !exists(json, "heatChargerConnected")
+      ? undefined
+      : CicHealthCheckStatusFromJSON(json["heatChargerConnected"]),
   };
 }
 
@@ -99,5 +108,8 @@ export function DeviceConnectionStatusesToJSON(
       value.openthermBoilerConnected,
     ),
     thermostatConnected: CicHealthCheckStatusToJSON(value.thermostatConnected),
+    heatChargerConnected: CicHealthCheckStatusToJSON(
+      value.heatChargerConnected,
+    ),
   };
 }

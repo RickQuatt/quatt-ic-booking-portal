@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useApiClient } from "../../api-client/context";
 
-export const useGetInstallationDetails = (orderNumber: string) => {
+export const useGetInstallationDetails = (iuid: string) => {
   const apiClient = useApiClient();
   const {
     data: installationDetailsResponse,
@@ -9,8 +9,8 @@ export const useGetInstallationDetails = (orderNumber: string) => {
     error: installationDetailsError,
     refetch: refetchInstallationDetails,
   } = useQuery({
-    queryKey: ["installationDetail", orderNumber],
-    queryFn: () => apiClient.adminGetInstallation({ orderNumber }),
+    queryKey: ["installationDetail", iuid],
+    queryFn: () => apiClient.adminGetInstallation({ orderNumber: iuid }),
   });
 
   const installationDetails = installationDetailsResponse?.result;

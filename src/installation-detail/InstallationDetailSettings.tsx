@@ -111,6 +111,10 @@ export function InstallationDetailSettings({
   const onSubmit = React.useCallback(
     async (data: InstallationDetailFormData) => {
       const response = await apiClient.adminUpdateInstallation({
+        /*
+        //HAUNTED-HOUSE ignore until haunted house code is merged
+        iuid: installation.iuid?.toString() as string,
+        */
         orderNumber: installation.orderNumber?.toString() as string,
         updateAdminInstallation: data as unknown as CICAdvancedFormDataActual,
       });
@@ -119,6 +123,10 @@ export function InstallationDetailSettings({
         reset({}, { keepValues: true });
       }
     },
+    /*
+    //HAUNTED-HOUSE ignore until haunted house code is merged
+    [apiClient, installation.iuid, reset],
+    */
     [apiClient, installation.orderNumber, reset],
   );
 

@@ -189,8 +189,25 @@ models/*
 !models/UpdateCicSharedProperties.ts
 !models/UpdateCicWifiProperties.ts
 
+!models/UpdateComissioningStatusEnum.ts
+!models/RetryDeviceIdentification403Response.ts
+!models/RetryDeviceIdentification403ResponseFromJSON.ts
+!models/RetryDeviceIdentification403ResponseToJSON.ts
+!models/RetryDeviceIdentification403ResponseAllOfMeta.ts
+!models/UpdateCommissioningToJSON.ts
+!models/CicCommissioningFromJSON.ts
+!models/UpdateDevice400Response.ts
+!models/UpdateDevice400ResponseToJSON.ts
+!models/UpdateDevice400ResponseAllOfMeta.ts
+!models/UpdateCommissioning.ts
+!models/HybridCommissioningMode.ts
+!models/CicCommissioningFromJSON.ts
+!models/AdminCicCreateInstallation409ResponseAllOfMeta.ts
+
 apis/*
 !apis/SupportDashboardApi.ts
 
 !models/index.ts
 #!apis/index.ts
+
+

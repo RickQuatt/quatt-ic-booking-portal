@@ -16,21 +16,21 @@ import { exists, mapValues } from "../runtime";
 /**
  *
  * @export
- * @interface UpdateUserClient404ResponseAllOfMeta
+ * @interface UpdateDevice400ResponseAllOfMeta
  */
-export interface UpdateUserClient404ResponseAllOfMeta {
+export interface UpdateDevice400ResponseAllOfMeta {
   /**
    *
    * @type {object}
-   * @memberof UpdateUserClient404ResponseAllOfMeta
+   * @memberof UpdateDevice400ResponseAllOfMeta
    */
   status?: object;
 }
 
 /**
- * Check if a given object implements the UpdateUserClient404ResponseAllOfMeta interface.
+ * Check if a given object implements the UpdateDevice400ResponseAllOfMeta interface.
  */
-export function instanceOfUpdateUserClient404ResponseAllOfMeta(
+export function instanceOfUpdateDevice400ResponseAllOfMeta(
   value: object,
 ): boolean {
   let isInstance = true;
@@ -38,16 +38,16 @@ export function instanceOfUpdateUserClient404ResponseAllOfMeta(
   return isInstance;
 }
 
-export function UpdateUserClient404ResponseAllOfMetaFromJSON(
+export function UpdateDevice400ResponseAllOfMetaFromJSON(
   json: any,
-): UpdateUserClient404ResponseAllOfMeta {
-  return UpdateUserClient404ResponseAllOfMetaFromJSONTyped(json, false);
+): UpdateDevice400ResponseAllOfMeta {
+  return UpdateDevice400ResponseAllOfMetaFromJSONTyped(json, false);
 }
 
-export function UpdateUserClient404ResponseAllOfMetaFromJSONTyped(
+export function UpdateDevice400ResponseAllOfMetaFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): UpdateUserClient404ResponseAllOfMeta {
+): UpdateDevice400ResponseAllOfMeta {
   if (json === undefined || json === null) {
     return json;
   }
@@ -56,8 +56,8 @@ export function UpdateUserClient404ResponseAllOfMetaFromJSONTyped(
   };
 }
 
-export function UpdateUserClient404ResponseAllOfMetaToJSON(
-  value?: UpdateUserClient404ResponseAllOfMeta | null,
+export function UpdateDevice400ResponseAllOfMetaToJSON(
+  value?: UpdateDevice400ResponseAllOfMeta | null,
 ): any {
   if (value === undefined) {
     return undefined;

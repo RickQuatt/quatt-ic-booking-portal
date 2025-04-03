@@ -21,16 +21,16 @@ import { exists, mapValues } from "../runtime";
 export interface CreateTariff409ResponseAllOfResult {
   /**
    *
-   * @type {any}
+   * @type {object}
    * @memberof CreateTariff409ResponseAllOfResult
    */
-  error?: any | null;
+  error?: object;
   /**
    *
-   * @type {any}
+   * @type {object}
    * @memberof CreateTariff409ResponseAllOfResult
    */
-  errorCode?: any | null;
+  errorCode?: object;
 }
 
 /**

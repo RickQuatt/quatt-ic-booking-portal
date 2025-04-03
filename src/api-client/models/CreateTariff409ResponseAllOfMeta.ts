@@ -21,10 +21,10 @@ import { exists, mapValues } from "../runtime";
 export interface CreateTariff409ResponseAllOfMeta {
   /**
    *
-   * @type {any}
+   * @type {object}
    * @memberof CreateTariff409ResponseAllOfMeta
    */
-  status?: any | null;
+  status?: object;
 }
 
 /**

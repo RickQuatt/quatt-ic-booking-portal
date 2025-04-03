@@ -291,7 +291,7 @@ export interface AdminCic {
    * @type {string}
    * @memberof AdminCic
    */
-  installationId: string;
+  installationId: string | null;
   /**
    *
    * @type {Date}

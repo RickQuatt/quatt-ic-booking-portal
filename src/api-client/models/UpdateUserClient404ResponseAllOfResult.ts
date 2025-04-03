@@ -21,16 +21,16 @@ import { exists, mapValues } from "../runtime";
 export interface UpdateUserClient404ResponseAllOfResult {
   /**
    *
-   * @type {any}
+   * @type {object}
    * @memberof UpdateUserClient404ResponseAllOfResult
    */
-  errorCode?: any | null;
+  errorCode?: object;
   /**
    *
-   * @type {any}
+   * @type {object}
    * @memberof UpdateUserClient404ResponseAllOfResult
    */
-  error?: any | null;
+  error?: object;
 }
 
 /**

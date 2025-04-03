@@ -2,6 +2,7 @@ apis/SupportDashboardApi.ts
 models/AdminAddInstallationNote200Response.ts
 models/AdminCic.ts
 models/AdminCicCreateInstallation409Response.ts
+models/AdminCicCreateInstallation409ResponseAllOfMeta.ts
 models/AdminCicCreateInstallation409ResponseAllOfResult.ts
 models/AdminCreateInstaller200Response.ts
 models/AdminDashboardCics200Response.ts
@@ -66,12 +67,6 @@ models/FinishIdentificationTestRequest.ts
 models/FlowRateTestStatus.ts
 models/ForgetWifiMeCicRequest.ts
 models/GetAllTariffs200Response.ts
-models/GetInsights200Response.ts
-models/GetInsights200ResponseResult.ts
-models/GetInsights200ResponseResultGraphInner.ts
-models/GetInsights200ResponseResultOutsideTemperatureGraphInner.ts
-models/GetInsights200ResponseResultRoomTemperatureGraphInner.ts
-models/GetInsights200ResponseResultWaterTemperatureGraphInner.ts
 models/GetInstallerCic200Response.ts
 models/GetMe200Response.ts
 models/GetMe401Response.ts
@@ -86,6 +81,7 @@ models/HeatDeliverySystem.ts
 models/HeatPump.ts
 models/HeatPumpCommissioning.ts
 models/HeatPumpTestLevel.ts
+models/HybridCommissioningMode.ts
 models/IdentificationStatus.ts
 models/IdentificationTestStatus.ts
 models/Installation.ts
@@ -110,6 +106,8 @@ models/Range.ts
 models/ReferralMember.ts
 models/RequestPairInstallerCicRequest.ts
 models/ResponseMeta.ts
+models/RetryDeviceIdentification403Response.ts
+models/RetryDeviceIdentification403ResponseAllOfMeta.ts
 models/SettingsHeader.ts
 models/SilentMode.ts
 models/StartHeatPumpTestRequest.ts
@@ -125,6 +123,9 @@ models/UpdateAdminCic.ts
 models/UpdateAdminInstallation.ts
 models/UpdateCicSharedProperties.ts
 models/UpdateCicWifiProperties.ts
+models/UpdateCommissioning.ts
+models/UpdateDevice400Response.ts
+models/UpdateDevice400ResponseAllOfMeta.ts
 models/UpdateInstallerCic.ts
 models/UpdateMeCic.ts
 models/UpdateMeUser.ts

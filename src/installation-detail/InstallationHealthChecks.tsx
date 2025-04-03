@@ -21,13 +21,14 @@ import ThresholdCheck from "../ui-components/threshold-check/ThresholdCheck";
 import { useMemo } from "react";
 
 interface InstallationHealthCheckProps {
-  orderNumber: string;
+  iuid: string;
   cicId: string;
   thermostatType: ThermostatType | null;
   deviceConnectionStatuses: DeviceConnectionStatuses;
   internetConnectionStatuses: InternetConnectionStatuses;
   boilerType?: BoilerType | null;
   numberOfHeatPumps: number | null;
+  isAllE: boolean;
 }
 
 const healthcheckTextByStatusForConnectivity: Record<
@@ -41,13 +42,14 @@ const healthcheckTextByStatusForConnectivity: Record<
 };
 
 export function InstallationHealthChecks({
-  orderNumber,
+  iuid,
   cicId,
   thermostatType,
   deviceConnectionStatuses,
   internetConnectionStatuses,
   boilerType,
   numberOfHeatPumps,
+  isAllE,
 }: InstallationHealthCheckProps) {
   const apiClient = useApiClient();
 
@@ -57,7 +59,7 @@ export function InstallationHealthChecks({
     isPending,
     refetch,
   } = useQuery({
-    queryKey: ["installationHealthCheck", orderNumber, cicId],
+    queryKey: ["installationHealthCheck", iuid, cicId],
     queryFn: () =>
       apiClient.adminGetCicHealthCheck({
         cicId,
@@ -159,6 +161,18 @@ export function InstallationHealthChecks({
           }
         />
       )}
+      {isAllE && deviceConnectionStatuses.heatChargerConnected ? (
+        <HealthCheckText
+          title="All-E Heat Charger"
+          status={deviceConnectionStatuses.heatChargerConnected}
+          errorStatusText={heatPumpErrorText}
+          text={
+            healthcheckTextByStatusForConnectivity[
+              deviceConnectionStatuses.heatChargerConnected
+            ]
+          }
+        />
+      ) : null}
       <p className={classes["sub-header"]}>Connectivity</p>
       <HealthCheckText
         title="WiFi"

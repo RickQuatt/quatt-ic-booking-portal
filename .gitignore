@@ -33,4 +33,6 @@ dist-ssr
 *.sw?
 
 local_utilities/
+task-context
+CLAUDE.md
 .env

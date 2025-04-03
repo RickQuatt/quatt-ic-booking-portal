@@ -15,6 +15,55 @@ interface InstallationDetailProps {
   installation: AdminInstallationDetail;
 }
 
+const renderNestedValue = (value: unknown, indent = 1) => {
+  if (value === null || value === undefined) {
+    return <span>null</span>;
+  }
+
+  if (Array.isArray(value)) {
+    return (
+      <ul
+        style={{
+          paddingLeft: `${indent * 20}px`,
+          marginTop: 0,
+          marginBottom: 0,
+        }}
+      >
+        {value.map((item, index) => (
+          <li key={index}>
+            {typeof item === "object" && item !== null
+              ? renderNestedValue(item, indent + 1)
+              : String(item)}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (typeof value === "object") {
+    return (
+      <ul
+        style={{
+          paddingLeft: `${indent * 20}px`,
+          marginTop: 0,
+          marginBottom: 0,
+        }}
+      >
+        {Object.entries(value).map(([nestedKey, nestedValue]) => (
+          <li key={nestedKey}>
+            <b>{nestedKey}:</b>{" "}
+            {typeof nestedValue === "object" && nestedValue !== null
+              ? renderNestedValue(nestedValue, indent + 1)
+              : String(nestedValue)}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  return String(value);
+};
+
 export function InstallationDetailSettingsHistory({
   installation,
 }: InstallationDetailProps) {
@@ -133,13 +182,39 @@ function InstallationDetailSettingsItem({
           <li>
             <b>settings:</b>
           </li>
-          {settingsColumn.map(([key, value]) => (
-            <li className={classes["settings-history-child-setting"]} key={key}>
-              <>
-                <b>{key}:</b> {value}
-              </>
-            </li>
-          ))}
+          {settingsColumn.map(([key, value]) => {
+            try {
+              if (typeof value === "object") {
+                return (
+                  <li
+                    className={classes["settings-history-child-setting"]}
+                    key={key}
+                  >
+                    <b>{key}:</b> {renderNestedValue(value)}
+                  </li>
+                );
+              }
+              return (
+                <li
+                  className={classes["settings-history-child-setting"]}
+                  key={key}
+                >
+                  <>
+                    <b>{key}:</b> {value}
+                  </>
+                </li>
+              );
+            } catch (e) {
+              console.error(
+                "The following Settings Update Message field could not be render",
+                e,
+                { key, value },
+              );
+              return (
+                <li>The Property {key} cound not be rendered correctly</li>
+              );
+            }
+          })}
         </ul>
       )}
     </AccordionItem>

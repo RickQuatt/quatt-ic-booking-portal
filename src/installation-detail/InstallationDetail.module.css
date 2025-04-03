@@ -115,6 +115,7 @@
 
 .settings-history-card {
   font-size: 0.8rem;
+  overflow-y: auto;
 }
 
 .settings-history-bullet {

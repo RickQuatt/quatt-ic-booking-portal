@@ -261,7 +261,7 @@ export interface InstallerCic {
    * @type {string}
    * @memberof InstallerCic
    */
-  installationId: string;
+  installationId: string | null;
   /**
    *
    * @type {Date}

@@ -140,7 +140,23 @@ export interface UpdateAdminCic {
    * @memberof UpdateAdminCic
    */
   numberOfHeatPumps?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof UpdateAdminCic
+   */
+  setAllEEmergencyBackupHeaterState?: UpdateAdminCicSetAllEEmergencyBackupHeaterStateEnum;
 }
+
+/**
+ * @export
+ */
+export const UpdateAdminCicSetAllEEmergencyBackupHeaterStateEnum = {
+  On: "on",
+  Off: "off",
+} as const;
+export type UpdateAdminCicSetAllEEmergencyBackupHeaterStateEnum =
+  (typeof UpdateAdminCicSetAllEEmergencyBackupHeaterStateEnum)[keyof typeof UpdateAdminCicSetAllEEmergencyBackupHeaterStateEnum];
 
 /**
  * Check if a given object implements the UpdateAdminCic interface.
@@ -207,6 +223,12 @@ export function UpdateAdminCicFromJSONTyped(
     numberOfHeatPumps: !exists(json, "numberOfHeatPumps")
       ? undefined
       : json["numberOfHeatPumps"],
+    setAllEEmergencyBackupHeaterState: !exists(
+      json,
+      "setAllEEmergencyBackupHeaterState",
+    )
+      ? undefined
+      : json["setAllEEmergencyBackupHeaterState"],
   };
 }
 
@@ -233,5 +255,6 @@ export function UpdateAdminCicToJSON(value?: UpdateAdminCic | null): any {
     boilerType: BoilerTypeToJSON(value.boilerType),
     thermostatType: ThermostatTypeToJSON(value.thermostatType),
     numberOfHeatPumps: value.numberOfHeatPumps,
+    setAllEEmergencyBackupHeaterState: value.setAllEEmergencyBackupHeaterState,
   };
 }
