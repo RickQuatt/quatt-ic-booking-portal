@@ -13,6 +13,7 @@ import { ButtonLink } from "../ui-components/button/Button";
 import { AdminCic, ConnectionStatus } from "../api-client/models";
 import { formatDate, formatDateDistance } from "../utils/formatDate";
 import {
+  getGrafanaAllEDashboardLink,
   getGrafanaDataPerCICLink,
   getMenderLink,
 } from "../cic-detail/getLinks";
@@ -243,7 +244,20 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
           href={getGrafanaDataPerCICLink(cicEntry.id)}
           target="_blank"
         >
-          Grafana
+          Grafana - Data per CIC
+        </ButtonLink>
+      </Td>
+      <Td>
+        <ButtonLink
+          href={
+            cicEntry.allEStatus
+              ? getGrafanaAllEDashboardLink(cicEntry.id)
+              : undefined
+          }
+          target="_blank"
+          disabled={!cicEntry.allEStatus}
+        >
+          Grafana - All E Dashboard
         </ButtonLink>
       </Td>
       <Td>

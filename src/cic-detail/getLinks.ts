@@ -32,6 +32,17 @@ export function getGrafanaDataPerCICLink(id: string) {
   return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/clickhouse-data-per-cic/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
 }
 
+export function getGrafanaAllEDashboardLink(id: string) {
+  const env = getEnvironment();
+  if (env.isLocal || env.isDevelopment) {
+    return `https://g-d4ebd27178.grafana-workspace.eu-west-1.amazonaws.com/d/all-e-dashboard/all-e-dashboard?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
+  }
+  if (env.isStaging) {
+    return `https://g-2048f245a4.grafana-workspace.eu-west-1.amazonaws.com/d/all-e-dashboard/all-e-dashboard?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
+  }
+  return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/all-e-dashboard/all-e-dashboard?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
+}
+
 export function getGrafanaDiagnosticsLink(id: string) {
   const env = getEnvironment();
 

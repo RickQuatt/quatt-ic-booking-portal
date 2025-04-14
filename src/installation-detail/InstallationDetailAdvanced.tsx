@@ -1,6 +1,11 @@
-import { AdminInstallationDetail, ZuperService } from "../api-client/models";
+import {
+  AdminInstallationDetail,
+  InstallationType,
+  ZuperService,
+} from "../api-client/models";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import {
+  getGrafanaAllEDashboardLink,
   getGrafanaDataPerCICLink,
   getGrafanaDiagnosticsLink,
   getHubspotDealLink,
@@ -29,6 +34,10 @@ export function InstallationDetailAdvanced({
   if (!activeCic) {
     throw new Error("Active CIC not found");
   }
+  const isAllElectric =
+    installation.installationType === InstallationType.AllElectric ||
+    installation.installationType === InstallationType.AllElectricDuo;
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="📊 Advanced insights" />
@@ -49,6 +58,15 @@ export function InstallationDetailAdvanced({
         </ButtonLink>
         <ButtonLink href={getGrafanaDataPerCICLink(activeCic)} target="_blank">
           Grafana - Data per CIC
+        </ButtonLink>
+        <ButtonLink
+          href={
+            isAllElectric ? getGrafanaAllEDashboardLink(activeCic) : undefined
+          }
+          target="_blank"
+          disabled={!isAllElectric}
+        >
+          Grafana - All E Dashboard
         </ButtonLink>
         {menderId && (
           <ButtonLink href={getMenderLink(menderId)} target="_blank">
