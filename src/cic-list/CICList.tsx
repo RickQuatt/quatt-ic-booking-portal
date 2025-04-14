@@ -244,20 +244,7 @@ function CICRow({ cicEntry }: { cicEntry: AdminCic }) {
           href={getGrafanaDataPerCICLink(cicEntry.id)}
           target="_blank"
         >
-          Grafana - Data per CIC
-        </ButtonLink>
-      </Td>
-      <Td>
-        <ButtonLink
-          href={
-            cicEntry.allEStatus
-              ? getGrafanaAllEDashboardLink(cicEntry.id)
-              : undefined
-          }
-          target="_blank"
-          disabled={!cicEntry.allEStatus}
-        >
-          Grafana - All E Dashboard
+          Grafana
         </ButtonLink>
       </Td>
       <Td>

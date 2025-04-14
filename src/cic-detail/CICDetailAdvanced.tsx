@@ -13,6 +13,7 @@ import { AdvancedSettingsModal } from "./AdvancedSettingsModal";
 import classes from "./CICDetail.module.css";
 import { DetailSectionHeader } from "./CICDetailSectionHeader";
 import {
+  getGrafanaAllEDashboardLink,
   getGrafanaDataPerCICLink,
   getHubspotSearchOrderLink,
   getMenderLink,
@@ -152,6 +153,17 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         )}
         <ButtonLink href={getGrafanaDataPerCICLink(cicData.id)} target="_blank">
           Grafana
+        </ButtonLink>
+        <ButtonLink
+          href={
+            cicData.allEStatus
+              ? getGrafanaAllEDashboardLink(cicData.id)
+              : undefined
+          }
+          target="_blank"
+          disabled={!cicData.allEStatus}
+        >
+          Grafana - All E Dashboard
         </ButtonLink>
         <FormField>
           <FormFieldTitle>Supervisory Control Mode</FormFieldTitle>
