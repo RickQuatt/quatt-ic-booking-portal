@@ -24,10 +24,10 @@ export function CICDetailHealthChecks({ cicData }: { cicData: AdminCic }) {
   }, [cicData.healthChecksByKpi]);
 
   const rows = React.useMemo(() => {
-    return getEntries(entriesByCategory).map(([category, entries]) => {
-      const rows = entries.map(([kpi, value]) => {
+    return getEntries(entriesByCategory).map(([category, entries], index) => {
+      const rows = entries.map(([kpi, value], index) => {
         return (
-          <FormField key={kpi}>
+          <FormField key={index}>
             <FormFieldTitle>{kpiToLabel[kpi]}</FormFieldTitle>
             <HealthCheckCircle status={value.status} />
           </FormField>
@@ -37,6 +37,7 @@ export function CICDetailHealthChecks({ cicData }: { cicData: AdminCic }) {
       return (
         <>
           <DetailSubSectionHeader
+            key={index}
             title={categoryToLabel[category as CicHealthCheckCategory]}
           />
           {rows}

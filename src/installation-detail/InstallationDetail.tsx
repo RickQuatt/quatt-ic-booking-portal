@@ -21,20 +21,22 @@ import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 import { InstallationDetailZuperService } from "./InstallationDetailZuperService";
 
 interface InstallationDetailProps {
-  iuid: string;
+  installationUuid: string;
 }
 
-export function InstallationDetail({ iuid }: InstallationDetailProps) {
+export function InstallationDetail({
+  installationUuid,
+}: InstallationDetailProps) {
   const {
     installationDetails,
     installationDetailsError,
     isLoadingInstallationDetails,
     refetchInstallationDetails,
-  } = useGetInstallationDetails(iuid);
+  } = useGetInstallationDetails(installationUuid);
 
   // TODO: implement Zuper changes
   const { zuperJobs, isLoadingZuperJobs, zuperJobsError, refetchZuperJobs } =
-    useGetZuperJobs(iuid);
+    useGetZuperJobs(installationUuid, installationDetails?.orderNumber);
 
   if (isLoadingInstallationDetails) {
     return <Loader />;
@@ -46,8 +48,8 @@ export function InstallationDetail({ iuid }: InstallationDetailProps) {
       installationDetailsError?.response?.status === 404;
 
     const errorDescription = installationNotfound
-      ? `No installation found with IUID ${iuid}`
-      : `Failed to fetch installation details for IUID ${iuid}.`;
+      ? `No installation found with installationUuid ${installationUuid}`
+      : `Failed to fetch installation details for installationUuid ${installationUuid}.`;
 
     const refetchInstallation = installationNotfound
       ? undefined
@@ -68,12 +70,12 @@ export function InstallationDetail({ iuid }: InstallationDetailProps) {
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
         <span className={classes["order-number"]}>
-          {iuid} - {installationDetails.country}
+          {installationUuid} - {installationDetails.country}
         </span>
         <div className={classes["detail-section"]}>
           <DetailSectionHeader title="🏥 Health checks" />
           <InstallationHealthChecks
-            iuid={iuid}
+            installationUuid={installationUuid}
             isAllE={isAllE}
             cicId={installationDetails.activeCic}
             thermostatType={installationDetails.thermostatType}

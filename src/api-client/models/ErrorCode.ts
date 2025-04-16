@@ -119,6 +119,13 @@ export const ErrorCode = {
   InstallationIsNotHybrid: "INSTALLATION_IS_NOT_HYBRID",
   InstallationIsNotAllElectric: "INSTALLATION_IS_NOT_ALL_ELECTRIC",
   OutdoorUnitsNotFound: "OUTDOOR_UNITS_NOT_FOUND",
+  CommissioningInProgress: "COMMISSIONING_IN_PROGRESS",
+  UnableToAddDeviceToCommissioning: "UNABLE_TO_ADD_DEVICE_TO_COMMISSIONING",
+  InstallationUuidNotFound: "INSTALLATION_UUID_NOT_FOUND",
+  HouseIdNotFound: "HOUSE_ID_NOT_FOUND",
+  HubspotQueryError: "HUBSPOT_QUERY_ERROR",
+  InvalidZipcodeFormat: "INVALID_ZIPCODE_FORMAT",
+  HubspotHouseNotFound: "HUBSPOT_HOUSE_NOT_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

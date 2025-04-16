@@ -28,11 +28,10 @@ export function InstallationList() {
       false,
       filters.cicId,
       filters.orderNumber,
-      //HAUNTED-HOUSE
-      // filters.iuid,
-      // filters.zipCode,
-      // filters.houseNumber,
-      // filters.houseAddition,
+      filters.installationUuid,
+      filters.zipCode,
+      filters.houseNumber,
+      filters.houseAddition,
     );
 
   const { paginatedItems, paginationRange, currentPage, changePage } =
@@ -44,22 +43,17 @@ export function InstallationList() {
   const noInstallationsFound = installations && installations.length === 0;
 
   const isDirty = filters.cicId || filters.orderNumber;
-  /*
-   //HAUNTED-HOUSE re-add once haunted house is released
-  const iuidPlaceholder = isDirty
+  const installationUuidPlaceholder = isDirty
     ? ""
     : "e.g. INS-f804fb98-664b-4c94-ba01-38579323b34c";
-  */
   const orderNumberPlaceholder = isDirty ? "" : "e.g. QUATT1513202";
   const cicIdPlaceholder = isDirty
     ? ""
     : "e.g. CIC-16762b7b-6977-4047-999e-5bf39226f7f5";
-  /*
-    //HAUNTED-HOUSE re-add once haunted house is released
-    const zipCodePlaceholder = isDirty ? "" : "e.g. 1111AB";
-    const houseNumberPlaceholder = isDirty ? "" : "e.g. 123";
-    const additionPlaceholder = isDirty ? "" : "e.g. 1";
-    */
+
+  const zipCodePlaceholder = isDirty ? "" : "e.g. 1111AB";
+  const houseNumberPlaceholder = isDirty ? "" : "e.g. 123";
+  const additionPlaceholder = isDirty ? "" : "e.g. 1";
 
   return (
     <div className={classes.page}>
@@ -82,15 +76,12 @@ export function InstallationList() {
       <Table gridClass={classes["table-grid"]}>
         <THead>
           <Tr>
-            {/* 
-            //HAUNTED-HOUSE
-            <Th><TdText>IUID</TdText></Th> 
-            */}
+            <Th>
+              <TdText>Installation UUID</TdText>
+            </Th>
             <Th>
               <TdText>Order number</TdText>
             </Th>
-            {/* 
-            //HAUNTED-HOUSE
             <Th>
               <TdText>Zip code</TdText>
             </Th>
@@ -100,7 +91,7 @@ export function InstallationList() {
             <Th>
               <TdText>House addition</TdText>
             </Th>
-             */}
+
             <Th>
               <TdText>Active CIC</TdText>
             </Th>
@@ -112,16 +103,14 @@ export function InstallationList() {
             </Th>
           </Tr>
           <Tr>
-            {/* 
-              //HAUNTED-HOUSE
             <Th>
               <TextFilter
-                filterKey="iuid"
-                placeholder={iuidPlaceholder}
+                filterKey="installationUuid"
+                placeholder={installationUuidPlaceholder}
                 setFilters={setFilters}
-              /> 
+              />
             </Th>
-              */}
+
             <Th>
               <TextFilter
                 filterKey="orderNumber"
@@ -129,36 +118,31 @@ export function InstallationList() {
                 setFilters={setFilters}
               />
             </Th>
-            {/* 
+
             <Th>
-              //HAUNTED-HOUSE
               <TextFilter
                 filterKey="zipCode"
                 placeholder={zipCodePlaceholder}
                 setFilters={setFilters}
-              /> 
+              />
             </Th>
-              */}
-            {/* 
+
             <Th>
-              //HAUNTED-HOUSE
               <TextFilter
                 filterKey="houseNumber"
                 placeholder={houseNumberPlaceholder}
                 setFilters={setFilters}
-              /> 
+              />
             </Th>
-              */}
-            {/* 
+
             <Th>
-              //HAUNTED-HOUSE
               <TextFilter
                 filterKey="houseAddition"
                 placeholder={additionPlaceholder}
                 setFilters={setFilters}
-              /> 
+              />
             </Th>
-              */}
+
             <Th>
               <TextFilter
                 filterKey="cicId"
@@ -206,38 +190,32 @@ export function InstallationList() {
     installation: AdminInstallationsList;
   }) {
     const oldInstallationDetailLink = `/installations/${installation.orderNumber}`;
-    // const installationDetailLink = `/installations/${installation.iuid}`;
+    const installationDetailLink = `/installations/${installation.installationUuid}`;
     const cicDetailLink = `/cics/${installation.cicId}`;
     return (
       <Tr>
-        {/*
         <Td>
-          //HAUNTED-HOUSE
-           <Link to={installationDetailLink}>{installation.iuid}</Link> 
-           
+          <Link to={installationDetailLink}>
+            {installation.installationUuid}
+          </Link>
         </Td>
-           */}
+
         <Td>
           <Link to={oldInstallationDetailLink}>{installation.orderNumber}</Link>
         </Td>
-        {/*
+
         <Td>
-        //HAUNTED-HOUSE
-        <TdText>{installation.zipCode}</TdText> 
-        
+          <TdText>{installation.zipCode}</TdText>
         </Td>
-        */}
-        {/* 
+
         <Td>
-        //HAUNTED-HOUSE
-        <TdText>{installation.houseNumber}</TdText> 
+          <TdText>{installation.houseNumber}</TdText>
         </Td>
-        */}
-        {/*
+
         <Td>
-         <TdText>{installation.houseAddition}</TdText> 
-         </Td>
-         */}
+          <TdText>{installation.houseAddition}</TdText>
+        </Td>
+
         <Td>
           <Link to={cicDetailLink}>{installation.cicId}</Link>
         </Td>

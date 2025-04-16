@@ -19,34 +19,28 @@ import type {
   AdminDashboardCics200Response,
   AdminGetCic200Response,
   AdminGetInstallation200Response,
+  AdminGetInstallationClickhouseData200Response,
   AdminGetInstallationCommissioning200Response,
-  AdminGetInstallationHealthCheck200Response,
   AdminGetInstallationNotes200Response,
   AdminGetInstallationSetting200Response,
   AdminGetInstallationTickets200Response,
   AdminGetInstallationZuperJobs200Response,
-  AdminGetZuperJobsByOrderNumber200Response,
+  AdminGetZuperJobsByInstallationUuid200Response,
   AdminInstallationsList200Response,
   AdminListCics200Response,
   AdminListInstallers200Response,
   AdminUpdateInstallationNote200Response,
   CompleteCommissioning200Response,
   CreateTariff200Response,
-  CreateTariff409Response,
   CreateTariffRequest,
   CreateUpdateInstaller,
   CreateUpdateNote,
   ForgetWifiMeCicRequest,
   GetAllTariffs200Response,
   GetInstallerCic200Response,
-  GetMe401Response,
-  GetMe500Response,
-  RetryDeviceIdentification403Response,
   UpdateAdminCic,
   UpdateAdminInstallation,
   UpdateCommissioning,
-  UpdateDevice400Response,
-  UpdateUserClient404Response,
 } from "../models/index";
 import {
   AdminAddInstallationNote200ResponseFromJSON,
@@ -59,10 +53,10 @@ import {
   AdminGetCic200ResponseToJSON,
   AdminGetInstallation200ResponseFromJSON,
   AdminGetInstallation200ResponseToJSON,
+  AdminGetInstallationClickhouseData200ResponseFromJSON,
+  AdminGetInstallationClickhouseData200ResponseToJSON,
   AdminGetInstallationCommissioning200ResponseFromJSON,
   AdminGetInstallationCommissioning200ResponseToJSON,
-  AdminGetInstallationHealthCheck200ResponseFromJSON,
-  AdminGetInstallationHealthCheck200ResponseToJSON,
   AdminGetInstallationNotes200ResponseFromJSON,
   AdminGetInstallationNotes200ResponseToJSON,
   AdminGetInstallationSetting200ResponseFromJSON,
@@ -71,8 +65,8 @@ import {
   AdminGetInstallationTickets200ResponseToJSON,
   AdminGetInstallationZuperJobs200ResponseFromJSON,
   AdminGetInstallationZuperJobs200ResponseToJSON,
-  AdminGetZuperJobsByOrderNumber200ResponseFromJSON,
-  AdminGetZuperJobsByOrderNumber200ResponseToJSON,
+  AdminGetZuperJobsByInstallationUuid200ResponseFromJSON,
+  AdminGetZuperJobsByInstallationUuid200ResponseToJSON,
   AdminInstallationsList200ResponseFromJSON,
   AdminInstallationsList200ResponseToJSON,
   AdminListCics200ResponseFromJSON,
@@ -85,8 +79,6 @@ import {
   CompleteCommissioning200ResponseToJSON,
   CreateTariff200ResponseFromJSON,
   CreateTariff200ResponseToJSON,
-  CreateTariff409ResponseFromJSON,
-  CreateTariff409ResponseToJSON,
   CreateTariffRequestFromJSON,
   CreateTariffRequestToJSON,
   CreateUpdateInstallerFromJSON,
@@ -99,22 +91,12 @@ import {
   GetAllTariffs200ResponseToJSON,
   GetInstallerCic200ResponseFromJSON,
   GetInstallerCic200ResponseToJSON,
-  GetMe401ResponseFromJSON,
-  GetMe401ResponseToJSON,
-  GetMe500ResponseFromJSON,
-  GetMe500ResponseToJSON,
-  RetryDeviceIdentification403ResponseFromJSON,
-  RetryDeviceIdentification403ResponseToJSON,
   UpdateAdminCicFromJSON,
   UpdateAdminCicToJSON,
   UpdateAdminInstallationFromJSON,
   UpdateAdminInstallationToJSON,
   UpdateCommissioningFromJSON,
   UpdateCommissioningToJSON,
-  UpdateDevice400ResponseFromJSON,
-  UpdateDevice400ResponseToJSON,
-  UpdateUserClient404ResponseFromJSON,
-  UpdateUserClient404ResponseToJSON,
 } from "../models/index";
 
 export interface AdminAddInstallationNoteRequest {
@@ -152,6 +134,10 @@ export interface AdminCicCicIdRebootOptionsRequest {
 
 export interface AdminCicListOptionsRequest {
   orderNumber?: string;
+  installationUuid?: string;
+  zipCode?: string;
+  houseAddition?: string;
+  houseNumber?: string;
   cicId?: string;
   createdAtStart?: Date;
   createdAtEnd?: Date;
@@ -200,7 +186,7 @@ export interface AdminGetCicHealthCheckRequest {
 }
 
 export interface AdminGetInstallationRequest {
-  orderNumber: string;
+  installationUuid: string;
 }
 
 export interface AdminGetInstallationClickhouseDataRequest {
@@ -210,11 +196,6 @@ export interface AdminGetInstallationClickhouseDataRequest {
 export interface AdminGetInstallationCommissioningRequest {
   installationId: string;
   commissioningId: number;
-}
-
-export interface AdminGetInstallationHealthCheckRequest {
-  orderNumber: string;
-  cicId: string;
 }
 
 export interface AdminGetInstallationNotesRequest {
@@ -242,8 +223,9 @@ export interface AdminGetInstallerRequest {
   installerId: string;
 }
 
-export interface AdminGetZuperJobsByOrderNumberRequest {
-  orderNumber: string;
+export interface AdminGetZuperJobsByInstallationUuidRequest {
+  installationUuid: string;
+  orderNumber?: string;
 }
 
 export interface AdminInstallationInstallationIdClickhouseOptionsRequest {
@@ -282,31 +264,39 @@ export interface AdminInstallationInstallationIdZuperJobsOptionsRequest {
   installationId: string;
 }
 
+export interface AdminInstallationInstallationUuidOptionsRequest {
+  installationUuid: string;
+}
+
+export interface AdminInstallationInstallationUuidZuperJobsOptionsRequest {
+  installationUuid: string;
+  orderNumber?: string;
+}
+
 export interface AdminInstallationListOptionsRequest {
   orderNumber?: string;
   cicId?: string;
-}
-
-export interface AdminInstallationOrderNumberHealthCheckCicIdOptionsRequest {
-  orderNumber: string;
-  cicId: string;
-}
-
-export interface AdminInstallationOrderNumberOptionsRequest {
-  orderNumber: string;
-}
-
-export interface AdminInstallationOrderNumberZuperJobsOptionsRequest {
-  orderNumber: string;
+  installationUuid?: string;
+  zipCode?: string;
+  houseNumber?: string;
+  houseAddition?: string;
 }
 
 export interface AdminInstallationsListRequest {
   orderNumber?: string;
   cicId?: string;
+  installationUuid?: string;
+  zipCode?: string;
+  houseNumber?: string;
+  houseAddition?: string;
 }
 
 export interface AdminListCicsRequest {
   orderNumber?: string;
+  installationUuid?: string;
+  zipCode?: string;
+  houseAddition?: string;
+  houseNumber?: string;
   cicId?: string;
   createdAtStart?: Date;
   createdAtEnd?: Date;
@@ -325,7 +315,7 @@ export interface AdminUpdateCicRequest {
 }
 
 export interface AdminUpdateInstallationRequest {
-  orderNumber: string;
+  installationUuid: string;
   updateAdminInstallation: UpdateAdminInstallation;
 }
 
@@ -812,6 +802,22 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     if (requestParameters.orderNumber !== undefined) {
       queryParameters["orderNumber"] = requestParameters.orderNumber;
+    }
+
+    if (requestParameters.installationUuid !== undefined) {
+      queryParameters["installationUuid"] = requestParameters.installationUuid;
+    }
+
+    if (requestParameters.zipCode !== undefined) {
+      queryParameters["zipCode"] = requestParameters.zipCode;
+    }
+
+    if (requestParameters.houseAddition !== undefined) {
+      queryParameters["houseAddition"] = requestParameters.houseAddition;
+    }
+
+    if (requestParameters.houseNumber !== undefined) {
+      queryParameters["houseNumber"] = requestParameters.houseNumber;
     }
 
     if (requestParameters.cicId !== undefined) {
@@ -1444,7 +1450,9 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   async adminGetCicHealthCheckRaw(
     requestParameters: AdminGetCicHealthCheckRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<AdminGetInstallationHealthCheck200Response>> {
+  ): Promise<
+    runtime.ApiResponse<AdminGetInstallationClickhouseData200Response>
+  > {
     if (
       requestParameters.cicId === null ||
       requestParameters.cicId === undefined
@@ -1481,7 +1489,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     );
 
     return new runtime.JSONApiResponse(response, (jsonValue) =>
-      AdminGetInstallationHealthCheck200ResponseFromJSON(jsonValue),
+      AdminGetInstallationClickhouseData200ResponseFromJSON(jsonValue),
     );
   }
 
@@ -1491,7 +1499,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   async adminGetCicHealthCheck(
     requestParameters: AdminGetCicHealthCheckRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<AdminGetInstallationHealthCheck200Response> {
+  ): Promise<AdminGetInstallationClickhouseData200Response> {
     const response = await this.adminGetCicHealthCheckRaw(
       requestParameters,
       initOverrides,
@@ -1507,12 +1515,12 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<AdminGetInstallation200Response>> {
     if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
     ) {
       throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminGetInstallation.",
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminGetInstallation.",
       );
     }
 
@@ -1530,9 +1538,9 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     }
     const response = await this.request(
       {
-        path: `/admin/installation/{orderNumber}`.replace(
-          `{${"orderNumber"}}`,
-          encodeURIComponent(String(requestParameters.orderNumber)),
+        path: `/admin/installation/{installationUuid}`.replace(
+          `{${"installationUuid"}}`,
+          encodeURIComponent(String(requestParameters.installationUuid)),
         ),
         method: "GET",
         headers: headerParameters,
@@ -1567,7 +1575,9 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   async adminGetInstallationClickhouseDataRaw(
     requestParameters: AdminGetInstallationClickhouseDataRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<AdminGetInstallationHealthCheck200Response>> {
+  ): Promise<
+    runtime.ApiResponse<AdminGetInstallationClickhouseData200Response>
+  > {
     if (
       requestParameters.installationId === null ||
       requestParameters.installationId === undefined
@@ -1604,7 +1614,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     );
 
     return new runtime.JSONApiResponse(response, (jsonValue) =>
-      AdminGetInstallationHealthCheck200ResponseFromJSON(jsonValue),
+      AdminGetInstallationClickhouseData200ResponseFromJSON(jsonValue),
     );
   }
 
@@ -1615,7 +1625,7 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   async adminGetInstallationClickhouseData(
     requestParameters: AdminGetInstallationClickhouseDataRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<AdminGetInstallationHealthCheck200Response> {
+  ): Promise<AdminGetInstallationClickhouseData200Response> {
     const response = await this.adminGetInstallationClickhouseDataRaw(
       requestParameters,
       initOverrides,
@@ -1695,84 +1705,6 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminGetInstallationCommissioning200Response> {
     const response = await this.adminGetInstallationCommissioningRaw(
-      requestParameters,
-      initOverrides,
-    );
-    return await response.value();
-  }
-
-  /**
-   * Get health check data for selected installation by CIC id
-   * @deprecated
-   */
-  async adminGetInstallationHealthCheckRaw(
-    requestParameters: AdminGetInstallationHealthCheckRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<AdminGetInstallationHealthCheck200Response>> {
-    if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminGetInstallationHealthCheck.",
-      );
-    }
-
-    if (
-      requestParameters.cicId === null ||
-      requestParameters.cicId === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "cicId",
-        "Required parameter requestParameters.cicId was null or undefined when calling adminGetInstallationHealthCheck.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("bearerAuth", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    const response = await this.request(
-      {
-        path: `/admin/installation/{orderNumber}/health-check/{cicId}`
-          .replace(
-            `{${"orderNumber"}}`,
-            encodeURIComponent(String(requestParameters.orderNumber)),
-          )
-          .replace(
-            `{${"cicId"}}`,
-            encodeURIComponent(String(requestParameters.cicId)),
-          ),
-        method: "GET",
-        headers: headerParameters,
-        query: queryParameters,
-      },
-      initOverrides,
-    );
-
-    return new runtime.JSONApiResponse(response, (jsonValue) =>
-      AdminGetInstallationHealthCheck200ResponseFromJSON(jsonValue),
-    );
-  }
-
-  /**
-   * Get health check data for selected installation by CIC id
-   * @deprecated
-   */
-  async adminGetInstallationHealthCheck(
-    requestParameters: AdminGetInstallationHealthCheckRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<AdminGetInstallationHealthCheck200Response> {
-    const response = await this.adminGetInstallationHealthCheckRaw(
       requestParameters,
       initOverrides,
     );
@@ -2161,23 +2093,29 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Get installation & service jobs from Zuper by installation order number
+   * Get installation & service jobs from Zuper by Installation UUID
    */
-  async adminGetZuperJobsByOrderNumberRaw(
-    requestParameters: AdminGetZuperJobsByOrderNumberRequest,
+  async adminGetZuperJobsByInstallationUuidRaw(
+    requestParameters: AdminGetZuperJobsByInstallationUuidRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<AdminGetZuperJobsByOrderNumber200Response>> {
+  ): Promise<
+    runtime.ApiResponse<AdminGetZuperJobsByInstallationUuid200Response>
+  > {
     if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
     ) {
       throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminGetZuperJobsByOrderNumber.",
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminGetZuperJobsByInstallationUuid.",
       );
     }
 
     const queryParameters: any = {};
+
+    if (requestParameters.orderNumber !== undefined) {
+      queryParameters["orderNumber"] = requestParameters.orderNumber;
+    }
 
     const headerParameters: runtime.HTTPHeaders = {};
 
@@ -2191,9 +2129,9 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     }
     const response = await this.request(
       {
-        path: `/admin/installation/{orderNumber}/zuper-jobs`.replace(
-          `{${"orderNumber"}}`,
-          encodeURIComponent(String(requestParameters.orderNumber)),
+        path: `/admin/installation/{installationUuid}/zuper-jobs`.replace(
+          `{${"installationUuid"}}`,
+          encodeURIComponent(String(requestParameters.installationUuid)),
         ),
         method: "GET",
         headers: headerParameters,
@@ -2203,18 +2141,18 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     );
 
     return new runtime.JSONApiResponse(response, (jsonValue) =>
-      AdminGetZuperJobsByOrderNumber200ResponseFromJSON(jsonValue),
+      AdminGetZuperJobsByInstallationUuid200ResponseFromJSON(jsonValue),
     );
   }
 
   /**
-   * Get installation & service jobs from Zuper by installation order number
+   * Get installation & service jobs from Zuper by Installation UUID
    */
-  async adminGetZuperJobsByOrderNumber(
-    requestParameters: AdminGetZuperJobsByOrderNumberRequest,
+  async adminGetZuperJobsByInstallationUuid(
+    requestParameters: AdminGetZuperJobsByInstallationUuidRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<AdminGetZuperJobsByOrderNumber200Response> {
-    const response = await this.adminGetZuperJobsByOrderNumberRaw(
+  ): Promise<AdminGetZuperJobsByInstallationUuid200Response> {
+    const response = await this.adminGetZuperJobsByInstallationUuidRaw(
       requestParameters,
       initOverrides,
     );
@@ -2655,6 +2593,106 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
+  async adminInstallationInstallationUuidOptionsRaw(
+    requestParameters: AdminInstallationInstallationUuidOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminInstallationInstallationUuidOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationUuid}`.replace(
+          `{${"installationUuid"}}`,
+          encodeURIComponent(String(requestParameters.installationUuid)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationInstallationUuidOptions(
+    requestParameters: AdminInstallationInstallationUuidOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationUuidOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
+  async adminInstallationInstallationUuidZuperJobsOptionsRaw(
+    requestParameters: AdminInstallationInstallationUuidZuperJobsOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminInstallationInstallationUuidZuperJobsOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    if (requestParameters.orderNumber !== undefined) {
+      queryParameters["orderNumber"] = requestParameters.orderNumber;
+    }
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationUuid}/zuper-jobs`.replace(
+          `{${"installationUuid"}}`,
+          encodeURIComponent(String(requestParameters.installationUuid)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationInstallationUuidZuperJobsOptions(
+    requestParameters: AdminInstallationInstallationUuidZuperJobsOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationUuidZuperJobsOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
   async adminInstallationListOptionsRaw(
     requestParameters: AdminInstallationListOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
@@ -2667,6 +2705,22 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     if (requestParameters.cicId !== undefined) {
       queryParameters["cicId"] = requestParameters.cicId;
+    }
+
+    if (requestParameters.installationUuid !== undefined) {
+      queryParameters["installationUuid"] = requestParameters.installationUuid;
+    }
+
+    if (requestParameters.zipCode !== undefined) {
+      queryParameters["zipCode"] = requestParameters.zipCode;
+    }
+
+    if (requestParameters.houseNumber !== undefined) {
+      queryParameters["houseNumber"] = requestParameters.houseNumber;
+    }
+
+    if (requestParameters.houseAddition !== undefined) {
+      queryParameters["houseAddition"] = requestParameters.houseAddition;
     }
 
     const headerParameters: runtime.HTTPHeaders = {};
@@ -2697,165 +2751,6 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   */
-  async adminInstallationOrderNumberHealthCheckCicIdOptionsRaw(
-    requestParameters: AdminInstallationOrderNumberHealthCheckCicIdOptionsRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<void>> {
-    if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminInstallationOrderNumberHealthCheckCicIdOptions.",
-      );
-    }
-
-    if (
-      requestParameters.cicId === null ||
-      requestParameters.cicId === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "cicId",
-        "Required parameter requestParameters.cicId was null or undefined when calling adminInstallationOrderNumberHealthCheckCicIdOptions.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    const response = await this.request(
-      {
-        path: `/admin/installation/{orderNumber}/health-check/{cicId}`
-          .replace(
-            `{${"orderNumber"}}`,
-            encodeURIComponent(String(requestParameters.orderNumber)),
-          )
-          .replace(
-            `{${"cicId"}}`,
-            encodeURIComponent(String(requestParameters.cicId)),
-          ),
-        method: "OPTIONS",
-        headers: headerParameters,
-        query: queryParameters,
-      },
-      initOverrides,
-    );
-
-    return new runtime.VoidApiResponse(response);
-  }
-
-  /**
-   */
-  async adminInstallationOrderNumberHealthCheckCicIdOptions(
-    requestParameters: AdminInstallationOrderNumberHealthCheckCicIdOptionsRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<void> {
-    await this.adminInstallationOrderNumberHealthCheckCicIdOptionsRaw(
-      requestParameters,
-      initOverrides,
-    );
-  }
-
-  /**
-   */
-  async adminInstallationOrderNumberOptionsRaw(
-    requestParameters: AdminInstallationOrderNumberOptionsRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<void>> {
-    if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminInstallationOrderNumberOptions.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    const response = await this.request(
-      {
-        path: `/admin/installation/{orderNumber}`.replace(
-          `{${"orderNumber"}}`,
-          encodeURIComponent(String(requestParameters.orderNumber)),
-        ),
-        method: "OPTIONS",
-        headers: headerParameters,
-        query: queryParameters,
-      },
-      initOverrides,
-    );
-
-    return new runtime.VoidApiResponse(response);
-  }
-
-  /**
-   */
-  async adminInstallationOrderNumberOptions(
-    requestParameters: AdminInstallationOrderNumberOptionsRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<void> {
-    await this.adminInstallationOrderNumberOptionsRaw(
-      requestParameters,
-      initOverrides,
-    );
-  }
-
-  /**
-   */
-  async adminInstallationOrderNumberZuperJobsOptionsRaw(
-    requestParameters: AdminInstallationOrderNumberZuperJobsOptionsRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<void>> {
-    if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminInstallationOrderNumberZuperJobsOptions.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    const response = await this.request(
-      {
-        path: `/admin/installation/{orderNumber}/zuper-jobs`.replace(
-          `{${"orderNumber"}}`,
-          encodeURIComponent(String(requestParameters.orderNumber)),
-        ),
-        method: "OPTIONS",
-        headers: headerParameters,
-        query: queryParameters,
-      },
-      initOverrides,
-    );
-
-    return new runtime.VoidApiResponse(response);
-  }
-
-  /**
-   */
-  async adminInstallationOrderNumberZuperJobsOptions(
-    requestParameters: AdminInstallationOrderNumberZuperJobsOptionsRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<void> {
-    await this.adminInstallationOrderNumberZuperJobsOptionsRaw(
-      requestParameters,
-      initOverrides,
-    );
-  }
-
-  /**
    * Installations list
    */
   async adminInstallationsListRaw(
@@ -2870,6 +2765,22 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     if (requestParameters.cicId !== undefined) {
       queryParameters["cicId"] = requestParameters.cicId;
+    }
+
+    if (requestParameters.installationUuid !== undefined) {
+      queryParameters["installationUuid"] = requestParameters.installationUuid;
+    }
+
+    if (requestParameters.zipCode !== undefined) {
+      queryParameters["zipCode"] = requestParameters.zipCode;
+    }
+
+    if (requestParameters.houseNumber !== undefined) {
+      queryParameters["houseNumber"] = requestParameters.houseNumber;
+    }
+
+    if (requestParameters.houseAddition !== undefined) {
+      queryParameters["houseAddition"] = requestParameters.houseAddition;
     }
 
     const headerParameters: runtime.HTTPHeaders = {};
@@ -3012,6 +2923,22 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     if (requestParameters.orderNumber !== undefined) {
       queryParameters["orderNumber"] = requestParameters.orderNumber;
+    }
+
+    if (requestParameters.installationUuid !== undefined) {
+      queryParameters["installationUuid"] = requestParameters.installationUuid;
+    }
+
+    if (requestParameters.zipCode !== undefined) {
+      queryParameters["zipCode"] = requestParameters.zipCode;
+    }
+
+    if (requestParameters.houseAddition !== undefined) {
+      queryParameters["houseAddition"] = requestParameters.houseAddition;
+    }
+
+    if (requestParameters.houseNumber !== undefined) {
+      queryParameters["houseNumber"] = requestParameters.houseNumber;
     }
 
     if (requestParameters.cicId !== undefined) {
@@ -3276,12 +3203,12 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<AdminGetInstallation200Response>> {
     if (
-      requestParameters.orderNumber === null ||
-      requestParameters.orderNumber === undefined
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
     ) {
       throw new runtime.RequiredError(
-        "orderNumber",
-        "Required parameter requestParameters.orderNumber was null or undefined when calling adminUpdateInstallation.",
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminUpdateInstallation.",
       );
     }
 
@@ -3311,9 +3238,9 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     }
     const response = await this.request(
       {
-        path: `/admin/installation/{orderNumber}`.replace(
-          `{${"orderNumber"}}`,
-          encodeURIComponent(String(requestParameters.orderNumber)),
+        path: `/admin/installation/{installationUuid}`.replace(
+          `{${"installationUuid"}}`,
+          encodeURIComponent(String(requestParameters.installationUuid)),
         ),
         method: "PUT",
         headers: headerParameters,

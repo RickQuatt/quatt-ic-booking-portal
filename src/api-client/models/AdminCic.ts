@@ -597,6 +597,12 @@ export interface AdminCic {
    * @type {string}
    * @memberof AdminCic
    */
+  installationUuid?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof AdminCic
+   */
   menderId: string | null;
   /**
    *
@@ -913,6 +919,9 @@ export function AdminCicFromJSONTyped(
       ? undefined
       : json["lastStatUpdate"],
     canStartCommissioning: json["canStartCommissioning"],
+    installationUuid: !exists(json, "installationUuid")
+      ? undefined
+      : json["installationUuid"],
     menderId: json["menderId"],
     createdAt: new Date(json["createdAt"]),
     lastConnectionStatusUpdatedAt:
@@ -1042,6 +1051,7 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     lastCommissioning: CicCommissioningToJSON(value.lastCommissioning),
     lastStatUpdate: value.lastStatUpdate,
     canStartCommissioning: value.canStartCommissioning,
+    installationUuid: value.installationUuid,
     menderId: value.menderId,
     createdAt: value.createdAt.toISOString(),
     lastConnectionStatusUpdatedAt:

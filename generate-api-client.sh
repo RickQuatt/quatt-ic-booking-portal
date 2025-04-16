@@ -22,4 +22,3 @@ npx @openapitools/openapi-generator-cli generate \
 
 cd $ORIGINAL_PATH;
 
-

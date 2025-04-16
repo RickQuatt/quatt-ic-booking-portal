@@ -188,7 +188,6 @@ models/*
 !models/TariffType.ts
 !models/UpdateCicSharedProperties.ts
 !models/UpdateCicWifiProperties.ts
-
 !models/UpdateComissioningStatusEnum.ts
 !models/RetryDeviceIdentification403Response.ts
 !models/RetryDeviceIdentification403ResponseFromJSON.ts
@@ -203,11 +202,11 @@ models/*
 !models/HybridCommissioningMode.ts
 !models/CicCommissioningFromJSON.ts
 !models/AdminCicCreateInstallation409ResponseAllOfMeta.ts
+!models/AdminGetZuperJobsByInstallationUuid200Response.ts
+
 
 apis/*
 !apis/SupportDashboardApi.ts
 
 !models/index.ts
 #!apis/index.ts
-
-

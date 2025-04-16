@@ -70,9 +70,11 @@ function App() {
                 return <CICDetailRenderer cicId={params.cicId} />;
               }}
             </Route>
-            <Route path="/installations/:iuid">
+            <Route path="/installations/:installationUuid">
               {(params) => (
-                <InstallationDetail iuid={params.iuid.toUpperCase()} />
+                <InstallationDetail
+                  installationUuid={params.installationUuid}
+                />
               )}
             </Route>
           </ApiClientProvider>
