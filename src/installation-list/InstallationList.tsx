@@ -189,7 +189,6 @@ export function InstallationList() {
   }: {
     installation: AdminInstallationsList;
   }) {
-    const oldInstallationDetailLink = `/installations/${installation.orderNumber}`;
     const installationDetailLink = `/installations/${installation.installationUuid}`;
     const cicDetailLink = `/cics/${installation.cicId}`;
     return (
@@ -201,7 +200,7 @@ export function InstallationList() {
         </Td>
 
         <Td>
-          <Link to={oldInstallationDetailLink}>{installation.orderNumber}</Link>
+          <Link to={installationDetailLink}>{installation.orderNumber}</Link>
         </Td>
 
         <Td>
