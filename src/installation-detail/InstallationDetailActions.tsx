@@ -2,7 +2,8 @@ import classes from "./InstallationDetail.module.css";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import { FormSection } from "../ui-components/form/Form";
 import { Button } from "../ui-components/button/Button";
-import useRebootCic from "./hooks/useRebootCic";
+import useRebootCic from "./hooks/useRebootDevice";
+import { AdminRebootDeviceRequestTargetEnum } from "../api-client/models/AdminRebootDeviceRequest";
 
 interface InstallationDetailActionsProps {
   cicId: string;
@@ -25,7 +26,7 @@ export function InstallationDetailActions({
   cicId,
   quattBuild,
 }: InstallationDetailActionsProps) {
-  const rebootCic = useRebootCic(cicId);
+  const rebootCic = useRebootCic(cicId, AdminRebootDeviceRequestTargetEnum.Cic);
   const isRebootDisabled = !versionSupportsReboot(quattBuild);
   const rebootLabel = isRebootDisabled
     ? "Reboot not supported by CIC version"

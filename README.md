@@ -29,6 +29,20 @@ This will generate the API client in `src/api-client`. If there are unresolved i
 
 The reason that we have to do this is because `openapi-generator-cli` by default includes all models from the API in the output. And because this dashboard's source-code is publically available, we don't want to expose the complete API to the end-user. Hence, we only include the exact files we need. It would be nice if `openapi-generator-cli` did this by default as a feature based on the tags in the openAPI spec but unfortunately it doesn't do that. Alternatively, we could consider moving the complete application behind an authentication wall in the future. In that case we wouldn't have to worry about this.
 
+Given we have an increasing number of models we DON'T want to include, an additional script has been created to remove any models NOT included in the `.openapi-generator-ignore` file
+
+```bash
+npm run api:clean-models
+```
+
+This command should be run AFTER you have verified which models need to be added to the `.openapi-generator-ignore` to ensure they are not removed from the `models/index.ts` file.
+
+If you want to run both in sequence, use the following command:
+
+```bash
+npm run api:generate-and-clean
+```
+
 ### Important Note
 
 Given that support dashboard APIs may be dependent on nested schemas, the amount of schemas you'll need to add may not seem very clear. Typically if you run the generator, and a lot of schemas have imports without related schema files likely means it's a deeply nested object that needs to be included.

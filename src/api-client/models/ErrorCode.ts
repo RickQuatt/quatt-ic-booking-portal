@@ -93,6 +93,7 @@ export const ErrorCode = {
   ForceCommissioningNotAvailable: "FORCE_COMMISSIONING_NOT_AVAILABLE",
   CancelCommissioningNotAvailable: "CANCEL_COMMISSIONING_NOT_AVAILABLE",
   RebootCicNotAvailable: "REBOOT_CIC_NOT_AVAILABLE",
+  RebootHeatchargerNotAvailable: "REBOOT_HEATCHARGER_NOT_AVAILABLE",
   ForgetWifiNotAvailable: "FORGET_WIFI_NOT_AVAILABLE",
   NoInstallationFoundForCic: "NO_INSTALLATION_FOUND_FOR_CIC",
   CicHasAlreadyInstallation: "CIC_HAS_ALREADY_INSTALLATION",
@@ -119,6 +120,13 @@ export const ErrorCode = {
   InstallationIsNotHybrid: "INSTALLATION_IS_NOT_HYBRID",
   InstallationIsNotAllElectric: "INSTALLATION_IS_NOT_ALL_ELECTRIC",
   OutdoorUnitsNotFound: "OUTDOOR_UNITS_NOT_FOUND",
+  CommissioningInProgress: "COMMISSIONING_IN_PROGRESS",
+  UnableToAddDeviceToCommissioning: "UNABLE_TO_ADD_DEVICE_TO_COMMISSIONING",
+  InstallationUuidNotFound: "INSTALLATION_UUID_NOT_FOUND",
+  HouseIdNotFound: "HOUSE_ID_NOT_FOUND",
+  HubspotQueryError: "HUBSPOT_QUERY_ERROR",
+  InvalidZipcodeFormat: "INVALID_ZIPCODE_FORMAT",
+  HubspotHouseNotFound: "HUBSPOT_HOUSE_NOT_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

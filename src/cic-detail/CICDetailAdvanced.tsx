@@ -18,7 +18,8 @@ import {
   getHubspotSearchOrderLink,
   getMenderLink,
 } from "./getLinks";
-import useRebootCic from "../installation-detail/hooks/useRebootCic";
+import useRebootDevice from "../installation-detail/hooks/useRebootDevice";
+import { AdminRebootDeviceRequestTargetEnum } from "../api-client/models/AdminRebootDeviceRequest";
 
 export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
   const {
@@ -26,7 +27,14 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
     open: openAdvancedSettingsModal,
     close: closeAdvancedSettingsModal,
   } = useModalState();
-  const rebootCic = useRebootCic(cicData.id);
+  const rebootCic = useRebootDevice(
+    cicData.id,
+    AdminRebootDeviceRequestTargetEnum.Cic,
+  );
+  const rebootHeatCharger = useRebootDevice(
+    cicData.id,
+    AdminRebootDeviceRequestTargetEnum.HeatCharger,
+  );
   const apiClient = useApiClient();
 
   const isAllE = cicData.allEStatus !== null;
@@ -193,6 +201,9 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         )}
         {cicData.supportsRebootAndForget && (
           <Button onClick={rebootCic}>Reboot CIC</Button>
+        )}
+        {isAllE && (
+          <Button onClick={rebootHeatCharger}>Reboot HeatCharger</Button>
         )}
         {cicData.supportsForceAndCancelCommissioning && (
           <Button onClick={cancelHybridCommissioning}>
