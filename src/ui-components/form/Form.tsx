@@ -5,6 +5,7 @@ import { FieldError } from "react-hook-form";
 import { Input, InputProps } from "../input/Input";
 import { Select, SelectProps } from "../select/Select";
 import { Textarea, TextareaProps } from "../textarea/Textarea";
+import { formatRelative } from "date-fns";
 
 export function FormSection({ children }: React.PropsWithChildren) {
   return <div className={classes["form-section"]}>{children}</div>;
@@ -25,6 +26,21 @@ export function FormFieldValue({ value }: FormFieldValueProps) {
   const stringValue = typeof value === "boolean" ? String(value) : value;
   return (
     <span className={classes["form-field-value"]}>{stringValue ?? "N/A"}</span>
+  );
+}
+
+type FormFieldDateProps = {
+  value?: Date | null;
+};
+
+export function FormFieldDate({ value }: FormFieldDateProps) {
+  if (!value) {
+    return <span className={classes["form-field-value"]}>N/A</span>;
+  }
+  return (
+    <span className={classes["form-field-value"]}>
+      {formatRelative(value, new Date())}
+    </span>
   );
 }
 

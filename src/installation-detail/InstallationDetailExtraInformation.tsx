@@ -21,6 +21,7 @@ const installationTypeMap: {
   [InstallationType.HybridDuo]: "Quatt Hybrid Duo",
   [InstallationType.AllElectric]: "Quatt All Electric",
   [InstallationType.AllElectricDuo]: "Quatt All Electric Duo",
+  [InstallationType.HomeBattery]: "Home Battery",
   [InstallationType.Unknown]: "Unknown",
 };
 
