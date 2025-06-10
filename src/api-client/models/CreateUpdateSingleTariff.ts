@@ -38,6 +38,7 @@ export interface CreateUpdateSingleTariff {
    */
   gasPrice: number;
   /**
+   * The date in ISO 8601 format (YYYY-MM-DD). This schema is used to represent dates in various contexts, such as event dates, deadlines, or any other date-related information.
    *
    * @type {Date}
    * @memberof CreateUpdateSingleTariff

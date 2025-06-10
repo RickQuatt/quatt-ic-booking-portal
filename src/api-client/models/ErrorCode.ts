@@ -102,7 +102,8 @@ export const ErrorCode = {
   DeviceAlreadyConfigured: "DEVICE_ALREADY_CONFIGURED",
   CannotUpdateDevice: "CANNOT_UPDATE_DEVICE",
   CommissioningNotInProgress: "COMMISSIONING_NOT_IN_PROGRESS",
-  NotAllDevicesAreConfigured: "NOT_ALL_DEVICES_ARE_CONFIGURED",
+  NotAllDevicesAreReadyForTestCreation:
+    "NOT_ALL_DEVICES_ARE_READY_FOR_TEST_CREATION",
   CacheNotFound: "CACHE_NOT_FOUND",
   CommissioningTestNotFound: "COMMISSIONING_TEST_NOT_FOUND",
   CommissioningTestBadRequest: "COMMISSIONING_TEST_BAD_REQUEST",
@@ -142,8 +143,16 @@ export const ErrorCode = {
   UnableToSaveHeatPumpData: "UNABLE_TO_SAVE_HEAT_PUMP_DATA",
   ExternalServiceError: "EXTERNAL_SERVICE_ERROR",
   ThreadDeviceEui64NotFound: "THREAD_DEVICE_EUI64_NOT_FOUND",
-  DeviceAlreadyLinkedToInstallation: "DEVICE_ALREADY_LINKED_TO_INSTALLATION",
+  DeviceIsLinkedToAnotherInstallation:
+    "DEVICE_IS_LINKED_TO_ANOTHER_INSTALLATION",
   HouseDoesNotHaveHomeBattery: "HOUSE_DOES_NOT_HAVE_HOME_BATTERY",
+  ThreadDeviceNotFoundInInstallation: "THREAD_DEVICE_NOT_FOUND_IN_INSTALLATION",
+  DeviceCredentialsNotFound: "DEVICE_CREDENTIALS_NOT_FOUND",
+  NoInstallationFoundForDevice: "NO_INSTALLATION_FOUND_FOR_DEVICE",
+  UnknownInstallationType: "UNKNOWN_INSTALLATION_TYPE",
+  HouseNotFound: "HOUSE_NOT_FOUND",
+  DeviceAlreadyLinked: "DEVICE_ALREADY_LINKED",
+  DeviceNotFoundInSystemList: "DEVICE_NOT_FOUND_IN_SYSTEM_LIST",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

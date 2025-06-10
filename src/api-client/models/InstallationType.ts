@@ -21,6 +21,7 @@ export const InstallationType = {
   HybridDuo: "hybrid_duo",
   AllElectric: "all_electric",
   AllElectricDuo: "all_electric_duo",
+  HomeBattery: "home_battery",
   Unknown: "unknown",
 } as const;
 export type InstallationType =
