@@ -73,6 +73,7 @@ models/FlowRateTestStatus.ts
 models/ForgetWifiMeCicRequest.ts
 models/GetAllTariffs200Response.ts
 models/GetInstallationCommissionings200Response.ts
+models/GetInstallationLatestCommissioning200Response.ts
 models/GetInstallerCic200Response.ts
 models/GetMe200Response.ts
 models/GetMeCic200Response.ts
@@ -123,6 +124,7 @@ models/UpdateAdminInstallation.ts
 models/UpdateCicSharedProperties.ts
 models/UpdateCicWifiProperties.ts
 models/UpdateCommissioning.ts
+models/UpdateCommissioningTest.ts
 models/UpdateInstallerCic.ts
 models/UpdateMeCic.ts
 models/UpdateMeUser.ts

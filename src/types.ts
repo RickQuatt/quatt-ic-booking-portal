@@ -1,3 +1,11 @@
+import "@tanstack/react-query";
+import { ResponseError } from "./api-client/runtime";
+
+declare module "@tanstack/react-query" {
+  interface Register {
+    defaultError: ResponseError;
+  }
+}
 export interface CICEntry {
   id: string;
   cableConnectionStatus: "disconnected" | "connected" | "not_reachable";

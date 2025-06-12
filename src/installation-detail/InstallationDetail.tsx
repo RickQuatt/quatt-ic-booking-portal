@@ -19,6 +19,7 @@ import { InstallationType } from "../api-client/models/InstallationType";
 import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 import { InstallationDetailZuperService } from "./InstallationDetailZuperService";
+import { InstallationLatestCommissioning } from "./InstallationLatestCommissioning";
 
 interface InstallationDetailProps {
   installationUuid: string;
@@ -95,6 +96,7 @@ export function InstallationDetail({
           installation={installationDetails}
         />
         <InstallationDetailCicHistory installation={installationDetails} />
+        <InstallationLatestCommissioning installation={installationDetails} />
         <InstallationDetailCommissioningHistory
           installation={installationDetails}
         />
