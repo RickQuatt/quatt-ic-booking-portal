@@ -20,7 +20,6 @@ import {
 import {
   CreateUpdateDoubleTariff,
   CreateUpdateSingleTariff,
-  ErrorResponse,
   Tariff,
 } from "../api-client/models";
 import { useApiClient } from "../api-client/context";
@@ -31,6 +30,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { formatAsDate } from "../utils/formatDate";
 import { ResponseError } from "../api-client/runtime";
+import { ErrorResponse } from "../api-client/models/ErrorResponse";
 
 interface Props extends ModalProps {
   installationId: string;

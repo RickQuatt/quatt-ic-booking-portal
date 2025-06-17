@@ -162,12 +162,6 @@ export interface AppSettingsGet200ResponseResult {
   boilerRunningPowerThreshold: number;
   /**
    *
-   * @type {number}
-   * @memberof AppSettingsGet200ResponseResult
-   */
-  i18NexusTranslationsVersion: number;
-  /**
-   *
    * @type {AppSettingsGet200ResponseResultTariffCOPValidation}
    * @memberof AppSettingsGet200ResponseResult
    */
@@ -203,7 +197,6 @@ export function instanceOfAppSettingsGet200ResponseResult(
   isInstance = isInstance && "heatPumpRunningPowerThreshold" in value;
   isInstance = isInstance && "heatPumpTestTimeout" in value;
   isInstance = isInstance && "boilerRunningPowerThreshold" in value;
-  isInstance = isInstance && "i18NexusTranslationsVersion" in value;
   isInstance = isInstance && "tariffCOPValidation" in value;
 
   return isInstance;
@@ -250,7 +243,6 @@ export function AppSettingsGet200ResponseResultFromJSONTyped(
     heatPumpRunningPowerThreshold: json["heatPumpRunningPowerThreshold"],
     heatPumpTestTimeout: json["heatPumpTestTimeout"],
     boilerRunningPowerThreshold: json["boilerRunningPowerThreshold"],
-    i18NexusTranslationsVersion: json["i18NexusTranslationsVersion"],
     tariffCOPValidation:
       AppSettingsGet200ResponseResultTariffCOPValidationFromJSON(
         json["tariffCOPValidation"],
@@ -295,7 +287,6 @@ export function AppSettingsGet200ResponseResultToJSON(
     heatPumpRunningPowerThreshold: value.heatPumpRunningPowerThreshold,
     heatPumpTestTimeout: value.heatPumpTestTimeout,
     boilerRunningPowerThreshold: value.boilerRunningPowerThreshold,
-    i18NexusTranslationsVersion: value.i18NexusTranslationsVersion,
     tariffCOPValidation:
       AppSettingsGet200ResponseResultTariffCOPValidationToJSON(
         value.tariffCOPValidation,

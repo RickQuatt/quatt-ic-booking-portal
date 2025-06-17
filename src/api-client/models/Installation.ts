@@ -87,6 +87,24 @@ export interface Installation {
    */
   activeCic: string | null;
   /**
+   * The hardware ID of the cic
+   * @type {string}
+   * @memberof Installation
+   */
+  hwid: string | null;
+  /**
+   * The type of the ODU1
+   * @type {string}
+   * @memberof Installation
+   */
+  odu1Type: string | null;
+  /**
+   * The type of the ODU2
+   * @type {string}
+   * @memberof Installation
+   */
+  odu2Type: string | null;
+  /**
    *
    * @type {number}
    * @memberof Installation
@@ -306,6 +324,9 @@ export function instanceOfInstallation(value: object): boolean {
   isInstance = isInstance && "id" in value;
   isInstance = isInstance && "externalId" in value;
   isInstance = isInstance && "activeCic" in value;
+  isInstance = isInstance && "hwid" in value;
+  isInstance = isInstance && "odu1Type" in value;
+  isInstance = isInstance && "odu2Type" in value;
   isInstance = isInstance && "electricityPrice" in value;
   isInstance = isInstance && "dayElectricityPrice" in value;
   isInstance = isInstance && "nightElectricityPrice" in value;
@@ -359,6 +380,9 @@ export function InstallationFromJSONTyped(
     id: json["id"],
     externalId: json["externalId"],
     activeCic: json["activeCic"],
+    hwid: json["hwid"],
+    odu1Type: json["odu1Type"],
+    odu2Type: json["odu2Type"],
     electricityPrice: json["electricityPrice"],
     dayElectricityPrice: json["dayElectricityPrice"],
     nightElectricityPrice: json["nightElectricityPrice"],
@@ -422,6 +446,9 @@ export function InstallationToJSON(value?: Installation | null): any {
     id: value.id,
     externalId: value.externalId,
     activeCic: value.activeCic,
+    hwid: value.hwid,
+    odu1Type: value.odu1Type,
+    odu2Type: value.odu2Type,
     electricityPrice: value.electricityPrice,
     dayElectricityPrice: value.dayElectricityPrice,
     nightElectricityPrice: value.nightElectricityPrice,

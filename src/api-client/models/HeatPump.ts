@@ -116,11 +116,11 @@ export interface HeatPump {
    */
   limitedByCop: boolean | null;
   /**
-   * the type of heatpump, "AMM4" for first versions. Will only be set for installers
+   * the type of heatpump
    * @type {string}
    * @memberof HeatPump
    */
-  oduType?: string | null;
+  oduType?: HeatPumpOduTypeEnum;
 }
 
 /**
@@ -131,6 +131,17 @@ export const HeatPumpStatusEnum = {
 } as const;
 export type HeatPumpStatusEnum =
   (typeof HeatPumpStatusEnum)[keyof typeof HeatPumpStatusEnum];
+
+/**
+ * @export
+ */
+export const HeatPumpOduTypeEnum = {
+  Amm4: "AMM4",
+  Amm4V15: "AMM4-V1.5",
+  Amh6: "AMH6",
+} as const;
+export type HeatPumpOduTypeEnum =
+  (typeof HeatPumpOduTypeEnum)[keyof typeof HeatPumpOduTypeEnum];
 
 /**
  * Check if a given object implements the HeatPump interface.

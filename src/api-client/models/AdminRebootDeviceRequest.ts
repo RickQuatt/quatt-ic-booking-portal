@@ -24,7 +24,7 @@ export interface AdminRebootDeviceRequest {
    * @type {string}
    * @memberof AdminRebootDeviceRequest
    */
-  target: AdminRebootDeviceRequestTargetEnum;
+  target?: AdminRebootDeviceRequestTargetEnum;
 }
 
 /**
@@ -42,7 +42,6 @@ export type AdminRebootDeviceRequestTargetEnum =
  */
 export function instanceOfAdminRebootDeviceRequest(value: object): boolean {
   let isInstance = true;
-  isInstance = isInstance && "target" in value;
 
   return isInstance;
 }
@@ -61,7 +60,7 @@ export function AdminRebootDeviceRequestFromJSONTyped(
     return json;
   }
   return {
-    target: json["target"],
+    target: !exists(json, "target") ? undefined : json["target"],
   };
 }
 

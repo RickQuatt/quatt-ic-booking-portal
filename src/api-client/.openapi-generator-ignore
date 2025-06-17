@@ -194,7 +194,6 @@ models/*
 !models/RetryDeviceIdentification403ResponseToJSON.ts
 !models/RetryDeviceIdentification403ResponseAllOfMeta.ts
 !models/UpdateCommissioningToJSON.ts
-!models/CicCommissioningFromJSON.ts
 !models/UpdateDevice400Response.ts
 !models/UpdateDevice400ResponseToJSON.ts
 !models/UpdateDevice400ResponseAllOfMeta.ts
@@ -204,6 +203,19 @@ models/*
 !models/AdminCicCreateInstallation409ResponseAllOfMeta.ts
 !models/AdminGetZuperJobsByInstallationUuid200Response.ts
 !models/AdminRebootDeviceRequest.ts
+!models/GetInstallationCommissionings200Response.ts
+!models/Error1.ts
+!models/Commissioning.ts
+!models/BaseCommissioningTest.ts
+!models/CommissioningAllOfPrerequisites.ts
+!models/CommissioningTestType.ts
+!models/CommissioningAllOfPrerequisitesCic.ts
+!models/CommissioningAllOfPrerequisitesDevices.ts
+!models/DeviceType.ts
+!models/HeatChargerCommissioningPrerequisiteDetails.ts
+!models/HeatChargerUpdateState.ts
+!models/GetInstallationLatestCommissioning200Response.ts
+!models/UpdateCommissioningTest.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

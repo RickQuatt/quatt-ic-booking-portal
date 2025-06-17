@@ -116,6 +116,10 @@ export function CICDetailMain({ cicData }: { cicData: AdminCic }) {
           <FormFieldValue value={cicData.quattBuild} />
         </FormField>
         <FormField>
+          <FormFieldTitle>Hwid (CIC hardware revision id)</FormFieldTitle>
+          <FormFieldValue value={cicData.hwid} />
+        </FormField>
+        <FormField>
           <FormFieldTitle>Last connection status updated at</FormFieldTitle>
           <FormFieldValue
             value={formatDateDistance(cicData.lastConnectionStatusUpdatedAt)}
