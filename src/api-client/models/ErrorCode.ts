@@ -121,7 +121,6 @@ export const ErrorCode = {
   InstallationIsNotHybrid: "INSTALLATION_IS_NOT_HYBRID",
   InstallationIsNotAllElectric: "INSTALLATION_IS_NOT_ALL_ELECTRIC",
   OutdoorUnitsNotFound: "OUTDOOR_UNITS_NOT_FOUND",
-  CommissioningInProgress: "COMMISSIONING_IN_PROGRESS",
   UnableToAddDeviceToCommissioning: "UNABLE_TO_ADD_DEVICE_TO_COMMISSIONING",
   CicIsNotReadyForCommissioning: "CIC_IS_NOT_READY_FOR_COMMISSIONING",
   InstallationUuidNotFound: "INSTALLATION_UUID_NOT_FOUND",
@@ -150,9 +149,14 @@ export const ErrorCode = {
   DeviceCredentialsNotFound: "DEVICE_CREDENTIALS_NOT_FOUND",
   NoInstallationFoundForDevice: "NO_INSTALLATION_FOUND_FOR_DEVICE",
   UnknownInstallationType: "UNKNOWN_INSTALLATION_TYPE",
+  ThreadDevicesNotSupported: "THREAD_DEVICES_NOT_SUPPORTED",
   HouseNotFound: "HOUSE_NOT_FOUND",
   DeviceAlreadyLinked: "DEVICE_ALREADY_LINKED",
   DeviceNotFoundInSystemList: "DEVICE_NOT_FOUND_IN_SYSTEM_LIST",
+  DeviceNameAlreadyTaken: "DEVICE_NAME_ALREADY_TAKEN",
+  CommissioningActionNotFound: "COMMISSIONING_ACTION_NOT_FOUND",
+  HouseDoesNotHaveRequiredFieldsForHomeBattery:
+    "HOUSE_DOES_NOT_HAVE_REQUIRED_FIELDS_FOR_HOME_BATTERY",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

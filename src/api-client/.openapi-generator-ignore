@@ -216,6 +216,8 @@ models/*
 !models/HeatChargerUpdateState.ts
 !models/GetInstallationLatestCommissioning200Response.ts
 !models/UpdateCommissioningTest.ts
+!models/SendCommandToCICRequest.ts
+!models/CommandType.ts
 
 apis/*
 !apis/SupportDashboardApi.ts
