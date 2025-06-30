@@ -8,6 +8,11 @@ This app is hosted on [Cloudflare pages](https://dash.cloudflare.com/980b3d2d9ff
 2. Run `npm run dev`
 3. Happy coding!
 
+## Secret page
+
+If you want to send MQTT command to a particular CIC.
+Use the following url: `/cics/{cicUuid}/debug`.
+
 ## Testing with local API
 
 If you have the Quatt-cloud mobile API running locally, you can do the following to use that instead:
