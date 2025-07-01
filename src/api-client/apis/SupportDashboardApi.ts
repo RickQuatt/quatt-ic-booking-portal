@@ -42,6 +42,7 @@ import type {
   GetInstallationCommissionings200Response,
   GetInstallationLatestCommissioning200Response,
   GetInstallerCic200Response,
+  SendCommandToCICRequest,
   UpdateAdminCic,
   UpdateAdminInstallation,
   UpdateCommissioning,
@@ -104,6 +105,8 @@ import {
   GetInstallationLatestCommissioning200ResponseToJSON,
   GetInstallerCic200ResponseFromJSON,
   GetInstallerCic200ResponseToJSON,
+  SendCommandToCICRequestFromJSON,
+  SendCommandToCICRequestToJSON,
   UpdateAdminCicFromJSON,
   UpdateAdminCicToJSON,
   UpdateAdminInstallationFromJSON,
@@ -357,6 +360,11 @@ export interface GetInstallationCommissioningsRequest {
 
 export interface GetInstallationLatestCommissioningRequest {
   installationId: string;
+}
+
+export interface SendCommandToCICOperationRequest {
+  cicId: string;
+  sendCommandToCICRequest: SendCommandToCICRequest;
 }
 
 export interface UpdateCommissioningTestRequest {
@@ -3681,6 +3689,38 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
+  async installerCommissioningTestCommissioningTestUuidOptionsRaw(
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/installer/commissioningTest/{commissioningTestUuid}`,
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async installerCommissioningTestCommissioningTestUuidOptions(
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.installerCommissioningTestCommissioningTestUuidOptionsRaw(
+      initOverrides,
+    );
+  }
+
+  /**
+   */
   async installerInstallationInstallationIdCommissioningLatestOptionsRaw(
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<void>> {
@@ -3709,6 +3749,108 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     await this.installerInstallationInstallationIdCommissioningLatestOptionsRaw(
       initOverrides,
     );
+  }
+
+  /**
+   */
+  async installerInstallationInstallationIdCommissioningTestCurrentOptionsRaw(
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/installer/installation/{installationId}/commissioningTest/current`,
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async installerInstallationInstallationIdCommissioningTestCurrentOptions(
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.installerInstallationInstallationIdCommissioningTestCurrentOptionsRaw(
+      initOverrides,
+    );
+  }
+
+  /**
+   * Send a command to the CIC.
+   */
+  async sendCommandToCICRaw(
+    requestParameters: SendCommandToCICOperationRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling sendCommandToCIC.",
+      );
+    }
+
+    if (
+      requestParameters.sendCommandToCICRequest === null ||
+      requestParameters.sendCommandToCICRequest === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "sendCommandToCICRequest",
+        "Required parameter requestParameters.sendCommandToCICRequest was null or undefined when calling sendCommandToCIC.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/command`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: SendCommandToCICRequestToJSON(
+          requestParameters.sendCommandToCICRequest,
+        ),
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   * Send a command to the CIC.
+   */
+  async sendCommandToCIC(
+    requestParameters: SendCommandToCICOperationRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.sendCommandToCICRaw(requestParameters, initOverrides);
   }
 
   /**

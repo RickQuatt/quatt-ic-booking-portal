@@ -49,6 +49,7 @@ models/CicHealthChecksByKpi.ts
 models/CicSettingsUpdate.ts
 models/CicState.ts
 models/CicStatus.ts
+models/CommandType.ts
 models/Commissioning.ts
 models/CommissioningAllOfPrerequisites.ts
 models/CommissioningAllOfPrerequisitesCic.ts
@@ -108,6 +109,7 @@ models/PostReferralRequest.ts
 models/Range.ts
 models/ReferralMember.ts
 models/ResponseMeta.ts
+models/SendCommandToCICRequest.ts
 models/SettingsHeader.ts
 models/SilentMode.ts
 models/StartHeatPumpTestRequest.ts

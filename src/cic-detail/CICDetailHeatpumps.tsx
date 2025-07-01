@@ -11,6 +11,9 @@ import classes from "./CICDetail.module.css";
 import { DetailSectionHeader } from "./CICDetailSectionHeader";
 
 export function CICDetailHeatpumps({ cicData }: { cicData: AdminCic }) {
+  const hp1 = cicData.heatPumps.find((e) => e.modbusSlaveId === 1);
+  const hp2 = cicData.heatPumps.find((e) => e.modbusSlaveId === 2);
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="Heat pumps" />
@@ -25,19 +28,19 @@ export function CICDetailHeatpumps({ cicData }: { cicData: AdminCic }) {
         </FormField>
         <FormField>
           <FormFieldTitle>HP1 OduType</FormFieldTitle>
-          <FormFieldValue
-            value={
-              cicData.heatPumps.find((e) => e.modbusSlaveId === 1)?.oduType
-            }
-          />
+          <FormFieldValue value={hp1?.oduType} />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>HP1 pcbFirmwareVersion</FormFieldTitle>
+          <FormFieldValue value={hp1?.pcbFirmwareVersion} />
         </FormField>
         <FormField>
           <FormFieldTitle>HP2 OduType</FormFieldTitle>
-          <FormFieldValue
-            value={
-              cicData.heatPumps.find((e) => e.modbusSlaveId === 2)?.oduType
-            }
-          />
+          <FormFieldValue value={hp2?.oduType} />
+        </FormField>
+        <FormField>
+          <FormFieldTitle>HP2 pcbFirmwareVersion</FormFieldTitle>
+          <FormFieldValue value={hp2?.pcbFirmwareVersion} />
         </FormField>
         <FormField>
           <FormFieldTitle>Is HP2 connected</FormFieldTitle>

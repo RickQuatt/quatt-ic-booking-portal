@@ -121,6 +121,12 @@ export interface HeatPump {
    * @memberof HeatPump
    */
   oduType?: HeatPumpOduTypeEnum;
+  /**
+   * The PCB firmware version of the heat pump
+   * @type {string}
+   * @memberof HeatPump
+   */
+  pcbFirmwareVersion?: string | null;
 }
 
 /**
@@ -196,6 +202,9 @@ export function HeatPumpFromJSONTyped(
     silentModeStatus: json["silentModeStatus"],
     limitedByCop: json["limitedByCop"],
     oduType: !exists(json, "oduType") ? undefined : json["oduType"],
+    pcbFirmwareVersion: !exists(json, "pcbFirmwareVersion")
+      ? undefined
+      : json["pcbFirmwareVersion"],
   };
 }
 
@@ -224,5 +233,6 @@ export function HeatPumpToJSON(value?: HeatPump | null): any {
     silentModeStatus: value.silentModeStatus,
     limitedByCop: value.limitedByCop,
     oduType: value.oduType,
+    pcbFirmwareVersion: value.pcbFirmwareVersion,
   };
 }
