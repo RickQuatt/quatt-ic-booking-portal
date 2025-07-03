@@ -1,6 +1,10 @@
 import React from "react";
 import { useApiClient } from "../api-client/context";
-import { AdminCic, UpdateCommissioningStatusEnum } from "../api-client/models";
+import {
+  AdminCic,
+  CommandType,
+  UpdateCommissioningStatusEnum,
+} from "../api-client/models";
 import { Button, ButtonLink } from "../ui-components/button/Button";
 import {
   FormField,
@@ -149,6 +153,20 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
     }
   }, [apiClient, installationId, isAllE, cicData.id]);
 
+  const startLiveView = React.useCallback(async () => {
+    try {
+      await apiClient.sendCommandToCIC({
+        cicId: cicData.id,
+        sendCommandToCICRequest: {
+          type: CommandType.StartLiveView,
+        },
+      });
+      alert("Live view command sent successfully");
+    } catch (error) {
+      alert("Failed to start live view session.");
+    }
+  }, [apiClient, cicData.id]);
+
   return (
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="Advanced details" />
@@ -218,6 +236,7 @@ export function CICDetailAdvanced({ cicData }: { cicData: AdminCic }) {
         {cicData.supportsForceAndCancelCommissioning && (
           <Button onClick={completeCommissioning}>Force commissioning</Button>
         )}
+        <Button onClick={startLiveView}>Liveview (30 min)</Button>
       </FormSection>
     </div>
   );
