@@ -58,7 +58,9 @@ export function useMqttDebugStream({
     useState<ConnectionStatus>("disconnected");
   const [error, setError] = useState<string | null>(null);
 
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const eventSourceRef = useRef<{ close: () => void | Promise<void> } | null>(
+    null,
+  );
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messageIdCounter = useRef(0);
 
@@ -84,53 +86,87 @@ export function useMqttDebugStream({
       const baseUrl = import.meta.env.VITE_API_BASE_PATH as string;
       const url = `${baseUrl}/admin/mqtt-debug/stream?cicId=${encodeURIComponent(cicId)}`;
 
-      const eventSource = new EventSource(url);
-      eventSourceRef.current = eventSource;
+      // Use fetch with ReadableStream for SSE with authentication
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "text/event-stream",
+          "Cache-Control": "no-cache",
+        },
+      });
 
-      eventSource.onopen = () => {
-        setConnectionStatus("connected");
-        setError(null);
-      };
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
 
-      eventSource.onmessage = (event) => {
+      if (!response.body) {
+        throw new Error("Response body is null");
+      }
+
+      setConnectionStatus("connected");
+      setError(null);
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      // Store reader reference for cleanup
+      eventSourceRef.current = { close: () => reader.cancel() };
+
+      const readStream = async () => {
         try {
-          const sseMessage: SSEMessage = JSON.parse(event.data);
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            const { done, value } = await reader.read();
 
-          if (sseMessage.type === "mqtt-debug" && sseMessage.data) {
-            const message: MqttDebugMessage = {
-              id: `${++messageIdCounter.current}`,
-              direction: sseMessage.data.direction,
-              cicId: sseMessage.data.cicId,
-              topic: sseMessage.data.topic,
-              payload: sseMessage.data.payload,
-              timestamp: sseMessage.data.timestamp,
-              isError: sseMessage.data.isError,
-              errorDetails: sseMessage.data.errorDetails,
-            };
-            addMessage(message);
-          } else if (sseMessage.type === "error") {
-            setError(sseMessage.message || "Unknown error occurred");
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split("\n");
+
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                try {
+                  const data = line.slice(6); // Remove 'data: ' prefix
+                  if (data.trim() === "") continue; // Skip empty data
+
+                  const sseMessage: SSEMessage = JSON.parse(data);
+
+                  if (sseMessage.type === "mqtt-debug" && sseMessage.data) {
+                    const message: MqttDebugMessage = {
+                      id: `${++messageIdCounter.current}`,
+                      direction: sseMessage.data.direction,
+                      cicId: sseMessage.data.cicId,
+                      topic: sseMessage.data.topic,
+                      payload: sseMessage.data.payload,
+                      timestamp: sseMessage.data.timestamp,
+                      isError: sseMessage.data.isError,
+                      errorDetails: sseMessage.data.errorDetails,
+                    };
+                    addMessage(message);
+                  } else if (sseMessage.type === "error") {
+                    setError(sseMessage.message || "Unknown error occurred");
+                  }
+                } catch (parseError) {
+                  console.error("Failed to parse SSE message:", parseError);
+                }
+              }
+            }
           }
-        } catch (parseError) {
-          console.error("Failed to parse SSE message:", parseError);
+        } catch (streamError) {
+          console.error("Stream reading error:", streamError);
+          setConnectionStatus("error");
+          setError("Connection lost. Retrying...");
+
+          // Auto-reconnect after 3 seconds
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (enabled) {
+              connect();
+            }
+          }, 3000);
         }
       };
 
-      eventSource.onerror = (event) => {
-        console.error("SSE Error:", event);
-        setConnectionStatus("error");
-        setError("Connection lost. Retrying...");
-
-        eventSource.close();
-        eventSourceRef.current = null;
-
-        // Auto-reconnect after 3 seconds
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (enabled) {
-            connect();
-          }
-        }, 3000);
-      };
+      readStream();
     } catch (err) {
       setConnectionStatus("error");
       setError(err instanceof Error ? err.message : "Failed to connect");

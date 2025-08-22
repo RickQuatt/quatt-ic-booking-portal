@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { MqttDebugMessage } from "../hooks/useMqttDebugStream";
 import classes from "./MessageDetail.module.css";
 
@@ -19,18 +19,20 @@ export function MessageDetail({ message }: MessageDetailProps) {
     }
   };
 
-  const formatPayload = (payload: unknown): string => {
-    if (typeof payload === "string") {
-      try {
-        return JSON.stringify(JSON.parse(payload), null, 2);
-      } catch {
-        return payload;
+  const formattedPayload = useMemo(() => {
+    const formatPayload = (payload: unknown): string => {
+      if (typeof payload === "string") {
+        try {
+          return JSON.stringify(JSON.parse(payload), null, 2);
+        } catch {
+          return payload;
+        }
       }
-    }
-    return JSON.stringify(payload, null, 2);
-  };
+      return JSON.stringify(payload, null, 2);
+    };
 
-  const formattedPayload = formatPayload(message.payload);
+    return formatPayload(message.payload);
+  }, [message.payload]);
 
   return (
     <div className={classes.detail}>
