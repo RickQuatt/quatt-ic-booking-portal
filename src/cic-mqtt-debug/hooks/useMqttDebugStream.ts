@@ -63,6 +63,7 @@ export function useMqttDebugStream({
   );
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messageIdCounter = useRef(0);
+  const isStreamActiveRef = useRef(false);
 
   const addMessage = useCallback((message: MqttDebugMessage) => {
     setMessages((prev) => {
@@ -108,14 +109,19 @@ export function useMqttDebugStream({
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      isStreamActiveRef.current = true;
 
       // Store reader reference for cleanup
-      eventSourceRef.current = { close: () => reader.cancel() };
+      eventSourceRef.current = {
+        close: () => {
+          isStreamActiveRef.current = false;
+          return reader.cancel();
+        },
+      };
 
       const readStream = async () => {
         try {
-          // eslint-disable-next-line no-constant-condition
-          while (true) {
+          while (isStreamActiveRef.current) {
             const { done, value } = await reader.read();
 
             if (done) break;
@@ -174,6 +180,8 @@ export function useMqttDebugStream({
   }, [cicId, enabled, addMessage]);
 
   const disconnect = useCallback(() => {
+    isStreamActiveRef.current = false;
+
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;

@@ -112,6 +112,7 @@ The API client is auto-generated from the main Quatt-cloud OpenAPI specification
 ### Real-time Features & SSE Integration
 
 #### SSE Connection Management
+
 - **Base URL Construction**: Use `import.meta.env.VITE_API_BASE_PATH` for API endpoint URLs
 - **Authentication**: Use fetch with ReadableStream instead of EventSource to include `Authorization: Bearer {token}` headers
 - **Stream Reading**: Use `response.body.getReader()` with `TextDecoder` to parse SSE data manually
@@ -120,6 +121,7 @@ The API client is auto-generated from the main Quatt-cloud OpenAPI specification
 - **Connection Cleanup**: Always cleanup stream readers in `useEffect` return functions with `reader.cancel()`
 
 #### Message Management
+
 - **Performance**: Implement message limits (e.g., `MAX_MESSAGES = 1000`) with array slicing
 - **Auto-scroll**: Detect `scrollTop === 0` to toggle auto-scroll behavior on/off
 - **UI State**: Use single expanded message state to prevent UI overflow
@@ -128,26 +130,30 @@ The API client is auto-generated from the main Quatt-cloud OpenAPI specification
 ### Component Architecture
 
 #### Debug Interface Pattern
+
 - **Route Structure**: Follow `/cics/:cicId/[feature]` pattern for CIC-specific tools
 - **Page Wrapper**: Use existing wrapper pattern (like `CICDebugPageWrapper`) for new routes
 - **Component Organization**: Create `components/` and `hooks/` subdirectories for feature modules
 - **Integration**: Add navigation links in existing sections (e.g., Advanced details)
 
 #### UI Component Patterns
+
 - **Copy Functionality**: Implement `navigator.clipboard.writeText()` with success notifications
 - **Mobile Design**: Use CSS Grid with `@media (max-width: 768px)` breakpoints
 - **Loading States**: Reuse existing `Loader`, `ErrorText`, and `Button` components
 - **Status Indicators**: Use color-coded visual feedback for connection states
 
 #### CSS & Styling
+
 - **Module Naming**: Follow `.module.css` convention matching component names
 - **Typography**: Use `"Menlo", "Monaco", "Consolas", monospace` for code/data display
 - **Color System**: Consistent color coding (green=connected, red=error, yellow=connecting)
 - **Responsive Design**: Mobile-first approach with collapsible sections
 
 ### Performance Considerations
+
 - **Virtual Scrolling**: Consider for lists with >1000 items
-- **Message Throttling**: Implement if real-time message rate becomes excessive  
+- **Message Throttling**: Implement if real-time message rate becomes excessive
 - **Memory Management**: Cleanup timeouts and connections to prevent memory leaks
 - **State Updates**: Batch state updates for high-frequency real-time data
 - **JSON Parsing**: Use `useMemo` for expensive operations like JSON formatting to prevent re-computation on every render
