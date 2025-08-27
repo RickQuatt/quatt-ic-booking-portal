@@ -94,8 +94,7 @@ export function useMqttDebugStream({
           Accept: "text/event-stream",
           "Cache-Control": "no-cache",
         },
-        // Add timeout to prevent hanging connections
-        signal: AbortSignal.timeout(30000), // 30 second timeout
+        // No timeout for SSE - we want persistent connections
       });
 
       if (!response.ok) {
@@ -208,8 +207,15 @@ export function useMqttDebugStream({
           setConnectionStatus("error");
           setError(errorMessage);
 
-          // Clear the current stream reference before reconnecting
-          eventSourceRef.current = null;
+          // Clean up current connection properly
+          if (eventSourceRef.current) {
+            try {
+              await eventSourceRef.current.close();
+            } catch (closeError) {
+              console.debug("Error closing stream during cleanup:", closeError);
+            }
+            eventSourceRef.current = null;
+          }
 
           // Auto-reconnect after 3 seconds if still enabled
           if (enabled && isStreamActiveRef.current) {
