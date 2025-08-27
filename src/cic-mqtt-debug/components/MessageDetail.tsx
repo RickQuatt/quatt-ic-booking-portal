@@ -66,7 +66,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
               className={`${classes.value} ${classes.direction} ${message.direction === "to_cloud" ? classes.toCloud : classes.fromCloud}`}
             >
               {message.direction === "to_cloud"
-                ? "🔄 To Cloud"
+                ? "⬆️ To Cloud"
                 : "⬇️ From Cloud"}
             </span>
           </div>

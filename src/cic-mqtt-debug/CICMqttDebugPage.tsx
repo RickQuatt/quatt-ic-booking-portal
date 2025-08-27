@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminCic } from "../api-client/models";
 import { ConnectionStatus } from "./components/ConnectionStatus";
 import { MessageList } from "./components/MessageList";
@@ -34,6 +34,11 @@ export function CICMqttDebugPage({ data: { id } }: CICMqttDebugPageProps) {
     setIsStreamEnabled(false);
     disconnect();
   };
+
+  useEffect(() => {
+    // Auto-start streaming when component mounts
+    handleStart();
+  }, []);
 
   return (
     <div className={classes.page}>

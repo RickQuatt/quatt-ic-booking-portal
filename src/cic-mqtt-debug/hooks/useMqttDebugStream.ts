@@ -119,6 +119,8 @@ export function useMqttDebugStream({
         },
       };
 
+      let buffer = "";
+
       const readStream = async () => {
         try {
           while (isStreamActiveRef.current) {
@@ -127,7 +129,12 @@ export function useMqttDebugStream({
             if (done) break;
 
             const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split("\n");
+            buffer += chunk;
+
+            // Process complete lines from buffer
+            const lines = buffer.split("\n");
+            // Keep the last line in buffer if it doesn't end with newline
+            buffer = lines.pop() || "";
 
             for (const line of lines) {
               if (line.startsWith("data: ")) {
@@ -153,7 +160,12 @@ export function useMqttDebugStream({
                     setError(sseMessage.message || "Unknown error occurred");
                   }
                 } catch (parseError) {
-                  console.error("Failed to parse SSE message:", parseError);
+                  console.error(
+                    "Failed to parse SSE message:",
+                    parseError,
+                    "Data:",
+                    line,
+                  );
                 }
               }
             }

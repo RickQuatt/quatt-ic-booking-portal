@@ -46,7 +46,7 @@ export function MessageList({ messages }: MessageListProps) {
 
   const getDirectionInfo = (direction: "to_cloud" | "from_cloud") => {
     return direction === "to_cloud"
-      ? { icon: "🔄", label: "To Cloud", className: classes.toCloud }
+      ? { icon: "⬆️", label: "To Cloud", className: classes.toCloud }
       : { icon: "⬇️", label: "From Cloud", className: classes.fromCloud };
   };
 
@@ -79,7 +79,7 @@ export function MessageList({ messages }: MessageListProps) {
         </div>
         <div className={classes.legend}>
           <div className={`${classes.legendItem} ${classes.toCloud}`}>
-            <span>🔄</span>
+            <span>⬆️</span>
             <span>To Cloud</span>
           </div>
           <div className={`${classes.legendItem} ${classes.fromCloud}`}>
