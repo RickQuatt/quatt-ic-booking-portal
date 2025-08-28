@@ -13,26 +13,20 @@ interface CICMqttDebugPageProps {
 export function CICMqttDebugPage({ data: { id } }: CICMqttDebugPageProps) {
   const [isStreamEnabled, setIsStreamEnabled] = useState(false);
 
-  const {
-    messages,
-    connectionStatus,
-    error,
-    connect,
-    disconnect,
-    clearMessages,
-  } = useMqttDebugStream({
-    cicId: id,
-    enabled: isStreamEnabled,
-  });
+  const { messages, connectionStatus, error, clearMessages } =
+    useMqttDebugStream({
+      cicId: id,
+      enabled: isStreamEnabled,
+    });
 
   const handleStart = () => {
     setIsStreamEnabled(true);
-    connect();
+    // connect() will be called automatically by the hook's useEffect
   };
 
   const handleStop = () => {
     setIsStreamEnabled(false);
-    disconnect();
+    // disconnect() will be called automatically by the hook's useEffect
   };
 
   useEffect(() => {

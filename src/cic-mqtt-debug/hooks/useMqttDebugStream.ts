@@ -94,6 +94,7 @@ export function useMqttDebugStream({
           Accept: "text/event-stream",
           "Cache-Control": "no-cache",
         },
+        // No timeout for SSE - we want persistent connections
       });
 
       if (!response.ok) {
@@ -124,7 +125,18 @@ export function useMqttDebugStream({
       const readStream = async () => {
         try {
           while (isStreamActiveRef.current) {
-            const { done, value } = await reader.read();
+            let readResult;
+            try {
+              readResult = await reader.read();
+            } catch (readError) {
+              if (!isStreamActiveRef.current) {
+                // Stream was intentionally closed, don't treat as error
+                break;
+              }
+              throw readError;
+            }
+
+            const { done, value } = readResult;
 
             if (done) break;
 
@@ -171,31 +183,80 @@ export function useMqttDebugStream({
             }
           }
         } catch (streamError) {
-          console.error("Stream reading error:", streamError);
-          setConnectionStatus("error");
-          setError("Connection lost. Retrying...");
+          // Don't treat intentional stream closure as error
+          if (!isStreamActiveRef.current) {
+            return;
+          }
 
-          // Auto-reconnect after 3 seconds
-          reconnectTimeoutRef.current = setTimeout(() => {
-            if (enabled) {
-              connect();
+          console.error("Stream reading error:", streamError);
+
+          // Better error message based on error type
+          let errorMessage = "Connection lost. Retrying...";
+          if (
+            streamError instanceof TypeError &&
+            streamError.message.includes("Load failed")
+          ) {
+            errorMessage = "Network connection failed. Retrying...";
+          } else if (
+            streamError instanceof DOMException &&
+            streamError.name === "AbortError"
+          ) {
+            errorMessage = "Connection aborted. Retrying...";
+          }
+
+          setConnectionStatus("error");
+          setError(errorMessage);
+
+          // Clean up current connection properly
+          if (eventSourceRef.current) {
+            try {
+              await eventSourceRef.current.close();
+            } catch (closeError) {
+              console.debug("Error closing stream during cleanup:", closeError);
             }
-          }, 3000);
+            eventSourceRef.current = null;
+          }
+
+          // Auto-reconnect after 3 seconds if still enabled
+          if (enabled && isStreamActiveRef.current) {
+            reconnectTimeoutRef.current = setTimeout(() => {
+              connect();
+            }, 3000);
+          }
         }
       };
 
       readStream();
     } catch (err) {
       setConnectionStatus("error");
-      setError(err instanceof Error ? err.message : "Failed to connect");
+
+      // Provide better error messages based on error type
+      let errorMessage = "Failed to connect";
+      if (err instanceof TypeError && err.message.includes("Load failed")) {
+        errorMessage = "Network error - please check your connection";
+      } else if (err instanceof DOMException && err.name === "AbortError") {
+        errorMessage = "Connection timeout - server may be unavailable";
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
+
+      // Clear the stream reference on connection error
+      eventSourceRef.current = null;
     }
   }, [cicId, enabled, addMessage]);
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
     isStreamActiveRef.current = false;
 
     if (eventSourceRef.current) {
-      eventSourceRef.current.close();
+      try {
+        await eventSourceRef.current.close();
+      } catch (closeError) {
+        // Ignore close errors - stream might already be closed
+        console.debug("Stream close error (ignored):", closeError);
+      }
       eventSourceRef.current = null;
     }
 
