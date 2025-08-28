@@ -17,7 +17,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .sectionHeader h4 {
@@ -27,27 +27,87 @@
   color: #333;
 }
 
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.copyAllButton {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #666;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copyAllButton:hover {
+  background: #e8e8e8;
+  color: #333;
+}
+
 .errorHeader {
   color: #d32f2f !important;
 }
 
-.grid {
+.cardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cardTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardContent {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.field {
+.fieldGroup {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.field label {
+.fieldGroup label {
   font-weight: 600;
   color: #666;
-  font-size: 12px;
-  min-width: 80px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.valueWithCopy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .value {
@@ -82,19 +142,25 @@
 }
 
 .copyButton {
-  background: none;
-  border: 1px solid #ccc;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
   border-radius: 3px;
-  padding: 2px 6px;
+  padding: 2px 4px;
   cursor: pointer;
-  font-size: 11px;
-  color: #666;
+  font-size: 10px;
+  color: #6c757d;
   transition: all 0.2s;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .copyButton:hover {
-  background: #f0f0f0;
-  color: #333;
+  background: #e9ecef;
+  color: #495057;
+  border-color: #adb5bd;
 }
 
 .payloadActions {
@@ -172,18 +238,44 @@
 }
 
 @media (max-width: 768px) {
-  .grid {
+  .cardGrid {
     grid-template-columns: 1fr;
   }
 
-  .field {
+  .card {
+    margin-bottom: 8px;
+  }
+
+  .cardContent {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .fieldGroup {
+    gap: 3px;
+  }
+
+  .valueWithCopy {
     flex-direction: column;
     align-items: flex-start;
+    gap: 6px;
+  }
+
+  .copyButton {
+    align-self: flex-end;
+    min-width: 20px;
+    height: 20px;
+    font-size: 9px;
+  }
+
+  .headerActions {
+    flex-direction: column;
     gap: 4px;
   }
 
-  .field label {
-    min-width: auto;
+  .copyAllButton {
+    font-size: 10px;
+    padding: 3px 6px;
   }
 
   .payloadContent {

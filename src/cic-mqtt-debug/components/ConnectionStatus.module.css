@@ -8,6 +8,8 @@
   font-weight: 500;
   border: 1px solid #e5e5e5;
   background: #f9f9f9;
+  min-width: 0; /* Allow shrinking */
+  flex-shrink: 1;
 }
 
 .icon {
@@ -58,4 +60,52 @@
 
 .disconnected .text {
   color: #757575;
+}
+
+@media (max-width: 768px) {
+  .status {
+    font-size: 12px;
+    padding: 6px 10px;
+    gap: 6px;
+    max-width: 100%;
+    width: fit-content;
+    align-self: flex-start;
+  }
+
+  .icon {
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .errorText {
+    font-size: 11px;
+    margin-left: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .status {
+    font-size: 11px;
+    padding: 4px 8px;
+    gap: 4px;
+  }
+
+  .icon {
+    font-size: 9px;
+  }
+
+  .errorText {
+    font-size: 10px;
+    margin-left: 4px;
+  }
 }

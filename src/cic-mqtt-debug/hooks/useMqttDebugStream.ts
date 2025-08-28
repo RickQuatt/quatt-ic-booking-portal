@@ -10,6 +10,7 @@ export interface MqttDebugMessage {
   timestamp: string;
   isError?: boolean;
   errorDetails?: string;
+  messageSize?: number;
 }
 
 export interface SSEMessage {
@@ -24,6 +25,7 @@ export interface SSEMessage {
     timestamp: string;
     isError?: boolean;
     errorDetails?: string;
+    messageSize?: number;
   };
 }
 
@@ -166,6 +168,7 @@ export function useMqttDebugStream({
                       timestamp: sseMessage.data.timestamp,
                       isError: sseMessage.data.isError,
                       errorDetails: sseMessage.data.errorDetails,
+                      messageSize: sseMessage.data.messageSize,
                     };
                     addMessage(message);
                   } else if (sseMessage.type === "error") {

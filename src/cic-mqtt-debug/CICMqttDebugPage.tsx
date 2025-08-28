@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import { AdminCic } from "../api-client/models";
 import { ConnectionStatus } from "./components/ConnectionStatus";
 import { MessageList } from "./components/MessageList";
@@ -39,6 +40,7 @@ export function CICMqttDebugPage({ data: { id } }: CICMqttDebugPageProps) {
       payload: message.payload,
       isError: message.isError,
       id: message.id,
+      messageSize: message.messageSize,
     }));
 
     const jsonString = JSON.stringify(exportData, null, 2);
@@ -63,7 +65,12 @@ export function CICMqttDebugPage({ data: { id } }: CICMqttDebugPageProps) {
   return (
     <div className={classes.page}>
       <div className={classes.header}>
-        <h2>MQTT Debugger - {id}</h2>
+        <h2>
+          MQTT Debugger -{" "}
+          <Link href={`/cics/${id}`} className={classes.cicIdLink}>
+            {id}
+          </Link>
+        </h2>
         <ConnectionStatus status={connectionStatus} error={error} />
       </div>
 

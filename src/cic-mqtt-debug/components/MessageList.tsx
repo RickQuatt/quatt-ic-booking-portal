@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { MqttDebugMessage } from "../hooks/useMqttDebugStream";
 import { MessageDetail } from "./MessageDetail";
+import { formatBytes } from "../../utils/formatBytes";
 import classes from "./MessageList.module.css";
 
 interface MessageListProps {
@@ -116,6 +117,9 @@ export function MessageList({ messages }: MessageListProps) {
                   </span>
                   <span className={classes.direction}>
                     {directionInfo.label}
+                  </span>
+                  <span className={classes.messageSize}>
+                    | {formatBytes(message.messageSize)}
                   </span>
                   <span className={classes.topic}>{message.topic}</span>
                   {message.isError && (
