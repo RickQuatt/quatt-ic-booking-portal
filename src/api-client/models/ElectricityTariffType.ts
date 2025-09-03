@@ -16,24 +16,29 @@
  *
  * @export
  */
-export const TariffType = {
+export const ElectricityTariffType = {
   Single: "single",
   Double: "double",
   Dynamic: "dynamic",
 } as const;
-export type TariffType = (typeof TariffType)[keyof typeof TariffType];
+export type ElectricityTariffType =
+  (typeof ElectricityTariffType)[keyof typeof ElectricityTariffType];
 
-export function TariffTypeFromJSON(json: any): TariffType {
-  return TariffTypeFromJSONTyped(json, false);
+export function ElectricityTariffTypeFromJSON(
+  json: any,
+): ElectricityTariffType {
+  return ElectricityTariffTypeFromJSONTyped(json, false);
 }
 
-export function TariffTypeFromJSONTyped(
+export function ElectricityTariffTypeFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): TariffType {
-  return json as TariffType;
+): ElectricityTariffType {
+  return json as ElectricityTariffType;
 }
 
-export function TariffTypeToJSON(value?: TariffType | null): any {
+export function ElectricityTariffTypeToJSON(
+  value?: ElectricityTariffType | null,
+): any {
   return value as any;
 }

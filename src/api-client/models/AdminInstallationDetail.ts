@@ -345,6 +345,12 @@ export interface AdminInstallationDetail {
    */
   hasSoundSlider: boolean;
   /**
+   * Whether the CIC and client app both support dynamic pricing feature
+   * @type {boolean}
+   * @memberof AdminInstallationDetail
+   */
+  supportDynamicPricing: boolean;
+  /**
    *
    * @type {Array<CicState>}
    * @memberof AdminInstallationDetail
@@ -421,6 +427,7 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "lastConnectionStatusUpdatedAt" in value;
   isInstance = isInstance && "menderId" in value;
   isInstance = isInstance && "hasSoundSlider" in value;
+  isInstance = isInstance && "supportDynamicPricing" in value;
   isInstance = isInstance && "cicState" in value;
   isInstance = isInstance && "cicCommissioning" in value;
   isInstance = isInstance && "settingsUpdates" in value;
@@ -499,6 +506,7 @@ export function AdminInstallationDetailFromJSONTyped(
         : new Date(json["lastConnectionStatusUpdatedAt"]),
     menderId: json["menderId"],
     hasSoundSlider: json["hasSoundSlider"],
+    supportDynamicPricing: json["supportDynamicPricing"],
     cicState: (json["cicState"] as Array<any>).map(CicStateFromJSON),
     cicCommissioning: (json["cicCommissioning"] as Array<any>).map(
       AdminInstallationDetailAllOfCicCommissioningFromJSON,
@@ -578,6 +586,7 @@ export function AdminInstallationDetailToJSON(
         : value.lastConnectionStatusUpdatedAt.toISOString(),
     menderId: value.menderId,
     hasSoundSlider: value.hasSoundSlider,
+    supportDynamicPricing: value.supportDynamicPricing,
     cicState: (value.cicState as Array<any>).map(CicStateToJSON),
     cicCommissioning: (value.cicCommissioning as Array<any>).map(
       AdminInstallationDetailAllOfCicCommissioningToJSON,

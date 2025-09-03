@@ -24,6 +24,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ErrorText from "./ui-components/error-text/ErrorText";
 import { CICDebugPage } from "./cic-debug/CICDebugPage";
 import { CICMqttDebugPage } from "./cic-mqtt-debug/CICMqttDebugPage";
+import { DynamicPricingPage } from "./dynamic-pricing/DynamicPricingPage";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,9 @@ function App() {
             </Route>
             <Route path="/installations">
               <InstallationList />
+            </Route>
+            <Route path="/dynamic-pricing">
+              <DynamicPricingPage />
             </Route>
             <Route path="/cics/:cicId">
               {(params) => {

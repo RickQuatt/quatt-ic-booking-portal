@@ -1,0 +1,65 @@
+import { useQuery } from "@tanstack/react-query";
+import { useApiClient } from "../../api-client/context";
+import { GetDynamicPrices200Response } from "../../api-client/models/GetDynamicPrices200Response";
+import { PricingItem } from "../../api-client/models/PricingItem";
+
+interface PricingDataPoint {
+  hour: number;
+  price: number;
+  timestamp: string;
+}
+
+interface PricingResponse {
+  currentPrice: number;
+  hourlyPrices: PricingDataPoint[];
+}
+
+export function usePricingData(selectedDate: Date) {
+  const apiClient = useApiClient();
+
+  const formatDateForApi = (date: Date): string => {
+    return date.toISOString().split("T")[0];
+  };
+
+  const transformApiResponse = (
+    apiResponse: GetDynamicPrices200Response,
+  ): PricingResponse => {
+    const electricityPrices = apiResponse.result.prices.electricity;
+    const currentElectricityPrice = apiResponse.result.currentPrice.electricity;
+
+    const hourlyPrices: PricingDataPoint[] = electricityPrices.map(
+      (item: PricingItem) => {
+        const validFromDate = new Date(item.validFrom);
+        const hour = validFromDate.getHours();
+
+        return {
+          hour,
+          price: item.price,
+          timestamp: item.validFrom.toISOString(),
+        };
+      },
+    );
+
+    // Sort by hour to ensure correct chart display
+    hourlyPrices.sort((a, b) => a.hour - b.hour);
+
+    return {
+      currentPrice: currentElectricityPrice,
+      hourlyPrices,
+    };
+  };
+
+  return useQuery({
+    queryKey: ["dynamicPricing", formatDateForApi(selectedDate)],
+    queryFn: async (): Promise<PricingResponse> => {
+      // Use the real admin API endpoint
+      const apiResponse = await apiClient.getAdminDynamicPrices({
+        date: selectedDate,
+      });
+
+      return transformApiResponse(apiResponse);
+    },
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}

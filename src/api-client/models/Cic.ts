@@ -196,6 +196,12 @@ export interface Cic {
    * @memberof Cic
    */
   quattBuild: string | null;
+  /**
+   * Whether the CIC and client app both support dynamic pricing feature
+   * @type {boolean}
+   * @memberof Cic
+   */
+  hasDynamicPricing: boolean;
 }
 
 /**
@@ -239,6 +245,7 @@ export function instanceOfCic(value: object): boolean {
   isInstance = isInstance && "serial" in value;
   isInstance = isInstance && "numberOfHeatPumps" in value;
   isInstance = isInstance && "quattBuild" in value;
+  isInstance = isInstance && "hasDynamicPricing" in value;
 
   return isInstance;
 }
@@ -304,6 +311,7 @@ export function CicFromJSONTyped(json: any, ignoreDiscriminator: boolean): Cic {
     serial: json["serial"],
     numberOfHeatPumps: json["numberOfHeatPumps"],
     quattBuild: json["quattBuild"],
+    hasDynamicPricing: json["hasDynamicPricing"],
   };
 }
 
@@ -350,5 +358,6 @@ export function CicToJSON(value?: Cic | null): any {
     serial: value.serial,
     numberOfHeatPumps: value.numberOfHeatPumps,
     quattBuild: value.quattBuild,
+    hasDynamicPricing: value.hasDynamicPricing,
   };
 }

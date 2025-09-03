@@ -19,6 +19,13 @@ import {
   CreateUpdateDoubleTariffFromJSONTyped,
   CreateUpdateDoubleTariffToJSON,
 } from "./CreateUpdateDoubleTariff";
+import type { CreateUpdateEnergyTariff } from "./CreateUpdateEnergyTariff";
+import {
+  instanceOfCreateUpdateEnergyTariff,
+  CreateUpdateEnergyTariffFromJSON,
+  CreateUpdateEnergyTariffFromJSONTyped,
+  CreateUpdateEnergyTariffToJSON,
+} from "./CreateUpdateEnergyTariff";
 import type { CreateUpdateSingleTariff } from "./CreateUpdateSingleTariff";
 import {
   instanceOfCreateUpdateSingleTariff,
@@ -34,6 +41,7 @@ import {
  */
 export type CreateTariffRequest =
   | CreateUpdateDoubleTariff
+  | CreateUpdateEnergyTariff
   | CreateUpdateSingleTariff;
 
 export function CreateTariffRequestFromJSON(json: any): CreateTariffRequest {
@@ -49,6 +57,7 @@ export function CreateTariffRequestFromJSONTyped(
   }
   return {
     ...CreateUpdateDoubleTariffFromJSONTyped(json, true),
+    ...CreateUpdateEnergyTariffFromJSONTyped(json, true),
     ...CreateUpdateSingleTariffFromJSONTyped(json, true),
   };
 }
@@ -65,6 +74,9 @@ export function CreateTariffRequestToJSON(
 
   if (instanceOfCreateUpdateDoubleTariff(value)) {
     return CreateUpdateDoubleTariffToJSON(value as CreateUpdateDoubleTariff);
+  }
+  if (instanceOfCreateUpdateEnergyTariff(value)) {
+    return CreateUpdateEnergyTariffToJSON(value as CreateUpdateEnergyTariff);
   }
   if (instanceOfCreateUpdateSingleTariff(value)) {
     return CreateUpdateSingleTariffToJSON(value as CreateUpdateSingleTariff);

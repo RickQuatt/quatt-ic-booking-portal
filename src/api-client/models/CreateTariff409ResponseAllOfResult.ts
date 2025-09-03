@@ -21,17 +21,21 @@ import { exists, mapValues } from "../runtime";
 export interface CreateTariff409ResponseAllOfResult {
   /**
    *
-   * @type {object}
+   * @type {string}
    * @memberof CreateTariff409ResponseAllOfResult
    */
-  error?: object;
-  /**
-   *
-   * @type {object}
-   * @memberof CreateTariff409ResponseAllOfResult
-   */
-  errorCode?: object;
+  errorCode?: CreateTariff409ResponseAllOfResultErrorCodeEnum;
 }
+
+/**
+ * @export
+ */
+export const CreateTariff409ResponseAllOfResultErrorCodeEnum = {
+  DateConflict: "TARIFF_DATE_CONFLICT",
+  LimitReached: "TARIFF_LIMIT_REACHED",
+} as const;
+export type CreateTariff409ResponseAllOfResultErrorCodeEnum =
+  (typeof CreateTariff409ResponseAllOfResultErrorCodeEnum)[keyof typeof CreateTariff409ResponseAllOfResultErrorCodeEnum];
 
 /**
  * Check if a given object implements the CreateTariff409ResponseAllOfResult interface.
@@ -58,7 +62,6 @@ export function CreateTariff409ResponseAllOfResultFromJSONTyped(
     return json;
   }
   return {
-    error: !exists(json, "error") ? undefined : json["error"],
     errorCode: !exists(json, "errorCode") ? undefined : json["errorCode"],
   };
 }
@@ -73,7 +76,6 @@ export function CreateTariff409ResponseAllOfResultToJSON(
     return null;
   }
   return {
-    error: value.error,
     errorCode: value.errorCode,
   };
 }

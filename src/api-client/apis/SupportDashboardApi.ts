@@ -16,7 +16,10 @@ import * as runtime from "../runtime";
 import type {
   AdminAddInstallationNote200Response,
   AdminCreateInstaller200Response,
+  AdminCreateTariff403Response,
+  AdminCreateTariff404Response,
   AdminDashboardCics200Response,
+  AdminGetAllTariffs404Response,
   AdminGetCic200Response,
   AdminGetInstallation200Response,
   AdminGetInstallationClickhouseData200Response,
@@ -33,12 +36,19 @@ import type {
   AdminUpdateInstallationNote200Response,
   CompleteCommissioning200Response,
   CreateTariff200Response,
+  CreateTariff400Response,
+  CreateTariff409Response,
   CreateTariffRequest,
   CreateUpdateInstaller,
   CreateUpdateNote,
+  DeleteTariffForInstallation409Response,
   Error1,
   ForgetWifiMeCicRequest,
   GetAllTariffs200Response,
+  GetAllTariffs400Response,
+  GetDynamicPrices200Response,
+  GetDynamicPrices400Response,
+  GetDynamicPrices500Response,
   GetInstallationCommissionings200Response,
   GetInstallerCic200Response,
   GetInstallerInstallationLatestCommissioning200Response,
@@ -47,14 +57,22 @@ import type {
   UpdateAdminInstallation,
   UpdateCommissioning,
   UpdateCommissioningTest,
+  UpdateTariffForInstallation404Response,
+  UpdateTariffForInstallation409Response,
 } from "../models/index";
 import {
   AdminAddInstallationNote200ResponseFromJSON,
   AdminAddInstallationNote200ResponseToJSON,
   AdminCreateInstaller200ResponseFromJSON,
   AdminCreateInstaller200ResponseToJSON,
+  AdminCreateTariff403ResponseFromJSON,
+  AdminCreateTariff403ResponseToJSON,
+  AdminCreateTariff404ResponseFromJSON,
+  AdminCreateTariff404ResponseToJSON,
   AdminDashboardCics200ResponseFromJSON,
   AdminDashboardCics200ResponseToJSON,
+  AdminGetAllTariffs404ResponseFromJSON,
+  AdminGetAllTariffs404ResponseToJSON,
   AdminGetCic200ResponseFromJSON,
   AdminGetCic200ResponseToJSON,
   AdminGetInstallation200ResponseFromJSON,
@@ -87,18 +105,32 @@ import {
   CompleteCommissioning200ResponseToJSON,
   CreateTariff200ResponseFromJSON,
   CreateTariff200ResponseToJSON,
+  CreateTariff400ResponseFromJSON,
+  CreateTariff400ResponseToJSON,
+  CreateTariff409ResponseFromJSON,
+  CreateTariff409ResponseToJSON,
   CreateTariffRequestFromJSON,
   CreateTariffRequestToJSON,
   CreateUpdateInstallerFromJSON,
   CreateUpdateInstallerToJSON,
   CreateUpdateNoteFromJSON,
   CreateUpdateNoteToJSON,
+  DeleteTariffForInstallation409ResponseFromJSON,
+  DeleteTariffForInstallation409ResponseToJSON,
   Error1FromJSON,
   Error1ToJSON,
   ForgetWifiMeCicRequestFromJSON,
   ForgetWifiMeCicRequestToJSON,
   GetAllTariffs200ResponseFromJSON,
   GetAllTariffs200ResponseToJSON,
+  GetAllTariffs400ResponseFromJSON,
+  GetAllTariffs400ResponseToJSON,
+  GetDynamicPrices200ResponseFromJSON,
+  GetDynamicPrices200ResponseToJSON,
+  GetDynamicPrices400ResponseFromJSON,
+  GetDynamicPrices400ResponseToJSON,
+  GetDynamicPrices500ResponseFromJSON,
+  GetDynamicPrices500ResponseToJSON,
   GetInstallationCommissionings200ResponseFromJSON,
   GetInstallationCommissionings200ResponseToJSON,
   GetInstallerCic200ResponseFromJSON,
@@ -115,15 +147,23 @@ import {
   UpdateCommissioningToJSON,
   UpdateCommissioningTestFromJSON,
   UpdateCommissioningTestToJSON,
+  UpdateTariffForInstallation404ResponseFromJSON,
+  UpdateTariffForInstallation404ResponseToJSON,
+  UpdateTariffForInstallation409ResponseFromJSON,
+  UpdateTariffForInstallation409ResponseToJSON,
 } from "../models/index";
 
 export interface AdminAddInstallationNoteRequest {
   installationId: string;
   createUpdateNote: CreateUpdateNote;
+  xClientVersion?: string;
+  xClientPlatform?: AdminAddInstallationNoteXClientPlatformEnum;
 }
 
 export interface AdminCancelCommissioningRequest {
   cicId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminCancelCommissioningXClientPlatformEnum;
 }
 
 export interface AdminCicCicIdCancelCommissioningOptionsRequest {
@@ -150,6 +190,11 @@ export interface AdminCicCicIdRebootOptionsRequest {
   cicId: string;
 }
 
+export interface AdminCicDashboardOptionsRequest {
+  xClientVersion?: string;
+  xClientPlatform?: AdminCicDashboardOptionsXClientPlatformEnum;
+}
+
 export interface AdminCicListOptionsRequest {
   orderNumber?: string;
   installationUuid?: string;
@@ -165,34 +210,62 @@ export interface AdminCicListOptionsRequest {
 
 export interface AdminCompleteCommissioningRequest {
   cicId: string;
-}
-
-export interface AdminCreateInstallationTariffRequest {
-  installationId: string;
-  createTariffRequest: CreateTariffRequest;
+  xClientVersion?: string;
+  xClientPlatform?: AdminCompleteCommissioningXClientPlatformEnum;
 }
 
 export interface AdminCreateInstallerRequest {
   createUpdateInstaller: CreateUpdateInstaller;
+  xClientVersion?: string;
+  xClientPlatform?: AdminCreateInstallerXClientPlatformEnum;
+}
+
+export interface AdminCreateTariffRequest {
+  installationId: string;
+  createTariffRequest: CreateTariffRequest;
+  xClientVersion?: string;
+  xClientPlatform?: AdminCreateTariffXClientPlatformEnum;
+}
+
+export interface AdminDashboardCicsRequest {
+  xClientVersion?: string;
+  xClientPlatform?: AdminDashboardCicsXClientPlatformEnum;
 }
 
 export interface AdminDeleteInstallationNoteRequest {
   installationId: string;
   noteId: string;
-}
-
-export interface AdminDeleteInstallationTariffRequest {
-  installationId: string;
-  tariffId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminDeleteInstallationNoteXClientPlatformEnum;
 }
 
 export interface AdminDeleteInstallerRequest {
   installerId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminDeleteInstallerXClientPlatformEnum;
+}
+
+export interface AdminDeleteTariffRequest {
+  installationId: string;
+  tariffId: string;
+}
+
+export interface AdminEnergyDynamicPricesOptionsRequest {
+  xClientVersion?: string;
+  xClientPlatform?: AdminEnergyDynamicPricesOptionsXClientPlatformEnum;
 }
 
 export interface AdminForgetWifiRequest {
   cicId: string;
   forgetWifiMeCicRequest: ForgetWifiMeCicRequest;
+  xClientVersion?: string;
+  xClientPlatform?: AdminForgetWifiXClientPlatformEnum;
+}
+
+export interface AdminGetAllTariffsRequest {
+  installationId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetAllTariffsXClientPlatformEnum;
 }
 
 export interface AdminGetCicRequest {
@@ -201,6 +274,8 @@ export interface AdminGetCicRequest {
 
 export interface AdminGetCicHealthCheckRequest {
   cicId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetCicHealthCheckXClientPlatformEnum;
 }
 
 export interface AdminGetInstallationRequest {
@@ -209,11 +284,15 @@ export interface AdminGetInstallationRequest {
 
 export interface AdminGetInstallationClickhouseDataRequest {
   installationId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetInstallationClickhouseDataXClientPlatformEnum;
 }
 
 export interface AdminGetInstallationCommissioningRequest {
   installationId: string;
   commissioningId: number;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetInstallationCommissioningXClientPlatformEnum;
 }
 
 export interface AdminGetInstallationNotesRequest {
@@ -223,18 +302,20 @@ export interface AdminGetInstallationNotesRequest {
 export interface AdminGetInstallationSettingRequest {
   installationId: string;
   settingsId: string;
-}
-
-export interface AdminGetInstallationTariffRequest {
-  installationId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetInstallationSettingXClientPlatformEnum;
 }
 
 export interface AdminGetInstallationTicketsRequest {
   installationId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetInstallationTicketsXClientPlatformEnum;
 }
 
 export interface AdminGetInstallationZuperJobsRequest {
   installationId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetInstallationZuperJobsXClientPlatformEnum;
 }
 
 export interface AdminGetInstallerRequest {
@@ -243,6 +324,8 @@ export interface AdminGetInstallerRequest {
 
 export interface AdminGetZuperJobsByInstallationUuidRequest {
   installationUuid: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetZuperJobsByInstallationUuidXClientPlatformEnum;
   orderNumber?: string;
 }
 
@@ -272,10 +355,13 @@ export interface AdminInstallationInstallationIdSettingsUpdateSettingsIdOptionsR
 
 export interface AdminInstallationInstallationIdTariffOptionsRequest {
   installationId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminInstallationInstallationIdTariffOptionsXClientPlatformEnum;
 }
 
 export interface AdminInstallationInstallationIdTariffTariffIdOptionsRequest {
   installationId: string;
+  tariffId: string;
 }
 
 export interface AdminInstallationInstallationIdZuperJobsOptionsRequest {
@@ -301,6 +387,8 @@ export interface AdminInstallationListOptionsRequest {
 }
 
 export interface AdminInstallationsListRequest {
+  xClientVersion?: string;
+  xClientPlatform?: AdminInstallationsListXClientPlatformEnum;
   orderNumber?: string;
   cicId?: string;
   installationUuid?: string;
@@ -309,7 +397,14 @@ export interface AdminInstallationsListRequest {
   houseAddition?: string;
 }
 
+export interface AdminInstallerOptionsRequest {
+  xClientVersion?: string;
+  xClientPlatform?: AdminInstallerOptionsXClientPlatformEnum;
+}
+
 export interface AdminListCicsRequest {
+  xClientVersion?: string;
+  xClientPlatform?: AdminListCicsXClientPlatformEnum;
   orderNumber?: string;
   installationUuid?: string;
   zipCode?: string;
@@ -322,19 +417,30 @@ export interface AdminListCicsRequest {
   pageSize?: number;
 }
 
+export interface AdminListInstallersRequest {
+  xClientVersion?: string;
+  xClientPlatform?: AdminListInstallersXClientPlatformEnum;
+}
+
 export interface AdminRebootDeviceOperationRequest {
   cicId: string;
   adminRebootDeviceRequest: AdminRebootDeviceRequest;
+  xClientVersion?: string;
+  xClientPlatform?: AdminRebootDeviceXClientPlatformEnum;
 }
 
 export interface AdminUpdateCicRequest {
   cicId: string;
   updateAdminCic: UpdateAdminCic;
+  xClientVersion?: string;
+  xClientPlatform?: AdminUpdateCicXClientPlatformEnum;
 }
 
 export interface AdminUpdateInstallationRequest {
   installationUuid: string;
   updateAdminInstallation: UpdateAdminInstallation;
+  xClientVersion?: string;
+  xClientPlatform?: AdminUpdateInstallationXClientPlatformEnum;
 }
 
 export interface AdminUpdateInstallationNoteRequest {
@@ -343,38 +449,54 @@ export interface AdminUpdateInstallationNoteRequest {
   createUpdateNote: CreateUpdateNote;
 }
 
-export interface AdminUpdateInstallationTariffRequest {
-  installationId: string;
-  tariffId: string;
-  createTariffRequest: CreateTariffRequest;
-}
-
 export interface AdminUpdateInstallerRequest {
   installerId: string;
   createUpdateInstaller: CreateUpdateInstaller;
 }
 
+export interface AdminUpdateTariffRequest {
+  installationId: string;
+  tariffId: string;
+  createTariffRequest: CreateTariffRequest;
+}
+
+export interface GetAdminDynamicPricesRequest {
+  xClientVersion?: string;
+  xClientPlatform?: GetAdminDynamicPricesXClientPlatformEnum;
+  date?: Date;
+}
+
 export interface GetAdminInstallationLatestCommissioningRequest {
   installationId: string;
+  xClientVersion?: string;
+  xClientPlatform?: GetAdminInstallationLatestCommissioningXClientPlatformEnum;
 }
 
 export interface GetInstallationCommissioningsRequest {
   installationId: string;
+  xClientVersion?: string;
+  xClientPlatform?: GetInstallationCommissioningsXClientPlatformEnum;
 }
 
 export interface SendCommandToCICOperationRequest {
   cicId: string;
   sendCommandToCICRequest: SendCommandToCICRequest;
+  xClientVersion?: string;
+  xClientPlatform?: SendCommandToCICXClientPlatformEnum;
 }
 
 export interface UpdateAdminInstallationCommissioningRequest {
   installationId: string;
   updateCommissioning: UpdateCommissioning;
+  xClientVersion?: string;
+  xClientPlatform?: UpdateAdminInstallationCommissioningXClientPlatformEnum;
 }
 
 export interface UpdateCommissioningTestRequest {
   commissioningTestUuid: string;
   updateCommissioningTest: UpdateCommissioningTest;
+  xClientVersion?: string;
+  xClientPlatform?: UpdateCommissioningTestXClientPlatformEnum;
 }
 
 /**
@@ -413,6 +535,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -475,6 +615,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -801,11 +959,30 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   /**
    */
   async adminCicDashboardOptionsRaw(
+    requestParameters: AdminCicDashboardOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<void>> {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     const response = await this.request(
       {
@@ -823,9 +1000,10 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   /**
    */
   async adminCicDashboardOptions(
+    requestParameters: AdminCicDashboardOptionsRequest = {},
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
-    await this.adminCicDashboardOptionsRaw(initOverrides);
+    await this.adminCicDashboardOptionsRaw(requestParameters, initOverrides);
   }
 
   /**
@@ -925,6 +1103,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("bearerAuth", []);
@@ -966,80 +1162,6 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Add new tariff for specificed date and installation
-   */
-  async adminCreateInstallationTariffRaw(
-    requestParameters: AdminCreateInstallationTariffRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<CreateTariff200Response>> {
-    if (
-      requestParameters.installationId === null ||
-      requestParameters.installationId === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminCreateInstallationTariff.",
-      );
-    }
-
-    if (
-      requestParameters.createTariffRequest === null ||
-      requestParameters.createTariffRequest === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "createTariffRequest",
-        "Required parameter requestParameters.createTariffRequest was null or undefined when calling adminCreateInstallationTariff.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    headerParameters["Content-Type"] = "application/json";
-
-    if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("bearerAuth", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    const response = await this.request(
-      {
-        path: `/admin/installation/{installationId}/tariff`.replace(
-          `{${"installationId"}}`,
-          encodeURIComponent(String(requestParameters.installationId)),
-        ),
-        method: "POST",
-        headers: headerParameters,
-        query: queryParameters,
-        body: CreateTariffRequestToJSON(requestParameters.createTariffRequest),
-      },
-      initOverrides,
-    );
-
-    return new runtime.JSONApiResponse(response, (jsonValue) =>
-      CreateTariff200ResponseFromJSON(jsonValue),
-    );
-  }
-
-  /**
-   * Add new tariff for specificed date and installation
-   */
-  async adminCreateInstallationTariff(
-    requestParameters: AdminCreateInstallationTariffRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<CreateTariff200Response> {
-    const response = await this.adminCreateInstallationTariffRaw(
-      requestParameters,
-      initOverrides,
-    );
-    return await response.value();
-  }
-
-  /**
    * Create installer
    */
   async adminCreateInstallerRaw(
@@ -1061,6 +1183,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -1103,14 +1243,125 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   * Add new tariff for specified date and installation
+   */
+  async adminCreateTariffRaw(
+    requestParameters: AdminCreateTariffRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<CreateTariff200Response>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminCreateTariff.",
+      );
+    }
+
+    if (
+      requestParameters.createTariffRequest === null ||
+      requestParameters.createTariffRequest === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "createTariffRequest",
+        "Required parameter requestParameters.createTariffRequest was null or undefined when calling adminCreateTariff.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/tariff`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: CreateTariffRequestToJSON(requestParameters.createTariffRequest),
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      CreateTariff200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Add new tariff for specified date and installation
+   */
+  async adminCreateTariff(
+    requestParameters: AdminCreateTariffRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<CreateTariff200Response> {
+    const response = await this.adminCreateTariffRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
    * CIC Dashboard
    */
   async adminDashboardCicsRaw(
+    requestParameters: AdminDashboardCicsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<AdminDashboardCics200Response>> {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -1139,9 +1390,13 @@ export class SupportDashboardApi extends runtime.BaseAPI {
    * CIC Dashboard
    */
   async adminDashboardCics(
+    requestParameters: AdminDashboardCicsRequest = {},
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminDashboardCics200Response> {
-    const response = await this.adminDashboardCicsRaw(initOverrides);
+    const response = await this.adminDashboardCicsRaw(
+      requestParameters,
+      initOverrides,
+    );
     return await response.value();
   }
 
@@ -1175,6 +1430,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -1216,79 +1489,6 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Delete a tariff for a given installation
-   */
-  async adminDeleteInstallationTariffRaw(
-    requestParameters: AdminDeleteInstallationTariffRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<void>> {
-    if (
-      requestParameters.installationId === null ||
-      requestParameters.installationId === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminDeleteInstallationTariff.",
-      );
-    }
-
-    if (
-      requestParameters.tariffId === null ||
-      requestParameters.tariffId === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "tariffId",
-        "Required parameter requestParameters.tariffId was null or undefined when calling adminDeleteInstallationTariff.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("bearerAuth", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    const response = await this.request(
-      {
-        path: `/admin/installation/{installationId}/tariff/{tariffId}`
-          .replace(
-            `{${"installationId"}}`,
-            encodeURIComponent(String(requestParameters.installationId)),
-          )
-          .replace(
-            `{${"tariffId"}}`,
-            encodeURIComponent(String(requestParameters.tariffId)),
-          ),
-        method: "DELETE",
-        headers: headerParameters,
-        query: queryParameters,
-      },
-      initOverrides,
-    );
-
-    return new runtime.VoidApiResponse(response);
-  }
-
-  /**
-   * Delete a tariff for a given installation
-   */
-  async adminDeleteInstallationTariff(
-    requestParameters: AdminDeleteInstallationTariffRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<void> {
-    await this.adminDeleteInstallationTariffRaw(
-      requestParameters,
-      initOverrides,
-    );
-  }
-
-  /**
    * Delete installer
    */
   async adminDeleteInstallerRaw(
@@ -1308,6 +1508,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -1350,6 +1568,129 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   * Delete a tariff for a given installation
+   */
+  async adminDeleteTariffRaw(
+    requestParameters: AdminDeleteTariffRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminDeleteTariff.",
+      );
+    }
+
+    if (
+      requestParameters.tariffId === null ||
+      requestParameters.tariffId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "tariffId",
+        "Required parameter requestParameters.tariffId was null or undefined when calling adminDeleteTariff.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/tariff/{tariffId}`
+          .replace(
+            `{${"installationId"}}`,
+            encodeURIComponent(String(requestParameters.installationId)),
+          )
+          .replace(
+            `{${"tariffId"}}`,
+            encodeURIComponent(String(requestParameters.tariffId)),
+          ),
+        method: "DELETE",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   * Delete a tariff for a given installation
+   */
+  async adminDeleteTariff(
+    requestParameters: AdminDeleteTariffRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminDeleteTariffRaw(requestParameters, initOverrides);
+  }
+
+  /**
+   */
+  async adminEnergyDynamicPricesOptionsRaw(
+    requestParameters: AdminEnergyDynamicPricesOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
+    const response = await this.request(
+      {
+        path: `/admin/energy/dynamicPrices`,
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminEnergyDynamicPricesOptions(
+    requestParameters: AdminEnergyDynamicPricesOptionsRequest = {},
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminEnergyDynamicPricesOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
    * Forget wifi
    */
   async adminForgetWifiRaw(
@@ -1381,6 +1722,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -1417,6 +1776,85 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminForgetWifiRaw(requestParameters, initOverrides);
+  }
+
+  /**
+   * Gets all tariffs for specified installation
+   */
+  async adminGetAllTariffsRaw(
+    requestParameters: AdminGetAllTariffsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<GetAllTariffs200Response>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminGetAllTariffs.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/tariff`.replace(
+          `{${"installationId"}}`,
+          encodeURIComponent(String(requestParameters.installationId)),
+        ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      GetAllTariffs200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Gets all tariffs for specified installation
+   */
+  async adminGetAllTariffs(
+    requestParameters: AdminGetAllTariffsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<GetAllTariffs200Response> {
+    const response = await this.adminGetAllTariffsRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
   }
 
   /**
@@ -1502,6 +1940,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -1628,6 +2084,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("bearerAuth", []);
@@ -1701,6 +2175,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -1839,6 +2331,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("bearerAuth", []);
@@ -1885,67 +2395,6 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Get installation tariff
-   */
-  async adminGetInstallationTariffRaw(
-    requestParameters: AdminGetInstallationTariffRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<GetAllTariffs200Response>> {
-    if (
-      requestParameters.installationId === null ||
-      requestParameters.installationId === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminGetInstallationTariff.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("bearerAuth", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    const response = await this.request(
-      {
-        path: `/admin/installation/{installationId}/tariff`.replace(
-          `{${"installationId"}}`,
-          encodeURIComponent(String(requestParameters.installationId)),
-        ),
-        method: "GET",
-        headers: headerParameters,
-        query: queryParameters,
-      },
-      initOverrides,
-    );
-
-    return new runtime.JSONApiResponse(response, (jsonValue) =>
-      GetAllTariffs200ResponseFromJSON(jsonValue),
-    );
-  }
-
-  /**
-   * Get installation tariff
-   */
-  async adminGetInstallationTariff(
-    requestParameters: AdminGetInstallationTariffRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<GetAllTariffs200Response> {
-    const response = await this.adminGetInstallationTariffRaw(
-      requestParameters,
-      initOverrides,
-    );
-    return await response.value();
-  }
-
-  /**
    * Get installation tickets from hubspot
    */
   async adminGetInstallationTicketsRaw(
@@ -1965,6 +2414,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -2026,6 +2493,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -2154,6 +2639,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     }
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -2535,6 +3038,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     const response = await this.request(
       {
         path: `/admin/installation/{installationId}/tariff`.replace(
@@ -2579,16 +3100,31 @@ export class SupportDashboardApi extends runtime.BaseAPI {
       );
     }
 
+    if (
+      requestParameters.tariffId === null ||
+      requestParameters.tariffId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "tariffId",
+        "Required parameter requestParameters.tariffId was null or undefined when calling adminInstallationInstallationIdTariffTariffIdOptions.",
+      );
+    }
+
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
 
     const response = await this.request(
       {
-        path: `/admin/installation/{installationId}/tariff/{tariffId}`.replace(
-          `{${"installationId"}}`,
-          encodeURIComponent(String(requestParameters.installationId)),
-        ),
+        path: `/admin/installation/{installationId}/tariff/{tariffId}`
+          .replace(
+            `{${"installationId"}}`,
+            encodeURIComponent(String(requestParameters.installationId)),
+          )
+          .replace(
+            `{${"tariffId"}}`,
+            encodeURIComponent(String(requestParameters.tariffId)),
+          ),
         method: "OPTIONS",
         headers: headerParameters,
         query: queryParameters,
@@ -2853,6 +3389,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("bearerAuth", []);
@@ -2953,11 +3507,30 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   /**
    */
   async adminInstallerOptionsRaw(
+    requestParameters: AdminInstallerOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<void>> {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     const response = await this.request(
       {
@@ -2975,9 +3548,10 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   /**
    */
   async adminInstallerOptions(
+    requestParameters: AdminInstallerOptionsRequest = {},
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
-    await this.adminInstallerOptionsRaw(initOverrides);
+    await this.adminInstallerOptionsRaw(requestParameters, initOverrides);
   }
 
   /**
@@ -3035,6 +3609,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const headerParameters: runtime.HTTPHeaders = {};
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("bearerAuth", []);
@@ -3076,11 +3668,30 @@ export class SupportDashboardApi extends runtime.BaseAPI {
    * List installers
    */
   async adminListInstallersRaw(
+    requestParameters: AdminListInstallersRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<runtime.ApiResponse<AdminListInstallers200Response>> {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -3109,9 +3720,13 @@ export class SupportDashboardApi extends runtime.BaseAPI {
    * List installers
    */
   async adminListInstallers(
+    requestParameters: AdminListInstallersRequest = {},
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminListInstallers200Response> {
-    const response = await this.adminListInstallersRaw(initOverrides);
+    const response = await this.adminListInstallersRaw(
+      requestParameters,
+      initOverrides,
+    );
     return await response.value();
   }
 
@@ -3147,6 +3762,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -3224,6 +3857,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("bearerAuth", []);
@@ -3297,6 +3948,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -3431,95 +4100,6 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
-   * Update a tariff for a given installation
-   */
-  async adminUpdateInstallationTariffRaw(
-    requestParameters: AdminUpdateInstallationTariffRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<runtime.ApiResponse<CreateTariff200Response>> {
-    if (
-      requestParameters.installationId === null ||
-      requestParameters.installationId === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "installationId",
-        "Required parameter requestParameters.installationId was null or undefined when calling adminUpdateInstallationTariff.",
-      );
-    }
-
-    if (
-      requestParameters.tariffId === null ||
-      requestParameters.tariffId === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "tariffId",
-        "Required parameter requestParameters.tariffId was null or undefined when calling adminUpdateInstallationTariff.",
-      );
-    }
-
-    if (
-      requestParameters.createTariffRequest === null ||
-      requestParameters.createTariffRequest === undefined
-    ) {
-      throw new runtime.RequiredError(
-        "createTariffRequest",
-        "Required parameter requestParameters.createTariffRequest was null or undefined when calling adminUpdateInstallationTariff.",
-      );
-    }
-
-    const queryParameters: any = {};
-
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    headerParameters["Content-Type"] = "application/json";
-
-    if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("bearerAuth", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    const response = await this.request(
-      {
-        path: `/admin/installation/{installationId}/tariff/{tariffId}`
-          .replace(
-            `{${"installationId"}}`,
-            encodeURIComponent(String(requestParameters.installationId)),
-          )
-          .replace(
-            `{${"tariffId"}}`,
-            encodeURIComponent(String(requestParameters.tariffId)),
-          ),
-        method: "PUT",
-        headers: headerParameters,
-        query: queryParameters,
-        body: CreateTariffRequestToJSON(requestParameters.createTariffRequest),
-      },
-      initOverrides,
-    );
-
-    return new runtime.JSONApiResponse(response, (jsonValue) =>
-      CreateTariff200ResponseFromJSON(jsonValue),
-    );
-  }
-
-  /**
-   * Update a tariff for a given installation
-   */
-  async adminUpdateInstallationTariff(
-    requestParameters: AdminUpdateInstallationTariffRequest,
-    initOverrides?: RequestInit | runtime.InitOverrideFunction,
-  ): Promise<CreateTariff200Response> {
-    const response = await this.adminUpdateInstallationTariffRaw(
-      requestParameters,
-      initOverrides,
-    );
-    return await response.value();
-  }
-
-  /**
    * Update installer
    */
   async adminUpdateInstallerRaw(
@@ -3596,6 +4176,167 @@ export class SupportDashboardApi extends runtime.BaseAPI {
   }
 
   /**
+   * Update a tariff for a given installation
+   */
+  async adminUpdateTariffRaw(
+    requestParameters: AdminUpdateTariffRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<CreateTariff200Response>> {
+    if (
+      requestParameters.installationId === null ||
+      requestParameters.installationId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationId",
+        "Required parameter requestParameters.installationId was null or undefined when calling adminUpdateTariff.",
+      );
+    }
+
+    if (
+      requestParameters.tariffId === null ||
+      requestParameters.tariffId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "tariffId",
+        "Required parameter requestParameters.tariffId was null or undefined when calling adminUpdateTariff.",
+      );
+    }
+
+    if (
+      requestParameters.createTariffRequest === null ||
+      requestParameters.createTariffRequest === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "createTariffRequest",
+        "Required parameter requestParameters.createTariffRequest was null or undefined when calling adminUpdateTariff.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationId}/tariff/{tariffId}`
+          .replace(
+            `{${"installationId"}}`,
+            encodeURIComponent(String(requestParameters.installationId)),
+          )
+          .replace(
+            `{${"tariffId"}}`,
+            encodeURIComponent(String(requestParameters.tariffId)),
+          ),
+        method: "PUT",
+        headers: headerParameters,
+        query: queryParameters,
+        body: CreateTariffRequestToJSON(requestParameters.createTariffRequest),
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      CreateTariff200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Update a tariff for a given installation
+   */
+  async adminUpdateTariff(
+    requestParameters: AdminUpdateTariffRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<CreateTariff200Response> {
+    const response = await this.adminUpdateTariffRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   * Get dynamic prices data (Admin endpoint)
+   */
+  async getAdminDynamicPricesRaw(
+    requestParameters: GetAdminDynamicPricesRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<GetDynamicPrices200Response>> {
+    const queryParameters: any = {};
+
+    if (requestParameters.date !== undefined) {
+      queryParameters["date"] = (requestParameters.date as any)
+        .toISOString()
+        .substring(0, 10);
+    }
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/energy/dynamicPrices`,
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      GetDynamicPrices200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Get dynamic prices data (Admin endpoint)
+   */
+  async getAdminDynamicPrices(
+    requestParameters: GetAdminDynamicPricesRequest = {},
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<GetDynamicPrices200Response> {
+    const response = await this.getAdminDynamicPricesRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
    * Get latest commissioning of an installation
    */
   async getAdminInstallationLatestCommissioningRaw(
@@ -3617,6 +4358,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -3678,6 +4437,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const queryParameters: any = {};
 
     const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -3816,6 +4593,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("bearerAuth", []);
@@ -3885,6 +4680,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     headerParameters["Content-Type"] = "application/json";
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
 
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
@@ -3957,6 +4770,24 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     headerParameters["Content-Type"] = "application/json";
 
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
     if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("bearerAuth", []);
@@ -3994,3 +4825,334 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     await this.updateCommissioningTestRaw(requestParameters, initOverrides);
   }
 }
+
+/**
+ * @export
+ */
+export const AdminAddInstallationNoteXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminAddInstallationNoteXClientPlatformEnum =
+  (typeof AdminAddInstallationNoteXClientPlatformEnum)[keyof typeof AdminAddInstallationNoteXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminCancelCommissioningXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminCancelCommissioningXClientPlatformEnum =
+  (typeof AdminCancelCommissioningXClientPlatformEnum)[keyof typeof AdminCancelCommissioningXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminCicDashboardOptionsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminCicDashboardOptionsXClientPlatformEnum =
+  (typeof AdminCicDashboardOptionsXClientPlatformEnum)[keyof typeof AdminCicDashboardOptionsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminCompleteCommissioningXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminCompleteCommissioningXClientPlatformEnum =
+  (typeof AdminCompleteCommissioningXClientPlatformEnum)[keyof typeof AdminCompleteCommissioningXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminCreateInstallerXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminCreateInstallerXClientPlatformEnum =
+  (typeof AdminCreateInstallerXClientPlatformEnum)[keyof typeof AdminCreateInstallerXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminCreateTariffXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminCreateTariffXClientPlatformEnum =
+  (typeof AdminCreateTariffXClientPlatformEnum)[keyof typeof AdminCreateTariffXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminDashboardCicsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminDashboardCicsXClientPlatformEnum =
+  (typeof AdminDashboardCicsXClientPlatformEnum)[keyof typeof AdminDashboardCicsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminDeleteInstallationNoteXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminDeleteInstallationNoteXClientPlatformEnum =
+  (typeof AdminDeleteInstallationNoteXClientPlatformEnum)[keyof typeof AdminDeleteInstallationNoteXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminDeleteInstallerXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminDeleteInstallerXClientPlatformEnum =
+  (typeof AdminDeleteInstallerXClientPlatformEnum)[keyof typeof AdminDeleteInstallerXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminEnergyDynamicPricesOptionsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminEnergyDynamicPricesOptionsXClientPlatformEnum =
+  (typeof AdminEnergyDynamicPricesOptionsXClientPlatformEnum)[keyof typeof AdminEnergyDynamicPricesOptionsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminForgetWifiXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminForgetWifiXClientPlatformEnum =
+  (typeof AdminForgetWifiXClientPlatformEnum)[keyof typeof AdminForgetWifiXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetAllTariffsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetAllTariffsXClientPlatformEnum =
+  (typeof AdminGetAllTariffsXClientPlatformEnum)[keyof typeof AdminGetAllTariffsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetCicHealthCheckXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetCicHealthCheckXClientPlatformEnum =
+  (typeof AdminGetCicHealthCheckXClientPlatformEnum)[keyof typeof AdminGetCicHealthCheckXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetInstallationClickhouseDataXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetInstallationClickhouseDataXClientPlatformEnum =
+  (typeof AdminGetInstallationClickhouseDataXClientPlatformEnum)[keyof typeof AdminGetInstallationClickhouseDataXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetInstallationCommissioningXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetInstallationCommissioningXClientPlatformEnum =
+  (typeof AdminGetInstallationCommissioningXClientPlatformEnum)[keyof typeof AdminGetInstallationCommissioningXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetInstallationSettingXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetInstallationSettingXClientPlatformEnum =
+  (typeof AdminGetInstallationSettingXClientPlatformEnum)[keyof typeof AdminGetInstallationSettingXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetInstallationTicketsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetInstallationTicketsXClientPlatformEnum =
+  (typeof AdminGetInstallationTicketsXClientPlatformEnum)[keyof typeof AdminGetInstallationTicketsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetInstallationZuperJobsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetInstallationZuperJobsXClientPlatformEnum =
+  (typeof AdminGetInstallationZuperJobsXClientPlatformEnum)[keyof typeof AdminGetInstallationZuperJobsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetZuperJobsByInstallationUuidXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetZuperJobsByInstallationUuidXClientPlatformEnum =
+  (typeof AdminGetZuperJobsByInstallationUuidXClientPlatformEnum)[keyof typeof AdminGetZuperJobsByInstallationUuidXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminInstallationInstallationIdTariffOptionsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminInstallationInstallationIdTariffOptionsXClientPlatformEnum =
+  (typeof AdminInstallationInstallationIdTariffOptionsXClientPlatformEnum)[keyof typeof AdminInstallationInstallationIdTariffOptionsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminInstallationsListXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminInstallationsListXClientPlatformEnum =
+  (typeof AdminInstallationsListXClientPlatformEnum)[keyof typeof AdminInstallationsListXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminInstallerOptionsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminInstallerOptionsXClientPlatformEnum =
+  (typeof AdminInstallerOptionsXClientPlatformEnum)[keyof typeof AdminInstallerOptionsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminListCicsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminListCicsXClientPlatformEnum =
+  (typeof AdminListCicsXClientPlatformEnum)[keyof typeof AdminListCicsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminListInstallersXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminListInstallersXClientPlatformEnum =
+  (typeof AdminListInstallersXClientPlatformEnum)[keyof typeof AdminListInstallersXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminRebootDeviceOperationXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminRebootDeviceOperationXClientPlatformEnum =
+  (typeof AdminRebootDeviceOperationXClientPlatformEnum)[keyof typeof AdminRebootDeviceOperationXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminUpdateCicXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminUpdateCicXClientPlatformEnum =
+  (typeof AdminUpdateCicXClientPlatformEnum)[keyof typeof AdminUpdateCicXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminUpdateInstallationXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminUpdateInstallationXClientPlatformEnum =
+  (typeof AdminUpdateInstallationXClientPlatformEnum)[keyof typeof AdminUpdateInstallationXClientPlatformEnum];
+/**
+ * @export
+ */
+export const GetAdminDynamicPricesXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type GetAdminDynamicPricesXClientPlatformEnum =
+  (typeof GetAdminDynamicPricesXClientPlatformEnum)[keyof typeof GetAdminDynamicPricesXClientPlatformEnum];
+/**
+ * @export
+ */
+export const GetAdminInstallationLatestCommissioningXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type GetAdminInstallationLatestCommissioningXClientPlatformEnum =
+  (typeof GetAdminInstallationLatestCommissioningXClientPlatformEnum)[keyof typeof GetAdminInstallationLatestCommissioningXClientPlatformEnum];
+/**
+ * @export
+ */
+export const GetInstallationCommissioningsXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type GetInstallationCommissioningsXClientPlatformEnum =
+  (typeof GetInstallationCommissioningsXClientPlatformEnum)[keyof typeof GetInstallationCommissioningsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const SendCommandToCICOperationXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type SendCommandToCICOperationXClientPlatformEnum =
+  (typeof SendCommandToCICOperationXClientPlatformEnum)[keyof typeof SendCommandToCICOperationXClientPlatformEnum];
+/**
+ * @export
+ */
+export const UpdateAdminInstallationCommissioningXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type UpdateAdminInstallationCommissioningXClientPlatformEnum =
+  (typeof UpdateAdminInstallationCommissioningXClientPlatformEnum)[keyof typeof UpdateAdminInstallationCommissioningXClientPlatformEnum];
+/**
+ * @export
+ */
+export const UpdateCommissioningTestXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type UpdateCommissioningTestXClientPlatformEnum =
+  (typeof UpdateCommissioningTestXClientPlatformEnum)[keyof typeof UpdateCommissioningTestXClientPlatformEnum];

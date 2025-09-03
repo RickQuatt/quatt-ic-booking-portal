@@ -233,6 +233,12 @@ export interface MeCic {
    */
   quattBuild: string | null;
   /**
+   * Whether the CIC and client app both support dynamic pricing feature
+   * @type {boolean}
+   * @memberof MeCic
+   */
+  hasDynamicPricing: boolean;
+  /**
    * The (external) installationId - starts with INS-
    * @type {string}
    * @memberof MeCic
@@ -515,6 +521,7 @@ export function instanceOfMeCic(value: object): boolean {
   isInstance = isInstance && "serial" in value;
   isInstance = isInstance && "numberOfHeatPumps" in value;
   isInstance = isInstance && "quattBuild" in value;
+  isInstance = isInstance && "hasDynamicPricing" in value;
   isInstance = isInstance && "installationId" in value;
   isInstance = isInstance && "installedAt" in value;
   isInstance = isInstance && "flowRate" in value;
@@ -616,6 +623,7 @@ export function MeCicFromJSONTyped(
     serial: json["serial"],
     numberOfHeatPumps: json["numberOfHeatPumps"],
     quattBuild: json["quattBuild"],
+    hasDynamicPricing: json["hasDynamicPricing"],
     installationId: json["installationId"],
     installedAt:
       json["installedAt"] === null ? null : new Date(json["installedAt"]),
@@ -722,6 +730,7 @@ export function MeCicToJSON(value?: MeCic | null): any {
     serial: value.serial,
     numberOfHeatPumps: value.numberOfHeatPumps,
     quattBuild: value.quattBuild,
+    hasDynamicPricing: value.hasDynamicPricing,
     installationId: value.installationId,
     installedAt:
       value.installedAt === null ? null : value.installedAt.toISOString(),

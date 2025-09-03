@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { CreateTariff409ResponseAllOfResult } from "./CreateTariff409ResponseAllOfResult";
+import type { DynamicPrices } from "./DynamicPrices";
 import {
-  CreateTariff409ResponseAllOfResultFromJSON,
-  CreateTariff409ResponseAllOfResultFromJSONTyped,
-  CreateTariff409ResponseAllOfResultToJSON,
-} from "./CreateTariff409ResponseAllOfResult";
+  DynamicPricesFromJSON,
+  DynamicPricesFromJSONTyped,
+  DynamicPricesToJSON,
+} from "./DynamicPrices";
 import type { ResponseMeta } from "./ResponseMeta";
 import {
   ResponseMetaFromJSON,
@@ -29,27 +29,27 @@ import {
 /**
  *
  * @export
- * @interface CreateTariff409Response
+ * @interface GetDynamicPrices200Response
  */
-export interface CreateTariff409Response {
+export interface GetDynamicPrices200Response {
   /**
    *
    * @type {ResponseMeta}
-   * @memberof CreateTariff409Response
+   * @memberof GetDynamicPrices200Response
    */
   meta: ResponseMeta;
   /**
    *
-   * @type {CreateTariff409ResponseAllOfResult}
-   * @memberof CreateTariff409Response
+   * @type {DynamicPrices}
+   * @memberof GetDynamicPrices200Response
    */
-  result: CreateTariff409ResponseAllOfResult;
+  result: DynamicPrices;
 }
 
 /**
- * Check if a given object implements the CreateTariff409Response interface.
+ * Check if a given object implements the GetDynamicPrices200Response interface.
  */
-export function instanceOfCreateTariff409Response(value: object): boolean {
+export function instanceOfGetDynamicPrices200Response(value: object): boolean {
   let isInstance = true;
   isInstance = isInstance && "meta" in value;
   isInstance = isInstance && "result" in value;
@@ -57,27 +57,27 @@ export function instanceOfCreateTariff409Response(value: object): boolean {
   return isInstance;
 }
 
-export function CreateTariff409ResponseFromJSON(
+export function GetDynamicPrices200ResponseFromJSON(
   json: any,
-): CreateTariff409Response {
-  return CreateTariff409ResponseFromJSONTyped(json, false);
+): GetDynamicPrices200Response {
+  return GetDynamicPrices200ResponseFromJSONTyped(json, false);
 }
 
-export function CreateTariff409ResponseFromJSONTyped(
+export function GetDynamicPrices200ResponseFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean,
-): CreateTariff409Response {
+): GetDynamicPrices200Response {
   if (json === undefined || json === null) {
     return json;
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: CreateTariff409ResponseAllOfResultFromJSON(json["result"]),
+    result: DynamicPricesFromJSON(json["result"]),
   };
 }
 
-export function CreateTariff409ResponseToJSON(
-  value?: CreateTariff409Response | null,
+export function GetDynamicPrices200ResponseToJSON(
+  value?: GetDynamicPrices200Response | null,
 ): any {
   if (value === undefined) {
     return undefined;
@@ -87,6 +87,6 @@ export function CreateTariff409ResponseToJSON(
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: CreateTariff409ResponseAllOfResultToJSON(value.result),
+    result: DynamicPricesToJSON(value.result),
   };
 }
