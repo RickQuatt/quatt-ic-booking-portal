@@ -34,6 +34,10 @@ export const CommissioningTestType = {
   FillHeatBattery: "FILL_HEAT_BATTERY",
   DomesticHotWaterTemperature: "DOMESTIC_HOT_WATER_TEMPERATURE",
   CheckHeatBatteryFilled: "CHECK_HEAT_BATTERY_FILLED",
+  DeaerationChillFlow: "DEAERATION_CHILL_FLOW",
+  DeaerationChillSolenoid: "DEAERATION_CHILL_SOLENOID",
+  FlowrateChill: "FLOWRATE_CHILL",
+  CoolingChill: "COOLING_CHILL",
 } as const;
 export type CommissioningTestType =
   (typeof CommissioningTestType)[keyof typeof CommissioningTestType];

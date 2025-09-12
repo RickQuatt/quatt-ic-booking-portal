@@ -10,7 +10,7 @@ export const useGetInstallationTariffs = (installationId: string) => {
     refetch: refetchTariffs,
   } = useQuery({
     queryKey: ["installationTariffs", installationId],
-    queryFn: () => apiClient.adminGetInstallationTariff({ installationId }),
+    queryFn: () => apiClient.adminGetAllTariffs({ installationId }),
   });
 
   const tariffs = tariffsResponse?.result;

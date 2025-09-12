@@ -19,12 +19,12 @@ import {
   ResponseMetaFromJSONTyped,
   ResponseMetaToJSON,
 } from "./ResponseMeta";
-import type { TarrifsResult } from "./TarrifsResult";
+import type { TariffsResult } from "./TariffsResult";
 import {
-  TarrifsResultFromJSON,
-  TarrifsResultFromJSONTyped,
-  TarrifsResultToJSON,
-} from "./TarrifsResult";
+  TariffsResultFromJSON,
+  TariffsResultFromJSONTyped,
+  TariffsResultToJSON,
+} from "./TariffsResult";
 
 /**
  *
@@ -40,10 +40,10 @@ export interface GetAllTariffs200Response {
   meta: ResponseMeta;
   /**
    *
-   * @type {TarrifsResult}
+   * @type {TariffsResult}
    * @memberof GetAllTariffs200Response
    */
-  result: TarrifsResult;
+  result: TariffsResult;
 }
 
 /**
@@ -72,7 +72,7 @@ export function GetAllTariffs200ResponseFromJSONTyped(
   }
   return {
     meta: ResponseMetaFromJSON(json["meta"]),
-    result: TarrifsResultFromJSON(json["result"]),
+    result: TariffsResultFromJSON(json["result"]),
   };
 }
 
@@ -87,6 +87,6 @@ export function GetAllTariffs200ResponseToJSON(
   }
   return {
     meta: ResponseMetaToJSON(value.meta),
-    result: TarrifsResultToJSON(value.result),
+    result: TariffsResultToJSON(value.result),
   };
 }

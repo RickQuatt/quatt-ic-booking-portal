@@ -25,6 +25,7 @@ export const DeviceType = {
   HomeBattery: "HOME_BATTERY",
   Dongle: "DONGLE",
   Chill: "CHILL",
+  Boiler: "BOILER",
 } as const;
 export type DeviceType = (typeof DeviceType)[keyof typeof DeviceType];
 

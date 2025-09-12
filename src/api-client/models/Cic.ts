@@ -87,12 +87,6 @@ export interface Cic {
    */
   isScanningForWifi: boolean;
   /**
-   *
-   * @type {string}
-   * @memberof Cic
-   */
-  boilerDemand?: CicBoilerDemandEnum;
-  /**
    * Amount of power in watt
    * @type {number}
    * @memberof Cic
@@ -130,12 +124,6 @@ export interface Cic {
    * @memberof Cic
    */
   boilerPressure?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof Cic
-   */
-  thermostatDemand: CicThermostatDemandEnum;
   /**
    * Temperature in degrees celcius of the room
    * @type {number}
@@ -179,12 +167,6 @@ export interface Cic {
    */
   status: CicStatus;
   /**
-   * The cic serial number
-   * @type {string}
-   * @memberof Cic
-   */
-  serial: string | null;
-  /**
    *
    * @type {number}
    * @memberof Cic
@@ -196,25 +178,13 @@ export interface Cic {
    * @memberof Cic
    */
   quattBuild: string | null;
+  /**
+   * Whether the CIC and client app both support dynamic pricing feature
+   * @type {boolean}
+   * @memberof Cic
+   */
+  hasDynamicPricing: boolean;
 }
-
-/**
- * @export
- */
-export const CicBoilerDemandEnum = {
-  Heat: "heat",
-} as const;
-export type CicBoilerDemandEnum =
-  (typeof CicBoilerDemandEnum)[keyof typeof CicBoilerDemandEnum];
-
-/**
- * @export
- */
-export const CicThermostatDemandEnum = {
-  Heat: "heat",
-} as const;
-export type CicThermostatDemandEnum =
-  (typeof CicThermostatDemandEnum)[keyof typeof CicThermostatDemandEnum];
 
 /**
  * Check if a given object implements the Cic interface.
@@ -229,16 +199,15 @@ export function instanceOfCic(value: object): boolean {
   isInstance = isInstance && "availableWifiNetworks" in value;
   isInstance = isInstance && "lastScannedForWifi" in value;
   isInstance = isInstance && "isScanningForWifi" in value;
-  isInstance = isInstance && "thermostatDemand" in value;
   isInstance = isInstance && "thermostatRoomTemperature" in value;
   isInstance = isInstance && "thermostatRoomTemperatureSetPoint" in value;
   isInstance = isInstance && "thermostatFlameOn" in value;
   isInstance = isInstance && "showThermostatTemperatures" in value;
   isInstance = isInstance && "thermostatControlTemperatureSetPoint" in value;
   isInstance = isInstance && "status" in value;
-  isInstance = isInstance && "serial" in value;
   isInstance = isInstance && "numberOfHeatPumps" in value;
   isInstance = isInstance && "quattBuild" in value;
+  isInstance = isInstance && "hasDynamicPricing" in value;
 
   return isInstance;
 }
@@ -272,9 +241,6 @@ export function CicFromJSONTyped(json: any, ignoreDiscriminator: boolean): Cic {
         ? null
         : new Date(json["lastScannedForWifi"]),
     isScanningForWifi: json["isScanningForWifi"],
-    boilerDemand: !exists(json, "boilerDemand")
-      ? undefined
-      : json["boilerDemand"],
     boilerPower: !exists(json, "boilerPower") ? undefined : json["boilerPower"],
     boilerWaterTemperatureIn: !exists(json, "boilerWaterTemperatureIn")
       ? undefined
@@ -291,7 +257,6 @@ export function CicFromJSONTyped(json: any, ignoreDiscriminator: boolean): Cic {
     boilerPressure: !exists(json, "boilerPressure")
       ? undefined
       : json["boilerPressure"],
-    thermostatDemand: json["thermostatDemand"],
     thermostatRoomTemperature: json["thermostatRoomTemperature"],
     thermostatRoomTemperatureSetPoint:
       json["thermostatRoomTemperatureSetPoint"],
@@ -301,9 +266,9 @@ export function CicFromJSONTyped(json: any, ignoreDiscriminator: boolean): Cic {
     thermostatControlTemperatureSetPoint:
       json["thermostatControlTemperatureSetPoint"],
     status: CicStatusFromJSON(json["status"]),
-    serial: json["serial"],
     numberOfHeatPumps: json["numberOfHeatPumps"],
     quattBuild: json["quattBuild"],
+    hasDynamicPricing: json["hasDynamicPricing"],
   };
 }
 
@@ -331,14 +296,12 @@ export function CicToJSON(value?: Cic | null): any {
         ? null
         : value.lastScannedForWifi.toISOString(),
     isScanningForWifi: value.isScanningForWifi,
-    boilerDemand: value.boilerDemand,
     boilerPower: value.boilerPower,
     boilerWaterTemperatureIn: value.boilerWaterTemperatureIn,
     boilerWaterTemperatureOut: value.boilerWaterTemperatureOut,
     heatingWaterTemperatureIn: value.heatingWaterTemperatureIn,
     heatingWaterTemperatureOut: value.heatingWaterTemperatureOut,
     boilerPressure: value.boilerPressure,
-    thermostatDemand: value.thermostatDemand,
     thermostatRoomTemperature: value.thermostatRoomTemperature,
     thermostatRoomTemperatureSetPoint: value.thermostatRoomTemperatureSetPoint,
     thermostatFlameOn: value.thermostatFlameOn,
@@ -347,8 +310,8 @@ export function CicToJSON(value?: Cic | null): any {
     thermostatControlTemperatureSetPoint:
       value.thermostatControlTemperatureSetPoint,
     status: CicStatusToJSON(value.status),
-    serial: value.serial,
     numberOfHeatPumps: value.numberOfHeatPumps,
     quattBuild: value.quattBuild,
+    hasDynamicPricing: value.hasDynamicPricing,
   };
 }

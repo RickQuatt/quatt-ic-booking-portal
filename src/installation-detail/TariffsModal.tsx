@@ -17,20 +17,19 @@ import {
   ModalConfirmButton,
   ModalDeleteButton,
 } from "../ui-components/modal/Modal";
-import {
-  CreateUpdateDoubleTariff,
-  CreateUpdateSingleTariff,
-  Tariff,
-} from "../api-client/models";
+import { CreateUpdateEnergyTariff, Tariff } from "../api-client/models";
 import { useApiClient } from "../api-client/context";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { formatAsDate } from "../utils/formatDate";
 import { ResponseError } from "../api-client/runtime";
 import { ErrorResponse } from "../api-client/models/ErrorResponse";
+import {
+  createTariffForInstallation,
+  updateTariffForInstallation,
+} from "./api/tariffApi";
 
 interface Props extends ModalProps {
   installationId: string;
@@ -39,38 +38,102 @@ interface Props extends ModalProps {
 }
 
 const TariffFormSchema = yup.object({
-  tariffType: yup.string().required(),
-  electricityPrice: yup
+  electricityTariffType: yup
+    .string()
+    .required("Electricity tariff type is required"),
+  gasTariffType: yup.string().required("Gas tariff type is required"),
+
+  // Single electricity price
+  price: yup
     .number()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .when("tariffType", {
+    .typeError("Must be a valid number")
+    .transform((value, originalValue) => {
+      if (
+        originalValue === "" ||
+        originalValue === null ||
+        originalValue === undefined
+      ) {
+        return undefined;
+      }
+      return value;
+    })
+    .when("electricityTariffType", {
       is: "single",
-      then: (schema) => schema.required("Electricity tariff is required"),
+      then: (schema) =>
+        schema
+          .required("Electricity tariff is required")
+          .min(0.01, "Price must be greater than 0"),
       otherwise: (schema) => schema.nullable(),
     }),
 
-  dayElectricityPrice: yup
+  // Double electricity prices
+  dayPrice: yup
     .number()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .when("tariffType", {
+    .typeError("Must be a valid number")
+    .transform((value, originalValue) => {
+      if (
+        originalValue === "" ||
+        originalValue === null ||
+        originalValue === undefined
+      ) {
+        return undefined;
+      }
+      return value;
+    })
+    .when("electricityTariffType", {
       is: "double",
-      then: (schema) => schema.required("Day electricity tariff is required"),
+      then: (schema) =>
+        schema
+          .required("Day electricity tariff is required")
+          .min(0.01, "Price must be greater than 0"),
       otherwise: (schema) => schema.nullable(),
     }),
 
-  nightElectricityPrice: yup
+  nightPrice: yup
     .number()
-    .transform((value, originalValue) => (originalValue === "" ? null : value))
-    .when("tariffType", {
+    .typeError("Must be a valid number")
+    .transform((value, originalValue) => {
+      if (
+        originalValue === "" ||
+        originalValue === null ||
+        originalValue === undefined
+      ) {
+        return undefined;
+      }
+      return value;
+    })
+    .when("electricityTariffType", {
       is: "double",
-      then: (schema) => schema.required("Night electricity tariff is required"),
+      then: (schema) =>
+        schema
+          .required("Night electricity tariff is required")
+          .min(0.01, "Price must be greater than 0"),
       otherwise: (schema) => schema.nullable(),
     }),
 
+  // Gas price (only required for single gas tariff)
   gasPrice: yup
     .number()
-    .required("Gas price is required")
-    .transform((value, originalValue) => (originalValue === "" ? null : value)),
+    .typeError("Must be a valid number")
+    .transform((value, originalValue) => {
+      if (
+        originalValue === "" ||
+        originalValue === null ||
+        originalValue === undefined
+      ) {
+        return undefined;
+      }
+      return value;
+    })
+    .when("gasTariffType", {
+      is: "single",
+      then: (schema) =>
+        schema
+          .required("Gas price is required")
+          .min(0.01, "Price must be greater than 0"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
   validFrom: yup.date().required(),
 });
 
@@ -94,21 +157,68 @@ export function TariffsModal({
   installationId,
   onSuccess,
 }: Props) {
-  const selectedTariff =
-    tariffData?.dayElectricityPrice && tariffData?.nightElectricityPrice
-      ? "double"
-      : "single";
+  // Determine tariff type from new or legacy fields
+  // Determine electricity tariff type
+  const selectedElectricityTariff = useMemo(() => {
+    if (tariffData?.electricityTariffType) {
+      return tariffData.electricityTariffType;
+    }
+
+    // Fallback: Check for actual values in new structure
+    if (
+      tariffData?.electricity &&
+      "dayPrice" in tariffData.electricity &&
+      tariffData.electricity.dayPrice != null
+    ) {
+      return "double";
+    }
+
+    // Fallback: Check legacy fields with actual values
+    if (
+      tariffData?.dayElectricityPrice != null &&
+      tariffData?.nightElectricityPrice != null
+    ) {
+      return "double";
+    }
+
+    return "single";
+  }, [tariffData]);
+
+  // Determine gas tariff type
+  const selectedGasTariff = useMemo(() => {
+    if (tariffData?.gasTariffType) {
+      return tariffData.gasTariffType;
+    }
+
+    return "single"; // Default to single for gas
+  }, [tariffData]);
 
   const defaultValues = useMemo(
     () => ({
-      tariffType: selectedTariff,
-      electricityPrice: tariffData?.electricityPrice || undefined,
-      dayElectricityPrice: tariffData?.dayElectricityPrice || undefined,
-      nightElectricityPrice: tariffData?.nightElectricityPrice || undefined,
-      gasPrice: tariffData?.gasPrice,
-      validFrom: tariffData?.validFrom,
+      electricityTariffType: selectedElectricityTariff,
+      gasTariffType: selectedGasTariff,
+      // For single tariff, use new structure first, fallback to legacy, default to undefined for new forms
+      price:
+        tariffData?.electricity && "price" in tariffData.electricity
+          ? tariffData.electricity.price
+          : (tariffData?.electricityPrice ?? undefined),
+      // For double tariff, use new structure first, fallback to legacy, default to undefined for new forms
+      dayPrice:
+        tariffData?.electricity && "dayPrice" in tariffData.electricity
+          ? tariffData.electricity.dayPrice
+          : (tariffData?.dayElectricityPrice ?? undefined),
+      nightPrice:
+        tariffData?.electricity && "nightPrice" in tariffData.electricity
+          ? tariffData.electricity.nightPrice
+          : (tariffData?.nightElectricityPrice ?? undefined),
+      // For gas price, use new structure first, fallback to legacy, default to undefined for new forms
+      gasPrice:
+        tariffData?.gas && "price" in tariffData.gas
+          ? tariffData.gas.price
+          : (tariffData?.gasPrice ?? undefined),
+      validFrom: tariffData?.validFrom || new Date(),
     }),
-    [selectedTariff, tariffData],
+    [selectedElectricityTariff, selectedGasTariff, tariffData],
   );
 
   const {
@@ -123,7 +233,8 @@ export function TariffsModal({
     defaultValues,
   });
 
-  const tariffType = watch("tariffType");
+  const electricityTariffType = watch("electricityTariffType");
+  const gasTariffType = watch("gasTariffType");
   const startDate = watch("validFrom");
 
   const handleClose = useCallback(() => {
@@ -142,7 +253,7 @@ export function TariffsModal({
 
   const apiClient = useApiClient();
   const onSubmit = useCallback(
-    async (data: TariffFormData) => {
+    async (formData: TariffFormData) => {
       if (
         !window.confirm("Are you sure you would like to update the tariffs?")
       ) {
@@ -153,30 +264,52 @@ export function TariffsModal({
         return;
       }
 
-      const tariffBody =
-        tariffType === "single"
-          ? ({
-              tariffType,
-              electricityPrice: data.electricityPrice,
-              gasPrice: data.gasPrice,
-              validFrom: formatAsDate(startDate),
-            } as CreateUpdateSingleTariff)
-          : ({
-              tariffType,
-              dayElectricityPrice: data.dayElectricityPrice,
-              nightElectricityPrice: data.nightElectricityPrice,
-              gasPrice: data.gasPrice,
-              validFrom: formatAsDate(startDate),
-            } as CreateUpdateDoubleTariff);
+      // Construct electricity tariff based on selected type
+      let electricityTariff;
+      if (electricityTariffType === "single") {
+        electricityTariff = {
+          tariffType: "single" as const,
+          price: Number(formData.price),
+        };
+      } else if (electricityTariffType === "double") {
+        electricityTariff = {
+          tariffType: "double" as const,
+          dayPrice: Number(formData.dayPrice),
+          nightPrice: Number(formData.nightPrice),
+        };
+      } else if (electricityTariffType === "dynamic") {
+        electricityTariff = {
+          tariffType: "dynamic" as const,
+        };
+      } else {
+        throw new Error("Invalid electricity tariff type");
+      }
 
-      // If there is no tariff data, create a new tariff
+      // Construct gas tariff based on selected type
+      let gasTariff;
+      if (gasTariffType === "single") {
+        gasTariff = {
+          tariffType: "single" as const,
+          price: Number(formData.gasPrice),
+        };
+      } else if (gasTariffType === "dynamic") {
+        gasTariff = {
+          tariffType: "dynamic" as const,
+        };
+      } else {
+        throw new Error("Invalid gas tariff type");
+      }
+
+      const tariffBody: CreateUpdateEnergyTariff = {
+        validFrom: startDate,
+        electricity: electricityTariff,
+        gas: gasTariff,
+      };
+
+      // Create or update tariff using manual API functions to bypass serialization bugs
       if (!tariffData) {
         try {
-          await apiClient.adminCreateInstallationTariff({
-            installationId: installationId,
-            createTariffRequest: tariffBody,
-          });
-
+          await createTariffForInstallation(installationId, tariffBody);
           handleSubmitSuccess();
         } catch (error) {
           await handleRequestFailure(error, "Failed to create a tariff");
@@ -187,13 +320,11 @@ export function TariffsModal({
         }
 
         try {
-          // If there is tariff data, update the existing tariff
-          await apiClient.adminUpdateInstallationTariff({
-            installationId: installationId,
-            tariffId: tariffData.id,
-            createTariffRequest: tariffBody,
-          });
-
+          await updateTariffForInstallation(
+            installationId,
+            tariffData.id,
+            tariffBody,
+          );
           handleSubmitSuccess();
         } catch (error) {
           await handleRequestFailure(error, "Failed to update tariff data");
@@ -201,10 +332,10 @@ export function TariffsModal({
       }
     },
     [
-      apiClient,
       tariffData,
       installationId,
-      tariffType,
+      electricityTariffType,
+      gasTariffType,
       startDate,
       handleSubmitSuccess,
     ],
@@ -222,7 +353,7 @@ export function TariffsModal({
     }
 
     try {
-      await apiClient.adminDeleteInstallationTariff({
+      await apiClient.adminDeleteTariff({
         installationId: installationId,
         tariffId: tariffData.id,
       });
@@ -242,66 +373,82 @@ export function TariffsModal({
       <form onSubmit={handleSubmit(onSubmit)}>
         <ModalContent>
           <FormSection>
+            {/* Electricity tariff type selector */}
             <FormField>
-              <FormFieldTitle>Tariff</FormFieldTitle>
-              <FormSelectInput {...register("tariffType")}>
+              <FormFieldTitle>⚡️ Electricity tariff type</FormFieldTitle>
+              <FormSelectInput {...register("electricityTariffType")}>
                 <option value="single">Single tariff</option>
                 <option value="double">Double tariff</option>
+                <option value="dynamic">Dynamic tariff</option>
               </FormSelectInput>
             </FormField>
-            {tariffType === "single" ? (
+
+            {/* Electricity pricing fields based on type */}
+            {electricityTariffType === "single" && (
+              <FormField>
+                <FormFieldTitle>⚡️ Electricity price</FormFieldTitle>
+                <FormFieldInput
+                  type="number"
+                  step="0.00001"
+                  min={0.01}
+                  max={10}
+                  error={errors.price}
+                  {...register("price")}
+                />
+              </FormField>
+            )}
+
+            {electricityTariffType === "double" && (
               <>
                 <FormField>
-                  <FormFieldTitle>⚡️ Electricity tariff</FormFieldTitle>
+                  <FormFieldTitle>⚡️☀️ Day electricity price</FormFieldTitle>
                   <FormFieldInput
                     type="number"
                     step="0.00001"
                     min={0.01}
                     max={10}
-                    error={errors.electricityPrice}
-                    {...register("electricityPrice")}
-                  />
-                </FormField>
-              </>
-            ) : (
-              <>
-                <FormField>
-                  <FormFieldTitle>⚡️☀️ Day electricity tariff</FormFieldTitle>
-                  <FormFieldInput
-                    type="number"
-                    step="0.00001"
-                    min={0.01}
-                    max={10}
-                    error={errors.dayElectricityPrice}
-                    {...register("dayElectricityPrice")}
+                    error={errors.dayPrice}
+                    {...register("dayPrice")}
                   />
                 </FormField>
                 <FormField>
-                  <FormFieldTitle>
-                    ⚡️🌙 Night electricity tariff
-                  </FormFieldTitle>
+                  <FormFieldTitle>⚡️🌙 Night electricity price</FormFieldTitle>
                   <FormFieldInput
                     type="number"
                     step="0.00001"
                     min={0.01}
                     max={10}
-                    error={errors.nightElectricityPrice}
-                    {...register("nightElectricityPrice")}
+                    error={errors.nightPrice}
+                    {...register("nightPrice")}
                   />
                 </FormField>
               </>
             )}
+
+            {/* Gas tariff type selector */}
             <FormField>
-              <FormFieldTitle>🔥 Gas tariff</FormFieldTitle>
-              <FormFieldInput
-                type="number"
-                step="0.00001"
-                min={0.01}
-                max={10}
-                error={errors.gasPrice}
-                {...register("gasPrice")}
-              />
+              <FormFieldTitle>🔥 Gas tariff type</FormFieldTitle>
+              <FormSelectInput {...register("gasTariffType")}>
+                <option value="single">Single tariff</option>
+                <option value="dynamic">Dynamic tariff</option>
+              </FormSelectInput>
             </FormField>
+
+            {/* Gas pricing fields based on type */}
+            {gasTariffType === "single" && (
+              <FormField>
+                <FormFieldTitle>🔥 Gas price</FormFieldTitle>
+                <FormFieldInput
+                  type="number"
+                  step="0.00001"
+                  min={0.01}
+                  max={10}
+                  error={errors.gasPrice}
+                  {...register("gasPrice")}
+                />
+              </FormField>
+            )}
+
             <FormField>
               <FormFieldTitle>📆 Valid from</FormFieldTitle>
               <Controller
