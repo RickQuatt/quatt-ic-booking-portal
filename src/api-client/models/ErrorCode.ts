@@ -171,6 +171,19 @@ export const ErrorCode = {
   MissingRequiredColumns: "MISSING_REQUIRED_COLUMNS",
   NoDynamicEnergyPricingData: "NO_DYNAMIC_ENERGY_PRICING_DATA",
   UserAlreadyPairedToHomeBattery: "USER_ALREADY_PAIRED_TO_HOME_BATTERY",
+  NoInstalledatFoundForInstallation: "NO_INSTALLEDAT_FOUND_FOR_INSTALLATION",
+  InstallationHasNoCicAssociated: "INSTALLATION_HAS_NO_CIC_ASSOCIATED",
+  TariffTypeConflict: "TARIFF_TYPE_CONFLICT",
+  ElectricityTariffTypeConflict: "ELECTRICITY_TARIFF_TYPE_CONFLICT",
+  GasTariffTypeConflict: "GAS_TARIFF_TYPE_CONFLICT",
+  TariffDateConflict: "TARIFF_DATE_CONFLICT",
+  TariffLimitReached2: "TARIFF_LIMIT_REACHED",
+  NoTariffsFound: "NO_TARIFFS_FOUND",
+  PricingItemNotFoundForCurrentTime: "PRICING_ITEM_NOT_FOUND_FOR_CURRENT_TIME",
+  FeatureNotAvailable: "FEATURE_NOT_AVAILABLE",
+  NotImplemented: "NOT_IMPLEMENTED",
+  NoLegacyCommissioningHistory: "NO_LEGACY_COMMISSIONING_HISTORY",
+  LegacyCommissioningMigrationFailed: "LEGACY_COMMISSIONING_MIGRATION_FAILED",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

@@ -147,7 +147,23 @@ function InstallationDetailTariffItem({
     nightElectricityPrice,
     electricityPrice,
     gasPrice,
+    electricityTariffType,
+    gasTariffType,
   } = tariff;
+
+  const getElectricityDisplay = () => {
+    if (electricityTariffType === "dynamic") {
+      return "Dynamic";
+    }
+    return `€${electricityPrice ? roundNumber(electricityPrice, 2) : "n/a"}`;
+  };
+
+  const getGasDisplay = () => {
+    if (gasTariffType === "dynamic") {
+      return "Dynamic";
+    }
+    return `€${gasPrice ? roundNumber(gasPrice, 2) : "n/a"}`;
+  };
 
   return (
     <div>
@@ -165,15 +181,12 @@ function InstallationDetailTariffItem({
             <div className={classes["tariff-grid"]}>
               <div>⚡️☀️ €{roundNumber(dayElectricityPrice, 2)}</div>
               <div>⚡️🌙 €{roundNumber(nightElectricityPrice, 2)}</div>
-              <div>🔥 €{roundNumber(gasPrice, 2)}</div>
+              <div>🔥 {getGasDisplay()}</div>
             </div>
           ) : (
             <div className={classes["tariff-grid"]}>
-              <div>
-                ⚡️ €
-                {electricityPrice ? roundNumber(electricityPrice, 2) : "n/a"}
-              </div>
-              <div>🔥 €{roundNumber(gasPrice, 2)}</div>
+              <div>⚡️ {getElectricityDisplay()}</div>
+              <div>🔥 {getGasDisplay()}</div>
             </div>
           )}
         </div>

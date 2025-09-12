@@ -34,10 +34,6 @@ export function CICDetailBoilerInfo({ cicData }: { cicData: AdminCic }) {
           <FormFieldValue value={cicData.boilerPressure} />
         </FormField>
         <FormField>
-          <FormFieldTitle>Boiler demand</FormFieldTitle>
-          <FormFieldValue value={cicData.boilerDemand} />
-        </FormField>
-        <FormField>
           <FormFieldTitle>Boiler water temperature in</FormFieldTitle>
           <FormFieldValue value={cicData.boilerWaterTemperatureIn} />
         </FormField>

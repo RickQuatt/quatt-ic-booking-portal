@@ -1,7 +1,7 @@
 .form-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 
   & form {
     display: contents;
@@ -11,11 +11,15 @@
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
 }
 
 .form-field-title {
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #1a1a1a;
+  margin: 0;
 }
 
 .form-field-error {

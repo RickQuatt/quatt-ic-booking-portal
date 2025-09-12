@@ -22,10 +22,6 @@ export function CICDetailExtra({ cicData }: { cicData: AdminCic }) {
           <FormFieldValue value={cicData.flowRate} />
         </FormField>
         <FormField>
-          <FormFieldTitle>Serial</FormFieldTitle>
-          <FormFieldValue value={cicData.serial} />
-        </FormField>
-        <FormField>
           <FormFieldTitle>Supervisory control mode</FormFieldTitle>
           <FormFieldValue value={cicData.supervisoryControlMode} />
         </FormField>

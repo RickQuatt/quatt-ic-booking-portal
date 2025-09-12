@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from "../runtime";
-import type { CreateTariff409ResponseAllOfMeta } from "./CreateTariff409ResponseAllOfMeta";
-import {
-  CreateTariff409ResponseAllOfMetaFromJSON,
-  CreateTariff409ResponseAllOfMetaFromJSONTyped,
-  CreateTariff409ResponseAllOfMetaToJSON,
-} from "./CreateTariff409ResponseAllOfMeta";
 import type { CreateTariff409ResponseAllOfResult } from "./CreateTariff409ResponseAllOfResult";
 import {
   CreateTariff409ResponseAllOfResultFromJSON,
   CreateTariff409ResponseAllOfResultFromJSONTyped,
   CreateTariff409ResponseAllOfResultToJSON,
 } from "./CreateTariff409ResponseAllOfResult";
+import type { ResponseMeta } from "./ResponseMeta";
+import {
+  ResponseMetaFromJSON,
+  ResponseMetaFromJSONTyped,
+  ResponseMetaToJSON,
+} from "./ResponseMeta";
 
 /**
  *
@@ -34,10 +34,10 @@ import {
 export interface CreateTariff409Response {
   /**
    *
-   * @type {CreateTariff409ResponseAllOfMeta}
+   * @type {ResponseMeta}
    * @memberof CreateTariff409Response
    */
-  meta: CreateTariff409ResponseAllOfMeta;
+  meta: ResponseMeta;
   /**
    *
    * @type {CreateTariff409ResponseAllOfResult}
@@ -71,7 +71,7 @@ export function CreateTariff409ResponseFromJSONTyped(
     return json;
   }
   return {
-    meta: CreateTariff409ResponseAllOfMetaFromJSON(json["meta"]),
+    meta: ResponseMetaFromJSON(json["meta"]),
     result: CreateTariff409ResponseAllOfResultFromJSON(json["result"]),
   };
 }
@@ -86,7 +86,7 @@ export function CreateTariff409ResponseToJSON(
     return null;
   }
   return {
-    meta: CreateTariff409ResponseAllOfMetaToJSON(value.meta),
+    meta: ResponseMetaToJSON(value.meta),
     result: CreateTariff409ResponseAllOfResultToJSON(value.result),
   };
 }

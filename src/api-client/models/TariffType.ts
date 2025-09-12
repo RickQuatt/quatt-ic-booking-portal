@@ -19,6 +19,7 @@
 export const TariffType = {
   Single: "single",
   Double: "double",
+  Dynamic: "dynamic",
 } as const;
 export type TariffType = (typeof TariffType)[keyof typeof TariffType];
 
