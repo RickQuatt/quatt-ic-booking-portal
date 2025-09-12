@@ -17,6 +17,7 @@
  * @export
  */
 export const CommissioningActionType = {
+  HomeBatteryBindSystem: "HOME_BATTERY_BIND_SYSTEM",
   HomeBatteryUpdateBatteryInfo: "HOME_BATTERY_UPDATE_BATTERY_INFO",
   EmsCreateDigitalTwin: "EMS_CREATE_DIGITAL_TWIN",
 } as const;

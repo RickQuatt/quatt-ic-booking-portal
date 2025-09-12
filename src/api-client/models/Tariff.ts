@@ -13,6 +13,31 @@
  */
 
 import { exists, mapValues } from "../runtime";
+import type { CreateUpdateEnergyTariffElectricity } from "./CreateUpdateEnergyTariffElectricity";
+import {
+  CreateUpdateEnergyTariffElectricityFromJSON,
+  CreateUpdateEnergyTariffElectricityFromJSONTyped,
+  CreateUpdateEnergyTariffElectricityToJSON,
+} from "./CreateUpdateEnergyTariffElectricity";
+import type { CreateUpdateEnergyTariffGas } from "./CreateUpdateEnergyTariffGas";
+import {
+  CreateUpdateEnergyTariffGasFromJSON,
+  CreateUpdateEnergyTariffGasFromJSONTyped,
+  CreateUpdateEnergyTariffGasToJSON,
+} from "./CreateUpdateEnergyTariffGas";
+import type { ElectricityTariffType } from "./ElectricityTariffType";
+import {
+  ElectricityTariffTypeFromJSON,
+  ElectricityTariffTypeFromJSONTyped,
+  ElectricityTariffTypeToJSON,
+} from "./ElectricityTariffType";
+import type { GasTariffType } from "./GasTariffType";
+import {
+  GasTariffTypeFromJSON,
+  GasTariffTypeFromJSONTyped,
+  GasTariffTypeToJSON,
+} from "./GasTariffType";
+
 /**
  *
  * @export
@@ -24,31 +49,59 @@ export interface Tariff {
    * @type {string}
    * @memberof Tariff
    */
-  id?: string;
+  id: string;
+  /**
+   *
+   * @type {ElectricityTariffType}
+   * @memberof Tariff
+   */
+  electricityTariffType: ElectricityTariffType;
+  /**
+   *
+   * @type {GasTariffType}
+   * @memberof Tariff
+   */
+  gasTariffType: GasTariffType;
   /**
    * Electricity price for single tariff
    * @type {number}
    * @memberof Tariff
+   * @deprecated
    */
   electricityPrice?: number | null;
   /**
    * Day electricity price for double tariff
    * @type {number}
    * @memberof Tariff
+   * @deprecated
    */
   dayElectricityPrice?: number | null;
   /**
    * Night electricity price for double tariff
    * @type {number}
    * @memberof Tariff
+   * @deprecated
    */
   nightElectricityPrice?: number | null;
   /**
    * Gas price
    * @type {number}
    * @memberof Tariff
+   * @deprecated
    */
-  gasPrice: number;
+  gasPrice?: number | null;
+  /**
+   *
+   * @type {CreateUpdateEnergyTariffElectricity}
+   * @memberof Tariff
+   */
+  electricity: CreateUpdateEnergyTariffElectricity;
+  /**
+   *
+   * @type {CreateUpdateEnergyTariffGas}
+   * @memberof Tariff
+   */
+  gas: CreateUpdateEnergyTariffGas;
   /**
    * The date in ISO 8601 format (YYYY-MM-DD). This schema is used to represent dates in various contexts, such as event dates, deadlines, or any other date-related information.
    *
@@ -75,7 +128,11 @@ export interface Tariff {
  */
 export function instanceOfTariff(value: object): boolean {
   let isInstance = true;
-  isInstance = isInstance && "gasPrice" in value;
+  isInstance = isInstance && "id" in value;
+  isInstance = isInstance && "electricityTariffType" in value;
+  isInstance = isInstance && "gasTariffType" in value;
+  isInstance = isInstance && "electricity" in value;
+  isInstance = isInstance && "gas" in value;
   isInstance = isInstance && "validFrom" in value;
   isInstance = isInstance && "isDeletable" in value;
   isInstance = isInstance && "isDateEditable" in value;
@@ -95,7 +152,11 @@ export function TariffFromJSONTyped(
     return json;
   }
   return {
-    id: !exists(json, "id") ? undefined : json["id"],
+    id: json["id"],
+    electricityTariffType: ElectricityTariffTypeFromJSON(
+      json["electricityTariffType"],
+    ),
+    gasTariffType: GasTariffTypeFromJSON(json["gasTariffType"]),
     electricityPrice: !exists(json, "electricityPrice")
       ? undefined
       : json["electricityPrice"],
@@ -105,7 +166,11 @@ export function TariffFromJSONTyped(
     nightElectricityPrice: !exists(json, "nightElectricityPrice")
       ? undefined
       : json["nightElectricityPrice"],
-    gasPrice: json["gasPrice"],
+    gasPrice: !exists(json, "gasPrice") ? undefined : json["gasPrice"],
+    electricity: CreateUpdateEnergyTariffElectricityFromJSON(
+      json["electricity"],
+    ),
+    gas: CreateUpdateEnergyTariffGasFromJSON(json["gas"]),
     validFrom: new Date(json["validFrom"]),
     isDeletable: json["isDeletable"],
     isDateEditable: json["isDateEditable"],
@@ -121,10 +186,16 @@ export function TariffToJSON(value?: Tariff | null): any {
   }
   return {
     id: value.id,
+    electricityTariffType: ElectricityTariffTypeToJSON(
+      value.electricityTariffType,
+    ),
+    gasTariffType: GasTariffTypeToJSON(value.gasTariffType),
     electricityPrice: value.electricityPrice,
     dayElectricityPrice: value.dayElectricityPrice,
     nightElectricityPrice: value.nightElectricityPrice,
     gasPrice: value.gasPrice,
+    electricity: CreateUpdateEnergyTariffElectricityToJSON(value.electricity),
+    gas: CreateUpdateEnergyTariffGasToJSON(value.gas),
     validFrom: value.validFrom.toISOString().substring(0, 10),
     isDeletable: value.isDeletable,
     isDateEditable: value.isDateEditable,

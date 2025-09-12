@@ -22,10 +22,6 @@ export function CICDetailThermostatInfo({ cicData }: { cicData: AdminCic }) {
           <FormFieldValue value={cicData.thermostatType} />
         </FormField>
         <FormField>
-          <FormFieldTitle>Thermostat demand</FormFieldTitle>
-          <FormFieldValue value={cicData.thermostatDemand} />
-        </FormField>
-        <FormField>
           <FormFieldTitle>Thermostat flame on</FormFieldTitle>
           <FormFieldValue value={cicData.thermostatFlameOn} />
         </FormField>

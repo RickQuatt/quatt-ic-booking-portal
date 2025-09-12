@@ -85,7 +85,7 @@ export interface BaseCommissioningAction {
    * @type {string}
    * @memberof BaseCommissioningAction
    */
-  installerUuid: string;
+  installerUuid: string | null;
   /**
    *
    * @type {number}

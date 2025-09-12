@@ -177,12 +177,6 @@ export interface AdminCic {
    */
   isScanningForWifi: boolean;
   /**
-   *
-   * @type {string}
-   * @memberof AdminCic
-   */
-  boilerDemand?: AdminCicBoilerDemandEnum;
-  /**
    * Amount of power in watt
    * @type {number}
    * @memberof AdminCic
@@ -220,12 +214,6 @@ export interface AdminCic {
    * @memberof AdminCic
    */
   boilerPressure?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof AdminCic
-   */
-  thermostatDemand: AdminCicThermostatDemandEnum;
   /**
    * Temperature in degrees celcius of the room
    * @type {number}
@@ -269,12 +257,6 @@ export interface AdminCic {
    */
   status: CicStatus;
   /**
-   * The cic serial number
-   * @type {string}
-   * @memberof AdminCic
-   */
-  serial: string | null;
-  /**
    *
    * @type {number}
    * @memberof AdminCic
@@ -286,6 +268,12 @@ export interface AdminCic {
    * @memberof AdminCic
    */
   quattBuild: string | null;
+  /**
+   * Whether the CIC and client app both support dynamic pricing feature
+   * @type {boolean}
+   * @memberof AdminCic
+   */
+  hasDynamicPricing: boolean;
   /**
    * The (external) installationId - starts with INS-
    * @type {string}
@@ -675,24 +663,6 @@ export interface AdminCic {
 /**
  * @export
  */
-export const AdminCicBoilerDemandEnum = {
-  Heat: "heat",
-} as const;
-export type AdminCicBoilerDemandEnum =
-  (typeof AdminCicBoilerDemandEnum)[keyof typeof AdminCicBoilerDemandEnum];
-
-/**
- * @export
- */
-export const AdminCicThermostatDemandEnum = {
-  Heat: "heat",
-} as const;
-export type AdminCicThermostatDemandEnum =
-  (typeof AdminCicThermostatDemandEnum)[keyof typeof AdminCicThermostatDemandEnum];
-
-/**
- * @export
- */
 export const AdminCicMenderUpdateStateEnum = {
   Idle: "idle",
   Download: "download",
@@ -714,16 +684,15 @@ export function instanceOfAdminCic(value: object): boolean {
   isInstance = isInstance && "availableWifiNetworks" in value;
   isInstance = isInstance && "lastScannedForWifi" in value;
   isInstance = isInstance && "isScanningForWifi" in value;
-  isInstance = isInstance && "thermostatDemand" in value;
   isInstance = isInstance && "thermostatRoomTemperature" in value;
   isInstance = isInstance && "thermostatRoomTemperatureSetPoint" in value;
   isInstance = isInstance && "thermostatFlameOn" in value;
   isInstance = isInstance && "showThermostatTemperatures" in value;
   isInstance = isInstance && "thermostatControlTemperatureSetPoint" in value;
   isInstance = isInstance && "status" in value;
-  isInstance = isInstance && "serial" in value;
   isInstance = isInstance && "numberOfHeatPumps" in value;
   isInstance = isInstance && "quattBuild" in value;
+  isInstance = isInstance && "hasDynamicPricing" in value;
   isInstance = isInstance && "installationId" in value;
   isInstance = isInstance && "installedAt" in value;
   isInstance = isInstance && "flowRate" in value;
@@ -814,9 +783,6 @@ export function AdminCicFromJSONTyped(
         ? null
         : new Date(json["lastScannedForWifi"]),
     isScanningForWifi: json["isScanningForWifi"],
-    boilerDemand: !exists(json, "boilerDemand")
-      ? undefined
-      : json["boilerDemand"],
     boilerPower: !exists(json, "boilerPower") ? undefined : json["boilerPower"],
     boilerWaterTemperatureIn: !exists(json, "boilerWaterTemperatureIn")
       ? undefined
@@ -833,7 +799,6 @@ export function AdminCicFromJSONTyped(
     boilerPressure: !exists(json, "boilerPressure")
       ? undefined
       : json["boilerPressure"],
-    thermostatDemand: json["thermostatDemand"],
     thermostatRoomTemperature: json["thermostatRoomTemperature"],
     thermostatRoomTemperatureSetPoint:
       json["thermostatRoomTemperatureSetPoint"],
@@ -843,9 +808,9 @@ export function AdminCicFromJSONTyped(
     thermostatControlTemperatureSetPoint:
       json["thermostatControlTemperatureSetPoint"],
     status: CicStatusFromJSON(json["status"]),
-    serial: json["serial"],
     numberOfHeatPumps: json["numberOfHeatPumps"],
     quattBuild: json["quattBuild"],
+    hasDynamicPricing: json["hasDynamicPricing"],
     installationId: json["installationId"],
     installedAt:
       json["installedAt"] === null ? null : new Date(json["installedAt"]),
@@ -978,14 +943,12 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
         ? null
         : value.lastScannedForWifi.toISOString(),
     isScanningForWifi: value.isScanningForWifi,
-    boilerDemand: value.boilerDemand,
     boilerPower: value.boilerPower,
     boilerWaterTemperatureIn: value.boilerWaterTemperatureIn,
     boilerWaterTemperatureOut: value.boilerWaterTemperatureOut,
     heatingWaterTemperatureIn: value.heatingWaterTemperatureIn,
     heatingWaterTemperatureOut: value.heatingWaterTemperatureOut,
     boilerPressure: value.boilerPressure,
-    thermostatDemand: value.thermostatDemand,
     thermostatRoomTemperature: value.thermostatRoomTemperature,
     thermostatRoomTemperatureSetPoint: value.thermostatRoomTemperatureSetPoint,
     thermostatFlameOn: value.thermostatFlameOn,
@@ -994,9 +957,9 @@ export function AdminCicToJSON(value?: AdminCic | null): any {
     thermostatControlTemperatureSetPoint:
       value.thermostatControlTemperatureSetPoint,
     status: CicStatusToJSON(value.status),
-    serial: value.serial,
     numberOfHeatPumps: value.numberOfHeatPumps,
     quattBuild: value.quattBuild,
+    hasDynamicPricing: value.hasDynamicPricing,
     installationId: value.installationId,
     installedAt:
       value.installedAt === null ? null : value.installedAt.toISOString(),
