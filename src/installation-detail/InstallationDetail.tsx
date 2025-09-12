@@ -1,6 +1,7 @@
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import classes from "./InstallationDetail.module.css";
 import { InstallationDetailExtraInformation } from "./InstallationDetailExtraInformation";
+import { InstallationDetailHouseDetails } from "./InstallationDetailHouseDetails";
 import { InstallationDetailCicHistory } from "./InstallationDetailCicHistory";
 import { InstallationDetailCommissioningHistory } from "./InstallationDetailCommissioningHistory";
 import { InstallationDetailSettings } from "./InstallationDetailSettings";
@@ -92,6 +93,7 @@ export function InstallationDetail({
         </div>
 
         <InstallationDetailNotes installationId={installationId} />
+        <InstallationDetailHouseDetails installation={installationDetails} />
         <InstallationDetailExtraInformation
           installation={installationDetails}
         />
