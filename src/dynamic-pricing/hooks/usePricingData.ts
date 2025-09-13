@@ -34,10 +34,19 @@ export function usePricingData(selectedDate: Date) {
     const hourlyPrices: PricingDataPoint[] = electricityPrices.map(
       (item: PricingItem) => {
         const validFromDate = new Date(item.validFrom);
-        const hour = validFromDate.getHours();
+
+        // Convert to Amsterdam timezone for consistent display
+        const amsterdamHour = parseInt(
+          validFromDate.toLocaleTimeString("en-US", {
+            timeZone: "Europe/Amsterdam",
+            hour: "2-digit",
+            hour12: false,
+          }),
+          10,
+        );
 
         return {
-          hour,
+          hour: amsterdamHour,
           price: item.price,
           timestamp: item.validFrom.toISOString(),
           validFrom: item.validFrom.toISOString(),

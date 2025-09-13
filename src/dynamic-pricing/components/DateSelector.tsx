@@ -24,15 +24,17 @@ export function DateSelector({
   const maxDate = formatDateForInput(new Date());
 
   const handlePreviousDay = () => {
-    const previousDay = new Date(selectedDate);
-    previousDay.setDate(previousDay.getDate() - 1);
+    const previousDay = new Date(selectedDate.getTime() - 24 * 60 * 60 * 1000);
     onDateChange(previousDay);
   };
 
   const handleNextDay = () => {
-    const nextDay = new Date(selectedDate);
-    nextDay.setDate(nextDay.getDate() + 1);
+    const nextDay = new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000);
     onDateChange(nextDay);
+  };
+
+  const handleTodayClick = () => {
+    onDateChange(new Date());
   };
 
   const today = new Date();
@@ -60,6 +62,14 @@ export function DateSelector({
           max={maxDate}
           className={classes.input}
         />
+        <button
+          onClick={handleTodayClick}
+          disabled={isToday}
+          className={`${classes.todayButton} ${isToday ? classes.disabled : ""}`}
+          title="Go to today"
+        >
+          Today
+        </button>
         <button
           onClick={handleNextDay}
           disabled={isToday}
