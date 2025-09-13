@@ -27,6 +27,8 @@ interface PricingDataPoint {
   hour: number;
   price: number;
   timestamp: string;
+  validFrom: string;
+  validTo: string;
 }
 
 interface PricingChartProps {
@@ -81,9 +83,23 @@ export function PricingChart({ data, selectedDate }: PricingChartProps) {
           borderWidth: 1,
           callbacks: {
             label: (context: TooltipItem<"line">) => {
-              const hour = context.dataIndex;
-              const startTime = `${hour.toString().padStart(2, "0")}:00`;
-              const endTime = `${(hour + 1).toString().padStart(2, "0")}:00`;
+              const dataPoint = data[context.dataIndex];
+              const validFromDate = new Date(dataPoint.validFrom);
+              const validToDate = new Date(dataPoint.validTo);
+
+              const startTime = validFromDate.toLocaleTimeString("en-US", {
+                timeZone: "Europe/Amsterdam",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              });
+              const endTime = validToDate.toLocaleTimeString("en-US", {
+                timeZone: "Europe/Amsterdam",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              });
+
               return `${startTime} - ${endTime}: €${context.parsed.y.toFixed(3)} per kWh`;
             },
           },

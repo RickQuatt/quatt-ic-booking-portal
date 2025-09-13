@@ -7,10 +7,13 @@ interface PricingDataPoint {
   hour: number;
   price: number;
   timestamp: string;
+  validFrom: string;
+  validTo: string;
 }
 
 interface PricingResponse {
   currentPrice: number;
+  currentGasPrice: number;
   hourlyPrices: PricingDataPoint[];
 }
 
@@ -26,6 +29,7 @@ export function usePricingData(selectedDate: Date) {
   ): PricingResponse => {
     const electricityPrices = apiResponse.result.prices.electricity;
     const currentElectricityPrice = apiResponse.result.currentPrice.electricity;
+    const currentGasPrice = apiResponse.result.currentPrice.gas;
 
     const hourlyPrices: PricingDataPoint[] = electricityPrices.map(
       (item: PricingItem) => {
@@ -36,6 +40,8 @@ export function usePricingData(selectedDate: Date) {
           hour,
           price: item.price,
           timestamp: item.validFrom.toISOString(),
+          validFrom: item.validFrom.toISOString(),
+          validTo: item.validTo.toISOString(),
         };
       },
     );
@@ -45,6 +51,7 @@ export function usePricingData(selectedDate: Date) {
 
     return {
       currentPrice: currentElectricityPrice,
+      currentGasPrice: currentGasPrice,
       hourlyPrices,
     };
   };

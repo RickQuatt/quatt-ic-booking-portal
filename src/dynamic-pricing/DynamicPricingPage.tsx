@@ -12,6 +12,7 @@ export function DynamicPricingPage() {
   const { data, isLoading, isError, refetch } = usePricingData(selectedDate);
 
   const currentPrice = data?.currentPrice;
+  const currentGasPrice = data?.currentGasPrice;
   const pricingData = data?.hourlyPrices || [];
 
   if (isError) {
@@ -38,7 +39,13 @@ export function DynamicPricingPage() {
 
       {currentPrice && (
         <div className={classes.currentPrice}>
-          Current electricity price: €{currentPrice.toFixed(2)} per kWh
+          Current electricity price: €{currentPrice.toFixed(3)} per kWh
+        </div>
+      )}
+
+      {currentGasPrice && (
+        <div className={classes.currentPrice}>
+          Current gas price: €{currentGasPrice.toFixed(3)} per m³
         </div>
       )}
 
