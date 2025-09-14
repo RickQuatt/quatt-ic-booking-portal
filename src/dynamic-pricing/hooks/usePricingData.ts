@@ -29,12 +29,22 @@ export function usePricingData(selectedDate: Date) {
         const validFromDate = new Date(item.validFrom);
 
         // Convert to Amsterdam timezone for consistent display
-        const amsterdamDate = new Date(
-          validFromDate.toLocaleString("en-CA", {
+        const amsterdamHour = parseInt(
+          new Intl.DateTimeFormat("en-US", {
             timeZone: "Europe/Amsterdam",
-          }),
+            hour: "numeric",
+            hour12: false,
+          }).format(validFromDate),
+          10,
         );
-        const amsterdamHour = amsterdamDate.getHours();
+
+        // Pre-format times for tooltip using API data
+        const timeFormatter = new Intl.DateTimeFormat("en-US", {
+          timeZone: "Europe/Amsterdam",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
 
         return {
           hour: amsterdamHour,
@@ -42,6 +52,8 @@ export function usePricingData(selectedDate: Date) {
           timestamp: item.validFrom.toISOString(),
           validFrom: item.validFrom.toISOString(),
           validTo: item.validTo.toISOString(),
+          formattedValidFrom: timeFormatter.format(item.validFrom),
+          formattedValidTo: timeFormatter.format(item.validTo),
         };
       },
     );

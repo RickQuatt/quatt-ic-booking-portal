@@ -29,4 +29,6 @@ export interface PricingDataPoint {
   timestamp: string;
   validFrom: string;
   validTo: string;
+  formattedValidFrom: string;
+  formattedValidTo: string;
 }
