@@ -426,7 +426,7 @@ export interface AdminRebootDeviceOperationRequest {
   cicId: string;
   adminRebootDeviceRequest: AdminRebootDeviceRequest;
   xClientVersion?: string;
-  xClientPlatform?: AdminRebootDeviceOperationXClientPlatformEnum;
+  xClientPlatform?: AdminRebootDeviceXClientPlatformEnum;
 }
 
 export interface AdminUpdateCicRequest {
@@ -482,7 +482,7 @@ export interface SendCommandToCICOperationRequest {
   cicId: string;
   sendCommandToCICRequest: SendCommandToCICRequest;
   xClientVersion?: string;
-  xClientPlatform?: SendCommandToCICOperationXClientPlatformEnum;
+  xClientPlatform?: SendCommandToCICXClientPlatformEnum;
 }
 
 export interface UpdateAdminInstallationCommissioningRequest {

@@ -5,6 +5,9 @@ import { Configuration } from "./runtime";
 import { useContextWithCheck } from "../utils/useContextWithCheck";
 import { auth } from "../firebase";
 
+// Import enum patches to ensure module augmentation is processed
+import "./enum-patches";
+
 const ApiClientContext = React.createContext<SupportDashboardApi | undefined>(
   undefined,
 );

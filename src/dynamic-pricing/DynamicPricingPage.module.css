@@ -1,0 +1,110 @@
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  color: #1a1a1a;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.currentPricingSection {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.pricingSectionTitle {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.pricesContainer {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.electricityPrice {
+  background-color: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a365d;
+  flex: 1;
+  min-width: 250px;
+}
+
+.gasPrice {
+  background-color: #fff5e6;
+  border: 1px solid #ffcc80;
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #8b4513;
+  flex: 1;
+  min-width: 250px;
+}
+
+.sectionTitle {
+  color: #495057;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 16px 0;
+}
+
+.chartContainer {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 24px;
+  min-height: 400px;
+}
+
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .title {
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .chartContainer {
+    padding: 16px;
+  }
+}
