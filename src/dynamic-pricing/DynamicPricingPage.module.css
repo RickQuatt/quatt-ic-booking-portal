@@ -20,15 +20,49 @@
   margin: 0;
 }
 
-.currentPrice {
+.currentPricingSection {
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.pricingSectionTitle {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.pricesContainer {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.electricityPrice {
+  background-color: #e7f3ff;
+  border: 1px solid #b3d9ff;
   border-radius: 8px;
   padding: 16px 20px;
-  margin-bottom: 32px;
   font-size: 16px;
-  font-weight: 500;
-  color: #495057;
+  font-weight: 600;
+  color: #1a365d;
+  flex: 1;
+  min-width: 250px;
+}
+
+.gasPrice {
+  background-color: #fff5e6;
+  border: 1px solid #ffcc80;
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #8b4513;
+  flex: 1;
+  min-width: 250px;
 }
 
 .sectionTitle {

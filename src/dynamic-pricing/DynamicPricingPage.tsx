@@ -37,15 +37,21 @@ export function DynamicPricingPage() {
         />
       </div>
 
-      {currentPrice && (
-        <div className={classes.currentPrice}>
-          Current electricity price: €{currentPrice.toFixed(3)} per kWh
-        </div>
-      )}
-
-      {currentGasPrice && (
-        <div className={classes.currentPrice}>
-          Current gas price: €{currentGasPrice.toFixed(3)} per m³
+      {(currentPrice || currentGasPrice) && (
+        <div className={classes.currentPricingSection}>
+          <h2 className={classes.pricingSectionTitle}>Current Pricing</h2>
+          <div className={classes.pricesContainer}>
+            {currentPrice && (
+              <div className={classes.electricityPrice}>
+                ⚡ Electricity: €{currentPrice.toFixed(3)} per kWh
+              </div>
+            )}
+            {currentGasPrice && (
+              <div className={classes.gasPrice}>
+                🔥 Gas: €{currentGasPrice.toFixed(3)} per m³
+              </div>
+            )}
+          </div>
         </div>
       )}
 
