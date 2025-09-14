@@ -130,7 +130,7 @@ export function PricingChart({ data, selectedDate }: PricingChartProps) {
         intersect: false,
       },
     }),
-    [],
+    [data],
   );
 
   if (!data || data.length === 0) {

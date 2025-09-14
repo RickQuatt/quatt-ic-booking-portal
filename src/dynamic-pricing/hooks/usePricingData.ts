@@ -24,27 +24,25 @@ export function usePricingData(selectedDate: Date) {
     const currentElectricityPrice = apiResponse.result.currentPrice.electricity;
     const currentGasPrice = apiResponse.result.currentPrice.gas;
 
+    // Create formatters once outside the map function for efficiency
+    const hourFormatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Amsterdam",
+      hour: "numeric",
+      hour12: false,
+    });
+    const timeFormatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Amsterdam",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
     const hourlyPrices: PricingDataPoint[] = electricityPrices.map(
       (item: PricingItem) => {
         const validFromDate = new Date(item.validFrom);
 
         // Convert to Amsterdam timezone for consistent display
-        const amsterdamHour = parseInt(
-          new Intl.DateTimeFormat("en-US", {
-            timeZone: "Europe/Amsterdam",
-            hour: "numeric",
-            hour12: false,
-          }).format(validFromDate),
-          10,
-        );
-
-        // Pre-format times for tooltip using API data
-        const timeFormatter = new Intl.DateTimeFormat("en-US", {
-          timeZone: "Europe/Amsterdam",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        });
+        const amsterdamHour = parseInt(hourFormatter.format(validFromDate), 10);
 
         return {
           hour: amsterdamHour,
