@@ -127,3 +127,27 @@
 .settings-history-child-setting {
   margin-left: 16px;
 }
+
+.event-text {
+  margin-top: 8px;
+  font-size: 0.9em;
+  white-space: pre-wrap;
+}
+
+.event-date {
+  font-size: 0.8em;
+  color: #666;
+  font-weight: normal;
+}
+
+.event-card {
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 5px;
+  background: var(--box-background);
+  margin-bottom: 10px;
+}
+
+.empty-state {
+  text-align: center;
+}

@@ -87,6 +87,7 @@ export const ErrorCode = {
   OrderNumberNotFound: "ORDER_NUMBER_NOT_FOUND",
   CommissioningNotFound: "COMMISSIONING_NOT_FOUND",
   SettingsUpdateNotFound: "SETTINGS_UPDATE_NOT_FOUND",
+  SnowflakeQueryFailed: "SNOWFLAKE_QUERY_FAILED",
   NotesNotFound: "NOTES_NOT_FOUND",
   CommissioningIsForced: "COMMISSIONING_IS_FORCED",
   CommissioningIsCancelled: "COMMISSIONING_IS_CANCELLED",
@@ -187,6 +188,7 @@ export const ErrorCode = {
   NoLegacyCommissioningHistory: "NO_LEGACY_COMMISSIONING_HISTORY",
   LegacyCommissioningMigrationFailed: "LEGACY_COMMISSIONING_MIGRATION_FAILED",
   InvalidDateFormat: "INVALID_DATE_FORMAT",
+  NoCommissioningTestHandlerFound: "NO_COMMISSIONING_TEST_HANDLER_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

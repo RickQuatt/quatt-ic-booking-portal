@@ -21,6 +21,7 @@ import { InstallationDetailAdvanced } from "./InstallationDetailAdvanced";
 import { useGetZuperJobs } from "./hooks/useGetZuperJobs";
 import { InstallationDetailZuperService } from "./InstallationDetailZuperService";
 import { InstallationLatestCommissioning } from "./InstallationLatestCommissioning";
+import { InstallationDetailEvents } from "./InstallationDetailEvents";
 
 interface InstallationDetailProps {
   installationUuid: string;
@@ -119,6 +120,7 @@ export function InstallationDetail({
       </div>
 
       <div className={classes["detail-sections-api"]}>
+        <InstallationDetailEvents installationUuid={installationUuid} />
         <InstallationDetailTickets installationId={installationId} />
         {/* TODO: implement Zuper changes */}
         <InstallationDetailZuperService

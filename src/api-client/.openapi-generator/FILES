@@ -20,6 +20,9 @@ models/AdminGetCic200Response.ts
 models/AdminGetInstallation200Response.ts
 models/AdminGetInstallationClickhouseData200Response.ts
 models/AdminGetInstallationCommissioning200Response.ts
+models/AdminGetInstallationEvents200Response.ts
+models/AdminGetInstallationEvents500Response.ts
+models/AdminGetInstallationEvents500ResponseAllOfResult.ts
 models/AdminGetInstallationNotes200Response.ts
 models/AdminGetInstallationSetting200Response.ts
 models/AdminGetInstallationTickets200Response.ts
@@ -93,6 +96,7 @@ models/ElectricityTariffType.ts
 models/Error1.ts
 models/ErrorCode.ts
 models/ErrorResponseResult.ts
+models/Event.ts
 models/FinishIdentificationTestRequest.ts
 models/ForgetWifiMeCicRequest.ts
 models/GasTariffType.ts
@@ -100,6 +104,8 @@ models/GetAdminDynamicPrices200Response.ts
 models/GetAllTariffs200Response.ts
 models/GetAllTariffs400Response.ts
 models/GetAllTariffs400ResponseAllOfResult.ts
+models/GetAllTariffs403Response.ts
+models/GetAllTariffs403ResponseAllOfResult.ts
 models/GetDynamicPrices200Response.ts
 models/GetDynamicPrices400Response.ts
 models/GetDynamicPrices400ResponseAllOfResult.ts

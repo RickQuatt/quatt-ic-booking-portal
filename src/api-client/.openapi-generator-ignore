@@ -336,6 +336,20 @@ models/AdminCicAllOfInProgressCommissioningRef.ts
 !models/AdminDynamicPricesCurrentPrice.ts
 !models/AdminDynamicPricesCurrentPriceFromJSON.ts
 !models/AdminDynamicPricesCurrentPriceToJSON.ts
+!models/Event.ts
+!models/EventFromJSON.ts
+!models/EventToJSON.ts
+!models/AdminGetInstallationEvents200Response.ts
+!models/AdminGetInstallationEvents200ResponseFromJSON.ts
+!models/AdminGetInstallationEvents200ResponseToJSON.ts
+!models/AdminGetInstallationEvents500Response.ts
+!models/AdminGetInstallationEvents500ResponseFromJSON.ts
+!models/AdminGetInstallationEvents500ResponseToJSON.ts
+!models/AdminGetInstallationEvents500ResponseAllOfResult.ts
+!models/GetAllTariffs403Response.ts
+!models/GetAllTariffs403ResponseFromJSON.ts
+!models/GetAllTariffs403ResponseToJSON.ts
+!models/GetAllTariffs403ResponseAllOfResult.ts
 
 apis/*
 !apis/SupportDashboardApi.ts
