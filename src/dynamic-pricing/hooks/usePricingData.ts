@@ -17,7 +17,6 @@ const timeFormatter = new Intl.DateTimeFormat("en-US", {
   minute: "2-digit",
   hour12: false,
 });
-
 interface PricingResponse {
   currentPrice: number;
   currentGasPrice: number;
