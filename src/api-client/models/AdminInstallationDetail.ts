@@ -37,6 +37,8 @@ import {
   CountryFromJSONTyped,
   CountryToJSON,
 } from "./Country";
+import type { Device } from "./Device";
+import { DeviceFromJSON, DeviceFromJSONTyped, DeviceToJSON } from "./Device";
 import type { DeviceConnectionStatuses } from "./DeviceConnectionStatuses";
 import {
   DeviceConnectionStatusesFromJSON,
@@ -404,6 +406,12 @@ export interface AdminInstallationDetail {
    * @memberof AdminInstallationDetail
    */
   internetConnectionStatuses: InternetConnectionStatuses;
+  /**
+   *
+   * @type {Array<Device>}
+   * @memberof AdminInstallationDetail
+   */
+  devices?: Array<Device>;
 }
 
 /**
@@ -552,6 +560,9 @@ export function AdminInstallationDetailFromJSONTyped(
     internetConnectionStatuses: InternetConnectionStatusesFromJSON(
       json["internetConnectionStatuses"],
     ),
+    devices: !exists(json, "devices")
+      ? undefined
+      : (json["devices"] as Array<any>).map(DeviceFromJSON),
   };
 }
 
@@ -636,5 +647,9 @@ export function AdminInstallationDetailToJSON(
     internetConnectionStatuses: InternetConnectionStatusesToJSON(
       value.internetConnectionStatuses,
     ),
+    devices:
+      value.devices === undefined
+        ? undefined
+        : (value.devices as Array<any>).map(DeviceToJSON),
   };
 }

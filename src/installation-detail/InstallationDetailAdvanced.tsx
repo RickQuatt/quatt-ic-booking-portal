@@ -10,11 +10,13 @@ import {
   getGrafanaDiagnosticsLink,
   getHubspotDealLink,
   getMenderLink,
+  getRetoolBatteryDashboardLink,
 } from "../cic-detail/getLinks";
 import { ButtonLink } from "../ui-components/button/Button";
 import { FormSection } from "../ui-components/form/Form";
 import classes from "./InstallationDetail.module.css";
 import { InstallationDetailZuperButtonGroup } from "./InstallationDetailZuperButtonGroup";
+import { useHomeBatteryDevice } from "./hooks/useHomeBatteryDevice";
 
 export function InstallationDetailAdvanced({
   installation,
@@ -31,12 +33,47 @@ export function InstallationDetailAdvanced({
     ? "Hubspot - Deal"
     : "Hubspot - No deal";
 
-  if (!activeCic) {
-    throw new Error("Active CIC not found");
-  }
   const isAllElectric =
     installation.installationType === InstallationType.AllElectric ||
     installation.installationType === InstallationType.AllElectricDuo;
+
+  const isHomeBattery =
+    installation.installationType === InstallationType.HomeBattery;
+
+  const { batterySn } = useHomeBatteryDevice(installation);
+
+  if (!activeCic) {
+    return (
+      <div className={classes["detail-section"]}>
+        <DetailSectionHeader title="📊 Advanced insights" />
+        <FormSection>
+          {isHomeBattery && batterySn ? (
+            <ButtonLink
+              href={getRetoolBatteryDashboardLink(batterySn)}
+              target="_blank"
+            >
+              Battery Dashboard (Retool)
+            </ButtonLink>
+          ) : isHomeBattery ? (
+            <p>This is a home battery installation (no CIC required)</p>
+          ) : (
+            <p>No active CIC found for this installation</p>
+          )}
+          <InstallationDetailZuperButtonGroup
+            zuperInstallationJobs={zuperInstallationJobs}
+            isLoadingJobs={isLoadingZuperJobs}
+          />
+          <ButtonLink
+            href={hubspotDealLink}
+            target="_blank"
+            disabled={!hubspotDealLink}
+          >
+            {hubspotDealText}
+          </ButtonLink>
+        </FormSection>
+      </div>
+    );
+  }
 
   return (
     <div className={classes["detail-section"]}>
