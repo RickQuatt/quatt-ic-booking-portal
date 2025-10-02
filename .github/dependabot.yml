@@ -1,0 +1,25 @@
+# Dependabot configuration for Quatt Support Dashboard
+# Comprehensive configuration handling security, production, and development dependencies
+# Documentation: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Unified npm dependency management with security-first approach
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily" # Daily checks to catch security updates immediately
+      time: "09:00"
+      timezone: "Europe/Amsterdam"
+    open-pull-requests-limit: 10 # Allow more PRs to handle security + regular updates
+    labels:
+      - "dependencies"
+      - "automated"
+    # Allow all direct and development dependencies (security updates take priority automatically)
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "development"
+    # Protect against breaking changes - only allow minor and patch updates
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

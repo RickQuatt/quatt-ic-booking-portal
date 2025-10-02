@@ -189,6 +189,7 @@ export const ErrorCode = {
   LegacyCommissioningMigrationFailed: "LEGACY_COMMISSIONING_MIGRATION_FAILED",
   InvalidDateFormat: "INVALID_DATE_FORMAT",
   NoCommissioningTestHandlerFound: "NO_COMMISSIONING_TEST_HANDLER_FOUND",
+  InvalidWorkflowConfiguration: "INVALID_WORKFLOW_CONFIGURATION",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

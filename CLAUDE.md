@@ -159,4 +159,26 @@ The API client is auto-generated from the main Quatt-cloud OpenAPI specification
 - **JSON Parsing**: Use `useMemo` for expensive operations like JSON formatting to prevent re-computation on every render
 - **JSON Display**: Use `@uiw/react-json-view` for interactive JSON visualization with syntax highlighting and collapsible nodes
 
-- memorize always use QPD-152 as parent when creating bugs
+=======
+
+## Jira Configuration
+
+### Creating Jira Tickets
+
+When creating Jira tickets, use these default values to avoid unnecessary queries:
+
+- **Cloud ID**: `e00d2e3c-9946-4be6-b81a-0bb231fc50c7`
+- **Default Project**: `QPD` (Quatt Product Development)
+- **Default Parent for Bugs**: `QPD-152` (Production Incidents/Maintenance - App/Backend)
+- **Available Issue Types to use**: Bug, Task,
+- **Jira Team**: quatt-team
+- **always return the jira url when creating a ticket**: https://quatt-team.atlassian.net/browse/{issueId}
+
+Example bug creation command:
+
+```
+Project: QPD
+Issue Type: Bug
+Parent: QPD-152
+Summary: [description]
+```

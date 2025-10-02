@@ -45,7 +45,9 @@ models/AppSettingsGet200ResponseResult.ts
 models/AppSettingsGet200ResponseResultTariffCOPValidation.ts
 models/BaseCommissioningAction.ts
 models/BaseCommissioningTest.ts
+models/BoilerDevice.ts
 models/BoilerType.ts
+models/ChillDevice.ts
 models/Cic.ts
 models/CicAggregate.ts
 models/CicAggregateByCategory.ts
@@ -69,6 +71,7 @@ models/CommissioningAllOfPrerequisitesDevices.ts
 models/CommissioningTestType.ts
 models/CompleteCommissioning200Response.ts
 models/ConnectionStatus.ts
+models/ControlMode.ts
 models/Country.ts
 models/CreateTariff200Response.ts
 models/CreateTariff400Response.ts
@@ -85,8 +88,11 @@ models/CreateUpdateNote.ts
 models/CreateUpdateSingleTariff.ts
 models/DeleteTariffForInstallation409Response.ts
 models/DeleteTariffForInstallation409ResponseAllOfResult.ts
+models/Device.ts
 models/DeviceConnectionStatuses.ts
+models/DeviceStatus.ts
 models/DeviceType.ts
+models/DongleDevice.ts
 models/DoubleTariff.ts
 models/DynamicPrices.ts
 models/DynamicPricesCurrentPrice.ts
@@ -98,6 +104,7 @@ models/ErrorCode.ts
 models/ErrorResponseResult.ts
 models/Event.ts
 models/FinishIdentificationTestRequest.ts
+models/FlowTemperatureSensorDevice.ts
 models/ForgetWifiMeCicRequest.ts
 models/GasTariffType.ts
 models/GetAdminDynamicPrices200Response.ts
@@ -117,11 +124,20 @@ models/GetInstallerInstallationLatestCommissioning200Response.ts
 models/GetMe200Response.ts
 models/GetMeCic200Response.ts
 models/GetReferral200Response.ts
+models/HeatBatteryDevice.ts
+models/HeatBatterySize.ts
 models/HeatChargerCommissioningPrerequisiteDetails.ts
+models/HeatChargerDevice.ts
+models/HeatChargerDeviceAllOfFirmware.ts
 models/HeatChargerUpdateState.ts
 models/HeatDeliverySystem.ts
 models/HeatPump.ts
 models/HeatPumpTestLevel.ts
+models/HomeBatteryDevice.ts
+models/HomeBatteryDeviceAllOfBatterySpecifications.ts
+models/HomeBatteryDeviceAllOfBatterySpecificationsPowerInKwRange.ts
+models/HomeBatteryDeviceAllOfCurrentBatteryInsights.ts
+models/HomeBatteryDeviceAllOfCurrentBuildingInsights.ts
 models/HybridCommissioning.ts
 models/HybridCommissioningFlowRateTestStatus.ts
 models/HybridCommissioningHeatPumpPowerTest.ts
@@ -147,6 +163,7 @@ models/MeUser.ts
 models/MeUserClient.ts
 models/Note.ts
 models/NullableCountry.ts
+models/OutDoorUnitDevice.ts
 models/PostReferralRequest.ts
 models/PricingItem.ts
 models/Range.ts
@@ -162,6 +179,7 @@ models/Tariff.ts
 models/TariffType.ts
 models/TariffsResult.ts
 models/TariffsResultCurrentTariff.ts
+models/ThermostatDevice.ts
 models/ThermostatType.ts
 models/Ticket.ts
 models/TicketHsPipelineStage.ts

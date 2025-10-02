@@ -31,9 +31,7 @@ interface PricingChartProps {
 
 export function PricingChart({ data, selectedDate }: PricingChartProps) {
   const chartData = React.useMemo(() => {
-    const labels = data.map(
-      (point) => `${point.hour.toString().padStart(2, "0")}:00`,
-    );
+    const labels = data.map((point) => point.formattedValidFrom);
     const prices = data.map((point) => point.price);
 
     return {

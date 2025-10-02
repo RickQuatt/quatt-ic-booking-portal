@@ -80,3 +80,7 @@ export function getHubspotDealLink(hubspotDealId: string | null) {
 export function getZuperJobLink(jobUid: string) {
   return `https://app.zuperpro.com/jobs/${jobUid}/details`;
 }
+
+export function getRetoolBatteryDashboardLink(batterySn: string) {
+  return `https://quatt.retool.com/app/battery-dashboard?_environment=production&battery_sn=${batterySn}`;
+}
