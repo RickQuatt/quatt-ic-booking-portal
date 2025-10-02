@@ -62,7 +62,11 @@ export function DynamicPricingPage() {
             <Loader />
           </div>
         ) : (
-          <PricingChart data={pricingData} selectedDate={selectedDate} />
+          <PricingChart
+            data={pricingData}
+            selectedDate={selectedDate}
+            currentGasPrice={currentGasPrice}
+          />
         )}
       </div>
     </div>
