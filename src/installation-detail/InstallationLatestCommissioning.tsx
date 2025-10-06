@@ -300,7 +300,7 @@ export function InstallationLatestCommissioning({
 
   return (
     <div className={classes["detail-section"]}>
-      <DetailSectionHeader title="Latest All-e commissioning" />
+      <DetailSectionHeader title="Latest non-hybrid commissioning" />
       {isLoading && <div>Loading...</div>}
       {isError && error.response.status != 404 && (
         <ErrorText

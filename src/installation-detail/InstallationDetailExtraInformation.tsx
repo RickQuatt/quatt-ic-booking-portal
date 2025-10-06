@@ -47,7 +47,17 @@ export function InstallationDetailExtraInformation({
       <FormSection>
         <FormField>
           <FormFieldTitle>Active CIC</FormFieldTitle>
-          <Link href={`/cics/${activeCic}`}>{activeCic}</Link>
+          {activeCic ? (
+            <Link href={`/cics/${activeCic}`}>{activeCic}</Link>
+          ) : (
+            <FormFieldValue value="N/A - Home Battery Installation" />
+          )}
+        </FormField>{" "}
+        <FormField>
+          <FormFieldTitle>Installation type</FormFieldTitle>
+          <FormFieldValue
+            value={installationTypeMap[installation.installationType]}
+          />
         </FormField>
         <FormField>
           <FormFieldTitle>
@@ -87,12 +97,6 @@ export function InstallationDetailExtraInformation({
                 ? formatDateTimeString(installedAt.toISOString())
                 : "N/A"
             }
-          />
-        </FormField>
-        <FormField>
-          <FormFieldTitle>Installation type</FormFieldTitle>
-          <FormFieldValue
-            value={installationTypeMap[installation.installationType]}
           />
         </FormField>
         <FormField>

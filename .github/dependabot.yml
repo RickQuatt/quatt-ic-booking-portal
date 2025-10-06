@@ -8,10 +8,10 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"  # Daily checks to catch security updates immediately
+      interval: "daily" # Daily checks to catch security updates immediately
       time: "09:00"
       timezone: "Europe/Amsterdam"
-    open-pull-requests-limit: 10  # Allow more PRs to handle security + regular updates
+    open-pull-requests-limit: 10 # Allow more PRs to handle security + regular updates
     labels:
       - "dependencies"
       - "automated"

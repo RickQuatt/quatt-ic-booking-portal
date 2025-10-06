@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   TooltipItem,
+  ChartDataset,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import classes from "./PricingChart.module.css";
@@ -27,110 +28,209 @@ ChartJS.register(
 interface PricingChartProps {
   data: PricingDataPoint[];
   selectedDate: Date;
+  currentGasPrice?: number;
 }
 
-export function PricingChart({ data, selectedDate }: PricingChartProps) {
+// Static chart configuration (doesn't change between renders)
+const STATIC_CHART_OPTIONS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      display: true,
+      title: {
+        display: true,
+        text: "Time (hours)",
+        color: "#495057",
+        font: {
+          size: 12,
+          weight: 500,
+        },
+      },
+      grid: {
+        color: "#e9ecef",
+      },
+      ticks: {
+        color: "#6c757d",
+        maxTicksLimit: 12,
+      },
+    },
+    y: {
+      type: "linear" as const,
+      display: true,
+      position: "left" as const,
+      title: {
+        display: true,
+        text: "€/kWh",
+        color: "#495057",
+        font: {
+          size: 12,
+          weight: 500,
+        },
+      },
+      grid: {
+        color: "#e9ecef",
+      },
+      ticks: {
+        color: "#6c757d",
+        callback: function (value: string | number) {
+          return `€${Number(value).toFixed(3)}`;
+        },
+      },
+    },
+  },
+  interaction: {
+    mode: "nearest" as const,
+    axis: "x" as const,
+    intersect: false,
+  },
+  plugins: {
+    tooltip: {
+      mode: "index" as const,
+      intersect: false,
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
+      titleColor: "#ffffff",
+      bodyColor: "#ffffff",
+      borderColor: "#28a745",
+      borderWidth: 1,
+    },
+  },
+};
+
+export function PricingChart({
+  data,
+  selectedDate,
+  currentGasPrice,
+}: PricingChartProps) {
+  // Gas calorific value in kWh/m³ (same as backend: 8.79 kWh/m³)
+  const HEAT_FROM_M3_OF_GAS = 8.7925; // kWh/m³
+
   const chartData = React.useMemo(() => {
-    const labels = data.map(
-      (point) => `${point.hour.toString().padStart(2, "0")}:00`,
-    );
+    const labels = data.map((point) => point.formattedValidFrom);
     const prices = data.map((point) => point.price);
+
+    const datasets: ChartDataset<"line">[] = [
+      {
+        label: "Electricity Price (€/kWh)",
+        data: prices,
+        borderColor: "#28a745", // Green color matching the app design
+        backgroundColor: "rgba(40, 167, 69, 0.1)",
+        borderWidth: 2,
+        fill: true,
+        stepped: "before" as const, // Show stepped chart - price constant from start of each hour
+        tension: 0, // No smoothing for stepped chart
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        yAxisID: "y",
+      },
+    ];
+
+    // Add COP switching line if we have gas price
+    // Only show COP line if gas price is defined and not zero (to prevent division by zero)
+    if (currentGasPrice !== undefined && currentGasPrice !== 0) {
+      // Calculate COP for switching at each time point
+      // COP = electricityPrice_€/kWh / (gasPrice_€/m³ / heatFromM3OfGas_kWh/m³)
+      // Simplified: COP = (electricityPrice_€/kWh × heatFromM3OfGas_kWh/m³) / gasPrice_€/m³
+      // Note: Negative gas prices are theoretically possible (like negative electricity prices)
+      const copValues = prices.map((electricityPrice) => {
+        // Handle edge case: if electricity price is null/undefined, return null for that point
+        if (electricityPrice === undefined || electricityPrice === null) {
+          return null;
+        }
+        return (electricityPrice * HEAT_FROM_M3_OF_GAS) / currentGasPrice;
+      });
+
+      datasets.push({
+        label: "COP Switching Point",
+        data: copValues,
+        borderColor: "#ff6b35", // Orange color for COP line
+        backgroundColor: "transparent",
+        borderWidth: 2,
+        fill: false,
+        stepped: "before" as const,
+        tension: 0,
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        yAxisID: "y1", // Use secondary y-axis for COP values
+        spanGaps: true, // Connect line across null/missing values
+      });
+    }
 
     return {
       labels,
-      datasets: [
-        {
-          label: "Price (€/kWh)",
-          data: prices,
-          borderColor: "#28a745", // Green color matching the app design
-          backgroundColor: "rgba(40, 167, 69, 0.1)",
-          borderWidth: 2,
-          fill: true,
-          stepped: "before" as const, // Show stepped chart - price constant from start of each hour
-          tension: 0, // No smoothing for stepped chart
-          pointBackgroundColor: "#28a745",
-          pointBorderColor: "#ffffff",
-          pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-        },
-      ],
+      datasets,
     };
-  }, [data]);
+  }, [data, currentGasPrice]);
 
   const options = React.useMemo(
     () => ({
-      responsive: true,
-      maintainAspectRatio: false,
+      ...STATIC_CHART_OPTIONS,
       plugins: {
+        ...STATIC_CHART_OPTIONS.plugins,
         legend: {
-          display: false,
+          display: currentGasPrice !== undefined && currentGasPrice !== 0,
+          position: "top" as const,
+          labels: {
+            usePointStyle: true,
+            padding: 15,
+          },
         },
         tooltip: {
-          mode: "index" as const,
-          intersect: false,
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
-          titleColor: "#ffffff",
-          bodyColor: "#ffffff",
-          borderColor: "#28a745",
-          borderWidth: 1,
+          ...STATIC_CHART_OPTIONS.plugins.tooltip,
           callbacks: {
             label: (context: TooltipItem<"line">) => {
-              const dataPoint = data[context.dataIndex];
-              return `${dataPoint.formattedValidFrom} - ${dataPoint.formattedValidTo}: €${context.parsed.y.toFixed(3)} per kWh`;
+              if (context.datasetIndex === 0) {
+                // Electricity price dataset
+                const dataPoint = data[context.dataIndex];
+                const price = context.parsed.y;
+                if (price === null || price === undefined) {
+                  return `${dataPoint.formattedValidFrom} - ${dataPoint.formattedValidTo}: No data`;
+                }
+                return `${dataPoint.formattedValidFrom} - ${dataPoint.formattedValidTo}: €${price.toFixed(3)} per kWh`;
+              } else {
+                // COP switching line - return array for multiple lines
+                const copValue = context.parsed.y;
+                if (copValue === null || copValue === undefined) {
+                  return "COP: No data";
+                }
+                return [
+                  `COP switching point: ${copValue.toFixed(2)}`,
+                  `(heat pump COP must be > ${copValue.toFixed(2)} to be cheaper than gas)`,
+                ];
+              }
             },
           },
         },
       },
       scales: {
-        x: {
-          display: true,
+        ...STATIC_CHART_OPTIONS.scales,
+        y1: {
+          type: "linear" as const,
+          display: currentGasPrice !== undefined && currentGasPrice !== 0,
+          position: "right" as const,
+          beginAtZero: true,
           title: {
             display: true,
-            text: "Time (hours)",
-            color: "#495057",
+            text: "COP",
+            color: "#ff6b35",
             font: {
               size: 12,
               weight: 500,
             },
           },
           grid: {
-            color: "#e9ecef",
+            drawOnChartArea: false, // Don't draw grid lines for secondary axis
           },
           ticks: {
-            color: "#6c757d",
-            maxTicksLimit: 12,
-          },
-        },
-        y: {
-          display: true,
-          title: {
-            display: true,
-            text: "€/kWh",
-            color: "#495057",
-            font: {
-              size: 12,
-              weight: 500,
-            },
-          },
-          grid: {
-            color: "#e9ecef",
-          },
-          ticks: {
-            color: "#6c757d",
+            color: "#ff6b35",
             callback: function (value: string | number) {
-              return `€${Number(value).toFixed(3)}`;
+              return Number(value).toFixed(1);
             },
           },
         },
-      },
-      interaction: {
-        mode: "nearest" as const,
-        axis: "x" as const,
-        intersect: false,
       },
     }),
-    [data],
+    [data, currentGasPrice],
   );
 
   if (!data || data.length === 0) {

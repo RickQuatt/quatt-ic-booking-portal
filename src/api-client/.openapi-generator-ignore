@@ -350,6 +350,24 @@ models/AdminCicAllOfInProgressCommissioningRef.ts
 !models/GetAllTariffs403ResponseFromJSON.ts
 !models/GetAllTariffs403ResponseToJSON.ts
 !models/GetAllTariffs403ResponseAllOfResult.ts
+!models/Device.ts
+!models/HomeBatteryDevice.ts
+!models/HomeBatteryDeviceAllOfBatterySpecifications.ts
+!models/HomeBatteryDeviceAllOfBatterySpecificationsPowerInKwRange.ts
+!models/HomeBatteryDeviceAllOfCurrentBatteryInsights.ts
+!models/HomeBatteryDeviceAllOfCurrentBuildingInsights.ts
+!models/ControlMode.ts
+!models/DeviceStatus.ts
+!models/BoilerDevice.ts
+!models/ChillDevice.ts
+!models/DongleDevice.ts
+!models/FlowTemperatureSensorDevice.ts
+!models/HeatBatteryDevice.ts
+!models/HeatBatterySize.ts
+!models/HeatChargerDevice.ts
+!models/HeatChargerDeviceAllOfFirmware.ts
+!models/OutDoorUnitDevice.ts
+!models/ThermostatDevice.ts
 
 apis/*
 !apis/SupportDashboardApi.ts
