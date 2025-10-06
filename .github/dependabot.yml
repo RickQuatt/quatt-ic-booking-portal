@@ -14,7 +14,6 @@ updates:
     open-pull-requests-limit: 10 # Allow more PRs to handle security + regular updates
     labels:
       - "dependencies"
-      - "automated"
     # Allow all direct and development dependencies (security updates take priority automatically)
     allow:
       - dependency-type: "direct"
