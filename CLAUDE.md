@@ -26,9 +26,9 @@ This is the Quatt Support Dashboard - a React TypeScript application for interna
 
 ### API Client Management
 
-- `npm run api:generate-client` - Generate API client from OpenAPI spec (requires Quatt-cloud repo path)
+- `npm run api:generate-client` - Generate API client from OpenAPI spec (requires Quatt-cloud repo path). By default the path is set correctly.
 - `npm run api:clean-models` - Remove unused API models based on .openapi-generator-ignore
-- `npm run api:generate-and-clean` - Run both API generation and cleanup in sequence
+- `npm run api:generate-and-clean` - Run both API generation and cleanup in sequence. This should be the default used when updating the API client.
 
 Example: `./generate-api-client.sh ../Quatt-cloud`
 
@@ -182,3 +182,8 @@ Issue Type: Bug
 Parent: QPD-152
 Summary: [description]
 ```
+
+When implementing a feature, always start by creating a new git branch from `develop` with the the naming convention QPD-{issueId}-{short-description}.
+Example: `QPD-1234-fix-mqtt-debugger`
+
+When creating a pull request, always have `develop` as the target branch and include the issueId in the title of the PR.

@@ -37,16 +37,16 @@ export function DynamicPricingPage() {
         />
       </div>
 
-      {(currentPrice || currentGasPrice) && (
+      {(currentPrice !== undefined || currentGasPrice !== undefined) && (
         <div className={classes.currentPricingSection}>
           <h2 className={classes.pricingSectionTitle}>Current Pricing</h2>
           <div className={classes.pricesContainer}>
-            {currentPrice && (
+            {currentPrice !== undefined && (
               <div className={classes.electricityPrice}>
                 ⚡ Electricity: €{currentPrice.toFixed(3)} per kWh
               </div>
             )}
-            {currentGasPrice && (
+            {currentGasPrice !== undefined && (
               <div className={classes.gasPrice}>
                 🔥 Gas: €{currentGasPrice.toFixed(3)} per m³
               </div>
@@ -62,7 +62,11 @@ export function DynamicPricingPage() {
             <Loader />
           </div>
         ) : (
-          <PricingChart data={pricingData} selectedDate={selectedDate} />
+          <PricingChart
+            data={pricingData}
+            selectedDate={selectedDate}
+            currentGasPrice={currentGasPrice}
+          />
         )}
       </div>
     </div>

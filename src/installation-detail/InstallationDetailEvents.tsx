@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState, useRef, useLayoutEffect } from "react";
 import { formatDateTime } from "../utils/formatDate";
 import classes from "./InstallationDetail.module.css";
 import { Loader } from "../ui-components/loader/Loader";
@@ -17,11 +17,45 @@ export function InstallationDetailEvents({
 }: InstallationDetailEventsProps) {
   const { events, eventsError, isLoadingEvents, refetchEvents } =
     useGetInstallationEvents(installationUuid);
+  const [expandedEventIds, setExpandedEventIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [truncatedEventIds, setTruncatedEventIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const textRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  // Measure which events are actually truncated after render
+  useLayoutEffect(() => {
+    if (!events) return;
+
+    const newTruncatedIds = new Set<string>();
+    events.forEach((event) => {
+      const element = textRefs.current.get(event.eventId);
+      if (element && element.scrollHeight > element.clientHeight) {
+        newTruncatedIds.add(event.eventId);
+      }
+    });
+    setTruncatedEventIds(newTruncatedIds);
+  }, [events]);
 
   const handleEventClick = useCallback((url: string | null | undefined) => {
     if (url && (url.startsWith("https://") || url.startsWith("http://"))) {
       window.open(url, "_blank", "noopener,noreferrer");
     }
+  }, []);
+
+  const toggleExpand = useCallback((eventId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedEventIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(eventId)) {
+        newSet.delete(eventId);
+      } else {
+        newSet.add(eventId);
+      }
+      return newSet;
+    });
   }, []);
 
   if (eventsError) {
@@ -44,29 +78,67 @@ export function InstallationDetailEvents({
             ) : (
               <>
                 {events &&
-                  events.map((event) => (
-                    <div
-                      style={{
-                        cursor: event.url ? "pointer" : "default",
-                      }}
-                      className={classes["event-card"]}
-                      key={event.eventId}
-                      onClick={() => handleEventClick(event.url)}
-                    >
-                      <div className={classes["detail-section-bold"]}>
-                        {getEventTypeEmoji(event.eventType)} {event.title}
-                      </div>
+                  events.map((event) => {
+                    const isExpanded = expandedEventIds.has(event.eventId);
+                    const isTruncated = truncatedEventIds.has(event.eventId);
+
+                    return (
                       <div
-                        className={classes["event-date"]}
-                      >{`Created: ${formatDateTime(event.createTime)}`}</div>
-                      {event.closeTime && (
+                        style={{
+                          cursor: event.url ? "pointer" : "default",
+                        }}
+                        className={classes["event-card"]}
+                        key={event.eventId}
+                        onClick={
+                          event.url
+                            ? () => handleEventClick(event.url)
+                            : undefined
+                        }
+                      >
+                        <div className={classes["detail-section-bold"]}>
+                          {getEventTypeEmoji(event.eventType)} {event.title}
+                        </div>
                         <div
                           className={classes["event-date"]}
-                        >{`Closed: ${formatDateTime(event.closeTime)}`}</div>
-                      )}
-                      <div className={classes["event-text"]}>{event.text}</div>
-                    </div>
-                  ))}
+                        >{`Created: ${formatDateTime(event.createTime)}`}</div>
+                        {event.closeTime && (
+                          <div
+                            className={classes["event-date"]}
+                          >{`Closed: ${formatDateTime(event.closeTime)}`}</div>
+                        )}
+                        <div
+                          ref={(el) => {
+                            if (el) {
+                              textRefs.current.set(event.eventId, el);
+                            } else {
+                              textRefs.current.delete(event.eventId);
+                            }
+                          }}
+                          className={`${classes["event-text"]} ${
+                            !isExpanded
+                              ? classes["event-text-truncated"]
+                              : classes["event-text-expanded"]
+                          }`}
+                        >
+                          {event.text}
+                        </div>
+                        {isTruncated && (
+                          <button
+                            className={classes["event-expand-button"]}
+                            onClick={(e) => toggleExpand(event.eventId, e)}
+                            aria-expanded={isExpanded}
+                            aria-label={
+                              isExpanded
+                                ? "Show less event details"
+                                : "Show more event details"
+                            }
+                          >
+                            {isExpanded ? "Show less" : "Show more"}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 {events && events.length === 0 && (
                   <div className={classes["empty-state"]}>No events 👍</div>
                 )}

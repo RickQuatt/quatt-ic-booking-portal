@@ -116,22 +116,10 @@ export function InstallationDetail({
           zuperInstallationJobs={zuperJobs?.installations}
           isLoadingZuperJobs={isLoadingZuperJobs}
         />
-        {installationDetails.activeCic ? (
-          <InstallationDetailActions
-            cicId={installationDetails.activeCic}
-            quattBuild={installationDetails.quattBuild}
-          />
-        ) : (
-          <div className={classes["detail-section"]}>
-            <DetailSectionHeader title="🛠️ Actions" />
-            {installationDetails.installationType ===
-            InstallationType.HomeBattery ? (
-              <p>This is a home battery installation (no CIC required)</p>
-            ) : (
-              <p>No active CIC found for this installation</p>
-            )}
-          </div>
-        )}
+        <InstallationDetailActions
+          cicId={installationDetails.activeCic}
+          quattBuild={installationDetails.quattBuild}
+        />
         {installationDetails.activeCic && (
           <>
             <InstallationDetailSettingsHistory
