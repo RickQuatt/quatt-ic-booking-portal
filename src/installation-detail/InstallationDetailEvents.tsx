@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef, useLayoutEffect } from "react";
 import { formatDateTime } from "../utils/formatDate";
 import classes from "./InstallationDetail.module.css";
 import { Loader } from "../ui-components/loader/Loader";
@@ -12,8 +12,6 @@ interface InstallationDetailEventsProps {
   installationUuid: string;
 }
 
-const TRUNCATE_THRESHOLD = 150; // characters
-
 export function InstallationDetailEvents({
   installationUuid,
 }: InstallationDetailEventsProps) {
@@ -22,6 +20,24 @@ export function InstallationDetailEvents({
   const [expandedEventIds, setExpandedEventIds] = useState<Set<string>>(
     new Set(),
   );
+  const [truncatedEventIds, setTruncatedEventIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const textRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  // Measure which events are actually truncated after render
+  useLayoutEffect(() => {
+    if (!events) return;
+
+    const newTruncatedIds = new Set<string>();
+    events.forEach((event) => {
+      const element = textRefs.current.get(event.eventId);
+      if (element && element.scrollHeight > element.clientHeight) {
+        newTruncatedIds.add(event.eventId);
+      }
+    });
+    setTruncatedEventIds(newTruncatedIds);
+  }, [events]);
 
   const handleEventClick = useCallback((url: string | null | undefined) => {
     if (url && (url.startsWith("https://") || url.startsWith("http://"))) {
@@ -64,8 +80,7 @@ export function InstallationDetailEvents({
                 {events &&
                   events.map((event) => {
                     const isExpanded = expandedEventIds.has(event.eventId);
-                    const shouldTruncate =
-                      event.text.length > TRUNCATE_THRESHOLD;
+                    const isTruncated = truncatedEventIds.has(event.eventId);
 
                     return (
                       <div
@@ -88,15 +103,22 @@ export function InstallationDetailEvents({
                           >{`Closed: ${formatDateTime(event.closeTime)}`}</div>
                         )}
                         <div
+                          ref={(el) => {
+                            if (el) {
+                              textRefs.current.set(event.eventId, el);
+                            } else {
+                              textRefs.current.delete(event.eventId);
+                            }
+                          }}
                           className={`${classes["event-text"]} ${
-                            shouldTruncate && !isExpanded
+                            !isExpanded
                               ? classes["event-text-truncated"]
                               : classes["event-text-expanded"]
                           }`}
                         >
                           {event.text}
                         </div>
-                        {shouldTruncate && (
+                        {isTruncated && (
                           <button
                             className={classes["event-expand-button"]}
                             onClick={(e) => toggleExpand(event.eventId, e)}
