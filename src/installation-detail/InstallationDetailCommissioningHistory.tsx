@@ -24,7 +24,7 @@ export function InstallationDetailCommissioningHistory({
 }: InstallationDetailCommissioningHistoryProps) {
   return (
     <div className={classes["detail-section"]}>
-      <DetailSectionHeader title="👨‍🔧 Commissioning history" />
+      <DetailSectionHeader title="👨‍🔧 Hybrid Commissioning history" />
       <FormSection>
         <FormField>
           <FormFieldTitle>Date of commissionings</FormFieldTitle>
