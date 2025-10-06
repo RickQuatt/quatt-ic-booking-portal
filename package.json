@@ -28,7 +28,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@tanstack/react-query": "^5.51.15",
     "@tanstack/react-query-devtools": "^5.51.15",
-    "@uiw/react-json-view": "^2.0.0-alpha.36",
+    "@uiw/react-json-view": "^2.0.0-alpha.39",
     "chart.js": "^4.4.3",
     "classnames": "^2.5.1",
     "date-fns": "^3.6.0",
