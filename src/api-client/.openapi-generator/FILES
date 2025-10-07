@@ -25,6 +25,8 @@ models/AdminGetInstallationEvents500Response.ts
 models/AdminGetInstallationEvents500ResponseAllOfResult.ts
 models/AdminGetInstallationNotes200Response.ts
 models/AdminGetInstallationSetting200Response.ts
+models/AdminGetInstallationSnowflakeInfo200Response.ts
+models/AdminGetInstallationSnowflakeInfo200ResponseResult.ts
 models/AdminGetInstallationTickets200Response.ts
 models/AdminGetInstallationZuperJobs200Response.ts
 models/AdminGetZuperJobsByInstallationUuid200Response.ts
@@ -103,6 +105,7 @@ models/Error1.ts
 models/ErrorCode.ts
 models/ErrorResponseResult.ts
 models/Event.ts
+models/EventType.ts
 models/FinishIdentificationTestRequest.ts
 models/FlowTemperatureSensorDevice.ts
 models/ForgetWifiMeCicRequest.ts
@@ -173,6 +176,7 @@ models/SendCommandToCICRequest.ts
 models/SettingsHeader.ts
 models/SilentMode.ts
 models/SingleTariff.ts
+models/SnowflakeInfo.ts
 models/StartHeatPumpTestRequest.ts
 models/StopIdentificationTestRequest.ts
 models/Tariff.ts
@@ -191,6 +195,8 @@ models/UpdateCicSharedPropertiesAvoidNighttimeCharging.ts
 models/UpdateCicWifiProperties.ts
 models/UpdateCommissioning.ts
 models/UpdateCommissioningTest.ts
+models/UpdateCommissioningTest409Response.ts
+models/UpdateCommissioningTest409ResponseAllOfResult.ts
 models/UpdateInstallerCic.ts
 models/UpdateMeCic.ts
 models/UpdateMeUser.ts

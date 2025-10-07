@@ -1,0 +1,81 @@
+.panel {
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 5px;
+  background: var(--box-background);
+  margin-bottom: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 600;
+  color: #333;
+  width: 40%;
+}
+
+.value {
+  color: #000;
+  word-break: break-word;
+}
+
+.value-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.value-link:hover {
+  text-decoration: underline;
+}
+
+.value-object {
+  background: #f5f5f5;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  margin: 0;
+  font-family: "Menlo", "Monaco", "Consolas", monospace;
+  white-space: pre;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-green {
+  background-color: #26926a;
+}
+
+.status-red {
+  background-color: #e0401d;
+}
+
+.empty-message {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}

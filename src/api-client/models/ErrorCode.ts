@@ -190,6 +190,12 @@ export const ErrorCode = {
   InvalidDateFormat: "INVALID_DATE_FORMAT",
   NoCommissioningTestHandlerFound: "NO_COMMISSIONING_TEST_HANDLER_FOUND",
   InvalidWorkflowConfiguration: "INVALID_WORKFLOW_CONFIGURATION",
+  CurrentCommissioningTestNotFound: "CURRENT_COMMISSIONING_TEST_NOT_FOUND",
+  CannotStartCommissioningTestACommissioningTestIsAlreadyRunning:
+    "CANNOT_START_COMMISSIONING_TEST_A_COMMISSIONING_TEST_IS_ALREADY_RUNNING",
+  CurrentCommissioningNotFound: "CURRENT_COMMISSIONING_NOT_FOUND",
+  CommissioningAlreadyRunningOnInstallation:
+    "COMMISSIONING_ALREADY_RUNNING_ON_INSTALLATION",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
