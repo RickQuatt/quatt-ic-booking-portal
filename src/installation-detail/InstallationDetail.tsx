@@ -23,6 +23,7 @@ import { InstallationDetailZuperService } from "./InstallationDetailZuperService
 import { InstallationLatestCommissioning } from "./InstallationLatestCommissioning";
 import { InstallationDetailEvents } from "./InstallationDetailEvents";
 import { InstallationDetailHomeBattery } from "./InstallationDetailHomeBattery";
+import { InstallationSnowflakeTables } from "./InstallationSnowflakeTables";
 
 interface InstallationDetailProps {
   installationUuid: string;
@@ -93,6 +94,8 @@ export function InstallationDetail({
             />
           </div>
         )}
+
+        <InstallationSnowflakeTables installationUuid={installationUuid} />
 
         <InstallationDetailNotes installationId={installationId} />
         <InstallationDetailHouseDetails installation={installationDetails} />

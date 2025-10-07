@@ -89,6 +89,9 @@ models/*
 !models/CicState.ts
 !models/AdminGetInstallation200Response.ts
 !models/AdminGetInstallationHealthCheck200Response.ts
+!models/AdminGetInstallationSnowflakeInfo200Response.ts
+!models/AdminGetInstallationSnowflakeInfo200ResponseFromJSON.ts
+!models/AdminGetInstallationSnowflakeInfo200ResponseToJSON.ts
 !models/AdminInstallationDetail.ts
 !models/AdminInstallationsList.ts
 !models/AdminInstallationsList200Response.ts
@@ -198,6 +201,10 @@ models/*
 !models/UpdateDevice400ResponseToJSON.ts
 !models/UpdateDevice400ResponseAllOfMeta.ts
 !models/UpdateCommissioning.ts
+!models/UpdateCommissioningTest409Response.ts
+!models/UpdateCommissioningTest409ResponseFromJSON.ts
+!models/UpdateCommissioningTest409ResponseToJSON.ts
+!models/UpdateCommissioningTest409ResponseAllOfResult.ts
 !models/HybridCommissioningMode.ts
 !models/CicCommissioningFromJSON.ts
 !models/AdminCicCreateInstallation409ResponseAllOfMeta.ts
@@ -368,6 +375,10 @@ models/AdminCicAllOfInProgressCommissioningRef.ts
 !models/HeatChargerDeviceAllOfFirmware.ts
 !models/OutDoorUnitDevice.ts
 !models/ThermostatDevice.ts
+!models/AdminGetInstallationSnowflakeInfo200ResponseResult.ts
+!models/SnowflakeInfo.ts
+!models/SnowflakeInfoFromJSON.ts
+!models/SnowflakeInfoToJSON.ts
 
 apis/*
 !apis/SupportDashboardApi.ts
