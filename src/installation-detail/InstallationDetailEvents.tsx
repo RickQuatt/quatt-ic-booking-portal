@@ -6,7 +6,9 @@ import { FormField, FormSection } from "../ui-components/form/Form";
 import { DetailSectionHeader } from "../cic-detail/CICDetailSectionHeader";
 import ErrorText from "../ui-components/error-text/ErrorText";
 import { useGetInstallationEvents } from "./hooks/useGetInstallationEvents";
-import { getEventTypeEmoji } from "./utils/eventTypeMapping";
+import { getEventTypeEmoji, EVENT_TYPE_CONFIG } from "./utils/eventTypeMapping";
+import { EventType } from "../api-client/models";
+import { Select } from "../ui-components/select/Select";
 
 interface InstallationDetailEventsProps {
   installationUuid: string;
@@ -15,8 +17,12 @@ interface InstallationDetailEventsProps {
 export function InstallationDetailEvents({
   installationUuid,
 }: InstallationDetailEventsProps) {
+  const [selectedEventType, setSelectedEventType] = useState<
+    EventType | undefined
+  >(undefined);
+
   const { events, eventsError, isLoadingEvents, refetchEvents } =
-    useGetInstallationEvents(installationUuid);
+    useGetInstallationEvents(installationUuid, selectedEventType);
   const [expandedEventIds, setExpandedEventIds] = useState<Set<string>>(
     new Set(),
   );
@@ -45,6 +51,14 @@ export function InstallationDetailEvents({
     }
   }, []);
 
+  const handleEventTypeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value;
+      setSelectedEventType(value === "" ? undefined : (value as EventType));
+    },
+    [],
+  );
+
   const toggleExpand = useCallback((eventId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setExpandedEventIds((prev) => {
@@ -71,6 +85,26 @@ export function InstallationDetailEvents({
     <div className={classes["detail-section"]}>
       <DetailSectionHeader title="📋 Events" />
       <FormSection>
+        <FormField>
+          <div className={classes["event-filter-container"]}>
+            <label className={classes["event-filter-label"]}>
+              Event Type Filter:
+            </label>
+            <div className={classes["event-filter-select"]}>
+              <Select
+                onChange={handleEventTypeChange}
+                value={selectedEventType || ""}
+              >
+                <option value="">ALL</option>
+                {EVENT_TYPE_CONFIG.map((config) => (
+                  <option key={config.value} value={config.value}>
+                    {config.emoji} {config.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+        </FormField>
         <FormField>
           <div className={classes["detail-section-api-cards"]}>
             {isLoadingEvents ? (

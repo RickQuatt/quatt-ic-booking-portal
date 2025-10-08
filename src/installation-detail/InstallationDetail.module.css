@@ -180,3 +180,18 @@
 .empty-state {
   text-align: center;
 }
+
+.event-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.event-filter-label {
+  white-space: nowrap;
+}
+
+.event-filter-select {
+  width: 200px;
+}

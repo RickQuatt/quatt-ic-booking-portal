@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from "../runtime";
+import type { EventType } from "./EventType";
+import {
+  EventTypeFromJSON,
+  EventTypeFromJSONTyped,
+  EventTypeToJSON,
+} from "./EventType";
+
 /**
  *
  * @export
@@ -26,11 +33,11 @@ export interface Event {
    */
   eventId: string;
   /**
-   * Type of event
-   * @type {string}
+   *
+   * @type {EventType}
    * @memberof Event
    */
-  eventType: string;
+  eventType: EventType;
   /**
    * Associated deal ID
    * @type {number}
@@ -104,7 +111,7 @@ export function EventFromJSONTyped(
   }
   return {
     eventId: json["eventId"],
-    eventType: json["eventType"],
+    eventType: EventTypeFromJSON(json["eventType"]),
     dealId: json["dealId"],
     createTime: new Date(json["createTime"]),
     closeTime: !exists(json, "closeTime")
@@ -128,7 +135,7 @@ export function EventToJSON(value?: Event | null): any {
   }
   return {
     eventId: value.eventId,
-    eventType: value.eventType,
+    eventType: EventTypeToJSON(value.eventType),
     dealId: value.dealId,
     createTime: value.createTime.toISOString(),
     closeTime:

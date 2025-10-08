@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useApiClient } from "../../api-client/context";
+import { EventType } from "../../api-client/models";
 
-export function useGetInstallationEvents(installationUuid: string) {
+export function useGetInstallationEvents(
+  installationUuid: string,
+  eventType?: EventType,
+) {
   const apiClient = useApiClient();
 
   const {
@@ -10,10 +14,11 @@ export function useGetInstallationEvents(installationUuid: string) {
     isPending: isLoadingEvents,
     refetch: refetchEvents,
   } = useQuery({
-    queryKey: ["installationEvents", installationUuid],
+    queryKey: ["installationEvents", installationUuid, eventType ?? "all"],
     queryFn: () => {
       return apiClient.adminGetInstallationEvents({
         installationUuid: installationUuid,
+        eventType: eventType,
       });
     },
   });

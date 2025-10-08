@@ -28,6 +28,7 @@ import type {
   AdminGetInstallationEvents500Response,
   AdminGetInstallationNotes200Response,
   AdminGetInstallationSetting200Response,
+  AdminGetInstallationSnowflakeInfo200Response,
   AdminGetInstallationTickets200Response,
   AdminGetInstallationZuperJobs200Response,
   AdminGetZuperJobsByInstallationUuid200Response,
@@ -45,6 +46,7 @@ import type {
   CreateUpdateNote,
   DeleteTariffForInstallation409Response,
   Error1,
+  EventType,
   ForgetWifiMeCicRequest,
   GetAdminDynamicPrices200Response,
   GetAllTariffs200Response,
@@ -60,6 +62,7 @@ import type {
   UpdateAdminInstallation,
   UpdateCommissioning,
   UpdateCommissioningTest,
+  UpdateCommissioningTest409Response,
   UpdateTariffForInstallation404Response,
   UpdateTariffForInstallation409Response,
 } from "../models/index";
@@ -92,6 +95,8 @@ import {
   AdminGetInstallationNotes200ResponseToJSON,
   AdminGetInstallationSetting200ResponseFromJSON,
   AdminGetInstallationSetting200ResponseToJSON,
+  AdminGetInstallationSnowflakeInfo200ResponseFromJSON,
+  AdminGetInstallationSnowflakeInfo200ResponseToJSON,
   AdminGetInstallationTickets200ResponseFromJSON,
   AdminGetInstallationTickets200ResponseToJSON,
   AdminGetInstallationZuperJobs200ResponseFromJSON,
@@ -126,6 +131,8 @@ import {
   DeleteTariffForInstallation409ResponseToJSON,
   Error1FromJSON,
   Error1ToJSON,
+  EventTypeFromJSON,
+  EventTypeToJSON,
   ForgetWifiMeCicRequestFromJSON,
   ForgetWifiMeCicRequestToJSON,
   GetAdminDynamicPrices200ResponseFromJSON,
@@ -156,6 +163,8 @@ import {
   UpdateCommissioningToJSON,
   UpdateCommissioningTestFromJSON,
   UpdateCommissioningTestToJSON,
+  UpdateCommissioningTest409ResponseFromJSON,
+  UpdateCommissioningTest409ResponseToJSON,
   UpdateTariffForInstallation404ResponseFromJSON,
   UpdateTariffForInstallation404ResponseToJSON,
   UpdateTariffForInstallation409ResponseFromJSON,
@@ -308,6 +317,7 @@ export interface AdminGetInstallationEventsRequest {
   installationUuid: string;
   xClientVersion?: string;
   xClientPlatform?: AdminGetInstallationEventsXClientPlatformEnum;
+  eventType?: EventType;
 }
 
 export interface AdminGetInstallationNotesRequest {
@@ -319,6 +329,12 @@ export interface AdminGetInstallationSettingRequest {
   settingsId: string;
   xClientVersion?: string;
   xClientPlatform?: AdminGetInstallationSettingXClientPlatformEnum;
+}
+
+export interface AdminGetInstallationSnowflakeInfoRequest {
+  installationUuid: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminGetInstallationSnowflakeInfoXClientPlatformEnum;
 }
 
 export interface AdminGetInstallationTicketsRequest {
@@ -388,6 +404,10 @@ export interface AdminInstallationInstallationUuidEventsOptionsRequest {
 }
 
 export interface AdminInstallationInstallationUuidOptionsRequest {
+  installationUuid: string;
+}
+
+export interface AdminInstallationInstallationUuidSnowflakeinfoOptionsRequest {
   installationUuid: string;
 }
 
@@ -2279,6 +2299,10 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
     const queryParameters: any = {};
 
+    if (requestParameters.eventType !== undefined) {
+      queryParameters["eventType"] = requestParameters.eventType;
+    }
+
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (
@@ -2488,6 +2512,87 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<AdminGetInstallationSetting200Response> {
     const response = await this.adminGetInstallationSettingRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   * Get Snowflake support data for installation from 3 tables (fct_support_health, fct_support_info, fct_support_connections)
+   */
+  async adminGetInstallationSnowflakeInfoRaw(
+    requestParameters: AdminGetInstallationSnowflakeInfoRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<
+    runtime.ApiResponse<AdminGetInstallationSnowflakeInfo200Response>
+  > {
+    if (
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminGetInstallationSnowflakeInfo.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationUuid}/snowflakeinfo`.replace(
+          `{${"installationUuid"}}`,
+          encodeURIComponent(String(requestParameters.installationUuid)),
+        ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminGetInstallationSnowflakeInfo200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Get Snowflake support data for installation from 3 tables (fct_support_health, fct_support_info, fct_support_connections)
+   */
+  async adminGetInstallationSnowflakeInfo(
+    requestParameters: AdminGetInstallationSnowflakeInfoRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminGetInstallationSnowflakeInfo200Response> {
+    const response = await this.adminGetInstallationSnowflakeInfoRaw(
       requestParameters,
       initOverrides,
     );
@@ -3386,6 +3491,54 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminInstallationInstallationUuidOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
+  async adminInstallationInstallationUuidSnowflakeinfoOptionsRaw(
+    requestParameters: AdminInstallationInstallationUuidSnowflakeinfoOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminInstallationInstallationUuidSnowflakeinfoOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationUuid}/snowflakeinfo`.replace(
+          `{${"installationUuid"}}`,
+          encodeURIComponent(String(requestParameters.installationUuid)),
+        ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationInstallationUuidSnowflakeinfoOptions(
+    requestParameters: AdminInstallationInstallationUuidSnowflakeinfoOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationUuidSnowflakeinfoOptionsRaw(
       requestParameters,
       initOverrides,
     );
@@ -5146,6 +5299,16 @@ export const AdminGetInstallationSettingXClientPlatformEnum = {
 } as const;
 export type AdminGetInstallationSettingXClientPlatformEnum =
   (typeof AdminGetInstallationSettingXClientPlatformEnum)[keyof typeof AdminGetInstallationSettingXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminGetInstallationSnowflakeInfoXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminGetInstallationSnowflakeInfoXClientPlatformEnum =
+  (typeof AdminGetInstallationSnowflakeInfoXClientPlatformEnum)[keyof typeof AdminGetInstallationSnowflakeInfoXClientPlatformEnum];
 /**
  * @export
  */
