@@ -24,6 +24,7 @@ import { InstallationLatestCommissioning } from "./InstallationLatestCommissioni
 import { InstallationDetailEvents } from "./InstallationDetailEvents";
 import { InstallationDetailHomeBattery } from "./InstallationDetailHomeBattery";
 import { InstallationSnowflakeTables } from "./InstallationSnowflakeTables";
+import { getInstallationTypeEmoji } from "../utils/installationTypeEmojiMapper";
 
 interface InstallationDetailProps {
   installationUuid: string;
@@ -68,11 +69,13 @@ export function InstallationDetail({
   const isAllE =
     installationDetails.installationType === InstallationType.AllElectric ||
     installationDetails.installationType === InstallationType.AllElectricDuo;
+  const emoji = getInstallationTypeEmoji(installationDetails.installationType);
   return (
     <div className={classes["detail-sections"]}>
       <div className={classes["detail-sections-health"]}>
         <span className={classes["order-number"]}>
           {installationUuid} - {installationDetails.country} -{" "}
+          {emoji && `${emoji} `}
           {installationDetails.installationType}
         </span>
         {installationDetails.activeCic && (
