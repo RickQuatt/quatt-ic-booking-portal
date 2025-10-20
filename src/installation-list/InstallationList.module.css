@@ -18,7 +18,7 @@
 }
 
 .table-grid {
-  grid-template-columns: 2fr 0.6fr 0.5fr 0.5fr 0.5fr 1fr 0.6fr 0.6fr;
+  grid-template-columns: 0.3fr 2fr 0.6fr 0.5fr 0.5fr 0.5fr 1fr 0.6fr 0.6fr;
   border: 1px solid #ddd;
   border-radius: 4px;
   overflow-y: auto;
@@ -40,4 +40,11 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   color: #666;
+}
+
+.installation-type-emoji {
+  font-size: 0.85rem;
+  cursor: help;
+  white-space: nowrap;
+  display: inline-block;
 }

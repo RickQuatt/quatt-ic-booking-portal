@@ -20,6 +20,10 @@ import { TextFilter } from "../ui-components/filter/TextFilter";
 import { useGetInstallationsList } from "./hooks/useGetInstallationsList";
 import { Loader } from "../ui-components/loader/Loader";
 import ErrorText from "../ui-components/error-text/ErrorText";
+import {
+  getInstallationTypeEmoji,
+  getInstallationTypeLabel,
+} from "../utils/installationTypeEmojiMapper";
 
 export function InstallationList() {
   const [filters, setFilters] = React.useState<InstallationFilters>({});
@@ -77,6 +81,11 @@ export function InstallationList() {
         <THead>
           <Tr>
             <Th>
+              <TdText>
+                <span title="Installation Type">🏷️</span>
+              </TdText>
+            </Th>
+            <Th>
               <TdText>Installation UUID</TdText>
             </Th>
             <Th>
@@ -103,6 +112,7 @@ export function InstallationList() {
             </Th>
           </Tr>
           <Tr>
+            <Th></Th>
             <Th>
               <TextFilter
                 filterKey="installationUuid"
@@ -191,8 +201,20 @@ export function InstallationList() {
   }) {
     const installationDetailLink = `/installations/${installation.installationUuid}`;
     const cicDetailLink = `/cics/${installation.cicId}`;
+    const emoji = getInstallationTypeEmoji(installation.installationType);
+    const typeLabel = getInstallationTypeLabel(installation.installationType);
     return (
       <Tr>
+        <Td>
+          <TdText>
+            <span
+              className={classes["installation-type-emoji"]}
+              title={typeLabel}
+            >
+              {emoji}
+            </span>
+          </TdText>
+        </Td>
         <Td>
           <Link to={installationDetailLink}>
             {installation.installationUuid}
