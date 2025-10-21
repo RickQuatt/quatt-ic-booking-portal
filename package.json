@@ -62,7 +62,7 @@
     "husky": "^9.1.2",
     "lint-staged": "^15.5.2",
     "postcss-nesting": "^12.1.5",
-    "prettier": "^3.3.3",
+    "prettier": "^3.6.2",
     "typescript": "^5.5.4",
     "vite": "^5.3.5"
   },
