@@ -41,7 +41,7 @@ jobs:
           # model: "claude-opus-4-1-20250805"
 
           # Allow dependabot to trigger code reviews
-          allowed_bots: 'dependabot'
+          allowed_bots: "dependabot"
 
           # Direct prompt for automated review (no @claude mention needed)
 
