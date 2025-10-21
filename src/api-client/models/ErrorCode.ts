@@ -173,6 +173,8 @@ export const ErrorCode = {
   EmptyFileError: "EMPTY_FILE_ERROR",
   MissingRequiredColumns: "MISSING_REQUIRED_COLUMNS",
   NoDynamicEnergyPricingData: "NO_DYNAMIC_ENERGY_PRICING_DATA",
+  InsufficientDynamicEnergyPricingData:
+    "INSUFFICIENT_DYNAMIC_ENERGY_PRICING_DATA",
   UserAlreadyPairedToHomeBattery: "USER_ALREADY_PAIRED_TO_HOME_BATTERY",
   NoInstalledatFoundForInstallation: "NO_INSTALLEDAT_FOUND_FOR_INSTALLATION",
   InstallationHasNoCicAssociated: "INSTALLATION_HAS_NO_CIC_ASSOCIATED",
@@ -196,6 +198,7 @@ export const ErrorCode = {
   CurrentCommissioningNotFound: "CURRENT_COMMISSIONING_NOT_FOUND",
   CommissioningAlreadyRunningOnInstallation:
     "COMMISSIONING_ALREADY_RUNNING_ON_INSTALLATION",
+  NoDevicesConfigurationFound: "NO_DEVICES_CONFIGURATION_FOUND",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

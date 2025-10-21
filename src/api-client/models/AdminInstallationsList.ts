@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from "../runtime";
+import type { InstallationType } from "./InstallationType";
+import {
+  InstallationTypeFromJSON,
+  InstallationTypeFromJSONTyped,
+  InstallationTypeToJSON,
+} from "./InstallationType";
+
 /**
  *
  * @export
@@ -67,6 +74,12 @@ export interface AdminInstallationsList {
    * @memberof AdminInstallationsList
    */
   houseAddition: string;
+  /**
+   *
+   * @type {InstallationType}
+   * @memberof AdminInstallationsList
+   */
+  installationType: InstallationType;
 }
 
 /**
@@ -82,6 +95,7 @@ export function instanceOfAdminInstallationsList(value: object): boolean {
   isInstance = isInstance && "zipCode" in value;
   isInstance = isInstance && "houseNumber" in value;
   isInstance = isInstance && "houseAddition" in value;
+  isInstance = isInstance && "installationType" in value;
 
   return isInstance;
 }
@@ -108,6 +122,7 @@ export function AdminInstallationsListFromJSONTyped(
     zipCode: json["zipCode"],
     houseNumber: json["houseNumber"],
     houseAddition: json["houseAddition"],
+    installationType: InstallationTypeFromJSON(json["installationType"]),
   };
 }
 
@@ -129,5 +144,6 @@ export function AdminInstallationsListToJSON(
     zipCode: value.zipCode,
     houseNumber: value.houseNumber,
     houseAddition: value.houseAddition,
+    installationType: InstallationTypeToJSON(value.installationType),
   };
 }

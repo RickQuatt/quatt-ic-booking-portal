@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import {
   AdminInstallationDetail,
@@ -21,15 +21,15 @@ import {
 } from "../ui-components/form/Form";
 import { Button } from "../ui-components/button/Button";
 import { formatDistance, formatDistanceToNow } from "date-fns";
+import { Select } from "../ui-components/select/Select";
 
 interface InstallationLatestCommissioningProps {
   installation: AdminInstallationDetail;
 }
 
-const currentTestStatus: BaseCommissioningTestStatusEnum[] = [
+const runningTestStatuses: BaseCommissioningTestStatusEnum[] = [
   BaseCommissioningTestStatusEnum.WaitingPrerequisite,
   BaseCommissioningTestStatusEnum.InProgress,
-  BaseCommissioningTestStatusEnum.Ready,
   BaseCommissioningTestStatusEnum.Validated,
 ];
 
@@ -56,7 +56,11 @@ function toCommissioningStatusText(status: CommissioningStatusEnum): string {
 
 function toCommissioningTestStatusText(
   status: BaseCommissioningTestStatusEnum,
+  isInPostTreatment?: boolean,
 ): string {
+  if (isInPostTreatment) {
+    return "Test in post-treatment phase";
+  }
   switch (status) {
     case BaseCommissioningTestStatusEnum.Success:
       return "Test successful";
@@ -79,16 +83,18 @@ function toCommissioningTestStatusText(
   }
 }
 
-function getCurrentTest(
+function getRunningTest(
   tests: BaseCommissioningTest[],
 ): BaseCommissioningTest | null {
   if (!tests || tests.length === 0) {
     return null;
   }
-  const currentTest = tests.find((test) =>
-    currentTestStatus.find((status) => status === test.status),
+  const runningTest = tests.find(
+    (test) =>
+      runningTestStatuses.find((status) => status === test.status) ||
+      test.isInPostTreatment,
   );
-  return currentTest || null;
+  return runningTest || null;
 }
 
 function commissioningTestUnfinished(
@@ -156,7 +162,12 @@ function CommissioningTest({ test }: { test: BaseCommissioningTest }) {
       </FormField>
       <FormField>
         <FormFieldTitle>Test status</FormFieldTitle>
-        <FormFieldValue value={toCommissioningTestStatusText(test.status)} />
+        <FormFieldValue
+          value={toCommissioningTestStatusText(
+            test.status,
+            test.isInPostTreatment,
+          )}
+        />
       </FormField>
       {commissioningTestUnfinished(test.status) && (
         <>
@@ -242,6 +253,53 @@ function CommissioningTest({ test }: { test: BaseCommissioningTest }) {
   );
 }
 
+function CommissioningTestSelectStarter({
+  tests,
+}: {
+  tests: BaseCommissioningTest[];
+}) {
+  const apiClient = useApiClient();
+  const { isPending, mutate: startTest } = useMutation({
+    mutationFn: (testUuid: string) =>
+      apiClient.updateCommissioningTest({
+        updateCommissioningTest: {
+          status: BaseCommissioningTestStatusEnum.InProgress,
+        },
+        commissioningTestUuid: testUuid,
+      }),
+  });
+  const [selectedTest, setSelectedTest] = useState<string>("");
+  const onChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value;
+      setSelectedTest(value);
+    },
+    [],
+  );
+
+  return (
+    <>
+      <FormField>
+        <FormFieldTitle>No Test is started</FormFieldTitle>
+        <Select onChange={onChange} value={selectedTest}>
+          <option value="">Select a test to start</option>
+          {tests.map((test) => (
+            <option key={test.uuid} value={test.uuid}>
+              {test.type}
+            </option>
+          ))}
+        </Select>
+        <Button
+          disabled={selectedTest === "" || isPending}
+          onClick={() => startTest(selectedTest)}
+        >
+          Start Selected Test
+        </Button>
+      </FormField>
+    </>
+  );
+}
+
 const refetchOnlyWhenCommissioningIsUnfinished =
   (options: { refetchIntervalSeconds: number }) =>
   (query: {
@@ -283,15 +341,24 @@ export function InstallationLatestCommissioning({
     mutationFn: () =>
       apiClient.updateAdminInstallationCommissioning({
         updateCommissioning: {
-          status: BaseCommissioningTestStatusEnum.Success,
+          status: CommissioningStatusEnum.Success,
           forced: true,
         },
         installationId: installation.externalId || "",
       }),
   });
 
-  const currentTest = useMemo(() => {
-    return data?.result.tests ? getCurrentTest(data.result.tests) : null;
+  const readyTests = useMemo(() => {
+    return data?.result.tests
+      ? data.result.tests
+          .filter(
+            (test) => test.status === BaseCommissioningTestStatusEnum.Ready,
+          )
+          .sort((a, b) => a.step - b.step)
+      : [];
+  }, [data]);
+  const runningTest = useMemo(() => {
+    return data?.result.tests ? getRunningTest(data.result.tests) : null;
   }, [data]);
 
   if (!installation.externalId) {
@@ -347,8 +414,16 @@ export function InstallationLatestCommissioning({
               <FormFieldValue value={data.result.forced ? "Yes" : "No"} />
             </FormField>
           )}
-          {data.result.status === "IN_PROGRESS" && currentTest && (
-            <CommissioningTest test={currentTest} />
+          {data.result.status === "IN_PROGRESS" && (
+            <>
+              {runningTest && <CommissioningTest test={runningTest} />}
+              {!runningTest && readyTests.length === 1 && (
+                <CommissioningTest test={readyTests[0]} />
+              )}
+              {!runningTest && readyTests.length > 1 && (
+                <CommissioningTestSelectStarter tests={readyTests} />
+              )}
+            </>
           )}
         </FormSection>
       )}
