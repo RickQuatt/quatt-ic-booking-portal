@@ -4,6 +4,8 @@ models/AdminCic.ts
 models/AdminCicCreateInstallation409Response.ts
 models/AdminCicCreateInstallation409ResponseAllOfMeta.ts
 models/AdminCicCreateInstallation409ResponseAllOfResult.ts
+models/AdminCicDeviceStream400Response.ts
+models/AdminCicDeviceStream400ResponseAllOfResult.ts
 models/AdminCicSettingsUpdate.ts
 models/AdminCicState.ts
 models/AdminCreateInstaller200Response.ts

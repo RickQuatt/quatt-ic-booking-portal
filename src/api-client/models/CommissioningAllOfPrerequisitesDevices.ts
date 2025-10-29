@@ -51,13 +51,13 @@ export interface CommissioningAllOfPrerequisitesDevices {
    */
   name?: string | null;
   /**
-   * Whether the cic is ready for commissioning
+   * Whether the device is ready for commissioning
    * @type {boolean}
    * @memberof CommissioningAllOfPrerequisitesDevices
    */
   isReadyForCommissioning: boolean;
   /**
-   * The reasons why the cic is not ready for commissioning
+   * The reasons why the device is not ready for commissioning
    * @type {Array<string>}
    * @memberof CommissioningAllOfPrerequisitesDevices
    */

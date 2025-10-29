@@ -65,6 +65,7 @@ export const ErrorCode = {
   ExternalApiError: "EXTERNAL_API_ERROR",
   NotPossibleWith1HeatPump: "NOT_POSSIBLE_WITH_1_HEAT_PUMP",
   CicNeedsUpdate: "CIC_NEEDS_UPDATE",
+  MissingCicId: "MISSING_CIC_ID",
   MissingInstallationId: "MISSING_INSTALLATION_ID",
   InstallationInsightsNotAvailable: "INSTALLATION_INSIGHTS_NOT_AVAILABLE",
   MissingDayOrNightElectricityPrice: "MISSING_DAY_OR_NIGHT_ELECTRICITY_PRICE",
@@ -99,7 +100,6 @@ export const ErrorCode = {
   NoInstallationFoundForCic: "NO_INSTALLATION_FOUND_FOR_CIC",
   CicHasAlreadyInstallation: "CIC_HAS_ALREADY_INSTALLATION",
   InstallationCountryNotFound2: "INSTALLATION_COUNTRY_NOT_FOUND",
-  CommissioningConfigurationConflict: "COMMISSIONING_CONFIGURATION_CONFLICT",
   DeviceAlreadyConfigured: "DEVICE_ALREADY_CONFIGURED",
   CannotUpdateDevice: "CANNOT_UPDATE_DEVICE",
   CommissioningNotInProgress: "COMMISSIONING_NOT_IN_PROGRESS",
@@ -149,6 +149,7 @@ export const ErrorCode = {
     "DEVICE_IS_LINKED_TO_ANOTHER_INSTALLATION",
   HouseDoesNotHaveHomeBattery: "HOUSE_DOES_NOT_HAVE_HOME_BATTERY",
   ThreadDeviceNotFoundInInstallation: "THREAD_DEVICE_NOT_FOUND_IN_INSTALLATION",
+  ThreadDeviceNotFoundInCicStats: "THREAD_DEVICE_NOT_FOUND_IN_CIC_STATS",
   DeviceCredentialsNotFound: "DEVICE_CREDENTIALS_NOT_FOUND",
   NoInstallationFoundForDevice: "NO_INSTALLATION_FOUND_FOR_DEVICE",
   UnknownInstallationType: "UNKNOWN_INSTALLATION_TYPE",
@@ -199,6 +200,7 @@ export const ErrorCode = {
   CommissioningAlreadyRunningOnInstallation:
     "COMMISSIONING_ALREADY_RUNNING_ON_INSTALLATION",
   NoDevicesConfigurationFound: "NO_DEVICES_CONFIGURATION_FOUND",
+  MissingOnFailureConfiguration: "MISSING_ON_FAILURE_CONFIGURATION",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

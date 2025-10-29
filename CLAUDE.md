@@ -10,7 +10,8 @@ This is the Quatt Support Dashboard - a React TypeScript application for interna
 
 ### Development
 
-- `npm run dev` - Start development server with Vite
+- `npm run dev` - Start development server with Vite (no auth middleware)
+- `npm run dev:with-auth` - Start development server with Cloudflare Pages Functions middleware for auth
 - `npm run build` - Build for production
 - `npm run build:staging` - Build for staging environment
 - `npm run build:development` - Build for development environment
@@ -89,10 +90,14 @@ The API client is auto-generated from the main Quatt-cloud OpenAPI specification
 
 ### Authentication & Security
 
-- Firebase Authentication with Google OAuth
-- JWT tokens automatically included in API requests
-- Route-level authentication checks in App.tsx
-- Public repository requires careful API model management
+- **Server-Side Authentication**: Cloudflare Pages Functions middleware protects ALL routes (including static assets)
+- **Session-Based Auth**: Firebase Admin SDK validates session cookies server-side
+- **Asset Protection**: Static files (`/assets/*`) blocked until user authenticates
+- **Firebase OAuth**: Google sign-in handled by Firebase Auth client-side
+- **JWT tokens**: Automatically included in API requests
+- **Setup Required**: See `CLOUDFLARE_AUTH_SETUP.md` for environment variable configuration
+
+**Important**: The middleware requires Firebase service account credentials to be configured in Cloudflare environment variables. Without these, the site will not load.
 
 ### Environment Configuration
 

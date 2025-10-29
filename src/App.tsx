@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { auth, signinWithGoogle } from "./firebase";
+import { auth, signinWithGoogle, createSessionCookie } from "./firebase";
 import { User } from "firebase/auth";
 import { Redirect, Route } from "wouter";
 import {
@@ -33,14 +33,56 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
+  console.log("Setting up auth state listener", user);
   useEffect(() => {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        setUser(user);
-        setIsAuthenticated(true);
+    let mounted = true;
+    let unsubscribe: (() => void) | undefined;
+
+    const checkAuth = async () => {
+      // Check if middleware already handled authentication (session cookie exists)
+      // This happens when running with wrangler (npm run dev:with-auth)
+      const hasSessionCookie = document.cookie.includes("session=");
+
+      if (hasSessionCookie) {
+        // Middleware authenticated - skip Firebase auth, just mark as authenticated
+        if (mounted) {
+          console.log("Session cookie detected - authenticated via middleware");
+          setIsAuthenticated(true);
+          setLoading(false);
+        }
+        return;
       }
-      setLoading(false);
-    });
+
+      // Pure Vite mode (npm run dev) - use Firebase auth as usual
+      console.log("No session cookie - using Firebase auth");
+      unsubscribe = auth.onAuthStateChanged(async (user) => {
+        if (!mounted) return;
+
+        if (user) {
+          // Get the ID token and create session cookie
+          try {
+            const idToken = await user.getIdToken();
+            await createSessionCookie(idToken);
+            setUser(user);
+            setIsAuthenticated(true);
+          } catch (error) {
+            console.error("Failed to create session cookie:", error);
+            // Still set the user as authenticated since Firebase auth succeeded
+            setUser(user);
+            setIsAuthenticated(true);
+          }
+        }
+        setLoading(false);
+      });
+    };
+
+    checkAuth();
+
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      mounted = false;
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   if (loading) return null;

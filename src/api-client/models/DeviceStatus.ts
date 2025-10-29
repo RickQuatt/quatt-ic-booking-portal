@@ -18,13 +18,10 @@
  */
 export const DeviceStatus = {
   Factory: "FACTORY",
-  PendingIdentification: "PENDING_IDENTIFICATION",
-  Identified: "IDENTIFIED",
-  IdentificationFailed: "IDENTIFICATION_FAILED",
-  Configured: "CONFIGURED",
-  CancelCommissioning: "CANCEL_COMMISSIONING",
   Uninstalled: "UNINSTALLED",
   Active: "ACTIVE",
+  PendingCommissioning: "PENDING_COMMISSIONING",
+  InError: "IN_ERROR",
 } as const;
 export type DeviceStatus = (typeof DeviceStatus)[keyof typeof DeviceStatus];
 

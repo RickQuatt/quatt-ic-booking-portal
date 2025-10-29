@@ -5,6 +5,8 @@ export * from "./AdminCic";
 export * from "./AdminCicCreateInstallation409Response";
 export * from "./AdminCicCreateInstallation409ResponseAllOfMeta";
 export * from "./AdminCicCreateInstallation409ResponseAllOfResult";
+export * from "./AdminCicDeviceStream400Response";
+export * from "./AdminCicDeviceStream400ResponseAllOfResult";
 export * from "./AdminCicSettingsUpdate";
 export * from "./AdminCicState";
 export * from "./AdminCreateInstaller200Response";

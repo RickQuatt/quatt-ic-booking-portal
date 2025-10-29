@@ -382,6 +382,10 @@ models/AdminCicAllOfInProgressCommissioningRef.ts
 !models/SnowflakeInfo.ts
 !models/SnowflakeInfoFromJSON.ts
 !models/SnowflakeInfoToJSON.ts
+!models/AdminCicDeviceStream400Response.ts
+!models/AdminCicDeviceStream400ResponseFromJSON.ts
+!models/AdminCicDeviceStream400ResponseToJSON.ts
+!models/AdminCicDeviceStream400ResponseAllOfResult.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

@@ -15,6 +15,7 @@
 import * as runtime from "../runtime";
 import type {
   AdminAddInstallationNote200Response,
+  AdminCicDeviceStream400Response,
   AdminCreateInstaller200Response,
   AdminCreateTariff403Response,
   AdminCreateTariff404Response,
@@ -69,6 +70,8 @@ import type {
 import {
   AdminAddInstallationNote200ResponseFromJSON,
   AdminAddInstallationNote200ResponseToJSON,
+  AdminCicDeviceStream400ResponseFromJSON,
+  AdminCicDeviceStream400ResponseToJSON,
   AdminCreateInstaller200ResponseFromJSON,
   AdminCreateInstaller200ResponseToJSON,
   AdminCreateTariff403ResponseFromJSON,
@@ -211,6 +214,12 @@ export interface AdminCicCicIdRebootOptionsRequest {
 export interface AdminCicDashboardOptionsRequest {
   xClientVersion?: string;
   xClientPlatform?: AdminCicDashboardOptionsXClientPlatformEnum;
+}
+
+export interface AdminCicDeviceStreamRequest {
+  cicId: string;
+  xClientVersion?: string;
+  xClientPlatform?: AdminCicDeviceStreamXClientPlatformEnum;
 }
 
 export interface AdminCicListOptionsRequest {
@@ -1043,6 +1052,87 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<void> {
     await this.adminCicDashboardOptionsRaw(requestParameters, initOverrides);
+  }
+
+  /**
+   * Stream real-time device data extracted from CicStat via Server-Sent Events. Subscribes to MQTT debug messages and streams device properties when messages come from device to cloud. Requires admin authentication and specific CIC ID.
+   */
+  async adminCicDeviceStreamRaw(
+    requestParameters: AdminCicDeviceStreamRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<string>> {
+    if (
+      requestParameters.cicId === null ||
+      requestParameters.cicId === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "cicId",
+        "Required parameter requestParameters.cicId was null or undefined when calling adminCicDeviceStream.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/cic/{cicId}/device-stream`.replace(
+          `{${"cicId"}}`,
+          encodeURIComponent(String(requestParameters.cicId)),
+        ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<string>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
+  }
+
+  /**
+   * Stream real-time device data extracted from CicStat via Server-Sent Events. Subscribes to MQTT debug messages and streams device properties when messages come from device to cloud. Requires admin authentication and specific CIC ID.
+   */
+  async adminCicDeviceStream(
+    requestParameters: AdminCicDeviceStreamRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<string> {
+    const response = await this.adminCicDeviceStreamRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
   }
 
   /**
@@ -5159,6 +5249,16 @@ export const AdminCicDashboardOptionsXClientPlatformEnum = {
 } as const;
 export type AdminCicDashboardOptionsXClientPlatformEnum =
   (typeof AdminCicDashboardOptionsXClientPlatformEnum)[keyof typeof AdminCicDashboardOptionsXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminCicDeviceStreamXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminCicDeviceStreamXClientPlatformEnum =
+  (typeof AdminCicDeviceStreamXClientPlatformEnum)[keyof typeof AdminCicDeviceStreamXClientPlatformEnum];
 /**
  * @export
  */
