@@ -84,6 +84,7 @@ Use the Task tool with general-purpose agent for comprehensive codebase analysis
 4. **Check for existing patterns** to follow
 
 Example Task prompt:
+
 ```
 Analyze the codebase for Jira ticket QPD-XXXX: "<summary>"
 
