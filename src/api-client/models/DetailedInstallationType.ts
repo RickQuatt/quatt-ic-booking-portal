@@ -13,7 +13,7 @@
  */
 
 /**
- *
+ * The detailed type of installation
  * @export
  */
 export const DetailedInstallationType = {

@@ -100,6 +100,7 @@ export const ErrorCode = {
   NoInstallationFoundForCic: "NO_INSTALLATION_FOUND_FOR_CIC",
   CicHasAlreadyInstallation: "CIC_HAS_ALREADY_INSTALLATION",
   InstallationCountryNotFound2: "INSTALLATION_COUNTRY_NOT_FOUND",
+  InvalidFilterCombination: "INVALID_FILTER_COMBINATION",
   DeviceAlreadyConfigured: "DEVICE_ALREADY_CONFIGURED",
   CannotUpdateDevice: "CANNOT_UPDATE_DEVICE",
   CommissioningNotInProgress: "COMMISSIONING_NOT_IN_PROGRESS",
@@ -202,6 +203,16 @@ export const ErrorCode = {
   NoDevicesConfigurationFound: "NO_DEVICES_CONFIGURATION_FOUND",
   MissingOnFailureConfiguration: "MISSING_ON_FAILURE_CONFIGURATION",
   ThreadDeviceNotFound: "THREAD_DEVICE_NOT_FOUND",
+  ChillInterfaceBoardAlreadyAssigned: "CHILL_INTERFACE_BOARD_ALREADY_ASSIGNED",
+  ChillInterfaceBoardNotInInventory: "CHILL_INTERFACE_BOARD_NOT_IN_INVENTORY",
+  ChillDeviceNotFound: "CHILL_DEVICE_NOT_FOUND",
+  ChillInterfaceBoardNotAssigned: "CHILL_INTERFACE_BOARD_NOT_ASSIGNED",
+  ChillInterfaceBoardAlreadyDeactivated:
+    "CHILL_INTERFACE_BOARD_ALREADY_DEACTIVATED",
+  ChillInterfaceBoardNotActive: "CHILL_INTERFACE_BOARD_NOT_ACTIVE",
+  ChillInterfaceBoardNotBelongToInstallation:
+    "CHILL_INTERFACE_BOARD_NOT_BELONG_TO_INSTALLATION",
+  DeviceIsNotChill: "DEVICE_IS_NOT_CHILL",
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

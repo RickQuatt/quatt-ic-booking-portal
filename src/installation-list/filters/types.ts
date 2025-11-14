@@ -1,7 +1,7 @@
 import type { components } from "../../openapi-client/types/api/v1";
 
 // Filter types aligned with new paginated API endpoint
-// GET /admin/installation/list query parameters
+// GET /admin/installations query parameters
 export type InstallationFilters = {
   // Supported by new API
   cicId?: string;

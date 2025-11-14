@@ -10,7 +10,7 @@ export function getInstallationTypeEmoji(
   type: InstallationType | undefined,
 ): string {
   if (!type) {
-    return "";
+    return "❓";
   }
 
   switch (type) {
@@ -41,9 +41,9 @@ export function getInstallationTypeEmoji(
  * @returns The human-readable label for the installation type
  */
 export function getInstallationTypeLabel(
-  type: InstallationType | undefined,
+  type: InstallationType | undefined | "null",
 ): string {
-  if (!type) {
+  if (!type || type === "null") {
     return "";
   }
 

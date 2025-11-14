@@ -390,6 +390,15 @@ models/AdminCicAllOfInProgressCommissioningRef.ts
 !models/ThreadCommissioningPrerequisiteDetails.ts
 !models/ThreadDeviceUpdateState.ts
 !models/DetailedInstallationType.ts
+!models/AdminReplaceChillInterfaceBoard400Response.ts
+!models/AdminReplaceChillInterfaceBoard200Response.ts
+!models/AdminReplaceChillInterfaceBoard400Response.ts
+!models/AdminReplaceChillInterfaceBoard404Response.ts
+!models/ReplaceChillInterfaceBoardRequest.ts
+!models/ReplaceChillInterfaceBoardResponse.ts
+!models/AdminReplaceChillInterfaceBoard400ResponseAllOfResult.ts
+!models/AdminReplaceChillInterfaceBoard404ResponseAllOfResult.ts
+!models/ChillInterfaceBoard.ts
 
 apis/*
 !apis/SupportDashboardApi.ts

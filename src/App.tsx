@@ -25,6 +25,7 @@ import ErrorText from "./ui-components/error-text/ErrorText";
 import { CICDebugPage } from "./cic-debug/CICDebugPage";
 import { CICMqttDebugPage } from "./cic-mqtt-debug/CICMqttDebugPage";
 import { DynamicPricingPage } from "./dynamic-pricing/DynamicPricingPage";
+import { DeviceList } from "./device-list/DeviceList";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,9 @@ function App() {
             </Route>
             <Route path="/dynamic-pricing">
               <DynamicPricingPage />
+            </Route>
+            <Route path="/devices">
+              <DeviceList />
             </Route>
             <Route path="/cics/:cicId">
               {(params) => {

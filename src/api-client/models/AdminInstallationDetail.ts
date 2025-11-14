@@ -393,7 +393,7 @@ export interface AdminInstallationDetail {
    * @type {DetailedInstallationType}
    * @memberof AdminInstallationDetail
    */
-  type: DetailedInstallationType | null;
+  type?: DetailedInstallationType | null;
   /**
    *
    * @type {Array<AdminInstallationDetailAllOfCicCommissioning>}
@@ -477,7 +477,6 @@ export function instanceOfAdminInstallationDetail(value: object): boolean {
   isInstance = isInstance && "houseId" in value;
   isInstance = isInstance && "houseAddition" in value;
   isInstance = isInstance && "cicState" in value;
-  isInstance = isInstance && "type" in value;
   isInstance = isInstance && "cicCommissioning" in value;
   isInstance = isInstance && "settingsUpdates" in value;
   isInstance = isInstance && "deviceConnectionStatuses" in value;
@@ -561,7 +560,9 @@ export function AdminInstallationDetailFromJSONTyped(
     houseId: json["houseId"],
     houseAddition: json["houseAddition"],
     cicState: (json["cicState"] as Array<any>).map(AdminCicStateFromJSON),
-    type: DetailedInstallationTypeFromJSON(json["type"]),
+    type: !exists(json, "type")
+      ? undefined
+      : DetailedInstallationTypeFromJSON(json["type"]),
     cicCommissioning: (json["cicCommissioning"] as Array<any>).map(
       AdminInstallationDetailAllOfCicCommissioningFromJSON,
     ),

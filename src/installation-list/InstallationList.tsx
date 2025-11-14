@@ -74,7 +74,7 @@ export function InstallationList() {
   // Use new openapi-react-query client
   const { data, isLoading, error } = client.useQuery(
     "get",
-    "/admin/installation/list",
+    "/admin/installations",
     {
       params: {
         query: queryParams,

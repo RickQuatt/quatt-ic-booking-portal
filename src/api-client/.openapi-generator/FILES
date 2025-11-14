@@ -38,6 +38,11 @@ models/AdminListCics200Response.ts
 models/AdminListCics200ResponseResult.ts
 models/AdminListInstallers200Response.ts
 models/AdminRebootDeviceRequest.ts
+models/AdminReplaceChillInterfaceBoard200Response.ts
+models/AdminReplaceChillInterfaceBoard400Response.ts
+models/AdminReplaceChillInterfaceBoard400ResponseAllOfResult.ts
+models/AdminReplaceChillInterfaceBoard404Response.ts
+models/AdminReplaceChillInterfaceBoard404ResponseAllOfResult.ts
 models/AdminUpdateInstallationNote200Response.ts
 models/AllEStatus.ts
 models/AppCompatibilityGet200Response.ts
@@ -51,6 +56,7 @@ models/BaseCommissioningTest.ts
 models/BoilerDevice.ts
 models/BoilerType.ts
 models/ChillDevice.ts
+models/ChillInterfaceBoard.ts
 models/ChillRunningMode.ts
 models/Cic.ts
 models/CicAggregate.ts
@@ -175,6 +181,8 @@ models/PostReferralRequest.ts
 models/PricingItem.ts
 models/Range.ts
 models/ReferralMember.ts
+models/ReplaceChillInterfaceBoardRequest.ts
+models/ReplaceChillInterfaceBoardResponse.ts
 models/ResponseMeta.ts
 models/SendCommandToCICRequest.ts
 models/SettingsHeader.ts

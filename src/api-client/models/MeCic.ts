@@ -472,6 +472,12 @@ export interface MeCic {
    * @memberof MeCic
    */
   allEStatus: AllEStatus | null;
+  /**
+   * Indicates whether there are Chill devices linked to this CIC/installation
+   * @type {boolean}
+   * @memberof MeCic
+   */
+  hasChills: boolean;
 }
 
 /**
@@ -530,6 +536,7 @@ export function instanceOfMeCic(value: object): boolean {
   isInstance = isInstance && "quattHeatingProductionAmount" in value;
   isInstance = isInstance && "electricityConsumptionAmount" in value;
   isInstance = isInstance && "allEStatus" in value;
+  isInstance = isInstance && "hasChills" in value;
 
   return isInstance;
 }
@@ -657,6 +664,7 @@ export function MeCicFromJSONTyped(
     quattHeatingProductionAmount: json["quattHeatingProductionAmount"],
     electricityConsumptionAmount: json["electricityConsumptionAmount"],
     allEStatus: AllEStatusFromJSON(json["allEStatus"]),
+    hasChills: json["hasChills"],
   };
 }
 
@@ -750,5 +758,6 @@ export function MeCicToJSON(value?: MeCic | null): any {
     quattHeatingProductionAmount: value.quattHeatingProductionAmount,
     electricityConsumptionAmount: value.electricityConsumptionAmount,
     allEStatus: AllEStatusToJSON(value.allEStatus),
+    hasChills: value.hasChills,
   };
 }

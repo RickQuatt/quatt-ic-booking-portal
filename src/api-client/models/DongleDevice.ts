@@ -62,6 +62,30 @@ export interface DongleDevice {
    * @memberof DongleDevice
    */
   type: DongleDeviceTypeEnum;
+  /**
+   * Dongle device serial number
+   * @type {string}
+   * @memberof DongleDevice
+   */
+  serialNumber: string;
+  /**
+   * Thread network hardware identifier (EUI-64)
+   * @type {string}
+   * @memberof DongleDevice
+   */
+  eui64: string;
+  /**
+   * Dongle role in Thread network (nullable)
+   * @type {string}
+   * @memberof DongleDevice
+   */
+  role?: DongleDeviceRoleEnum;
+  /**
+   * PCB hardware version
+   * @type {string}
+   * @memberof DongleDevice
+   */
+  pcbHwVersion: string;
 }
 
 /**
@@ -74,6 +98,16 @@ export type DongleDeviceTypeEnum =
   (typeof DongleDeviceTypeEnum)[keyof typeof DongleDeviceTypeEnum];
 
 /**
+ * @export
+ */
+export const DongleDeviceRoleEnum = {
+  Extender: "EXTENDER",
+  Rcp: "RCP",
+} as const;
+export type DongleDeviceRoleEnum =
+  (typeof DongleDeviceRoleEnum)[keyof typeof DongleDeviceRoleEnum];
+
+/**
  * Check if a given object implements the DongleDevice interface.
  */
 export function instanceOfDongleDevice(value: object): boolean {
@@ -81,6 +115,9 @@ export function instanceOfDongleDevice(value: object): boolean {
   isInstance = isInstance && "uuid" in value;
   isInstance = isInstance && "status" in value;
   isInstance = isInstance && "type" in value;
+  isInstance = isInstance && "serialNumber" in value;
+  isInstance = isInstance && "eui64" in value;
+  isInstance = isInstance && "pcbHwVersion" in value;
 
   return isInstance;
 }
@@ -105,6 +142,10 @@ export function DongleDeviceFromJSONTyped(
       ? undefined
       : json["installationUuid"],
     type: json["type"],
+    serialNumber: json["serialNumber"],
+    eui64: json["eui64"],
+    role: !exists(json, "role") ? undefined : json["role"],
+    pcbHwVersion: json["pcbHwVersion"],
   };
 }
 
@@ -122,5 +163,9 @@ export function DongleDeviceToJSON(value?: DongleDevice | null): any {
     status: DeviceStatusToJSON(value.status),
     installationUuid: value.installationUuid,
     type: value.type,
+    serialNumber: value.serialNumber,
+    eui64: value.eui64,
+    role: value.role,
+    pcbHwVersion: value.pcbHwVersion,
   };
 }

@@ -1528,15 +1528,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/installer/devicesConfiguration": {
+  "/installer/products": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** @description Get all available devices configuration */
-    get: operations["getDevicesConfiguration"];
+    /** @description Get all available products (installation/setup workflows) for installers */
+    get: operations["getProducts"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1906,6 +1906,57 @@ export interface paths {
     get: operations["getInstallations"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/devices/chills": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get all the current states of Chill devices linked to an installation */
+    get: operations["getAllChillsInInstallation"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/devices/chills/{deviceUuid}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get the current state of a Chill device linked to an installation */
+    get: operations["getChillInInstallation"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/devices/chills/{deviceUuid}/actions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Push a new action to a Chill device linked to an installation */
+    post: operations["pushChillAction"];
     delete?: never;
     options?: never;
     head?: never;
@@ -2605,7 +2656,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/admin/installation/list": {
+  "/admin/installation/{installationUuid}/device/{deviceUuid}/replace-chill-interface-board": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Replace a Chill Interface Board for a CHILL device by deactivating the currently active board and activating a new one from inventory */
+    post: operations["AdminReplaceChillInterfaceBoard"];
+    delete?: never;
+    options: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          installationUuid: components["parameters"]["InstallationUuid"];
+          deviceUuid: components["parameters"]["deviceUuid"];
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        204: components["responses"]["CORSPreflightResponse"];
+      };
+    };
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/installations": {
     parameters: {
       query?: never;
       header?: never;
@@ -2617,6 +2699,31 @@ export interface paths {
      * @description Returns a paginated list of installations with optional filters
      */
     get: operations["getAdminInstallationList"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/devices": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get admin device list with pagination and filtering
+     * @description Returns a paginated list of devices with optional filters. Admin only.
+     *
+     *     **Conditional Filtering:**
+     *     - Common filters are always available
+     *     - Device-specific filters require matching `type` parameter
+     *     - Example: `role` filter requires `type=DONGLE`
+     */
+    get: operations["getAdminDeviceList"];
     put?: never;
     post?: never;
     delete?: never;
@@ -3713,6 +3820,11 @@ export interface components {
        */
       electricityConsumptionAmount: number | null;
       allEStatus: components["schemas"]["AllEStatus"];
+      /**
+       * @description Indicates whether there are Chill devices linked to this CIC/installation
+       * @example true
+       */
+      hasChills: boolean;
     };
     InstallerCic: components["schemas"]["MeCic"] & {
       zipCode: components["schemas"]["NullableZipCode"];
@@ -4008,7 +4120,7 @@ export interface components {
     };
     AdminInstallationDetail: components["schemas"]["Installation"] & {
       cicState: components["schemas"]["AdminCicState"][];
-      type: components["schemas"]["DetailedInstallationType"];
+      type?: components["schemas"]["DetailedInstallationType"];
       cicCommissioning: {
         id: number;
         isForced: boolean;
@@ -4021,7 +4133,7 @@ export interface components {
       devices?: components["schemas"]["Device"][];
     };
     AdminInstallationsList: {
-      cicId: components["schemas"]["CicUuid"];
+      cicId: components["schemas"]["CicUuid"] | null;
       orderNumber: components["schemas"]["NullableOrderNumber"];
       createdAt: components["schemas"]["Datetime"];
       updatedAt: components["schemas"]["Datetime"];
@@ -4030,7 +4142,7 @@ export interface components {
       houseNumber: string;
       houseAddition: string;
       houseId: string;
-      installationType: components["schemas"]["DetailedInstallationType"];
+      installationType?: components["schemas"]["DetailedInstallationType"];
     };
     CreateUpdateInstaller: {
       /** @example Jan de Vries */
@@ -4403,6 +4515,7 @@ export interface components {
       | "NO_INSTALLATION_FOUND_FOR_CIC"
       | "CIC_HAS_ALREADY_INSTALLATION"
       | "INSTALLATION_COUNTRY_NOT_FOUND"
+      | "INVALID_FILTER_COMBINATION"
       | "DEVICE_ALREADY_CONFIGURED"
       | "CANNOT_UPDATE_DEVICE"
       | "COMMISSIONING_NOT_IN_PROGRESS"
@@ -4495,7 +4608,15 @@ export interface components {
       | "COMMISSIONING_ALREADY_RUNNING_ON_INSTALLATION"
       | "NO_DEVICES_CONFIGURATION_FOUND"
       | "MISSING_ON_FAILURE_CONFIGURATION"
-      | "THREAD_DEVICE_NOT_FOUND";
+      | "THREAD_DEVICE_NOT_FOUND"
+      | "CHILL_INTERFACE_BOARD_ALREADY_ASSIGNED"
+      | "CHILL_INTERFACE_BOARD_NOT_IN_INVENTORY"
+      | "CHILL_DEVICE_NOT_FOUND"
+      | "CHILL_INTERFACE_BOARD_NOT_ASSIGNED"
+      | "CHILL_INTERFACE_BOARD_ALREADY_DEACTIVATED"
+      | "CHILL_INTERFACE_BOARD_NOT_ACTIVE"
+      | "CHILL_INTERFACE_BOARD_NOT_BELONG_TO_INSTALLATION"
+      | "DEVICE_IS_NOT_CHILL";
     ErrorResponse: components["schemas"]["Error"];
     ErrorResponseResult: {
       /** @example Unexpected error */
@@ -4508,7 +4629,6 @@ export interface components {
     InstallationStatus: "active" | "inactive";
     allEStatus: components["schemas"]["AllEStatus"];
     BaseDevice: {
-      /** @example PENDING */
       uuid: components["schemas"]["DeviceUuid"];
       cicUuid?: components["schemas"]["CicUuid"] | null;
       /** @example OUTDOOR_UNIT_1 */
@@ -4683,6 +4803,26 @@ export interface components {
          */
         totalSavingsYesterday: number | null;
       } | null;
+    };
+    ChillDevice: components["schemas"]["BaseDevice"] & {
+      /** @enum {string} */
+      type: "CHILL";
+      /**
+       * @description Chill device serial number
+       * @example CHILL-123456
+       */
+      serialNumber: string;
+      /**
+       * @description Thread network hardware identifier (EUI-64)
+       * @example 0011223344556677
+       */
+      eui64: string;
+      /**
+       * @description PCB hardware version
+       * @example v1.2.3
+       */
+      pcbHwVersion: string;
+      metrics?: components["schemas"]["BaseChillMetrics"];
     };
     /**
      * @example ALL_ELECTRIC
@@ -6834,10 +6974,118 @@ export interface components {
     DongleDevice: components["schemas"]["BaseDevice"] & {
       /** @enum {string} */
       type: "DONGLE";
+      /**
+       * @description Dongle device serial number
+       * @example DONGLE-123456
+       */
+      serialNumber: string;
+      /**
+       * @description Thread network hardware identifier (EUI-64)
+       * @example 0011223344556677
+       */
+      eui64: string;
+      /**
+       * @description Dongle role in Thread network (nullable)
+       * @example RCP
+       * @enum {string|null}
+       */
+      role?: "EXTENDER" | "RCP" | null;
+      /**
+       * @description PCB hardware version
+       * @example v1.2.3
+       */
+      pcbHwVersion: string;
     };
-    ChillDevice: components["schemas"]["BaseDevice"] & {
-      /** @enum {string} */
-      type: "CHILL";
+    /**
+     * @description The running mode of the CHILL cooling device
+     * @enum {string}
+     */
+    ChillRunningMode:
+      | "STANDBY"
+      | "COOLING"
+      | "HEATING"
+      | "AUTOMATIC"
+      | "COMMODITY_INSPECTION_COOL"
+      | "COMMODITY_INSPECTION_HEAT"
+      | "SUBSTRATE_MODE";
+    /** @description Common operational data fields shared between CHILL device diagnostics and realtime data */
+    BaseChillMetrics: {
+      /**
+       * @description Running mode of the CHILL device
+       * @example COOLING
+       */
+      runningMode: components["schemas"]["ChillRunningMode"] | null;
+      /**
+       * @description Compressor enable status
+       * @example true
+       */
+      compressorEnabled: boolean | null;
+      /**
+       * @description Four-way valve state, true means the refrigerant cycle is reversed
+       * @example false
+       */
+      fourWayValveReversed: boolean | null;
+      /**
+       * @description Solenoid-valve enable state
+       * @example true
+       */
+      solenoidValveEnabled: boolean | null;
+      /**
+       * @description Actual fan speed in RPM
+       * @example 789
+       */
+      fanActualSpeedRPM: number | null;
+      /**
+       * @description Pump feedback speed in RPM
+       * @example 500
+       */
+      pumpFeedbackSpeedRPM: number | null;
+      /**
+       * @description Real-time ambient air temperature (T3) in °C
+       * @example 25
+       */
+      ambientTemperature: number | null;
+      /**
+       * @description Relative humidity in percentage
+       * @example 56
+       */
+      humidityPercentage: number | null;
+      /**
+       * @description Inlet CH water temperature (T4) in °C
+       * @example 18.3
+       */
+      inletChTemperature: number | null;
+      /**
+       * @description Outlet CH water temperature (T5) in °C
+       * @example 16.02
+       */
+      outletChTemperature: number | null;
+      /**
+       * @description True if condensation-water tank is present
+       * @example true
+       */
+      condensationTankPresent: boolean | null;
+      /**
+       * @description Water-flow switch state (true = closed)
+       * @example true
+       */
+      waterFlowSwitchClosed: boolean | null;
+      /**
+       * @description Active system failure conditions from CHILL control board
+       * @example [
+       *       "fanFailure",
+       *       "hostComms"
+       *     ]
+       */
+      systemFailures: string[] | null;
+      /**
+       * @description Active system protection conditions from CHILL control board
+       * @example [
+       *       "highDischargePressure",
+       *       "condensationTankFull"
+       *     ]
+       */
+      systemProtections: string[] | null;
     };
     BoilerDevice: components["schemas"]["BaseDevice"] & {
       /** @enum {string} */
@@ -6978,6 +7226,16 @@ export interface components {
         errorCode?: "NO_LEGACY_COMMISSIONING_HISTORY";
       };
     };
+    /**
+     * @description Product type representing different installation/setup workflows available to installers
+     * @enum {string}
+     */
+    Product:
+      | "HYBRID"
+      | "ALL_ELECTRIC"
+      | "CHILL"
+      | "HOME_BATTERY"
+      | "QUATT_NETWORK";
     UpdateThermostat: {
       /** @example true */
       hasRoomTemperatureControl: boolean;
@@ -7054,102 +7312,13 @@ export interface components {
       | "COMPRESSOR_COOLDOWN"
       | "SAFETY_COOLDOWN"
       | "DEGRADED_SERVICE";
-    /**
-     * @description The running mode of the CHILL cooling device
-     * @enum {string}
-     */
-    ChillRunningMode:
-      | "STANDBY"
-      | "COOLING"
-      | "HEATING"
-      | "AUTOMATIC"
-      | "COMMODITY_INSPECTION_COOL"
-      | "COMMODITY_INSPECTION_HEAT"
-      | "SUBSTRATE_MODE";
-    /** @description Diagnostics information from the CHILL cooling device being commissioned */
-    ChillDiagnostics: {
+    ChillDiagnostics: components["schemas"]["BaseChillMetrics"] & {
       eui64: components["schemas"]["EUI64"];
       /**
        * @description Human-readable name of the CHILL device, or null if not set
        * @example CHILL Unit 1
        */
       name: string | null;
-      /**
-       * @description Running mode of the CHILL device
-       * @example COOLING
-       */
-      runningMode: components["schemas"]["ChillRunningMode"] | null;
-      /**
-       * @description Compressor enable status
-       * @example true
-       */
-      compressorEnabled: boolean | null;
-      /**
-       * @description Four-way valve state, true means the refrigerant cycle is reversed
-       * @example false
-       */
-      fourWayValveReversed: boolean | null;
-      /**
-       * @description Solenoid-valve enable state
-       * @example true
-       */
-      solenoidValveEnabled: boolean | null;
-      /**
-       * @description Actual fan speed in RPM
-       * @example 789
-       */
-      fanActualSpeedRPM: number | null;
-      /**
-       * @description Pump feedback speed in RPM
-       * @example 500
-       */
-      pumpFeedbackSpeedRPM: number | null;
-      /**
-       * @description Real-time ambient air temperature (T3) in °C
-       * @example 25
-       */
-      ambientTemperature: number | null;
-      /**
-       * @description Relative humidity in percentage
-       * @example 56
-       */
-      humidityPercentage: number | null;
-      /**
-       * @description Inlet CH water temperature (T4) in °C
-       * @example 18.3
-       */
-      inletChTemperature: number | null;
-      /**
-       * @description Outlet CH water temperature (T5) in °C
-       * @example 16.02
-       */
-      outletChTemperature: number | null;
-      /**
-       * @description True if condensation-water tank is present
-       * @example true
-       */
-      condensationTankPresent: boolean | null;
-      /**
-       * @description Water-flow switch state (true = closed)
-       * @example true
-       */
-      waterFlowSwitchClosed: boolean | null;
-      /**
-       * @description Active system failure conditions from CHILL control board
-       * @example [
-       *       "fanFailure",
-       *       "hostComms"
-       *     ]
-       */
-      systemFailures: string[] | null;
-      /**
-       * @description Active system protection conditions from CHILL control board
-       * @example [
-       *       "highDischargePressure",
-       *       "condensationTankFull"
-       *     ]
-       */
-      systemProtections: string[] | null;
     };
     /** @description Comprehensive diagnostics information for the Quatt system */
     Diagnostics: {
@@ -7217,11 +7386,11 @@ export interface components {
     };
     DeaerationChillFlow: components["schemas"]["BaseCommissioningTest"] & {
       /**
-       * @description The name of the chill device being tested
+       * @description The name of the Chill device being tested
        * @example Living Room Chill
        */
       chillDeviceName: string;
-      /** @description The live data for chill deaeration flow test */
+      /** @description The live data for Chill deaeration flow test */
       liveData: {
         /** @description The datetime of the last update of the live data */
         lastUpdatedAt: components["schemas"]["Datetime"];
@@ -7240,7 +7409,7 @@ export interface components {
     };
     DeaerationChillSolenoid: components["schemas"]["BaseCommissioningTest"] & {
       /**
-       * @description The name of the chill device being tested
+       * @description The name of the Chill device being tested
        * @example Living Room Chill
        */
       chillDeviceName: string;
@@ -7251,7 +7420,7 @@ export interface components {
       minimumTimeRequiredInSeconds?: number;
       /** @description The datetime when the test will end at the earliest */
       minimumDatetime?: components["schemas"]["NullableDateTime"];
-      /** @description The live data for chill deaeration solenoid test */
+      /** @description The live data for Chill deaeration solenoid test */
       liveData: {
         /** @description The datetime of the last update of the live data */
         lastUpdatedAt: components["schemas"]["Datetime"];
@@ -7275,7 +7444,7 @@ export interface components {
     };
     FlowrateChill: components["schemas"]["BaseCommissioningTest"] & {
       /**
-       * @description The name of the chill device being tested
+       * @description The name of the Chill device being tested
        * @example Living Room Chill
        */
       chillDeviceName: string;
@@ -7286,7 +7455,7 @@ export interface components {
       minimumTimeRequiredInSeconds: number;
       /** @description The datetime when the test will end at the earliest (after 1 minute for waterFlowSwitchClosed validation) */
       minimumDatetime?: components["schemas"]["NullableDateTime"];
-      /** @description The live data for chill flowrate test */
+      /** @description The live data for Chill flowrate test */
       liveData: {
         /** @description The datetime of the last update of the live data */
         lastUpdatedAt: components["schemas"]["Datetime"];
@@ -7336,7 +7505,7 @@ export interface components {
     } | null;
     CoolingChill: components["schemas"]["BaseCommissioningTest"] & {
       /**
-       * @description The name of the chill device being tested
+       * @description The name of the Chill device being tested
        * @example Living Room Chill
        */
       chillDeviceName: string;
@@ -7352,7 +7521,7 @@ export interface components {
        * @example 35
        */
       expectedPreCoolingTemperature: number;
-      /** @description The live data for chill cooling test */
+      /** @description The live data for Chill cooling test */
       liveData: {
         /** @description The datetime of the last update of the live data */
         lastUpdatedAt: components["schemas"]["Datetime"];
@@ -7410,13 +7579,240 @@ export interface components {
       | "setCommissioningModeTestDischargingHeatcharger"
       | "setCommissioningModeTestPowerHeatcharger";
     /**
+     * @description Visual color theme of the Chill device for identification and personalization in the user interface
+     * @example CALM_GREEN
+     * @enum {string}
+     */
+    ChillColor: "CALM_GREEN" | "SOFT_SAND" | "COOL_BLACK";
+    /**
+     * @description Current operational status of the Chill device. Human readable status indicating the device's state and any warnings or errors
+     * @example ON_WORKING
+     * @enum {string}
+     */
+    ChillStatus:
+      | "ON_STARTING"
+      | "ON_WORKING"
+      | "ON_TARGET_TEMPERATURE_REACHED"
+      | "OFF_STOPPING"
+      | "OFF"
+      | "WARNING_NOT_COOLING_HEATING_SYSTEM_IS_HEATING"
+      | "WARNING_TANK_FULL"
+      | "WARNING_TANK_MISSING"
+      | "WARNING_IN_MAINTENANCE"
+      | "WARNING_DISCONNECTED"
+      | "ERROR";
+    /**
+     * @description Fan speed setting for the Chill device. Controls the airflow and noise level of the unit
+     * @example BOOST
+     * @enum {string}
+     */
+    ChillFanMode: "NORMAL" | "MUTE" | "BOOST";
+    /**
+     * @description Operating mode of the Chill device. Determines whether the device is providing cooling or heating
+     * @example COOLING
+     * @enum {string}
+     */
+    ChillMode: "COOLING" | "HEATING";
+    /** @description Error condition affecting the Chill device, including a specific error code and human-readable message */
+    ChillError: {
+      /**
+       * @description Specific error code identifying the type of failure or protection that triggered
+       * @example HIGH_VOLT_SWITCH_PROTECTION
+       * @enum {string}
+       */
+      code:
+        | "AMBIENT_TEMPERATURE_SENSOR_FAILURE"
+        | "SUCTION_TEMPERATURE_SENSOR_FAILURE"
+        | "DISCHARGE_TEMPERATURE_SENSOR_FAILURE"
+        | "INLET_CH_TEMPERATURE_SENSOR_FAILURE"
+        | "OUTLET_CH_TEMPERATURE_SENSOR_FAILURE"
+        | "EVAPORATOR_COIL_TEMPERATURE_SENSOR_FAILURE"
+        | "CONDENSOR_OUTLET_TEMPERATURE_SENSOR_FAILURE"
+        | "HUMIDITY_SENSOR_FAILURE"
+        | "SUCTION_PRESSURE_SENSOR_FAILURE"
+        | "DISCHARGE_TEMPERATURE_SENSOR_FAILURE_3X"
+        | "EXCESSIVE_CH_TEMP_DIFF_3X"
+        | "INLET_CH_TEMP_LIMIT_3X"
+        | "FAN_FAILURE"
+        | "ABNORMAL_CH_TEMP_DIFF_3X"
+        | "EEPROM_FAILURE"
+        | "HOST_COMMS_FAILURE"
+        | "HIGH_DISCHARGE_PRESSURE_PROTECTION"
+        | "HIGH_VOLT_SWITCH_PROTECTION"
+        | "SUCTION_PRESSURE_PROTECTION"
+        | "HIGH_VOLT_SWITCH_PROTECTION_3X"
+        | "SUCTION_PRESSURE_PROTECTION_3X"
+        | "REFRIGERANT_EVAPORATOR_COIL_ANTIFREEZE"
+        | "REFRIGERANT_EVAPORATOR_COIL_ANTIFREEZE_3X"
+        | "REFRIGERANT_CONDENSOR_COIL_ANTIFREEZE"
+        | "REFRIGERANT_CONDENSOR_OUTLET_OVERHEAT"
+        | "HEATING_EVAPORATOR_COIL_OVERHEAT"
+        | "HEATING_EVAPORATOR_COIL_OVERHEAT_3X"
+        | "EXCESSIVE_CH_TEMP_DIFF_PROTECTION"
+        | "INLET_CH_TEMP_LIMIT_PROTECTION"
+        | "ABNORMAL_CH_TEMP_DIFF_PROTECTION"
+        | "PUMP_OVER_VOLTAGE_PROTECTION"
+        | "PUMP_UNDER_VOLTAGE_PROTECTION"
+        | "PUMP_OVER_CURRENT_PROTECTION"
+        | "PUMP_UNDER_CURRENT_PROTECTION"
+        | "PUMP_LIGHT_LOAD_PROTECTION"
+        | "PUMP_STALL_PROTECTION"
+        | "WATER_FLOW_SWITCH_PROTECTION";
+      /**
+       * @description Human-readable description of the error condition for display to users or debugging
+       * @example Invalid Chill device state
+       */
+      message: string;
+    };
+    ChillState: {
+      uuid: components["schemas"]["DeviceUuid"];
+      eui64: components["schemas"]["EUI64"];
+      /**
+       * @description Human-readable name of the Chill device
+       * @example Chill Device 1
+       */
+      name: string;
+      color: components["schemas"]["ChillColor"];
+      status: components["schemas"]["ChillStatus"];
+      /** @description Indicates whether the Chill device is on or off */
+      isOn: {
+        /**
+         * @description True if the Chill device is on, false if it is off
+         * @example true
+         */
+        value: boolean;
+        /**
+         * @description Indicates if the on/off state change is pending
+         * @example false
+         */
+        isPending: boolean;
+      };
+      fanMode: components["schemas"]["ChillFanMode"];
+      mode: components["schemas"]["ChillMode"];
+      /**
+       * Format: int32
+       * @description Target temperature in degrees Celsius. Accepts integer values between 16°C and 31°C
+       * @example 22
+       */
+      targetTemperature: number;
+      /**
+       * Format: float
+       * @description Current ambient temperature measured by the Chill device in degrees Celsius
+       * @example 21
+       */
+      ambientTemperature: number;
+      /**
+       * @description Water tank level warning status for the Chill device. Indicates when the condensation tank is approaching capacity
+       * @example true
+       */
+      hasWaterTankLevelWarning: boolean;
+      /**
+       * @description List of current error conditions affecting the Chill device. Null when no errors are present
+       * @example []
+       */
+      errors: components["schemas"]["ChillError"][] | null;
+      lastUpdatedAt: components["schemas"]["Datetime"];
+      /**
+       * Format: int32
+       * @description Minimum allowed target temperature for this Chill device in degrees Celsius
+       * @example 16
+       */
+      minTargetTemperature: number;
+      /**
+       * Format: int32
+       * @description Maximum allowed target temperature for this Chill device in degrees Celsius
+       * @example 31
+       */
+      maxTargetTemperature: number;
+    };
+    /** @example CHA-7f24b2d2-a261-4c53-bc61-4e06a836d690 */
+    ChillActionUuid: string;
+    /** @description Set the target temperature of the Chill device */
+    ChillActionSetTargetTemperature: {
+      uuid?: components["schemas"]["ChillActionUuid"];
+      /**
+       * @example SET_TARGET_TEMPERATURE
+       * @enum {string}
+       */
+      type: "SET_TARGET_TEMPERATURE";
+      /**
+       * Format: int32
+       * @description Desired target temperature in degrees Celsius. Accepts integer values between 16°C and 31°C
+       * @example 22
+       */
+      targetTemperature: number;
+    };
+    /** @description Set the operating mode of the Chill device */
+    ChillActionSetMode: {
+      uuid?: components["schemas"]["ChillActionUuid"];
+      /**
+       * @example SET_MODE
+       * @enum {string}
+       */
+      type: "SET_MODE";
+      mode: components["schemas"]["ChillMode"];
+    };
+    /** @description Set the fan mode of the Chill device */
+    ChillActionSetFanMode: {
+      uuid?: components["schemas"]["ChillActionUuid"];
+      /**
+       * @example SET_FAN_MODE
+       * @enum {string}
+       */
+      type: "SET_FAN_MODE";
+      fanMode: components["schemas"]["ChillFanMode"];
+    };
+    /** @description Set the Chill device ON or OFF */
+    ChillActionSetOnOff: {
+      uuid?: components["schemas"]["ChillActionUuid"];
+      /**
+       * @example SET_ON_OFF
+       * @enum {string}
+       */
+      type: "SET_ON_OFF";
+      /**
+       * @description Set to true to turn the Chill device ON, or false to turn it OFF
+       * @example true
+       */
+      on: boolean;
+    };
+    ChillActionRequest:
+      | components["schemas"]["ChillActionSetTargetTemperature"]
+      | components["schemas"]["ChillActionSetMode"]
+      | components["schemas"]["ChillActionSetFanMode"]
+      | components["schemas"]["ChillActionSetOnOff"];
+    /**
+     * @description The type of action to be performed on the Chill device
+     * @example SET_TARGET_TEMPERATURE
+     * @enum {string}
+     */
+    ChillActionType:
+      | "SET_TARGET_TEMPERATURE"
+      | "SET_MODE"
+      | "SET_FAN_MODE"
+      | "SET_ON_OFF";
+    /** @description Response returned when a Chill action is created */
+    ChillActionCreatedResponse: {
+      uuid: components["schemas"]["ChillActionUuid"];
+      type: components["schemas"]["ChillActionType"];
+      /**
+       * Format: int64
+       * @description The timestamp (in milliseconds since epoch) when the action was created
+       * @example 1672531199000
+       */
+      createdAt: number;
+    };
+    /**
      * Format: uuid
      * @example 7f24b2d2-a261-4c53-bc61-4e06a836d690
      */
     NullableUuid: string | null;
     /** @example CIC-7f24b2d2-a261-4c53-bc61-4e06a836d690 */
     NullableCicUuid: string | null;
-    /** @enum {string|null} */
+    /**
+     * @description The detailed type of installation
+     * @enum {string|null}
+     */
     DetailedInstallationType:
       | "HYBRID_SINGLE"
       | "HYBRID_DUO"
@@ -7453,6 +7849,78 @@ export interface components {
        */
       value: unknown;
     };
+    /** @description Request body for replacing a Chill Interface Board */
+    ReplaceChillInterfaceBoardRequest: {
+      /**
+       * @description EUI-64 of the new board from inventory to activate
+       * @example FEDCBA9876543210
+       */
+      newBoardEui64: string;
+    };
+    /** @description Chill Interface Board with lifecycle information */
+    ChillInterfaceBoard: {
+      /**
+       * @description Unique identifier with CHI- prefix
+       * @example CHI-12345678-1234-1234-1234-123456789012
+       */
+      uuid: string;
+      /**
+       * @description Associated CHILL device UUID (NULL = inventory)
+       * @example DEV-12345678-1234-1234-1234-123456789012
+       */
+      chillDeviceUuid?: string | null;
+      /**
+       * @description Extended Unique Identifier (ASCII-HEX 8 bytes)
+       * @example 0123456789ABCDEF
+       */
+      eui64: string;
+      /**
+       * @description Thread Pre-Shared Key (ASCII-HEX 32 bytes)
+       * @example 0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF
+       */
+      pskThread: string;
+      /**
+       * @description DTLS Pre-Shared Key (ASCII-HEX 32 bytes)
+       * @example FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210
+       */
+      pskDTLS: string;
+      /**
+       * @description PCB hardware version
+       * @example v1.0
+       */
+      pcbHwVersion: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when board was first activated (NULL = inventory)
+       * @example 2025-01-15T10:30:00Z
+       */
+      activatedAt?: string | null;
+      /**
+       * Format: date-time
+       * @description Timestamp when board was deactivated/replaced (NULL = active)
+       * @example null
+       */
+      deactivatedAt?: string | null;
+      /**
+       * Format: date-time
+       * @description Timestamp when board was created in system
+       * @example 2025-01-10T08:00:00Z
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when board was last updated
+       * @example 2025-01-15T10:30:00Z
+       */
+      updatedAt: string;
+    };
+    /** @description Response containing both deactivated and activated boards */
+    ReplaceChillInterfaceBoardResponse: {
+      /** @description The board that was deactivated */
+      oldBoard: components["schemas"]["ChillInterfaceBoard"];
+      /** @description The board that was activated */
+      newBoard: components["schemas"]["ChillInterfaceBoard"];
+    };
     PaginatedInstallationList: {
       /** @description Array of installation list items */
       installations: components["schemas"]["AdminInstallationsList"][];
@@ -7474,6 +7942,99 @@ export interface components {
       /**
        * @description Total number of pages
        * @example 1
+       */
+      totalPages: number;
+    };
+    /**
+     * @example RCP
+     * @enum {string}
+     */
+    DongleRole: "EXTENDER" | "RCP";
+    AdminDeviceListItem: {
+      /**
+       * @description Device UUID (DEV-xxx format)
+       * @example DEV-7f24b2d2-a261-4c53-bc61-4e06a836d690
+       */
+      deviceUuid: string;
+      type: components["schemas"]["DeviceType"];
+      /**
+       * @description Device name from device table
+       * @example Living Room Thermostat
+       */
+      name?: string | null;
+      status?: components["schemas"]["DeviceStatus"];
+      /**
+       * @description Serial number (available for DONGLE, CHILL, OUTDOOR_UNIT, HEAT_CHARGER, HEAT_BATTERY, HOME_BATTERY)
+       * @example DONGLE-123456
+       */
+      serialNumber?: string | null;
+      /**
+       * @description Thread network EUI-64 identifier. For DONGLE dongle.eui64, For CHILL activeChillInterfaceBoard.eui64
+       * @example 0011223344556677
+       */
+      eui64?: string | null;
+      /**
+       * @description Dongle role (only present when type=DONGLE)
+       * @example RCP
+       */
+      dongleRole?:
+        | (Record<string, never> | null)
+        | components["schemas"]["DongleRole"];
+      /**
+       * @description Dongle PCB hardware version (only present when type=DONGLE)
+       * @example v1.2.3
+       */
+      donglePcbHwVersion?: string | null;
+      /**
+       * @description Heat battery size (only present when type=HEAT_BATTERY)
+       * @example large
+       */
+      heatBatterySize?:
+        | (Record<string, never> | null)
+        | components["schemas"]["HeatBatterySize"];
+      /**
+       * @description Installation external ID (INS-xxx format)
+       * @example INS-123e4567-e89b-12d3-a456-426614174000
+       */
+      installationUuid?: string | null;
+      /**
+       * @description CIC ID (CIC-xxx format)
+       * @example CIC-7f24b2d2-a261-4c53-bc61-4e06a836d690
+       */
+      cicId?: string | null;
+      /**
+       * Format: date-time
+       * @description Device creation timestamp
+       * @example 2024-01-01T00:00:00.000Z
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Device last update timestamp
+       * @example 2024-01-01T00:00:00.000Z
+       */
+      updatedAt: string;
+    };
+    PaginatedDeviceList: {
+      devices: components["schemas"]["AdminDeviceListItem"][];
+      /**
+       * @description Total number of devices matching filters
+       * @example 150
+       */
+      total: number;
+      /**
+       * @description Current page number
+       * @example 1
+       */
+      page: number;
+      /**
+       * @description Number of devices per page
+       * @example 20
+       */
+      pageSize: number;
+      /**
+       * @description Total number of pages
+       * @example 8
        */
       totalPages: number;
     };
@@ -11236,7 +11797,7 @@ export interface operations {
       500: components["responses"]["Unexpected"];
     };
   };
-  getDevicesConfiguration: {
+  getProducts: {
     parameters: {
       query?: never;
       header?: {
@@ -11256,7 +11817,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description List of devices configuration */
+      /** @description List of available products */
       200: {
         headers: {
           [name: string]: unknown;
@@ -11264,7 +11825,7 @@ export interface operations {
         content: {
           "application/json": {
             meta: components["schemas"]["ResponseMeta"];
-            result: components["schemas"]["DevicesConfiguration"][];
+            result: components["schemas"]["Product"][];
           };
         };
       };
@@ -12315,6 +12876,135 @@ export interface operations {
       };
       401: components["responses"]["Unauthorized"];
       403: components["responses"]["Forbidden"];
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  getAllChillsInInstallation: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Full state of the Chill devices */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: {
+              /** @example [] */
+              chills: components["schemas"]["ChillState"][];
+            };
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      404: components["responses"]["NotFound"];
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  getChillInInstallation: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        deviceUuid: components["parameters"]["deviceUuid"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Full state of the Chill device */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["ChillState"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      404: components["responses"]["NotFound"];
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  pushChillAction: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        deviceUuid: components["parameters"]["deviceUuid"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChillActionRequest"];
+      };
+    };
+    responses: {
+      /** @description Action created and sent successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["ChillActionCreatedResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      404: components["responses"]["NotFound"];
       500: components["responses"]["Unexpected"];
     };
   };
@@ -13702,6 +14392,90 @@ export interface operations {
       500: components["responses"]["Unexpected"];
     };
   };
+  AdminReplaceChillInterfaceBoard: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationUuid: components["parameters"]["InstallationUuid"];
+        deviceUuid: components["parameters"]["deviceUuid"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "newBoardEui64": "FEDCBA9876543210"
+         *     }
+         */
+        "application/json": components["schemas"]["ReplaceChillInterfaceBoardRequest"];
+      };
+    };
+    responses: {
+      /** @description Board successfully replaced */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["ReplaceChillInterfaceBoardResponse"];
+          };
+        };
+      };
+      /** @description Bad request - device or board validation failed */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "DEVICE_IS_NOT_CHILL"
+                | "CHILL_INTERFACE_BOARD_ALREADY_DEACTIVATED"
+                | "CHILL_INTERFACE_BOARD_NOT_ACTIVE"
+                | "CHILL_INTERFACE_BOARD_ALREADY_ASSIGNED"
+                | "CHILL_INTERFACE_BOARD_NOT_BELONG_TO_INSTALLATION";
+            };
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Device or board not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "CHILL_DEVICE_NOT_FOUND"
+                | "CHILL_INTERFACE_BOARD_NOT_IN_INVENTORY";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
   getAdminInstallationList: {
     parameters: {
       query?: {
@@ -13823,7 +14597,8 @@ export interface operations {
            *       }
            *     }
            */
-          "application/json": components["schemas"]["ResponseMeta"] & {
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
             result: components["schemas"]["PaginatedInstallationList"];
           };
         };
@@ -13841,6 +14616,203 @@ export interface operations {
            *       "meta": {
            *         "errorCode": "INTERNAL_SERVER_ERROR",
            *         "message": "Failed to fetch installations from the database."
+           *       }
+           *     }
+           */
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  getAdminDeviceList: {
+    parameters: {
+      query?: {
+        /**
+         * @description Page number for pagination
+         * @example 1
+         */
+        page?: number;
+        /**
+         * @description Number of items per page
+         * @example 20
+         */
+        pageSize?: number;
+        /**
+         * @description Filter by device type (exact match)
+         * @example DONGLE
+         */
+        type?: components["schemas"]["DeviceType"];
+        /**
+         * @description Filter by device UUID (partial match)
+         * @example DEV-123
+         */
+        deviceUuid?: string;
+        /**
+         * @description Filter by installation UUID (partial match)
+         * @example INS-123
+         */
+        installationUuid?: string;
+        /**
+         * @description Filter by CIC ID (partial match)
+         * @example CIC-123
+         */
+        cicId?: string;
+        /**
+         * @description Filter by serial number (partial match). Available for DONGLE, CHILL, OUTDOOR_UNIT, HEAT_CHARGER, HEAT_BATTERY, HOME_BATTERY
+         * @example DONGLE-123
+         */
+        serialNumber?: string;
+        /**
+         * @description Filter by device name (partial match)
+         * @example Living Room
+         */
+        name?: string;
+        /**
+         * @description Filter by device status (exact match)
+         * @example ACTIVE
+         */
+        status?: components["schemas"]["DeviceStatus"];
+        /**
+         * @description Filter by EUI-64 identifier (partial match).
+         *
+         *     **Location varies by device type:**
+         *     - DONGLE: deviceDongle.eui64
+         *     - CHILL: deviceChill.activeChillInterfaceBoard.eui64
+         * @example 0011223344
+         */
+        eui64?: string;
+        /**
+         * @description Filter by creation date start range (YYYY-MM-DD format)
+         * @example 2024-01-01
+         */
+        createdAtStart?: string;
+        /**
+         * @description Filter by creation date end range (YYYY-MM-DD format)
+         * @example 2024-12-31
+         */
+        createdAtEnd?: string;
+        /**
+         * @description Filter by update date start range (YYYY-MM-DD format)
+         * @example 2024-01-01
+         */
+        updatedAtStart?: string;
+        /**
+         * @description Filter by update date end range (YYYY-MM-DD format)
+         * @example 2024-12-31
+         */
+        updatedAtEnd?: string;
+        /**
+         * @description Filter by dongle role (exact match).
+         *
+         *     ⚠️ **Conditional Parameter**: Only available when type=DONGLE.
+         *     Using this parameter without type=DONGLE will result in 400 Bad Request.
+         * @example RCP
+         */
+        role?: components["schemas"]["DongleRole"];
+        /**
+         * @description Filter by PCB hardware version (exact match).
+         *
+         *     ⚠️ **Conditional Parameter**: Only available when type=DONGLE.
+         * @example v1.2.3
+         */
+        pcbHwVersion?: string;
+        /**
+         * @description Filter by heat battery size (exact match).
+         *
+         *     ⚠️ **Conditional Parameter**: Only available when type=HEAT_BATTERY.
+         * @example large
+         */
+        heatBatterySize?: components["schemas"]["HeatBatterySize"];
+      };
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successfully retrieved paginated device list */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "requestId": "550e8400-e29b-41d4-a716-446655440000"
+           *       },
+           *       "result": {
+           *         "devices": [
+           *           {
+           *             "deviceUuid": "DEV-123e4567-e89b-12d3-a456-426614174000",
+           *             "type": "DONGLE",
+           *             "serialNumber": "DONGLE-123456",
+           *             "eui64": "0011223344556677",
+           *             "dongleRole": "RCP",
+           *             "donglePcbHwVersion": "v1.2.3",
+           *             "installationUuid": "INS-123e4567-e89b-12d3-a456-426614174000",
+           *             "cicId": "CIC-7f24b2d2-a261-4c53-bc61-4e06a836d690",
+           *             "name": null,
+           *             "status": "ACTIVE",
+           *             "createdAt": "2024-01-01T00:00:00.000Z",
+           *             "updatedAt": "2024-01-01T00:00:00.000Z",
+           *             "heatBatterySize": null
+           *           }
+           *         ],
+           *         "total": 150,
+           *         "page": 1,
+           *         "pageSize": 20,
+           *         "totalPages": 8
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["PaginatedDeviceList"];
+          };
+        };
+      };
+      /** @description Bad Request - Invalid filter combination */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "errorCode": "INVALID_FILTER_COMBINATION",
+           *         "message": "Filter 'role' requires type=DONGLE"
+           *       }
+           *     }
+           */
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["Forbidden"];
+      /** @description Internal server error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "errorCode": "INTERNAL_SERVER_ERROR",
+           *         "message": "An error occurred while fetching device list"
            *       }
            *     }
            */

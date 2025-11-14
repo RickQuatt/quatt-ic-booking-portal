@@ -497,6 +497,12 @@ export interface InstallerCic {
    */
   allEStatus: AllEStatus | null;
   /**
+   * Indicates whether there are Chill devices linked to this CIC/installation
+   * @type {boolean}
+   * @memberof InstallerCic
+   */
+  hasChills: boolean;
+  /**
    *
    * @type {Array<HeatDeliverySystem>}
    * @memberof InstallerCic
@@ -631,6 +637,7 @@ export function instanceOfInstallerCic(value: object): boolean {
   isInstance = isInstance && "quattHeatingProductionAmount" in value;
   isInstance = isInstance && "electricityConsumptionAmount" in value;
   isInstance = isInstance && "allEStatus" in value;
+  isInstance = isInstance && "hasChills" in value;
   isInstance = isInstance && "heatDeliverySystems" in value;
   isInstance = isInstance && "thermostatType" in value;
   isInstance = isInstance && "quattBuildRequired" in value;
@@ -767,6 +774,7 @@ export function InstallerCicFromJSONTyped(
     quattHeatingProductionAmount: json["quattHeatingProductionAmount"],
     electricityConsumptionAmount: json["electricityConsumptionAmount"],
     allEStatus: AllEStatusFromJSON(json["allEStatus"]),
+    hasChills: json["hasChills"],
     heatDeliverySystems:
       json["heatDeliverySystems"] === null
         ? null
@@ -880,6 +888,7 @@ export function InstallerCicToJSON(value?: InstallerCic | null): any {
     quattHeatingProductionAmount: value.quattHeatingProductionAmount,
     electricityConsumptionAmount: value.electricityConsumptionAmount,
     allEStatus: AllEStatusToJSON(value.allEStatus),
+    hasChills: value.hasChills,
     heatDeliverySystems:
       value.heatDeliverySystems === null
         ? null

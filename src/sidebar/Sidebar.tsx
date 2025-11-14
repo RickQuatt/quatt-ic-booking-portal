@@ -41,6 +41,9 @@ export function Sidebar() {
           <Link href="/dynamic-pricing" className={classes["sidebar-button"]}>
             Dynamic Pricing
           </Link>
+          <Link href="/devices" className={classes["sidebar-button"]}>
+            Device List
+          </Link>
           <span className={classes["sidebar-button"]}>
             {import.meta.env.ENV}
           </span>

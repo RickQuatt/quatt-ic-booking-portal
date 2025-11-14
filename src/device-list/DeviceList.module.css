@@ -1,0 +1,192 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 20px 20px 20px;
+}
+
+.page-title {
+  margin-left: var(--table-side-padding);
+  margin-right: var(--table-side-padding);
+  align-content: center;
+}
+
+.page-title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.table-grid {
+  grid-template-columns: 1fr 1.8fr 1.2fr 1fr 1fr 1fr 1.5fr 1.2fr 0.8fr 0.8fr;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow-y: auto;
+  min-width: 1400px;
+}
+
+.conditional-filters-row {
+  background-color: #f8f9fa;
+}
+
+.conditional-filters {
+  display: flex;
+  gap: 20px;
+  padding: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+}
+
+.results-info {
+  margin: 10px 0;
+  padding: 8px 12px;
+  background-color: #f0f7ff;
+  border-left: 3px solid #4a90e2;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.loader-container {
+  width: 4rem;
+}
+
+.instruction-text {
+  margin-left: 1rem;
+  color: #a5a5a5;
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.info-text {
+  padding: 15px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.device-uuid {
+  font-family: "Menlo", "Monaco", "Consolas", monospace;
+  font-size: 0.85rem;
+}
+
+.eui64 {
+  font-family: "Menlo", "Monaco", "Consolas", monospace;
+  font-size: 0.85rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.status-active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-factory {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-uninstalled {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.status-default {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+/* Responsive design for mobile/tablet */
+@media (max-width: 768px) {
+  .page {
+    padding: 0 10px 10px 10px;
+  }
+
+  .page-title-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .table-grid {
+    min-width: auto;
+    overflow-x: auto;
+  }
+
+  .conditional-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .results-info {
+    font-size: 0.8rem;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+}

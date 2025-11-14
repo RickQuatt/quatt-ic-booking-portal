@@ -36,6 +36,9 @@ import type {
   AdminListCics200Response,
   AdminListInstallers200Response,
   AdminRebootDeviceRequest,
+  AdminReplaceChillInterfaceBoard200Response,
+  AdminReplaceChillInterfaceBoard400Response,
+  AdminReplaceChillInterfaceBoard404Response,
   AdminUpdateInstallationNote200Response,
   CompleteCommissioning200Response,
   CreateTariff200Response,
@@ -57,6 +60,7 @@ import type {
   GetInstallationCommissionings200Response,
   GetInstallerCic200Response,
   GetInstallerInstallationLatestCommissioning200Response,
+  ReplaceChillInterfaceBoardRequest,
   SendCommandToCICRequest,
   UpdateAdminCic,
   UpdateAdminInstallation,
@@ -111,6 +115,12 @@ import {
   AdminListInstallers200ResponseToJSON,
   AdminRebootDeviceRequestFromJSON,
   AdminRebootDeviceRequestToJSON,
+  AdminReplaceChillInterfaceBoard200ResponseFromJSON,
+  AdminReplaceChillInterfaceBoard200ResponseToJSON,
+  AdminReplaceChillInterfaceBoard400ResponseFromJSON,
+  AdminReplaceChillInterfaceBoard400ResponseToJSON,
+  AdminReplaceChillInterfaceBoard404ResponseFromJSON,
+  AdminReplaceChillInterfaceBoard404ResponseToJSON,
   AdminUpdateInstallationNote200ResponseFromJSON,
   AdminUpdateInstallationNote200ResponseToJSON,
   CompleteCommissioning200ResponseFromJSON,
@@ -153,6 +163,8 @@ import {
   GetInstallerCic200ResponseToJSON,
   GetInstallerInstallationLatestCommissioning200ResponseFromJSON,
   GetInstallerInstallationLatestCommissioning200ResponseToJSON,
+  ReplaceChillInterfaceBoardRequestFromJSON,
+  ReplaceChillInterfaceBoardRequestToJSON,
   SendCommandToCICRequestFromJSON,
   SendCommandToCICRequestToJSON,
   UpdateAdminCicFromJSON,
@@ -405,6 +417,11 @@ export interface AdminInstallationInstallationIdZuperJobsOptionsRequest {
   installationId: string;
 }
 
+export interface AdminInstallationInstallationUuidDeviceDeviceUuidReplaceChillInterfaceBoardOptionsRequest {
+  installationUuid: string;
+  deviceUuid: string;
+}
+
 export interface AdminInstallationInstallationUuidEventsOptionsRequest {
   installationUuid: string;
 }
@@ -452,6 +469,14 @@ export interface AdminRebootDeviceOperationRequest {
   adminRebootDeviceRequest: AdminRebootDeviceRequest;
   xClientVersion?: string;
   xClientPlatform?: AdminRebootDeviceXClientPlatformEnum;
+}
+
+export interface AdminReplaceChillInterfaceBoardRequest {
+  installationUuid: string;
+  deviceUuid: string;
+  replaceChillInterfaceBoardRequest: ReplaceChillInterfaceBoardRequest;
+  xClientVersion?: string;
+  xClientPlatform?: AdminReplaceChillInterfaceBoardXClientPlatformEnum;
 }
 
 export interface AdminUpdateCicRequest {
@@ -3469,6 +3494,69 @@ export class SupportDashboardApi extends runtime.BaseAPI {
 
   /**
    */
+  async adminInstallationInstallationUuidDeviceDeviceUuidReplaceChillInterfaceBoardOptionsRaw(
+    requestParameters: AdminInstallationInstallationUuidDeviceDeviceUuidReplaceChillInterfaceBoardOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<void>> {
+    if (
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminInstallationInstallationUuidDeviceDeviceUuidReplaceChillInterfaceBoardOptions.",
+      );
+    }
+
+    if (
+      requestParameters.deviceUuid === null ||
+      requestParameters.deviceUuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "deviceUuid",
+        "Required parameter requestParameters.deviceUuid was null or undefined when calling adminInstallationInstallationUuidDeviceDeviceUuidReplaceChillInterfaceBoardOptions.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationUuid}/device/{deviceUuid}/replace-chill-interface-board`
+          .replace(
+            `{${"installationUuid"}}`,
+            encodeURIComponent(String(requestParameters.installationUuid)),
+          )
+          .replace(
+            `{${"deviceUuid"}}`,
+            encodeURIComponent(String(requestParameters.deviceUuid)),
+          ),
+        method: "OPTIONS",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides,
+    );
+
+    return new runtime.VoidApiResponse(response);
+  }
+
+  /**
+   */
+  async adminInstallationInstallationUuidDeviceDeviceUuidReplaceChillInterfaceBoardOptions(
+    requestParameters: AdminInstallationInstallationUuidDeviceDeviceUuidReplaceChillInterfaceBoardOptionsRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<void> {
+    await this.adminInstallationInstallationUuidDeviceDeviceUuidReplaceChillInterfaceBoardOptionsRaw(
+      requestParameters,
+      initOverrides,
+    );
+  }
+
+  /**
+   */
   async adminInstallationInstallationUuidEventsOptionsRaw(
     requestParameters: AdminInstallationInstallationUuidEventsOptionsRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
@@ -4037,6 +4125,115 @@ export class SupportDashboardApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction,
   ): Promise<CompleteCommissioning200Response> {
     const response = await this.adminRebootDeviceRaw(
+      requestParameters,
+      initOverrides,
+    );
+    return await response.value();
+  }
+
+  /**
+   * Replace a Chill Interface Board for a CHILL device by deactivating the currently active board and activating a new one from inventory
+   */
+  async adminReplaceChillInterfaceBoardRaw(
+    requestParameters: AdminReplaceChillInterfaceBoardRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<runtime.ApiResponse<AdminReplaceChillInterfaceBoard200Response>> {
+    if (
+      requestParameters.installationUuid === null ||
+      requestParameters.installationUuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "installationUuid",
+        "Required parameter requestParameters.installationUuid was null or undefined when calling adminReplaceChillInterfaceBoard.",
+      );
+    }
+
+    if (
+      requestParameters.deviceUuid === null ||
+      requestParameters.deviceUuid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "deviceUuid",
+        "Required parameter requestParameters.deviceUuid was null or undefined when calling adminReplaceChillInterfaceBoard.",
+      );
+    }
+
+    if (
+      requestParameters.replaceChillInterfaceBoardRequest === null ||
+      requestParameters.replaceChillInterfaceBoardRequest === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "replaceChillInterfaceBoardRequest",
+        "Required parameter requestParameters.replaceChillInterfaceBoardRequest was null or undefined when calling adminReplaceChillInterfaceBoard.",
+      );
+    }
+
+    const queryParameters: any = {};
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    headerParameters["Content-Type"] = "application/json";
+
+    if (
+      requestParameters.xClientVersion !== undefined &&
+      requestParameters.xClientVersion !== null
+    ) {
+      headerParameters["X-Client-Version"] = String(
+        requestParameters.xClientVersion,
+      );
+    }
+
+    if (
+      requestParameters.xClientPlatform !== undefined &&
+      requestParameters.xClientPlatform !== null
+    ) {
+      headerParameters["X-Client-Platform"] = String(
+        requestParameters.xClientPlatform,
+      );
+    }
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("bearerAuth", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/admin/installation/{installationUuid}/device/{deviceUuid}/replace-chill-interface-board`
+          .replace(
+            `{${"installationUuid"}}`,
+            encodeURIComponent(String(requestParameters.installationUuid)),
+          )
+          .replace(
+            `{${"deviceUuid"}}`,
+            encodeURIComponent(String(requestParameters.deviceUuid)),
+          ),
+        method: "POST",
+        headers: headerParameters,
+        query: queryParameters,
+        body: ReplaceChillInterfaceBoardRequestToJSON(
+          requestParameters.replaceChillInterfaceBoardRequest,
+        ),
+      },
+      initOverrides,
+    );
+
+    return new runtime.JSONApiResponse(response, (jsonValue) =>
+      AdminReplaceChillInterfaceBoard200ResponseFromJSON(jsonValue),
+    );
+  }
+
+  /**
+   * Replace a Chill Interface Board for a CHILL device by deactivating the currently active board and activating a new one from inventory
+   */
+  async adminReplaceChillInterfaceBoard(
+    requestParameters: AdminReplaceChillInterfaceBoardRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction,
+  ): Promise<AdminReplaceChillInterfaceBoard200Response> {
+    const response = await this.adminReplaceChillInterfaceBoardRaw(
       requestParameters,
       initOverrides,
     );
@@ -5317,6 +5514,16 @@ export const AdminRebootDeviceOperationXClientPlatformEnum = {
 } as const;
 export type AdminRebootDeviceOperationXClientPlatformEnum =
   (typeof AdminRebootDeviceOperationXClientPlatformEnum)[keyof typeof AdminRebootDeviceOperationXClientPlatformEnum];
+/**
+ * @export
+ */
+export const AdminReplaceChillInterfaceBoardXClientPlatformEnum = {
+  Ios: "ios",
+  Android: "android",
+  Web: "web",
+} as const;
+export type AdminReplaceChillInterfaceBoardXClientPlatformEnum =
+  (typeof AdminReplaceChillInterfaceBoardXClientPlatformEnum)[keyof typeof AdminReplaceChillInterfaceBoardXClientPlatformEnum];
 /**
  * @export
  */

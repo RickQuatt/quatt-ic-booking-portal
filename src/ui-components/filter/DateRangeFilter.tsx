@@ -8,6 +8,7 @@ interface Props<T extends object> {
   minFilterKey: keyof T;
   maxFilterKey: keyof T;
   inputType?: React.HTMLInputTypeAttribute;
+  filters?: T;
 }
 
 const MAX_DATE = new Date().toISOString().slice(0, -8);
@@ -16,6 +17,7 @@ export function DateRangeFilter<T extends object>({
   setFilters,
   minFilterKey,
   maxFilterKey,
+  filters,
 }: Props<T>) {
   const onChangeMinDate = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,10 +51,32 @@ export function DateRangeFilter<T extends object>({
     [setFilters, maxFilterKey],
   );
 
+  // Get current filter values and convert Date to string for input
+  const minValue = filters?.[minFilterKey];
+  const maxValue = filters?.[maxFilterKey];
+
+  const minDateString = React.useMemo(() => {
+    return minValue instanceof Date ? minValue.toISOString().slice(0, -8) : "";
+  }, [minValue]);
+
+  const maxDateString = React.useMemo(() => {
+    return maxValue instanceof Date ? maxValue.toISOString().slice(0, -8) : "";
+  }, [maxValue]);
+
   return (
     <div className={classes["date-range-filter-container"]}>
-      <input type="datetime-local" max={MAX_DATE} onChange={onChangeMinDate} />
-      <input type="datetime-local" max={MAX_DATE} onChange={onChangeMaxDate} />
+      <input
+        type="datetime-local"
+        max={MAX_DATE}
+        value={minDateString}
+        onChange={onChangeMinDate}
+      />
+      <input
+        type="datetime-local"
+        max={MAX_DATE}
+        value={maxDateString}
+        onChange={onChangeMaxDate}
+      />
     </div>
   );
 }
