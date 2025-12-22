@@ -782,27 +782,59 @@ Every component MUST meet these accessibility standards:
 
 ## Jira Configuration
 
-### Creating Jira Tickets
+### Working with Jira Tickets
 
-When creating Jira tickets, use these default values to avoid unnecessary queries:
+This project uses the **acli (Atlassian Command Line Interface)** for Jira integration. Use the following skills for Jira operations:
 
-- **Cloud ID**: `e00d2e3c-9946-4be6-b81a-0bb231fc50c7`
+#### Available Skills
+
+| Skill               | Description                                                                              | Usage                     |
+| ------------------- | ---------------------------------------------------------------------------------------- | ------------------------- |
+| `/jira:ticket`      | Create or update QPD tickets for bugs, tasks, and features                               | `/jira:ticket`            |
+| `/jira:release`     | Create or update QPD releases and associated CHG change management tickets               | `/jira:release`           |
+| `/jira:begin-task`  | Start work on a Jira ticket (creates branch, plans, optionally executes with commit/PR) | `/jira:begin-task <ID>`   |
+| `/jira:change`      | Create or update CHG (Software Change Management) tickets for deployments                | `/jira:change`            |
+
+#### Default Values
+
+When creating Jira tickets, use these default values:
+
 - **Default Project**: `QPD` (Quatt Product Development)
 - **Default Parent for Bugs**: `QPD-152` (Production Incidents/Maintenance - App/Backend)
-- **Available Issue Types to use**: Bug, Task,
+- **Available Issue Types**: Bug, Task
 - **Jira Team**: quatt-team
-- **always return the jira url when creating a ticket**: https://quatt-team.atlassian.net/browse/{issueId}
+- **Jira URL Format**: `https://quatt-team.atlassian.net/browse/{issueId}`
 
-Example bug creation command:
+#### Git Branch Convention
 
+When implementing a feature or fixing a bug, always:
+
+1. Create a new git branch from `develop` with naming convention: `QPD-{issueId}-{short-description}`
+   - Example: `QPD-1234-fix-mqtt-debugger`
+2. When creating a pull request:
+   - Target branch: `develop`
+   - Include the issueId in the PR title
+   - Example PR title: `[QPD-1234] Fix MQTT debugger connection issues`
+
+#### Example Workflows
+
+**Create a bug ticket:**
+
+```bash
+/jira:ticket
+# Follow the prompts to create a Bug under QPD-152
 ```
-Project: QPD
-Issue Type: Bug
-Parent: QPD-152
-Summary: [description]
+
+**Start working on an existing ticket:**
+
+```bash
+/jira:begin-task QPD-1234
+# Automatically creates branch, plans implementation, and can execute with auto-commit/PR
 ```
 
-When implementing a feature, always start by creating a new git branch from `develop` with the the naming convention QPD-{issueId}-{short-description}.
-Example: `QPD-1234-fix-mqtt-debugger`
+**Create a release:**
 
-When creating a pull request, always have `develop` as the target branch and include the issueId in the title of the PR.
+```bash
+/jira:release
+# Creates release ticket and associated CHG change management ticket
+```

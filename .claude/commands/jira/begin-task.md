@@ -1,5 +1,5 @@
 ---
-allowed-tools: mcp__atlassian-jira__getJiraIssue, mcp__atlassian-jira__searchJiraIssuesUsingJql, mcp__atlassian-jira__addCommentToJiraIssue, Bash, Task, Grep, Read, Glob, TodoWrite, MultiEdit, Write
+allowed-tools: Bash, Task, Grep, Read, Glob, TodoWrite, MultiEdit, Write
 argument-hint: [QPD-XXXX] [--auto-execute] [--auto-commit] [--auto-pr]
 description: Start work on a Jira ticket by creating branch, planning, and optionally executing with auto-commit/PR
 ---
@@ -30,7 +30,7 @@ User provided input: **$ARGUMENTS**
 
 ### **Step 2: Fetch Jira Ticket**
 
-1. Use `mcp__atlassian-jira__getJiraIssue` to fetch ticket details:
+1. Use `acli jira workitem get --issue QPD-XXXX` to fetch ticket details:
    - Summary
    - Description
    - Issue Type (Bug, Task, Story, etc.)
@@ -39,6 +39,12 @@ User provided input: **$ARGUMENTS**
    - Parent/Epic information
 
 2. If ticket not found, inform user and stop
+
+**Example:**
+
+```bash
+acli jira workitem get --issue QPD-9999
+```
 
 ### **Step 3: Create Feature Branch**
 
@@ -136,7 +142,7 @@ Create a comprehensive plan using TodoWrite tool with items like:
    - User can modify plan if needed
 
 2. **If `--auto-execute` present**:
-   - Add comment to Jira ticket: "Started automated implementation"
+   - Add comment to Jira ticket using `acli jira workitem comment --issue QPD-XXXX --comment "Started automated implementation"`
    - Begin executing the plan immediately
    - Update TodoWrite items as you progress
 
@@ -221,8 +227,8 @@ If `--auto-pr` flag is present:
    ```
 
 3. **Update Jira ticket**:
-   - Add comment with PR link
-   - Optionally transition status if appropriate
+   - Add comment with PR link using `acli jira workitem comment --issue QPD-XXXX --comment "PR created: <url>"`
+   - Optionally transition status if appropriate using `acli jira workitem update`
 
 ### **Step 10: Final Report**
 

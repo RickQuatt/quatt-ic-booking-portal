@@ -1,5 +1,5 @@
 ---
-allowed-tools: mcp__atlassian-jira__createJiraIssue, mcp__atlassian-jira__updateJiraIssue, mcp__atlassian-jira__getJiraIssue, mcp__atlassian-jira__addCommentToJiraIssue, Grep, Read, Glob
+allowed-tools: Bash, Grep, Read, Glob
 argument-hint: [QPD-XXXX update-text OR new-issue-description]
 description: Create or update QPD (Quatt Product Development) tickets for bugs, tasks, and features
 ---
@@ -161,15 +161,33 @@ User provided input: **$ARGUMENTS**
 - Be discerning and accurate - no wild goose chases
 - Focus on the actual problem, not speculation
 - Keep descriptions factual and actionable
-- Use the MCP Jira integration for all operations
+- Use the `acli` command-line tool for all Jira operations
 - If additional research reveals more information, update the ticket with relevant details
 
-### **Available MCP Actions**
+### **Available ACLI Commands**
 
-- `createJiraIssue`: Create new tickets
-- `getJiraIssue`: Retrieve existing ticket details
-- `addCommentToJiraIssue`: Add comments to existing tickets
-- `updateJiraIssue`: Update ticket fields if needed
+Use the `acli` command-line tool via Bash for all Jira operations:
+
+- `acli jira workitem create`: Create new tickets
+- `acli jira workitem get`: Retrieve existing ticket details
+- `acli jira workitem comment`: Add comments to existing tickets
+- `acli jira workitem update`: Update ticket fields
+
+**ACLI Command Format Examples:**
+
+```bash
+# Create a bug ticket
+acli jira workitem create --project QPD --type Bug --summary "..." --description "..." --parent QPD-152 --priority Medium
+
+# Get ticket details
+acli jira workitem get --issue QPD-9999
+
+# Add comment to ticket
+acli jira workitem comment --issue QPD-9999 --comment "..."
+
+# Update ticket fields
+acli jira workitem update --issue QPD-9999 --field priority --value High
+```
 
 ### **After Operation**
 

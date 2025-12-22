@@ -1,5 +1,5 @@
 ---
-allowed-tools: mcp__atlassian-jira__createJiraIssue, mcp__atlassian-jira__updateJiraIssue, mcp__atlassian-jira__getJiraIssue, mcp__atlassian-jira__addCommentToJiraIssue
+allowed-tools: Bash, Grep, Read, Glob
 argument-hint: [CHG-XX update-text OR new-change-title]
 description: Create or update CHG (Software Change Management) tickets for deployments and infrastructure changes
 ---
@@ -78,11 +78,11 @@ User provided input: **$ARGUMENTS**
    - Extract update text (everything after the ticket key)
 
 2. **Fetch existing ticket**:
-   - Use `getJiraIssue` to retrieve current ticket details
+   - Use `acli jira workitem get --issue CHG-XX` to retrieve current ticket details
    - Understand the context of what's being updated
 
 3. **Add comment**:
-   - Use `addCommentToJiraIssue` to add the update text as a comment
+   - Use `acli jira workitem comment --issue CHG-XX --comment "..."` to add the update text as a comment
    - Format comment with timestamp context if relevant
 
 ### **Common Change Types**
@@ -103,15 +103,33 @@ User provided input: **$ARGUMENTS**
 - Keep descriptions factual and concise
 - Focus on operational impact, not technical implementation details
 - Always include risk assessment and rollback considerations for CREATE
-- Use the MCP Jira integration for all operations
+- Use the `acli` command-line tool for all Jira operations
 - Default assignee to Noah Clark for deployment-related changes
 
-### **Available MCP Actions**
+### **Available ACLI Commands**
 
-- `createJiraIssue`: Create new change tickets
-- `getJiraIssue`: Retrieve existing ticket details
-- `addCommentToJiraIssue`: Add comments to existing tickets
-- `updateJiraIssue`: Update ticket fields if needed
+Use the `acli` command-line tool via Bash for all Jira operations:
+
+- `acli jira workitem create`: Create new change tickets
+- `acli jira workitem get`: Retrieve existing ticket details
+- `acli jira workitem comment`: Add comments to existing tickets
+- `acli jira workitem update`: Update ticket fields
+
+**ACLI Command Format Examples:**
+
+```bash
+# Create a CHG ticket
+acli jira workitem create --project CHG --type Change --summary "Quatt Cloud release/v2.14.0" --description "..." --priority Medium
+
+# Get CHG ticket details
+acli jira workitem get --issue CHG-35
+
+# Add comment to CHG ticket
+acli jira workitem comment --issue CHG-35 --comment "Deployment completed successfully"
+
+# Update CHG ticket field
+acli jira workitem update --issue CHG-35 --field status --value "Completed"
+```
 
 ### **After Operation**
 
