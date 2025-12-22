@@ -114,8 +114,12 @@ export function AdvancedSettingsModal({
     ) {
       return;
     }
+    // Remove conflicting sound fields based on hasSoundSlider
     if (cicData.hasSoundSlider) {
       delete data.silentMode;
+    } else {
+      delete data.dayMaxSoundLevel;
+      delete data.nightMaxSoundLevel;
     }
     updateCicMutation.mutate({
       params: { path: { cicId } },

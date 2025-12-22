@@ -103,6 +103,13 @@ export function InstallationSettingsModal({
   });
 
   const onSubmit = (data: InstallationSettingsFormData) => {
+    // Remove conflicting sound fields based on hasSoundSlider
+    if (installation.hasSoundSlider) {
+      delete data.silentMode;
+    } else {
+      delete data.dayMaxSoundLevel;
+      delete data.nightMaxSoundLevel;
+    }
     updateSettings(data as components["schemas"]["UpdateAdminInstallation"]);
   };
 

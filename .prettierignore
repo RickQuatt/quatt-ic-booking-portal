@@ -1,2 +1,3 @@
 src/api-client/.openapi-generator/*
 .openapi-generator-ignore
+public/mockServiceWorker.js
