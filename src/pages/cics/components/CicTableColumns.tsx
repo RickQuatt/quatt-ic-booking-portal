@@ -9,13 +9,14 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ExternalLink } from "lucide-react";
 import type { components } from "@/openapi-client/types/api/v1";
+import { ConnectionStatus } from "@/constants/enums";
 
 type AdminCic = components["schemas"]["AdminCic"];
-type ConnectionStatus = components["schemas"]["ConnectionStatus"];
+type ConnectionStatusType = components["schemas"]["ConnectionStatus"];
 
 // Connection status color mapping
 const getConnectionStatusVariant = (
-  status: ConnectionStatus | null | undefined,
+  status: ConnectionStatusType | null | undefined,
 ): "success" | "destructive" | "secondary" => {
   if (!status) return "secondary";
 
@@ -29,13 +30,6 @@ const getConnectionStatusVariant = (
     default:
       return "secondary"; // Gray
   }
-};
-
-const getConnectionStatusText = (
-  status: ConnectionStatus | null | undefined,
-): string => {
-  if (!status) return "Unknown";
-  return status.replace(/_/g, " ").toUpperCase();
 };
 
 export const cicColumns: ColumnDef<AdminCic>[] = [
@@ -57,10 +51,10 @@ export const cicColumns: ColumnDef<AdminCic>[] = [
     cell: ({ row }) => {
       const status = row.getValue(
         "cableConnectionStatus",
-      ) as ConnectionStatus | null;
+      ) as ConnectionStatusType | null;
       return (
         <Badge variant={getConnectionStatusVariant(status)} className="text-xs">
-          {getConnectionStatusText(status)}
+          {status ? ConnectionStatus.getLabel(status) : "Unknown"}
         </Badge>
       );
     },
@@ -71,10 +65,10 @@ export const cicColumns: ColumnDef<AdminCic>[] = [
     cell: ({ row }) => {
       const status = row.getValue(
         "wifiConnectionStatus",
-      ) as ConnectionStatus | null;
+      ) as ConnectionStatusType | null;
       return (
         <Badge variant={getConnectionStatusVariant(status)} className="text-xs">
-          {getConnectionStatusText(status)}
+          {status ? ConnectionStatus.getLabel(status) : "Unknown"}
         </Badge>
       );
     },
@@ -85,10 +79,10 @@ export const cicColumns: ColumnDef<AdminCic>[] = [
     cell: ({ row }) => {
       const status = row.getValue(
         "lteConnectionStatus",
-      ) as ConnectionStatus | null;
+      ) as ConnectionStatusType | null;
       return (
         <Badge variant={getConnectionStatusVariant(status)} className="text-xs">
-          {getConnectionStatusText(status)}
+          {status ? ConnectionStatus.getLabel(status) : "Unknown"}
         </Badge>
       );
     },

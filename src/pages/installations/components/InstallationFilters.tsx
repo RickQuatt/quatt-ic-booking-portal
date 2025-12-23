@@ -15,15 +15,16 @@ import {
   getInstallationTypeLabel,
 } from "@/utils/installationTypeEmojiMapper";
 import type { components } from "@/openapi-client/types/api/v1";
+import { DetailedInstallationType } from "@/constants/enums";
 
-type DetailedInstallationType =
+type DetailedInstallationTypeValue =
   components["schemas"]["DetailedInstallationType"];
 
 export interface InstallationFilters {
   installationUuid?: string;
   orderNumber?: string;
   cicId?: string;
-  installationType?: DetailedInstallationType;
+  installationType?: DetailedInstallationTypeValue;
   zipCode?: string;
   houseNumber?: string;
   houseAddition?: string;
@@ -38,18 +39,6 @@ interface InstallationFiltersProps {
   filters: InstallationFilters;
   onFiltersChange: (filters: InstallationFilters) => void;
 }
-
-const INSTALLATION_TYPES: NonNullable<DetailedInstallationType>[] = [
-  "HYBRID_SINGLE",
-  "HYBRID_DUO",
-  "ALL_ELECTRIC_SINGLE",
-  "ALL_ELECTRIC_DUO",
-  "CHILL_HYBRID_SINGLE",
-  "CHILL_HYBRID_DUO",
-  "CHILL_ALL_ELECTRIC_SINGLE",
-  "CHILL_ALL_ELECTRIC_DUO",
-  "HOME_BATTERY",
-];
 
 export function InstallationFiltersComponent({
   filters,
@@ -69,6 +58,35 @@ export function InstallationFiltersComponent({
     filters.houseAddition || "",
   );
   const [houseIdInput, setHouseIdInput] = useState(filters.houseId || "");
+
+  // Sync local state from props (for browser back/forward navigation)
+  useEffect(() => {
+    setUuidInput(filters.installationUuid || "");
+  }, [filters.installationUuid]);
+
+  useEffect(() => {
+    setOrderNumberInput(filters.orderNumber || "");
+  }, [filters.orderNumber]);
+
+  useEffect(() => {
+    setCicIdInput(filters.cicId || "");
+  }, [filters.cicId]);
+
+  useEffect(() => {
+    setZipCodeInput(filters.zipCode || "");
+  }, [filters.zipCode]);
+
+  useEffect(() => {
+    setHouseNumberInput(filters.houseNumber || "");
+  }, [filters.houseNumber]);
+
+  useEffect(() => {
+    setHouseAdditionInput(filters.houseAddition || "");
+  }, [filters.houseAddition]);
+
+  useEffect(() => {
+    setHouseIdInput(filters.houseId || "");
+  }, [filters.houseId]);
 
   // Debounce effect for Installation UUID filter (min 3 chars)
   useEffect(() => {
@@ -187,7 +205,7 @@ export function InstallationFiltersComponent({
       installationType:
         value === "all"
           ? undefined
-          : (value as NonNullable<DetailedInstallationType>),
+          : (value as NonNullable<DetailedInstallationTypeValue>),
     });
   };
 
@@ -310,7 +328,7 @@ export function InstallationFiltersComponent({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              {INSTALLATION_TYPES.map((type) => {
+              {DetailedInstallationType.values.map((type) => {
                 const icons = getInstallationTypeIcons(type);
                 return (
                   <SelectItem key={type} value={type}>

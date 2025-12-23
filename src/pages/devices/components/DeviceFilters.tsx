@@ -11,63 +11,41 @@ import {
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { components } from "@/openapi-client/types/api/v1";
+import {
+  DeviceType,
+  DeviceStatus,
+  DongleRole,
+  HeatBatterySize,
+} from "@/constants/enums";
 
-type DeviceType = components["schemas"]["DeviceType"];
-type DeviceStatus = components["schemas"]["DeviceStatus"];
-type DongleRole = components["schemas"]["DongleRole"];
-type HeatBatterySize = components["schemas"]["HeatBatterySize"];
+type DeviceTypeValue = components["schemas"]["DeviceType"];
+type DeviceStatusValue = components["schemas"]["DeviceStatus"];
+type DongleRoleValue = components["schemas"]["DongleRole"];
+type HeatBatterySizeValue = components["schemas"]["HeatBatterySize"];
 
 export interface DeviceFilters {
-  type?: DeviceType;
+  type?: DeviceTypeValue;
   deviceUuid?: string;
   installationUuid?: string;
   cicId?: string;
   serialNumber?: string;
   name?: string;
-  status?: DeviceStatus;
+  status?: DeviceStatusValue;
   eui64?: string;
   minCreatedAt?: Date;
   maxCreatedAt?: Date;
   minUpdatedAt?: Date;
   maxUpdatedAt?: Date;
   // Conditional filters
-  role?: DongleRole;
+  role?: DongleRoleValue;
   pcbHwVersion?: string;
-  heatBatterySize?: HeatBatterySize;
+  heatBatterySize?: HeatBatterySizeValue;
 }
 
 interface DeviceFiltersProps {
   filters: DeviceFilters;
   onFiltersChange: (filters: DeviceFilters) => void;
 }
-
-const DEVICE_TYPES: DeviceType[] = [
-  "DONGLE",
-  "HEAT_BATTERY",
-  "BOILER",
-  "CHILL",
-  "FLOW_TEMPERATURE_SENSOR",
-  "HEAT_CHARGER",
-  "HOME_BATTERY",
-  "OUTDOOR_UNIT",
-  "THERMOSTAT",
-];
-
-const DEVICE_STATUSES: DeviceStatus[] = [
-  "ACTIVE",
-  "UNINSTALLED",
-  "PENDING_COMMISSIONING",
-  "FACTORY",
-  "IN_ERROR",
-];
-
-const DONGLE_ROLES: DongleRole[] = ["EXTENDER", "RCP"];
-
-const HEAT_BATTERY_SIZES: HeatBatterySize[] = [
-  "medium",
-  "large",
-  "extra_large",
-];
 
 export function DeviceFiltersComponent({
   filters,
@@ -89,6 +67,35 @@ export function DeviceFiltersComponent({
   const [pcbHwVersionInput, setPcbHwVersionInput] = useState(
     filters.pcbHwVersion || "",
   );
+
+  // Sync local state from props (for browser back/forward navigation)
+  useEffect(() => {
+    setDeviceUuidInput(filters.deviceUuid || "");
+  }, [filters.deviceUuid]);
+
+  useEffect(() => {
+    setInstallationUuidInput(filters.installationUuid || "");
+  }, [filters.installationUuid]);
+
+  useEffect(() => {
+    setCicIdInput(filters.cicId || "");
+  }, [filters.cicId]);
+
+  useEffect(() => {
+    setSerialNumberInput(filters.serialNumber || "");
+  }, [filters.serialNumber]);
+
+  useEffect(() => {
+    setNameInput(filters.name || "");
+  }, [filters.name]);
+
+  useEffect(() => {
+    setEui64Input(filters.eui64 || "");
+  }, [filters.eui64]);
+
+  useEffect(() => {
+    setPcbHwVersionInput(filters.pcbHwVersion || "");
+  }, [filters.pcbHwVersion]);
 
   // Debounce effect for Device UUID (min 3 chars)
   useEffect(() => {
@@ -182,7 +189,7 @@ export function DeviceFiltersComponent({
   }, [pcbHwVersionInput]);
 
   const handleDeviceTypeChange = (value: string) => {
-    const newType = value === "all" ? undefined : (value as DeviceType);
+    const newType = value === "all" ? undefined : (value as DeviceTypeValue);
     // Clear conditional filters when type changes
     onFiltersChange({
       ...filters,
@@ -197,21 +204,22 @@ export function DeviceFiltersComponent({
   const handleStatusChange = (value: string) => {
     onFiltersChange({
       ...filters,
-      status: value === "all" ? undefined : (value as DeviceStatus),
+      status: value === "all" ? undefined : (value as DeviceStatusValue),
     });
   };
 
   const handleRoleChange = (value: string) => {
     onFiltersChange({
       ...filters,
-      role: value === "all" ? undefined : (value as DongleRole),
+      role: value === "all" ? undefined : (value as DongleRoleValue),
     });
   };
 
   const handleHeatBatterySizeChange = (value: string) => {
     onFiltersChange({
       ...filters,
-      heatBatterySize: value === "all" ? undefined : (value as HeatBatterySize),
+      heatBatterySize:
+        value === "all" ? undefined : (value as HeatBatterySizeValue),
     });
   };
 
@@ -300,9 +308,9 @@ export function DeviceFiltersComponent({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              {DEVICE_TYPES.map((type) => (
+              {DeviceType.values.map((type) => (
                 <SelectItem key={type} value={type}>
-                  {type.replace(/_/g, " ")}
+                  {DeviceType.getLabel(type)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -345,9 +353,9 @@ export function DeviceFiltersComponent({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              {DEVICE_STATUSES.map((status) => (
+              {DeviceStatus.values.map((status) => (
                 <SelectItem key={status} value={status}>
-                  {status.replace(/_/g, " ")}
+                  {DeviceStatus.getLabel(status)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -490,9 +498,9 @@ export function DeviceFiltersComponent({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Roles</SelectItem>
-                    {DONGLE_ROLES.map((role) => (
+                    {DongleRole.values.map((role) => (
                       <SelectItem key={role} value={role}>
-                        {role}
+                        {DongleRole.getLabel(role)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -527,9 +535,9 @@ export function DeviceFiltersComponent({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Sizes</SelectItem>
-                    {HEAT_BATTERY_SIZES.map((size) => (
+                    {HeatBatterySize.values.map((size) => (
                       <SelectItem key={size} value={size}>
-                        {size}
+                        {HeatBatterySize.getLabel(size)}
                       </SelectItem>
                     ))}
                   </SelectContent>

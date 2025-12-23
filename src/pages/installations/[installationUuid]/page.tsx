@@ -202,12 +202,18 @@ export function InstallationDetailPage({
 
             {/* CIC Settings & Config */}
             {installation.activeCic && (
-              <CardContainer title="CIC Settings & Config">
-                <div className="max-h-[600px] space-y-4 overflow-y-auto">
-                  <InstallationSettingsHistory installation={installation} />
-                  <InstallationCicHistory installation={installation} />
-                </div>
-              </CardContainer>
+              <>
+                <CardContainer title="CIC Settings History">
+                  <div className="max-h-[400px] space-y-4 overflow-y-auto">
+                    <InstallationSettingsHistory installation={installation} />
+                  </div>
+                </CardContainer>
+                <CardContainer title="CIC History">
+                  <div className="max-h-[400px] overflow-y-auto">
+                    <InstallationCicHistory installation={installation} />
+                  </div>
+                </CardContainer>
+              </>
             )}
 
             {/* QR Codes */}

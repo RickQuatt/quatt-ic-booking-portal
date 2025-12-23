@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useMemo, useCallback } from "react";
 import { DataTable } from "@/components/shared/DataTable";
 import {
   InstallerFiltersComponent,
@@ -19,6 +19,7 @@ import { ListPageLoadingState } from "@/components/shared/ListPageLoadingState";
 import { ListPageErrorState } from "@/components/shared/ListPageErrorState";
 import { ListPageEmptyState } from "@/components/shared/ListPageEmptyState";
 import { PaginationControls } from "@/components/shared/PaginationControls";
+import { useInstallerListState } from "./hooks/useInstallerListState";
 
 type Installer = components["schemas"]["Installer"];
 
@@ -77,11 +78,15 @@ function filterInstallers(
 }
 
 export function InstallerListPage() {
-  const [filters, setFilters] = useState<InstallerFilters>({});
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 20,
-  });
+  const {
+    filters,
+    pagination,
+    setFilters,
+    goToPage,
+    nextPage,
+    previousPage,
+    hasActiveFilters,
+  } = useInstallerListState();
 
   const {
     isOpen: isInstallerModalOpen,
@@ -129,15 +134,6 @@ export function InstallerListPage() {
     return filteredInstallers.slice(start, end);
   }, [filteredInstallers, pagination.page, pagination.pageSize]);
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  }, [filters]);
-
-  const hasFilters = Object.values(filters).some(
-    (v) => v !== undefined && v !== "" && v !== "all",
-  );
-
   const handleDelete = useCallback(
     (installerId: string) => {
       const confirmed = window.confirm(
@@ -162,32 +158,10 @@ export function InstallerListPage() {
     [openInstallerModal, handleDelete],
   );
 
-  const handleFiltersChange = (newFilters: InstallerFilters) => {
-    setFilters(newFilters);
-  };
-
-  const handlePreviousPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      page: Math.max(1, prev.page - 1),
-    }));
-  };
-
-  const handleNextPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      page: Math.min(totalPages, prev.page + 1),
-    }));
-  };
-
-  const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }));
-  };
-
   // Generate subtitle based on filter state
   const getSubtitle = () => {
     const suffix = total !== 1 ? "s" : "";
-    if (hasFilters) {
+    if (hasActiveFilters) {
       return `${total} installer${suffix} found`;
     }
     return `${total} installer${suffix} total`;
@@ -233,7 +207,7 @@ export function InstallerListPage() {
 
         <InstallerFiltersComponent
           filters={filters}
-          onFiltersChange={handleFiltersChange}
+          onFiltersChange={setFilters}
         />
 
         {isLoading ? (
@@ -245,7 +219,7 @@ export function InstallerListPage() {
             {installers.length === 0 && (
               <ListPageEmptyState
                 entityName="installers"
-                hasFilters={hasFilters}
+                hasFilters={hasActiveFilters}
               />
             )}
 
@@ -254,9 +228,9 @@ export function InstallerListPage() {
               totalPages={totalPages}
               total={total}
               pageSize={pagination.pageSize}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
-              onPageChange={handlePageChange}
+              onPreviousPage={previousPage}
+              onNextPage={nextPage}
+              onPageChange={goToPage}
             />
           </>
         )}

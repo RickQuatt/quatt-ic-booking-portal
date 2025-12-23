@@ -26,6 +26,15 @@ export function CICFiltersComponent({
     filters.orderNumber || "",
   );
 
+  // Sync local state from props (for browser back/forward navigation)
+  useEffect(() => {
+    setIdInput(filters.id || "");
+  }, [filters.id]);
+
+  useEffect(() => {
+    setOrderNumberInput(filters.orderNumber || "");
+  }, [filters.orderNumber]);
+
   // Debounce effect for ID filter
   useEffect(() => {
     const timer = setTimeout(() => {

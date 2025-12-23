@@ -688,6 +688,97 @@ import { Button } from "@/components/ui/button";
 </Dialog>;
 ```
 
+### Enum Metadata Pattern
+
+When working with OpenAPI enum types for filters, dropdowns, or select options, use the type-safe enum metadata pattern:
+
+**Naming Convention:** Enum metadata object names MUST match the OpenAPI schema name exactly (no trailing "s"):
+
+- ✅ `DeviceType` (matches `components["schemas"]["DeviceType"]`)
+- ❌ `DeviceTypes` (incorrect - adds trailing "s")
+
+**Location:** `@/constants/enums/`
+
+**Folder Structure:**
+
+```
+src/constants/enums/
+├── helpers.ts            # createEnumMeta helper function & EnumMeta interface
+├── index.ts              # Barrel export (re-exports helper + all enums)
+├── deviceEnums.ts        # DeviceType, DeviceStatus, DongleRole, HeatBatterySize
+├── installationEnums.ts  # DetailedInstallationType
+├── cicEnums.ts           # ConnectionStatus, CicHealthCheckStatus
+└── eventEnums.ts         # EventType (with emoji support)
+```
+
+**Usage:**
+
+```typescript
+import { DeviceType, DeviceStatus, EventType } from "@/constants/enums";
+
+// For URL state filters - type is automatically inferred
+enumField(DeviceType)                          // preferred
+nullableEnumField(DetailedInstallationType)    // for nullable enums
+
+// Get human-readable label
+DeviceType.getLabel("HEAT_BATTERY") // → "Heat Battery"
+
+// Get emoji (optional, returns undefined if not defined)
+EventType.getEmoji("EVENT_EMAIL") // → "📧"
+
+// Map to select options
+DeviceType.values.map(type => (
+  <SelectItem key={type} value={type}>
+    {DeviceType.getLabel(type)}
+  </SelectItem>
+))
+
+// With emoji
+EventType.values.map(eventType => (
+  <SelectItem key={eventType} value={eventType}>
+    {EventType.getEmoji(eventType)} {EventType.getLabel(eventType)}
+  </SelectItem>
+))
+```
+
+**Adding a New Enum:**
+
+1. Create or add to an existing file in `src/constants/enums/` (e.g., `cicEnums.ts`)
+2. Import `createEnumMeta` from `./helpers`
+3. Define your enum metadata with `Record<EnumType, { label: string, emoji?: string }>`
+4. Export from `index.ts`
+
+```typescript
+// src/constants/enums/myNewEnums.ts
+import type { components } from "@/openapi-client/types/api/v1";
+import { createEnumMeta } from "./helpers";
+
+// Name MUST match the schema name exactly
+export const MyEnumType = createEnumMeta<components["schemas"]["MyEnumType"]>({
+  VALUE_ONE: { label: "Value One" },
+  VALUE_TWO: { label: "Value Two", emoji: "✨" }, // emoji is optional
+  // TypeScript ERROR if any value from the schema is missing
+});
+```
+
+**Benefits:**
+
+- Compile-time error if OpenAPI adds a new enum value you haven't handled
+- Duplicates impossible (object keys are unique)
+- Labels colocated with values (no `.replace(/_/g, " ")` hacks)
+- Single source of truth (no duplication across hooks and components)
+- Optional emoji support for visual indicators
+
+**Never do this:**
+
+```typescript
+// ❌ BAD - Not type-safe, can have duplicates, labels computed separately
+const DEVICE_TYPES: DeviceType[] = ["DONGLE", "HEAT_BATTERY", ...];
+
+// ❌ BAD - Uses .replace() hack instead of getLabel()
+const label = status.replace(/_/g, " ");
+```
+
 ### Accessibility Requirements
 
 Every component MUST meet these accessibility standards:

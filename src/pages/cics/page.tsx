@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
 import { DataTable } from "@/components/shared/DataTable";
 import { cicColumns } from "./components/CicTableColumns";
-import { CICFiltersComponent, CICFilters } from "./components/CICFilters";
+import { CICFiltersComponent } from "./components/CICFilters";
 import { motion } from "framer-motion";
 import { fadeInVariants } from "@/lib/animations";
 import { $api } from "@/openapi-client/context";
@@ -10,13 +9,18 @@ import { ListPageLoadingState } from "@/components/shared/ListPageLoadingState";
 import { ListPageErrorState } from "@/components/shared/ListPageErrorState";
 import { ListPageEmptyState } from "@/components/shared/ListPageEmptyState";
 import { PaginationControls } from "@/components/shared/PaginationControls";
+import { useCICListState } from "./hooks/useCICListState";
 
 export function CICListPage() {
-  const [filters, setFilters] = useState<CICFilters>({});
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 20,
-  });
+  const {
+    filters,
+    pagination,
+    setFilters,
+    goToPage,
+    nextPage,
+    previousPage,
+    hasActiveFilters,
+  } = useCICListState();
 
   const {
     data: results,
@@ -42,40 +46,10 @@ export function CICListPage() {
     { refetchOnWindowFocus: false },
   );
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  }, [filters]);
-
   const cics = results?.result?.cics || [];
   const total = results?.result?.total || 0;
   const totalPages = results?.result?.totalPages || 1;
   const currentPage = pagination.page;
-  const hasFilters = Object.values(filters).some(
-    (v) => v !== undefined && v !== "",
-  );
-
-  const handlePreviousPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      page: Math.max(1, prev.page - 1),
-    }));
-  };
-
-  const handleNextPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      page: Math.min(totalPages, prev.page + 1),
-    }));
-  };
-
-  const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }));
-  };
-
-  const handleFiltersChange = (newFilters: CICFilters) => {
-    setFilters(newFilters);
-  };
 
   if (isError) {
     return (
@@ -100,10 +74,7 @@ export function CICListPage() {
         isLoading={isLoading}
       />
 
-      <CICFiltersComponent
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-      />
+      <CICFiltersComponent filters={filters} onFiltersChange={setFilters} />
 
       {isLoading ? (
         <ListPageLoadingState entityName="CICs" />
@@ -112,7 +83,10 @@ export function CICListPage() {
           <DataTable columns={cicColumns} data={cics} />
 
           {cics.length === 0 && (
-            <ListPageEmptyState entityName="CICs" hasFilters={hasFilters} />
+            <ListPageEmptyState
+              entityName="CICs"
+              hasFilters={hasActiveFilters}
+            />
           )}
 
           <PaginationControls
@@ -120,9 +94,9 @@ export function CICListPage() {
             totalPages={totalPages}
             total={total}
             pageSize={pagination.pageSize}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onPageChange={handlePageChange}
+            onPreviousPage={previousPage}
+            onNextPage={nextPage}
+            onPageChange={goToPage}
           />
         </>
       )}

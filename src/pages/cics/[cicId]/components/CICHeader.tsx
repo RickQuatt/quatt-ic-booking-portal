@@ -184,7 +184,7 @@ export function CICHeader({
                     className="h-6 bg-blue-50 dark:bg-blue-950 border-blue-300 dark:border-blue-700"
                   >
                     <span className="text-xs font-semibold">
-                      SCM: {scmLabel}
+                      SCM: {scmLabel} ({cicData.supervisoryControlMode})
                     </span>
                   </Badge>
                 )}

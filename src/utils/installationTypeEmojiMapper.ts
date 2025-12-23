@@ -3,8 +3,9 @@ import HybridIcon from "@/assets/installationTypes/Hybrid.svg?react";
 import AllElectricIcon from "@/assets/installationTypes/All-E.svg?react";
 import ChillIcon from "@/assets/installationTypes/Chill.svg?react";
 import HomeBatteryIcon from "@/assets/installationTypes/HomeBattery.svg?react";
+import { DetailedInstallationType } from "@/constants/enums";
 
-type InstallationType = components["schemas"]["DetailedInstallationType"];
+type InstallationTypeValue = components["schemas"]["DetailedInstallationType"];
 
 /**
  * Maps installation types to their corresponding emoji representations
@@ -12,7 +13,7 @@ type InstallationType = components["schemas"]["DetailedInstallationType"];
  * @returns The emoji string representing the installation type
  */
 export function getInstallationTypeEmoji(
-  type: InstallationType | undefined,
+  type: InstallationTypeValue | undefined,
 ): string {
   if (!type) {
     return "❓";
@@ -83,7 +84,7 @@ export interface InstallationTypeIcons {
  * ```
  */
 export function getInstallationTypeIcons(
-  type: InstallationType | undefined,
+  type: InstallationTypeValue | undefined,
 ): InstallationTypeIcons | null {
   if (!type) {
     return null;
@@ -173,32 +174,10 @@ export function getInstallationTypeIcons(
  * @returns The human-readable label for the installation type
  */
 export function getInstallationTypeLabel(
-  type: InstallationType | undefined | "null",
+  type: InstallationTypeValue | undefined | "null",
 ): string {
   if (!type || type === "null") {
     return "";
   }
-
-  switch (type) {
-    case "HYBRID_SINGLE":
-      return "Hybrid Single";
-    case "HYBRID_DUO":
-      return "Hybrid Duo";
-    case "ALL_ELECTRIC_SINGLE":
-      return "All Electric Single";
-    case "ALL_ELECTRIC_DUO":
-      return "All Electric Duo";
-    case "CHILL_HYBRID_SINGLE":
-      return "Chill Hybrid Single";
-    case "CHILL_HYBRID_DUO":
-      return "Chill Hybrid Duo";
-    case "CHILL_ALL_ELECTRIC_SINGLE":
-      return "Chill All Electric Single";
-    case "CHILL_ALL_ELECTRIC_DUO":
-      return "Chill All Electric Duo";
-    case "HOME_BATTERY":
-      return "Home Battery";
-    default:
-      return "Unknown";
-  }
+  return DetailedInstallationType.getLabel(type);
 }

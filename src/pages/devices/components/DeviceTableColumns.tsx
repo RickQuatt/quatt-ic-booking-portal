@@ -3,13 +3,14 @@ import { Link } from "wouter";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/utils/formatDate";
 import type { components } from "@/openapi-client/types/api/v1";
+import { DeviceType, DeviceStatus } from "@/constants/enums";
 
 type DeviceItem = components["schemas"]["AdminDeviceListItem"];
-type DeviceStatus = components["schemas"]["DeviceStatus"];
+type DeviceStatusType = components["schemas"]["DeviceStatus"];
 
 // Status badge variant mapping
 const getStatusVariant = (
-  status?: DeviceStatus,
+  status?: DeviceStatusType,
 ): "success" | "destructive" | "secondary" | "default" => {
   if (!status) return "secondary";
 
@@ -28,25 +29,14 @@ const getStatusVariant = (
   }
 };
 
-// Format device type for display
-const formatDeviceType = (type: string): string => {
-  return type.replace(/_/g, " ");
-};
-
-// Format status for display
-const formatStatus = (status?: string): string => {
-  if (!status) return "—";
-  return status.replace(/_/g, " ");
-};
-
 export const deviceColumns: ColumnDef<DeviceItem>[] = [
   {
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => {
-      const type = row.getValue("type") as string;
+      const type = row.getValue("type") as components["schemas"]["DeviceType"];
       return (
-        <span className="text-sm font-medium">{formatDeviceType(type)}</span>
+        <span className="text-sm font-medium">{DeviceType.getLabel(type)}</span>
       );
     },
   },
@@ -70,10 +60,10 @@ export const deviceColumns: ColumnDef<DeviceItem>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as DeviceStatus | undefined;
+      const status = row.getValue("status") as DeviceStatusType | undefined;
       return (
         <Badge variant={getStatusVariant(status)} className="text-xs">
-          {formatStatus(status)}
+          {status ? DeviceStatus.getLabel(status) : "Unknown"}
         </Badge>
       );
     },

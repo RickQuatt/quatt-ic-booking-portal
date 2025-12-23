@@ -16,6 +16,8 @@ function getLoginPageHTML(firebaseConfig: string): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quatt Support Dashboard - Login</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
   <style>
     body {
       margin: 0;
@@ -47,7 +49,7 @@ function getLoginPageHTML(firebaseConfig: string): string {
       padding: 12px 24px;
       font-size: 16px;
       font-weight: 600;
-      border-radius: 4px;
+      border-radius: 20px;
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
     }
@@ -137,7 +139,12 @@ function getLoginPageHTML(firebaseConfig: string): string {
 }
 
 // Public paths that don't require authentication
-const PUBLIC_PATHS = ["/favicon.ico", "/manifest.json", "/robots.txt"];
+const PUBLIC_PATHS = [
+  "/favicon.ico",
+  "/favicon.png",
+  "/manifest.json",
+  "/robots.txt",
+];
 
 /**
  * Verify session JWT token

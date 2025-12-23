@@ -1,6 +1,6 @@
 import { driver, type DriveStep } from "driver.js";
-import "driver.js/dist/driver.css";
 import { useCallback, useState } from "react";
+import "driver.js/dist/driver.css";
 
 const STORAGE_PREFIX = "tour-completed-";
 

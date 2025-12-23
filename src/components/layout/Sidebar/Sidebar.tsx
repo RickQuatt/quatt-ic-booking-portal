@@ -22,6 +22,8 @@ import { logout } from "@/firebase";
 import { useTour } from "@/hooks/useTour";
 import { SIDEBAR_TOUR_ID, sidebarTourSteps } from "./sidebarTourSteps";
 
+const legacyDashboardUrl = "https://refactor.quatt-support-dashboard.pages.dev";
+
 interface NavItem {
   label: string;
   href: string;
@@ -158,6 +160,11 @@ export const Sidebar = ({ className }: SidebarProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  const currentPath = location;
+
+  navigationItems[navigationItems.length - 1].href =
+    `${legacyDashboardUrl}${currentPath}`;
+
   // Detect mobile viewport
   useEffect(() => {
     const checkMobile = () => {
@@ -202,7 +209,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
     return (
       <>
         {/* Fixed mobile header bar */}
-        <header className="fixed top-0 left-0 right-0 z-30 h-14 bg-light-foreground dark:bg-dark-foreground border-b border-gray-200 shadow-sm">
+        <header className="fixed top-0 left-0 right-0 z-30 h-14 bg-white dark:bg-dark-foreground border-b border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="h-full flex items-center px-4 gap-3">
             <Button
               size="icon"
@@ -240,7 +247,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
               exit="closed"
               className={cn(
                 "fixed left-0 top-0 bottom-0 z-50 w-64",
-                "bg-light-foreground dark:bg-dark-foreground  border-r border-gray-200 dark:border-gray-800 shadow-xl",
+                "bg-white dark:bg-dark-foreground border-r border-gray-200 dark:border-gray-800 shadow-xl",
                 "flex flex-col",
                 className,
               )}

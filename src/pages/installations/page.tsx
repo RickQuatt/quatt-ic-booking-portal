@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
 import { DataTable } from "@/components/shared/DataTable";
 import {
   InstallationFiltersComponent,
   installationColumns,
-  InstallationFilters,
 } from "./components";
 import { motion } from "framer-motion";
 import { fadeInVariants } from "@/lib/animations";
@@ -18,13 +16,18 @@ import { ListPageLoadingState } from "@/components/shared/ListPageLoadingState";
 import { ListPageErrorState } from "@/components/shared/ListPageErrorState";
 import { ListPageEmptyState } from "@/components/shared/ListPageEmptyState";
 import { PaginationControls } from "@/components/shared/PaginationControls";
+import { useInstallationListState } from "./hooks/useInstallationListState";
 
 export function InstallationListPage() {
-  const [filters, setFilters] = useState<InstallationFilters>({});
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 50,
-  });
+  const {
+    filters,
+    pagination,
+    setFilters,
+    goToPage,
+    nextPage,
+    previousPage,
+    hasActiveFilters,
+  } = useInstallationListState();
 
   // Build API query parameters with prefix logic and validation
   const queryParams = {
@@ -62,40 +65,10 @@ export function InstallationListPage() {
     },
   );
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  }, [filters]);
-
   const installations = data?.result?.installations || [];
   const total = data?.result?.total || 0;
   const totalPages = Math.ceil(total / pagination.pageSize) || 1;
   const currentPage = pagination.page;
-  const hasFilters = Object.values(filters).some(
-    (v) => v !== undefined && v !== "",
-  );
-
-  const handlePreviousPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      page: Math.max(1, prev.page - 1),
-    }));
-  };
-
-  const handleNextPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      page: Math.min(totalPages, prev.page + 1),
-    }));
-  };
-
-  const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }));
-  };
-
-  const handleFiltersChange = (newFilters: InstallationFilters) => {
-    setFilters(newFilters);
-  };
 
   if (error) {
     return (
@@ -122,7 +95,7 @@ export function InstallationListPage() {
 
       <InstallationFiltersComponent
         filters={filters}
-        onFiltersChange={handleFiltersChange}
+        onFiltersChange={setFilters}
       />
 
       {isLoading ? (
@@ -134,7 +107,7 @@ export function InstallationListPage() {
           {installations.length === 0 && (
             <ListPageEmptyState
               entityName="installations"
-              hasFilters={hasFilters}
+              hasFilters={hasActiveFilters}
             />
           )}
 
@@ -143,9 +116,9 @@ export function InstallationListPage() {
             totalPages={totalPages}
             total={total}
             pageSize={pagination.pageSize}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onPageChange={handlePageChange}
+            onPreviousPage={previousPage}
+            onNextPage={nextPage}
+            onPageChange={goToPage}
           />
         </>
       )}

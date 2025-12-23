@@ -34,6 +34,19 @@ export function InstallerFiltersComponent({
   const [nameInput, setNameInput] = useState(filters.name || "");
   const [phoneInput, setPhoneInput] = useState(filters.phone || "");
 
+  // Sync local state from props (for browser back/forward navigation)
+  useEffect(() => {
+    setCodeInput(filters.code || "");
+  }, [filters.code]);
+
+  useEffect(() => {
+    setNameInput(filters.name || "");
+  }, [filters.name]);
+
+  useEffect(() => {
+    setPhoneInput(filters.phone || "");
+  }, [filters.phone]);
+
   // Debounce effect for Code filter
   useEffect(() => {
     const timer = setTimeout(() => {

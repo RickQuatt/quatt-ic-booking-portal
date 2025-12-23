@@ -1,10 +1,5 @@
-import { useState, useEffect } from "react";
 import { DataTable } from "@/components/shared/DataTable";
-import {
-  DeviceFiltersComponent,
-  deviceColumns,
-  DeviceFilters,
-} from "./components";
+import { DeviceFiltersComponent, deviceColumns } from "./components";
 import { motion } from "framer-motion";
 import { fadeInVariants } from "@/lib/animations";
 import client from "@/openapi-client/client";
@@ -14,13 +9,18 @@ import { ListPageLoadingState } from "@/components/shared/ListPageLoadingState";
 import { ListPageErrorState } from "@/components/shared/ListPageErrorState";
 import { ListPageEmptyState } from "@/components/shared/ListPageEmptyState";
 import { PaginationControls } from "@/components/shared/PaginationControls";
+import { useDeviceListState } from "./hooks/useDeviceListState";
 
 export function DeviceListPage() {
-  const [filters, setFilters] = useState<DeviceFilters>({});
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 20,
-  });
+  const {
+    filters,
+    pagination,
+    setFilters,
+    goToPage,
+    nextPage,
+    previousPage,
+    hasActiveFilters,
+  } = useDeviceListState();
 
   // Build API query parameters with validation
   const queryParams = {
@@ -60,40 +60,10 @@ export function DeviceListPage() {
     },
   );
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  }, [filters]);
-
   const devices = data?.result?.devices || [];
   const total = data?.result?.total || 0;
   const totalPages = data?.result?.totalPages || 1;
   const currentPage = pagination.page;
-  const hasFilters = Object.values(filters).some(
-    (v) => v !== undefined && v !== "",
-  );
-
-  const handlePreviousPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      page: Math.max(1, prev.page - 1),
-    }));
-  };
-
-  const handleNextPage = () => {
-    setPagination((prev) => ({
-      ...prev,
-      page: Math.min(totalPages, prev.page + 1),
-    }));
-  };
-
-  const handlePageChange = (page: number) => {
-    setPagination((prev) => ({ ...prev, page }));
-  };
-
-  const handleFiltersChange = (newFilters: DeviceFilters) => {
-    setFilters(newFilters);
-  };
 
   // Check for filter validation errors (400 errors)
   const isFilterError = error && "status" in error && error.status === 400;
@@ -110,7 +80,7 @@ export function DeviceListPage() {
 
   // Generate subtitle based on filter state
   const getSubtitle = () => {
-    if (hasFilters) {
+    if (hasActiveFilters) {
       return `${total} device${total !== 1 ? "s" : ""} found`;
     }
     return "Use filters to search for devices";
@@ -129,10 +99,7 @@ export function DeviceListPage() {
         isLoading={isLoading}
       />
 
-      <DeviceFiltersComponent
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-      />
+      <DeviceFiltersComponent filters={filters} onFiltersChange={setFilters} />
 
       {/* Filter Validation Error */}
       {isFilterError && (
@@ -151,7 +118,10 @@ export function DeviceListPage() {
           <DataTable columns={deviceColumns} data={devices} />
 
           {devices.length === 0 && !isFilterError && (
-            <ListPageEmptyState entityName="devices" hasFilters={hasFilters} />
+            <ListPageEmptyState
+              entityName="devices"
+              hasFilters={hasActiveFilters}
+            />
           )}
 
           <PaginationControls
@@ -159,9 +129,9 @@ export function DeviceListPage() {
             totalPages={totalPages}
             total={total}
             pageSize={pagination.pageSize}
-            onPreviousPage={handlePreviousPage}
-            onNextPage={handleNextPage}
-            onPageChange={handlePageChange}
+            onPreviousPage={previousPage}
+            onNextPage={nextPage}
+            onPageChange={goToPage}
           />
         </>
       )}

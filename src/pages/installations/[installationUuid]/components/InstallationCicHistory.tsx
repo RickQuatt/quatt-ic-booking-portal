@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
+import { Link } from "wouter";
 
 type AdminInstallationDetail = components["schemas"]["AdminInstallationDetail"];
 
@@ -39,6 +40,7 @@ export function InstallationCicHistory({
           <TableRow>
             <TableHead className="w-[200px]">CIC</TableHead>
             <TableHead>Starts At</TableHead>
+            <TableHead>State</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -46,6 +48,7 @@ export function InstallationCicHistory({
             <TableRow key={state.id || index}>
               <TableCell className="font-medium">{state.cicId}</TableCell>
               <TableCell>{formatDateTime(new Date(state.startAt))}</TableCell>
+              <TableCell>{state.status}</TableCell>
             </TableRow>
           ))}
         </TableBody>

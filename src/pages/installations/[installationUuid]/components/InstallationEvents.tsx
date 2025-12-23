@@ -4,10 +4,8 @@ import { formatDateTime } from "@/utils/formatDate";
 import { Loader } from "@/components/shared/Loader";
 import { ErrorText } from "@/components/shared/ErrorText";
 import { useInstallationEvents } from "../hooks/useInstallationEvents";
-import {
-  getEventTypeEmoji,
-  EVENT_TYPE_CONFIG,
-} from "../utils/eventTypeMapping";
+import { getEventTypeEmoji } from "../utils/eventTypeMapping";
+import { EventType } from "@/constants/enums";
 import {
   Select,
   SelectContent,
@@ -107,9 +105,9 @@ export function InstallationEvents({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">📋 ALL</SelectItem>
-            {EVENT_TYPE_CONFIG.map((config) => (
-              <SelectItem key={config.value} value={config.value}>
-                {config.emoji} {config.label}
+            {EventType.values.map((eventType) => (
+              <SelectItem key={eventType} value={eventType}>
+                {EventType.getEmoji(eventType)} {EventType.getLabel(eventType)}
               </SelectItem>
             ))}
           </SelectContent>
