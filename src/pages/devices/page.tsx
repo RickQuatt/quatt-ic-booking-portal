@@ -16,6 +16,7 @@ export function DeviceListPage() {
     filters,
     pagination,
     setFilters,
+    clearAll,
     goToPage,
     nextPage,
     previousPage,
@@ -99,7 +100,11 @@ export function DeviceListPage() {
         isLoading={isLoading}
       />
 
-      <DeviceFiltersComponent filters={filters} onFiltersChange={setFilters} />
+      <DeviceFiltersComponent
+        filters={filters}
+        onFiltersChange={setFilters}
+        onClearAll={clearAll}
+      />
 
       {/* Filter Validation Error */}
       {isFilterError && (

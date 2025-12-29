@@ -23,6 +23,7 @@ export function InstallationListPage() {
     filters,
     pagination,
     setFilters,
+    clearAll,
     goToPage,
     nextPage,
     previousPage,
@@ -96,6 +97,7 @@ export function InstallationListPage() {
       <InstallationFiltersComponent
         filters={filters}
         onFiltersChange={setFilters}
+        onClearAll={clearAll}
       />
 
       {isLoading ? (

@@ -82,6 +82,7 @@ export function InstallerListPage() {
     filters,
     pagination,
     setFilters,
+    clearAll,
     goToPage,
     nextPage,
     previousPage,
@@ -208,6 +209,7 @@ export function InstallerListPage() {
         <InstallerFiltersComponent
           filters={filters}
           onFiltersChange={setFilters}
+          onClearAll={clearAll}
         />
 
         {isLoading ? (
