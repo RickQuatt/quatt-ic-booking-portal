@@ -38,11 +38,13 @@ export interface InstallationFilters {
 interface InstallationFiltersProps {
   filters: InstallationFilters;
   onFiltersChange: (filters: InstallationFilters) => void;
+  onClearAll: () => void;
 }
 
 export function InstallationFiltersComponent({
   filters,
   onFiltersChange,
+  onClearAll,
 }: InstallationFiltersProps) {
   // Local state for debounced text inputs
   const [uuidInput, setUuidInput] = useState(filters.installationUuid || "");
@@ -257,7 +259,7 @@ export function InstallationFiltersComponent({
     setHouseNumberInput("");
     setHouseAdditionInput("");
     setHouseIdInput("");
-    onFiltersChange({});
+    onClearAll();
   };
 
   const hasActiveFilters = Object.keys(filters).length > 0;

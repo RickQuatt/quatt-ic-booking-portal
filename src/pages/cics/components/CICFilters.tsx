@@ -14,11 +14,13 @@ export interface CICFilters {
 interface CICFiltersProps {
   filters: CICFilters;
   onFiltersChange: (filters: CICFilters) => void;
+  onClearAll: () => void;
 }
 
 export function CICFiltersComponent({
   filters,
   onFiltersChange,
+  onClearAll,
 }: CICFiltersProps) {
   // Local state for debounced text inputs
   const [idInput, setIdInput] = useState(filters.id || "");
@@ -79,7 +81,7 @@ export function CICFiltersComponent({
   const clearFilters = () => {
     setIdInput("");
     setOrderNumberInput("");
-    onFiltersChange({});
+    onClearAll();
   };
 
   const hasActiveFilters = Object.keys(filters).length > 0;

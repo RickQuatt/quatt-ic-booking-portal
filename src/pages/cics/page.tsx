@@ -16,6 +16,7 @@ export function CICListPage() {
     filters,
     pagination,
     setFilters,
+    clearAll,
     goToPage,
     nextPage,
     previousPage,
@@ -73,8 +74,11 @@ export function CICListPage() {
         subtitle={`${total} CICs found`}
         isLoading={isLoading}
       />
-
-      <CICFiltersComponent filters={filters} onFiltersChange={setFilters} />
+      <CICFiltersComponent
+        filters={filters}
+        onFiltersChange={setFilters}
+        onClearAll={clearAll}
+      />
 
       {isLoading ? (
         <ListPageLoadingState entityName="CICs" />

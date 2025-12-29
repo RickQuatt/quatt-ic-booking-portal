@@ -45,11 +45,13 @@ export interface DeviceFilters {
 interface DeviceFiltersProps {
   filters: DeviceFilters;
   onFiltersChange: (filters: DeviceFilters) => void;
+  onClearAll: () => void;
 }
 
 export function DeviceFiltersComponent({
   filters,
   onFiltersChange,
+  onClearAll,
 }: DeviceFiltersProps) {
   // Local state for debounced text inputs
   const [deviceUuidInput, setDeviceUuidInput] = useState(
@@ -271,7 +273,7 @@ export function DeviceFiltersComponent({
     setNameInput("");
     setEui64Input("");
     setPcbHwVersionInput("");
-    onFiltersChange({});
+    onClearAll();
   };
 
   const hasActiveFilters = Object.keys(filters).length > 0;

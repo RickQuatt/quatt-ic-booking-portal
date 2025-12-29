@@ -23,11 +23,13 @@ export interface InstallerFilters {
 interface InstallerFiltersProps {
   filters: InstallerFilters;
   onFiltersChange: (filters: InstallerFilters) => void;
+  onClearAll: () => void;
 }
 
 export function InstallerFiltersComponent({
   filters,
   onFiltersChange,
+  onClearAll,
 }: InstallerFiltersProps) {
   // Local state for debounced text inputs
   const [codeInput, setCodeInput] = useState(filters.code || "");
@@ -111,7 +113,7 @@ export function InstallerFiltersComponent({
     setCodeInput("");
     setNameInput("");
     setPhoneInput("");
-    onFiltersChange({});
+    onClearAll();
   };
 
   const hasActiveFilters = Object.keys(filters).length > 0;
