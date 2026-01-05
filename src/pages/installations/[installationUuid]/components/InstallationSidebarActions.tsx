@@ -63,7 +63,7 @@ export function InstallationSidebarActions({
 
         {/* Visit Jobs */}
         <Button className="w-full" variant="outline">
-          <Link
+          <a
             href={`/installations/${installationUuid}/visit-jobs`}
             className="w-full flex items-center justify-center gap-2"
             target="_blank"
@@ -71,7 +71,7 @@ export function InstallationSidebarActions({
           >
             <ClipboardList className="h-4 w-4" />
             Visit Jobs
-          </Link>
+          </a>
         </Button>
 
         {/* Submit NCR */}
