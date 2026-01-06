@@ -88,6 +88,31 @@ function getLoginPageHTML(firebaseConfig: string): string {
       throw error;
     }
 
+    // Validate return URL to prevent open redirect vulnerabilities
+    // Note: This is a browser-side duplicate of the server-side validation
+    function isValidReturnUrl(url) {
+      if (!url) return false;
+
+      // Must start with / but not // (prevents protocol-relative URLs)
+      if (!url.startsWith('/') || url.startsWith('//')) {
+        return false;
+      }
+
+      // Prevent path traversal
+      if (url.includes('..')) {
+        return false;
+      }
+
+      // Validate URL structure and ensure it's relative to current origin
+      try {
+        const parsed = new URL(url, window.location.origin);
+        // Ensure the parsed URL is still on the same origin
+        return parsed.origin === window.location.origin;
+      } catch {
+        return false;
+      }
+    }
+
     async function signInWithGoogle() {
       const button = document.getElementById('loginButton');
       const errorDiv = document.getElementById('error');
@@ -113,8 +138,11 @@ function getLoginPageHTML(firebaseConfig: string): string {
           throw new Error('Failed to create session');
         }
 
-        // Redirect to app
-        window.location.href = '/';
+        // Redirect to the original URL if provided and valid, otherwise go to root
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrl = urlParams.get('returnUrl');
+        const safeReturnUrl = returnUrl && isValidReturnUrl(returnUrl) ? returnUrl : '/';
+        window.location.href = safeReturnUrl;
       } catch (error) {
         console.error('Login error:', error);
         errorDiv.textContent = 'Login failed. Please try again.';
@@ -145,6 +173,78 @@ const PUBLIC_PATHS = [
   "/manifest.json",
   "/robots.txt",
 ];
+
+/**
+ * Validate return URL to prevent open redirect vulnerabilities
+ * Only allows safe relative URLs within the application
+ *
+ * Security checks:
+ * - Must be relative path starting with /
+ * - Must not be protocol-relative (//)
+ * - Must not contain path traversal (..)
+ * - Must parse as valid URL structure
+ *
+ * Note: This validation is duplicated in browser-side code (login page HTML)
+ * for defense-in-depth, as both contexts need independent validation.
+ */
+function isValidReturnUrl(url: string): boolean {
+  if (!url) return false;
+
+  // Must start with / but not // (prevents protocol-relative URLs)
+  if (!url.startsWith("/") || url.startsWith("//")) {
+    return false;
+  }
+
+  // Prevent path traversal attacks
+  if (url.includes("..")) {
+    return false;
+  }
+
+  // Additional validation: ensure reasonable path length
+  if (url.length > 2048) {
+    return false;
+  }
+
+  // Validate URL structure by parsing with a dummy base
+  try {
+    const parsed = new URL(url, "https://dummy.example.com");
+
+    // Ensure the URL is still on the dummy origin (not redirected externally)
+    if (parsed.origin !== "https://dummy.example.com") {
+      return false;
+    }
+
+    // Ensure path hasn't been manipulated by URL parsing
+    // (e.g., encoded characters that could bypass validation)
+    const pathWithQuery = url.split("#")[0]; // Remove fragment
+    if (parsed.pathname !== pathWithQuery.split("?")[0]) {
+      // Path was normalized differently than expected
+      return false;
+    }
+
+    return true;
+  } catch {
+    // Invalid URL structure
+    return false;
+  }
+}
+
+/**
+ * Create login redirect URL with return path
+ */
+function createLoginRedirectUrl(
+  request: Request,
+  currentPath: string,
+  search: string,
+): URL {
+  const loginUrl = new URL("/", request.url);
+  const returnUrl = currentPath + search;
+  // Only set returnUrl if it's valid
+  if (isValidReturnUrl(returnUrl)) {
+    loginUrl.searchParams.set("returnUrl", returnUrl);
+  }
+  return loginUrl;
+}
 
 /**
  * Verify session JWT token
@@ -244,8 +344,9 @@ export const onRequest = async (context: {
       });
     }
 
-    // Block ALL other paths including /assets/* - redirect to login
-    return Response.redirect(new URL("/", request.url), 303);
+    // Block ALL other paths including /assets/* - redirect to login with return URL
+    const loginUrl = createLoginRedirectUrl(request, url.pathname, url.search);
+    return Response.redirect(loginUrl, 303);
   }
 
   // Get session secret from environment
@@ -284,10 +385,11 @@ export const onRequest = async (context: {
       });
     }
 
-    // Block other paths
-    headers.set("Content-Type", "text/plain");
-    return new Response("Unauthorized - Please login first", {
-      status: 401,
+    // Block other paths - redirect to login with return URL
+    const loginUrl = createLoginRedirectUrl(request, url.pathname, url.search);
+    headers.set("Location", loginUrl.toString());
+    return new Response(null, {
+      status: 303,
       headers,
     });
   }

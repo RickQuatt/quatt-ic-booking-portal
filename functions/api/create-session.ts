@@ -194,7 +194,7 @@ export const onRequestPost = async (context: {
       "Path=/",
       `Max-Age=${expiresIn}`,
       ...(isProduction ? ["HttpOnly", "Secure"] : []),
-      "SameSite=Strict",
+      "SameSite=Lax", // Lax allows cookie on top-level navigation (e.g., clicking links from Grafana)
     ].join("; ");
 
     return new Response(

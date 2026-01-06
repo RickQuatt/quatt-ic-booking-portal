@@ -135,13 +135,7 @@ export function VisitJobsPage({ installationUuid }: VisitJobsPageProps) {
               )}
             </div>
           ) : (
-            visitJobs.map((job) => (
-              <VisitJobCard
-                key={job.jobUid}
-                job={job}
-                installationUuid={installationUuid}
-              />
-            ))
+            visitJobs.map((job) => <VisitJobCard key={job.jobUid} job={job} />)
           )}
         </div>
       </motion.div>

@@ -12,14 +12,13 @@ type VisitJob = components["schemas"]["VisitJob"];
 
 export interface VisitJobCardProps {
   job: VisitJob;
-  installationUuid: string;
 }
 
 /**
  * VisitJobCard - Displays details for a single visit job
  * Includes job info, timing, status badge, and image gallery with lightbox
  */
-export function VisitJobCard({ job, installationUuid }: VisitJobCardProps) {
+export function VisitJobCard({ job }: VisitJobCardProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -94,8 +93,10 @@ export function VisitJobCard({ job, installationUuid }: VisitJobCardProps) {
         <div className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground font-medium">Job ID:</span>
           <Link
-            href={`/installations/${installationUuid}/visit-jobs?jobUid=${job.jobUid}`}
+            href={`https://quatt.my.skedulo.com/job/${job.jobUid}`}
             className="text-primary hover:underline font-mono"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {job.jobUid}
           </Link>
