@@ -3,6 +3,7 @@ import type { components } from "@/openapi-client/types/api/v1";
 import { DataRow } from "@/components/shared/DetailPage";
 import { formatDateDistance, formatDateTimeString } from "@/utils/formatDate";
 import { getInstallationTypeLabel } from "@/utils/installationTypeEmojiMapper";
+import { Badge } from "@/components/ui/Badge";
 
 type AdminInstallationDetail = components["schemas"]["AdminInstallationDetail"];
 
@@ -30,6 +31,7 @@ export function InstallationDeviceInfoCard({
     hwid,
     odu1Type,
     odu2Type,
+    isNlFlexPilotParticipant,
   } = installation;
 
   return (
@@ -95,6 +97,16 @@ export function InstallationDeviceInfoCard({
               heatDeliverySystems && heatDeliverySystems.length > 0
                 ? heatDeliverySystems.join(", ")
                 : "No known heating systems"
+            }
+          />
+          <DataRow
+            label="FlexPilot Participant"
+            value={
+              <Badge
+                variant={isNlFlexPilotParticipant ? "success" : "secondary"}
+              >
+                {isNlFlexPilotParticipant ? "Yes" : "No"}
+              </Badge>
             }
           />
         </div>

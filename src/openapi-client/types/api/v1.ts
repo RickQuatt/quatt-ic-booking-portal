@@ -1895,6 +1895,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/admin/rig/{installationId}/setup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Return a quick overview of the current setup of that rig. A setup include several information about the state of the rig, and the possible changes that can be done on it. */
+    get: operations["getRigSetup"];
+    put?: never;
+    /** @description Perform an action to setup the rig to a desired state. */
+    post: operations["postRigSetup"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/me/installations": {
     parameters: {
       query?: never;
@@ -2756,6 +2774,83 @@ export interface paths {
     get: operations["getAdminDeviceList"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/installation/bulkJobs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create a bulk job for batch operations on installations
+     * @description Creates a new bulk job to perform batch operations on multiple installations.
+     *
+     *     Supported job types:
+     *     - **BACKFILL_INSIGHTS**: Recalculate historical insights data for installations (Hybrid and All-Electric)
+     *
+     *     The bulk job process:
+     *     1. Validates all installation IDs exist and are eligible for the operation
+     *     2. Creates background jobs (one per installation) for parallel processing
+     *     3. Tracks overall progress and results (completed, failed, skipped)
+     *
+     *     The endpoint uses discriminated unions - request body varies by jobType
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["BulkJobRequest"];
+        };
+      };
+      responses: {
+        /** @description Bulk job created successfully */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["BulkJobResponse"];
+          };
+        };
+        /** @description Validation errors */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Error"] & {
+              result?: {
+                /** @enum {string} */
+                errorCode?:
+                  | "INVALID_REQUEST"
+                  | "INVALID_DATE_FORMAT"
+                  | "INVALID_DATE_RANGE"
+                  | "INVALID_HOUR_BOUNDARY"
+                  | "FUTURE_DATE_NOT_ALLOWED"
+                  | "ALL_INSTALLATIONS_FAILED_VERIFICATION"
+                  | "UNSUPPORTED_BULK_JOB_TYPE";
+              };
+            };
+          };
+        };
+        401: components["responses"]["Unauthorized"];
+        403: components["responses"]["Forbidden"];
+        500: components["responses"]["Unexpected"];
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -4110,6 +4205,11 @@ export interface components {
       installedAt: components["schemas"]["NullableDateTime"];
       insightsStartAt: components["schemas"]["NullableDateTime"];
       hasBrokenCounters: boolean | null;
+      /**
+       * @description Whether the installation is a participant in the NL Flex pilot program
+       * @example false
+       */
+      isNlFlexPilotParticipant?: boolean | null;
       createdAt: components["schemas"]["Datetime"];
       updatedAt: components["schemas"]["Datetime"];
       /** @description The image version of the cic */
@@ -4624,6 +4724,14 @@ export interface components {
       | "NO_LEGACY_COMMISSIONING_HISTORY"
       | "LEGACY_COMMISSIONING_MIGRATION_FAILED"
       | "INVALID_DATE_FORMAT"
+      | "INVALID_DATE_RANGE"
+      | "INVALID_HOUR_BOUNDARY"
+      | "FUTURE_DATE_NOT_ALLOWED"
+      | "ALL_INSTALLATIONS_FAILED_VERIFICATION"
+      | "NO_DATA_FOUND_FOR_INSTALLATION"
+      | "BACKFILL_JOB_CREATION_FAILED"
+      | "UNSUPPORTED_BULK_JOB_TYPE"
+      | "INVALID_HANDLER_REQUEST_TYPE"
       | "NO_COMMISSIONING_TEST_HANDLER_FOUND"
       | "INVALID_WORKFLOW_CONFIGURATION"
       | "CURRENT_COMMISSIONING_TEST_NOT_FOUND"
@@ -4645,7 +4753,12 @@ export interface components {
       | "CANNOT_FIND_ANY_CHILL_STATS"
       | "CANNOT_FIND_CHILL_STATS"
       | "CANNOT_FIND_CHILL_STAT_FIELD_VALUE"
-      | "CANNOT_FIND_CHILL_LAST_UPDATED_AT";
+      | "CANNOT_FIND_CHILL_LAST_UPDATED_AT"
+      | "INVALID_CHILL_LAST_STAT"
+      | "INVALID_CHILL_SETPOINT_MODE"
+      | "TRY_TO_SET_THERMOSTAT_TYPE_TO_NULL_ON_EXISTING_INSTALLATION_WITH_THERMOSTAT_TYPE_SET"
+      | "RIG_NOT_FOUND"
+      | "UNSUPPORTED_ACTION_ON_RIG";
     ErrorResponse: components["schemas"]["Error"];
     ErrorResponseResult: {
       /** @example Unexpected error */
@@ -6712,6 +6825,17 @@ export interface components {
       };
     };
     /**
+     * @example RESET_TO_NORMAL_OPERATION
+     * @enum {string}
+     */
+    RigActionType: "RESET_TO_NORMAL_OPERATION";
+    /**
+     * @description Current operational status of the rig
+     * @example NORMAL_OPERATION
+     * @enum {string}
+     */
+    RigStatus: "NORMAL_OPERATION" | "OFFLINE" | "IN_COMMISSIONING";
+    /**
      * Format: uuid
      * @example 7f24b2d2-a261-4c53-bc61-4e06a836d690
      */
@@ -7622,29 +7746,28 @@ export interface components {
       | "setCommissioningModeTestChargingBoostEHeatcharger"
       | "setCommissioningModeTestDischargingHeatcharger"
       | "setCommissioningModeTestPowerHeatcharger";
+    RigSetup: {
+      status?: components["schemas"]["RigStatus"];
+      /**
+       * @description List of actions that can be performed on the rig
+       * @example [
+       *       "RESET_TO_NORMAL_OPERATION"
+       *     ]
+       */
+      availableActions?: components["schemas"]["RigActionType"][];
+    };
+    /** @description Send an action to perform on the rig */
+    RigSetupRequest: {
+      actionType: components["schemas"]["RigActionType"];
+    };
+    /** @description Action response after performing a rig action */
+    RigSetupActionResponse: Record<string, never>;
     /**
      * @description Visual color theme of the Chill device for identification and personalization in the user interface
      * @example CALM_GREEN
      * @enum {string}
      */
     ChillColor: "CALM_GREEN" | "SOFT_SAND" | "COOL_BLACK";
-    /**
-     * @description Current operational status of the Chill device. Human readable status indicating the device's state and any warnings or errors
-     * @example ON_WORKING
-     * @enum {string}
-     */
-    ChillStatus:
-      | "ON_STARTING"
-      | "ON_WORKING"
-      | "ON_TARGET_TEMPERATURE_REACHED"
-      | "OFF_STOPPING"
-      | "OFF"
-      | "WARNING_NOT_COOLING_HEATING_SYSTEM_IS_HEATING"
-      | "WARNING_TANK_FULL"
-      | "WARNING_TANK_MISSING"
-      | "WARNING_IN_MAINTENANCE"
-      | "WARNING_DISCONNECTED"
-      | "ERROR";
     /**
      * @description Fan speed setting for the Chill device. Controls the airflow and noise level of the unit
      * @example HIGH
@@ -7715,7 +7838,7 @@ export interface components {
        */
       message: string;
     };
-    ChillState: {
+    BaseChillState: {
       uuid: components["schemas"]["DeviceUuid"];
       eui64: components["schemas"]["EUI64"];
       /**
@@ -7724,7 +7847,6 @@ export interface components {
        */
       name: string;
       color: components["schemas"]["ChillColor"];
-      status: components["schemas"]["ChillStatus"];
       /** @description Indicates whether the Chill device is on or off */
       isOn: {
         /**
@@ -7742,17 +7864,6 @@ export interface components {
       mode: components["schemas"]["ChillMode"];
       coolingTargetTemperature: components["schemas"]["ChillTargetTemperature"];
       heatingTargetTemperature: components["schemas"]["ChillTargetTemperature"];
-      /**
-       * Format: float
-       * @description Current ambient temperature measured by the Chill device in degrees Celsius
-       * @example 21
-       */
-      ambientTemperature: number;
-      /**
-       * @description Water tank level warning status for the Chill device. Indicates when the condensation tank is approaching capacity
-       * @example true
-       */
-      hasWaterTankLevelWarning: boolean;
       /**
        * @description List of current error conditions affecting the Chill device. Null when no errors are present
        * @example []
@@ -7772,6 +7883,55 @@ export interface components {
        */
       maxTargetTemperature: number;
     };
+    ChillStateDisconnected: components["schemas"]["BaseChillState"] & {
+      /** @enum {string} */
+      status: "WARNING_DISCONNECTED";
+      /**
+       * @description Current ambient temperature is unavailable when the Chill device is disconnected
+       * @example null
+       * @enum {number|null}
+       */
+      ambientTemperature: null;
+      /**
+       * @description Water tank level warning status is unavailable when the Chill device is disconnected
+       * @example null
+       * @enum {boolean|null}
+       */
+      hasWaterTankLevelWarning: null;
+    };
+    /**
+     * @description Current connected operational status of the Chill device. Human readable status indicating the device's state and any warnings or errors
+     * @example ON_WORKING
+     * @enum {string}
+     */
+    ChillConnectedStatus:
+      | "ON_STARTING"
+      | "ON_WORKING"
+      | "ON_TARGET_TEMPERATURE_REACHED"
+      | "OFF_STOPPING"
+      | "OFF"
+      | "WARNING_NOT_COOLING_HEATING_SYSTEM_IS_HEATING"
+      | "WARNING_TANK_FULL"
+      | "WARNING_TANK_MISSING"
+      | "WARNING_IN_MAINTENANCE"
+      | "ERROR";
+    ChillStateConnected: components["schemas"]["BaseChillState"] & {
+      status: components["schemas"]["ChillConnectedStatus"];
+      /**
+       * Format: float
+       * @description Current ambient temperature measured by the Chill device in degrees Celsius
+       * @example 21
+       */
+      ambientTemperature: number;
+      /**
+       * @description Water tank level warning status for the Chill device. Indicates when the condensation tank is approaching capacity
+       * @example true
+       */
+      hasWaterTankLevelWarning: boolean;
+    };
+    ChillState:
+      | components["schemas"]["ChillStateDisconnected"]
+      | components["schemas"]["ChillStateConnected"];
     /** @example CHA-7f24b2d2-a261-4c53-bc61-4e06a836d690 */
     ChillActionUuid: string;
     /** @description Set the heating target temperature of the Chill device */
@@ -8005,6 +8165,11 @@ export interface components {
        */
       eui64: string;
       /**
+       * @description Serial number from hardware supplier
+       * @example CHIB01-20250925-B01-000009
+       */
+      serialNumber: string;
+      /**
        * @description Thread Pre-Shared Key (ASCII-HEX 32 bytes)
        * @example 0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF
        */
@@ -8167,6 +8332,69 @@ export interface components {
        * @example 8
        */
       totalPages: number;
+    };
+    BaseBulkJobRequest: {
+      /**
+       * @description Type of bulk job to execute
+       * @enum {string}
+       */
+      jobType: "BACKFILL_INSIGHTS";
+      /** @description List of installation external IDs to process */
+      installationIds: components["schemas"]["InstallationUuid"][];
+    };
+    BackfillInsightsJobRequest: components["schemas"]["BaseBulkJobRequest"] & {
+      /** @description Start of date range for backfill processing (must be at exact hour boundary) */
+      startDate: components["schemas"]["Datetime"];
+      /** @description End of date range for backfill processing. If not provided, defaults to current date and hour. */
+      endDate?: components["schemas"]["Datetime"];
+    } & {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      jobType: "BACKFILL_INSIGHTS";
+    };
+    BulkJobRequest: components["schemas"]["BackfillInsightsJobRequest"];
+    /** @example BULK-550e8400-e29b-41d4-a716-446655440000 */
+    BulkJobUuid: string;
+    BulkJobResponse: {
+      meta: components["schemas"]["ResponseMeta"];
+      result: {
+        /** @description Unique identifier for the bulk job */
+        bulkJobUuid: components["schemas"]["BulkJobUuid"];
+        /**
+         * @description Type of bulk job
+         * @enum {string}
+         */
+        jobType: "BACKFILL_INSIGHTS";
+        /** @description Number of background jobs created */
+        jobsCreated: number;
+        /**
+         * @description List of installation external IDs being backfilled
+         * @example [
+         *       "INS-12345678-1234-1234-1234-123456789012",
+         *       "INS-23456789-2345-2345-2345-234567890123"
+         *     ]
+         */
+        installationIds: string[];
+        /** @description Number of hours in the date range (per installation) */
+        hoursToProcess: number;
+        /**
+         * @description List of installations that failed verification and were skipped
+         * @example [
+         *       {
+         *         "installationId": "INS-12348678-1234-1234-1234-123456789012",
+         *         "reason": "No data found for installation in date range"
+         *       }
+         *     ]
+         */
+        skipped: {
+          /** @description Installation external ID that failed verification */
+          installationId: string;
+          /** @description Reason why verification failed */
+          reason: string;
+        }[];
+      };
     };
   };
   responses: {
@@ -12972,6 +13200,123 @@ export interface operations {
       500: components["responses"]["Unexpected"];
     };
   };
+  getRigSetup: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description A rig setup response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["RigSetup"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Rig not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "RIG_NOT_FOUND"
+                | "INSTALLATION_NOT_FOUND"
+                | "CIC_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  postRigSetup: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RigSetupRequest"];
+      };
+    };
+    responses: {
+      /** @description Action created and performed successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["RigSetupActionResponse"];
+          };
+        };
+      };
+      400: components["responses"]["BadRequest"];
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Rig not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "RIG_NOT_FOUND"
+                | "INSTALLATION_NOT_FOUND"
+                | "CIC_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
   getInstallations: {
     parameters: {
       query?: never;
@@ -14711,8 +15056,10 @@ export interface operations {
         /** @description Filter by installation type */
         installationType?: components["schemas"]["DetailedInstallationType"];
         /**
-         * @description Filter by zip code (partial match)
-         * @example 1234AB
+         * @description Filter by zip code (flexible partial match, case-insensitive).
+         *     Matches zipcodes with or without spaces (e.g., "1071 ZT" and "1071ZT" are both found).
+         *     Supports partial matching (e.g., "1071" matches "1071ZT").
+         * @example 1071 ZT
          */
         zipCode?: string;
         /**
