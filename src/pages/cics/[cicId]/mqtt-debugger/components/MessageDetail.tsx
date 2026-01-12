@@ -205,7 +205,7 @@ export function MessageDetail({ message }: MessageDetailProps) {
           ) : parsedPayload !== null && typeof parsedPayload === "object" ? (
             <ThemedJsonView
               value={parsedPayload}
-              collapsed={2}
+              collapsed={false}
               displayDataTypes={false}
               enableClipboard={true}
               onCopied={() => {

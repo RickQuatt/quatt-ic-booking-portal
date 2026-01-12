@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 
 interface ThemedJsonViewProps {
   value: object | undefined;
-  collapsed?: number;
+  collapsed?: boolean | number;
   displayDataTypes?: boolean;
   displayObjectSize?: boolean;
   enableClipboard?: boolean;
