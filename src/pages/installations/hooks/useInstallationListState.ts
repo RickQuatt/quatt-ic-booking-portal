@@ -37,6 +37,6 @@ export function useInstallationListState() {
       minUpdatedAt: dateField(),
       maxUpdatedAt: dateField(),
     },
-    defaultPageSize: 50,
+    defaultPageSize: 20,
   });
 }
