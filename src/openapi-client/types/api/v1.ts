@@ -8097,16 +8097,6 @@ export interface components {
        */
       duration: number | null;
       /**
-       * Format: date-time
-       * @description Estimated start time
-       */
-      estimatedStart: string | null;
-      /**
-       * Format: date-time
-       * @description Estimated end time
-       */
-      estimatedEnd: string | null;
-      /**
        * @description Type of job
        * @example HomeVisit
        */
@@ -8126,13 +8116,59 @@ export interface components {
        * @example Complete
        */
       jobStatus: string | null;
-      /** @description Device version */
-      deviceVersion: string | null;
       /**
-       * @description Array of related URLs
-       * @example []
+       * @description ODU (Outdoor Unit) device version
+       * @example 1.42.0
        */
-      allUrls: string[];
+      oduVersion: string | null;
+      /**
+       * @description Source system for the job (e.g., Skedulo, Zuper)
+       * @example skedulo
+       */
+      source: string | null;
+      /**
+       * @description Check-in checklist data from job management system (Skedulo/Zuper).
+       *     Dynamic form structure with question keys varying by job type.
+       *     Values can be strings (answers, URLs) or arrays of strings (multiple images/values).
+       *     Often null as most job systems don't distinguish check-in from check-out.
+       * @example null
+       */
+      checklistCheckIn: {
+        [key: string]: string | string[];
+      } | null;
+      /**
+       * @description Check-out checklist data from job management system (Skedulo/Zuper).
+       *     Dynamic form structure with 50+ possible question keys varying by job type and source.
+       *     Keys are question strings (e.g., "LMRA check uitgevoerd?", "All materials delivered?").
+       *     Values can be strings (answers like "Yes"/"No", URLs, free text) or arrays of strings (multiple image URLs).
+       * @example {
+       *       "LMRA check uitgevoerd?": "Ja",
+       *       "All materials delivered?": "Yes",
+       *       "Installation succesfull?": "Yes",
+       *       "Pictures of starting situation": [
+       *         "https://s3.example.com/image1.jpg",
+       *         "https://s3.example.com/image2.jpg"
+       *       ],
+       *       "Scan the CIC QR code": "https://app.quatt.io/cic/CIC-12345"
+       *     }
+       */
+      checklistCheckOut: {
+        [key: string]: string | string[];
+      } | null;
+      /**
+       * @description Array of image URLs from check-in
+       * @example [
+       *       "https://example.com/image1.jpg"
+       *     ]
+       */
+      imageUrlsCheckIn: string[];
+      /**
+       * @description Array of image URLs from check-out
+       * @example [
+       *       "https://example.com/image2.jpg"
+       *     ]
+       */
+      imageUrlsCheckOut: string[];
       /**
        * @description Names of resources assigned to job
        * @example Amir Wali

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/Button";
 import { Copy, Check } from "lucide-react";
 import { formatDateTimeString } from "@/utils/formatDate";
 import { ImageLightbox } from "./ImageLightbox";
+import { ChecklistSection } from "./ChecklistSection";
+import { ImageGallerySection } from "./ImageGallerySection";
 
 type VisitJob = components["schemas"]["VisitJob"];
 
@@ -22,6 +24,18 @@ export function VisitJobCard({ job }: VisitJobCardProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // Backward compatibility: prioritize new fields, fallback to old
+  const checkInImages = job.imageUrlsCheckIn || [];
+  const checkOutImages = job.imageUrlsCheckOut || [];
+  const hasLegacyData =
+    checkInImages.length === 0 && checkOutImages.length === 0;
+
+  // Combined images for lightbox (check-in first, then check-out)
+  const allImages = hasLegacyData ? [] : [...checkInImages, ...checkOutImages];
+
+  // Device version - oduVersion is the new field
+  const displayOduVersion = job.oduVersion;
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -145,27 +159,6 @@ export function VisitJobCard({ job }: VisitJobCardProps) {
               </span>
             </div>
           </div>
-          {(job.estimatedStart || job.estimatedEnd) && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm pt-1">
-              <div>
-                <span className="text-muted-foreground">Est. Start:</span>{" "}
-                <span className="font-medium">
-                  {job.estimatedStart
-                    ? formatDateTimeString(job.estimatedStart)
-                    : "N/A"}
-                </span>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Est. End:</span>{" "}
-                <span className="font-medium">
-                  {job.estimatedEnd
-                    ? formatDateTimeString(job.estimatedEnd)
-                    : "N/A"}
-                </span>
-              </div>
-              <div></div>
-            </div>
-          )}
         </div>
 
         {/* Job Details */}
@@ -192,10 +185,10 @@ export function VisitJobCard({ job }: VisitJobCardProps) {
                 <span className="font-medium">{job.productFamily}</span>
               </div>
             )}
-            {job.deviceVersion && (
+            {displayOduVersion && (
               <div>
-                <span className="text-muted-foreground">Device Version:</span>{" "}
-                <span className="font-medium">{job.deviceVersion}</span>
+                <span className="text-muted-foreground">ODU Version:</span>{" "}
+                <span className="font-medium">{displayOduVersion}</span>
               </div>
             )}
             {job.resourceNames && (
@@ -207,41 +200,77 @@ export function VisitJobCard({ job }: VisitJobCardProps) {
           </div>
         </div>
 
-        {/* Images */}
-        {job.allUrls && job.allUrls.length > 0 ? (
-          <div className="space-y-2">
+        {/* Source System */}
+        {job.source && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground font-medium">
+              Source:
+            </span>
+            <Badge variant="outline" className="font-mono">
+              {job.source}
+            </Badge>
+          </div>
+        )}
+
+        {/* Checklists */}
+        {(job.checklistCheckIn || job.checklistCheckOut) && (
+          <div className="space-y-3">
             <h4 className="text-sm font-semibold text-muted-foreground">
-              Images ({job.allUrls.length})
+              Checklists
             </h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-              {job.allUrls.map((url, index) => (
-                <div
-                  key={index}
-                  className="relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100 dark:bg-dark-foreground cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => handleImageClick(index)}
-                >
-                  <img
-                    src={url}
-                    alt={`Visit job image ${index + 1}`}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                </div>
-              ))}
+            <div className="space-y-2">
+              {job.checklistCheckIn && (
+                <ChecklistSection
+                  title="Check-in Checklist"
+                  data={job.checklistCheckIn}
+                />
+              )}
+              {job.checklistCheckOut && (
+                <ChecklistSection
+                  title="Check-out Checklist"
+                  data={job.checklistCheckOut}
+                />
+              )}
             </div>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground italic">
-            No images available
-          </p>
         )}
+
+        {/* Images - Separate check-in and check-out galleries */}
+        <div className="space-y-4">
+          {(checkInImages.length > 0 || checkOutImages.length > 0) && (
+            <h4 className="text-sm font-semibold text-muted-foreground">
+              Images
+            </h4>
+          )}
+          {checkInImages.length > 0 && (
+            <ImageGallerySection
+              title="Check-in Images"
+              images={checkInImages}
+              onImageClick={(index) => handleImageClick(index)}
+              emptyMessage="No check-in images available"
+            />
+          )}
+          {checkOutImages.length > 0 && (
+            <ImageGallerySection
+              title="Check-out Images"
+              images={checkOutImages}
+              onImageClick={(index) =>
+                handleImageClick(index + checkInImages.length)
+              }
+              emptyMessage="No check-out images available"
+            />
+          )}
+          {checkInImages.length === 0 && checkOutImages.length === 0 && (
+            <p className="text-sm text-muted-foreground italic">
+              No images available
+            </p>
+          )}
+        </div>
       </CardContent>
 
       {/* Image Lightbox */}
       <ImageLightbox
-        images={job.allUrls || []}
+        images={allImages}
         initialIndex={selectedImageIndex}
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
