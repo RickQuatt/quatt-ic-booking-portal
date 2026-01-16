@@ -4,7 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/Accordion";
-import { ThemedJsonView } from "@/components/shared/ThemedJsonView";
+import { ChecklistItemsView } from "../ChecklistItemsView";
 
 export interface ChecklistSectionProps {
   title: string;
@@ -13,7 +13,8 @@ export interface ChecklistSectionProps {
 }
 
 /**
- * ChecklistSection - Displays checklist JSON data in a collapsible accordion
+ * ChecklistSection - Displays checklist data in a collapsible accordion
+ * Shows question-answer pairs in a user-friendly format with image support
  *
  * @example
  * ```tsx
@@ -50,13 +51,7 @@ export function ChecklistSection({
           <span className="font-semibold text-sm">{displayTitle}</span>
         </AccordionTrigger>
         <AccordionContent className="px-4 pb-4">
-          <ThemedJsonView
-            value={data}
-            collapsed={2}
-            displayDataTypes={false}
-            showFullscreenButton={true}
-            title={title}
-          />
+          <ChecklistItemsView data={data} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>
