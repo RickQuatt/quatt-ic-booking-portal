@@ -5,9 +5,6 @@ const meta: Meta<typeof ChecklistItem> = {
   title: "Visit Jobs/ChecklistItem",
   component: ChecklistItem,
   tags: ["autodocs"],
-  argTypes: {
-    onImageClick: { action: "image clicked" },
-  },
 };
 
 export default meta;
@@ -34,32 +31,39 @@ export const EmptyValue: Story = {
   },
 };
 
-export const SingleImage: Story = {
+export const SingleURL: Story = {
   args: {
-    question: "Equipment Photo",
-    answer: "https://picsum.photos/seed/equipment/400/300",
-    onImageClick: (url, index) =>
-      console.log("Clicked image:", url, "at index:", index),
+    question: "Documentation",
+    answer: "https://example.com/installation-manual.pdf",
   },
 };
 
-export const ImageGallery: Story = {
+export const MultipleURLs: Story = {
   args: {
-    question: "Installation Photos",
+    question: "Related Documents",
     answer: [
-      "https://picsum.photos/seed/photo1/400/300",
-      "https://picsum.photos/seed/photo2/400/300",
-      "https://picsum.photos/seed/photo3/400/300",
+      "https://example.com/manual.pdf",
+      "https://example.com/warranty.pdf",
+      "https://example.com/specifications.pdf",
     ],
-    onImageClick: (url, index) =>
-      console.log("Clicked image:", url, "at index:", index),
   },
 };
 
-export const RelativeURLImage: Story = {
+export const RelativeURL: Story = {
   args: {
-    question: "Local Image",
-    answer: "/placeholder-image.jpg",
+    question: "Local Document",
+    answer: "/assets/documents/guide.pdf",
+  },
+};
+
+export const MixedContent: Story = {
+  args: {
+    question: "Mixed Items",
+    answer: [
+      "Text value",
+      "https://example.com/document.pdf",
+      "Another text value",
+    ],
   },
 };
 

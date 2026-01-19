@@ -1,22 +1,19 @@
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { motion } from "framer-motion";
 import { fadeInVariants } from "@/lib/animations";
-import {
-  isValidUrl,
-  getImageFallbackUrl,
-  IMAGE_CONSTANTS,
-} from "@/utils/urlUtils";
+import { isValidUrl } from "@/utils/urlUtils";
+import { ExternalLink } from "lucide-react";
 
 export interface ChecklistItemProps {
   question: string;
   answer: string | string[];
-  onImageClick?: (url: string, index: number) => void;
   className?: string;
 }
 
 /**
  * ChecklistItem - Renders a single checklist question-answer pair
- * Detects URLs and displays them as clickable image thumbnails
+ * Detects URLs and displays them as clickable links
  * Displays text values as badges
  *
  * @example
@@ -24,23 +21,16 @@ export interface ChecklistItemProps {
  * <ChecklistItem
  *   question="Condition of equipment"
  *   answer="Good"
- *   onImageClick={(url, index) => openLightbox(url, index)}
  * />
  * ```
  */
 export function ChecklistItem({
   question,
   answer,
-  onImageClick,
   className = "",
 }: ChecklistItemProps) {
   // Normalize answer to always be an array
   const answers = Array.isArray(answer) ? answer : [answer];
-
-  // Check if all answers are URLs (images)
-  const allAnswersAreUrls = answers.every(
-    (a) => typeof a === "string" && isValidUrl(a),
-  );
 
   return (
     <motion.div
@@ -56,41 +46,41 @@ export function ChecklistItem({
 
       {/* Answer */}
       <div className="flex flex-wrap gap-2 items-start">
-        {allAnswersAreUrls
-          ? // Display images
-            answers.map((url, index) => (
-              <button
+        {answers.map((value, index) => {
+          const isUrl = typeof value === "string" && isValidUrl(value);
+
+          if (isUrl) {
+            return (
+              <Button
                 key={index}
-                onClick={() => onImageClick?.(url, index)}
-                className="relative group overflow-hidden rounded-md border border-border hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                aria-label={`View image ${index + 1}`}
+                variant="link"
+                size="sm"
+                asChild
+                className="h-auto p-0 text-sm"
               >
-                <img
-                  src={url}
-                  alt={`${question} - Image ${index + 1}`}
-                  className="w-auto object-cover group-hover:scale-105 transition-transform duration-200"
-                  style={{ height: `${IMAGE_CONSTANTS.THUMBNAIL_HEIGHT}px` }}
-                  loading="lazy"
-                  onError={(e) => {
-                    // Fallback for failed image loads
-                    (e.target as HTMLImageElement).src = getImageFallbackUrl(
-                      IMAGE_CONSTANTS.FALLBACK_IMAGE_SIZE,
-                      "Image not found",
-                    );
-                  }}
-                />
-              </button>
-            ))
-          : // Display text badges
-            answers.map((value, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className="text-sm font-normal"
-              >
-                {value || "(empty)"}
-              </Badge>
-            ))}
+                <a
+                  href={value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 hover:underline"
+                >
+                  View Link
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </Button>
+            );
+          }
+
+          return (
+            <Badge
+              key={index}
+              variant="outline"
+              className="text-sm font-normal"
+            >
+              {value || "(empty)"}
+            </Badge>
+          );
+        })}
       </div>
     </motion.div>
   );

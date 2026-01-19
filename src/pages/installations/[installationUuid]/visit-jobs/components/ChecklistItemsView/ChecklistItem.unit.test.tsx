@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
 import { ChecklistItem } from "./ChecklistItem";
 
 describe("ChecklistItem", () => {
@@ -24,73 +24,30 @@ describe("ChecklistItem", () => {
     expect(screen.getByText("Item 3")).toBeInTheDocument();
   });
 
-  it("renders single URL as image thumbnail", () => {
-    const imageUrl = "https://example.com/image.jpg";
-    render(<ChecklistItem question="Photo" answer={imageUrl} />);
+  it("renders single URL as clickable link", () => {
+    const url = "https://example.com/document.pdf";
+    render(<ChecklistItem question="Documentation" answer={url} />);
 
-    const img = screen.getByRole("img", { name: /Photo - Image 1/i });
-    expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute("src", imageUrl);
+    const link = screen.getByRole("link", { name: /View Link/i });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute("href", url);
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
 
-  it("renders multiple URLs as image gallery", () => {
-    const imageUrls = [
-      "https://example.com/image1.jpg",
-      "https://example.com/image2.jpg",
-      "https://example.com/image3.jpg",
+  it("renders multiple URLs as multiple links", () => {
+    const urls = [
+      "https://example.com/doc1.pdf",
+      "https://example.com/doc2.pdf",
+      "https://example.com/doc3.pdf",
     ];
-    render(<ChecklistItem question="Photos" answer={imageUrls} />);
+    render(<ChecklistItem question="Documents" answer={urls} />);
 
-    imageUrls.forEach((url, index) => {
-      const img = screen.getByRole("img", {
-        name: `Photos - Image ${index + 1}`,
-      });
-      expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute("src", url);
+    const links = screen.getAllByRole("link", { name: /View Link/i });
+    expect(links).toHaveLength(3);
+    urls.forEach((url, index) => {
+      expect(links[index]).toHaveAttribute("href", url);
     });
-  });
-
-  it("calls onImageClick when image is clicked", () => {
-    const handleImageClick = vi.fn();
-    const imageUrl = "https://example.com/image.jpg";
-
-    render(
-      <ChecklistItem
-        question="Photo"
-        answer={imageUrl}
-        onImageClick={handleImageClick}
-      />,
-    );
-
-    const button = screen.getByRole("button", { name: /View image 1/i });
-    fireEvent.click(button);
-
-    expect(handleImageClick).toHaveBeenCalledWith(imageUrl, 0);
-    expect(handleImageClick).toHaveBeenCalledTimes(1);
-  });
-
-  it("calls onImageClick for each image in gallery", () => {
-    const handleImageClick = vi.fn();
-    const imageUrls = [
-      "https://example.com/image1.jpg",
-      "https://example.com/image2.jpg",
-    ];
-
-    render(
-      <ChecklistItem
-        question="Photos"
-        answer={imageUrls}
-        onImageClick={handleImageClick}
-      />,
-    );
-
-    const buttons = screen.getAllByRole("button");
-
-    fireEvent.click(buttons[0]);
-    expect(handleImageClick).toHaveBeenCalledWith(imageUrls[0], 0);
-
-    fireEvent.click(buttons[1]);
-    expect(handleImageClick).toHaveBeenCalledWith(imageUrls[1], 1);
   });
 
   it("handles empty string answer", () => {
@@ -100,13 +57,13 @@ describe("ChecklistItem", () => {
     expect(screen.getByText("(empty)")).toBeInTheDocument();
   });
 
-  it("handles relative URL paths as images", () => {
-    const imageUrl = "/assets/photo.jpg";
-    render(<ChecklistItem question="Local Photo" answer={imageUrl} />);
+  it("handles relative URL paths as links", () => {
+    const url = "/assets/document.pdf";
+    render(<ChecklistItem question="Local Document" answer={url} />);
 
-    const img = screen.getByRole("img", { name: /Local Photo - Image 1/i });
-    expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute("src", imageUrl);
+    const link = screen.getByRole("link", { name: /View Link/i });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute("href", url);
   });
 
   it("applies custom className", () => {
@@ -117,38 +74,47 @@ describe("ChecklistItem", () => {
     expect(container.firstChild).toHaveClass("custom-class");
   });
 
-  it("sets loading=lazy on images for performance", () => {
+  it("renders mixed content with both URLs and text", () => {
     render(
-      <ChecklistItem question="Photo" answer="https://example.com/image.jpg" />,
+      <ChecklistItem
+        question="Mixed"
+        answer={["Text value", "https://example.com/doc.pdf", "Another text"]}
+      />,
     );
 
-    const img = screen.getByRole("img");
-    expect(img).toHaveAttribute("loading", "lazy");
+    expect(screen.getByText("Text value")).toBeInTheDocument();
+    expect(screen.getByText("Another text")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /View Link/i }),
+    ).toBeInTheDocument();
   });
 
-  it("renders mixed content as text badges (not images) when not all URLs", () => {
-    // If we had mixed content (both URLs and text), they should all be treated as text
-    // This is an edge case based on our "all or nothing" URL detection
-    render(<ChecklistItem question="Mixed" answer={["Text", "More text"]} />);
-
-    expect(screen.getByText("Text")).toBeInTheDocument();
-    expect(screen.getByText("More text")).toBeInTheDocument();
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
-  });
-
-  it("does not treat strings with spaces after / as images", () => {
+  it("does not treat strings with spaces after / as links", () => {
     // Improved URL validation should reject "/some random text"
     render(
       <ChecklistItem
-        question="Not an image"
+        question="Not a URL"
         answer="/some random text with spaces"
       />,
     );
 
-    expect(screen.getByText("Not an image")).toBeInTheDocument();
+    expect(screen.getByText("Not a URL")).toBeInTheDocument();
     expect(
       screen.getByText("/some random text with spaces"),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
+
+  it("opens links in new tab with proper security attributes", () => {
+    render(
+      <ChecklistItem
+        question="External Link"
+        answer="https://example.com/external"
+      />,
+    );
+
+    const link = screen.getByRole("link");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
 });

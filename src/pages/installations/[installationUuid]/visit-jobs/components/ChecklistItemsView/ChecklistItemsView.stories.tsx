@@ -21,17 +21,17 @@ export const Default: Story = {
   },
 };
 
-export const WithImages: Story = {
+export const WithURLs: Story = {
   args: {
     data: {
       Inspector: "Jane Smith",
       "Equipment Status": "Operational",
-      "Check-in Photo": "https://picsum.photos/seed/checkin/400/300",
-      "Equipment Photos": [
-        "https://picsum.photos/seed/equipment1/400/300",
-        "https://picsum.photos/seed/equipment2/400/300",
+      "Installation Manual": "https://example.com/manual.pdf",
+      "Related Documents": [
+        "https://example.com/warranty.pdf",
+        "https://example.com/specifications.pdf",
       ],
-      "Check-out Photo": "https://picsum.photos/seed/checkout/400/300",
+      "Completion Certificate": "https://example.com/certificate.pdf",
     },
   },
 };
@@ -55,10 +55,10 @@ export const MixedContent: Story = {
       Inspector: "Alice Williams",
       Date: "2024-01-15",
       Status: "Completed",
-      Photos: [
-        "https://picsum.photos/seed/mixed1/400/300",
-        "https://picsum.photos/seed/mixed2/400/300",
-        "https://picsum.photos/seed/mixed3/400/300",
+      Documents: [
+        "https://example.com/report1.pdf",
+        "https://example.com/report2.pdf",
+        "https://example.com/report3.pdf",
       ],
       Notes: "All systems operational",
       "Next Inspection": "2024-06-15",
