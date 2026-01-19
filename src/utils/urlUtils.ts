@@ -1,25 +1,17 @@
 /**
- * Image-related constants
- */
-export const IMAGE_CONSTANTS = {
-  THUMBNAIL_HEIGHT: 120,
-  FALLBACK_IMAGE_SIZE: 120,
-} as const;
-
-/**
  * Checks if a string is a valid URL (absolute or relative)
  *
- * This function validates URLs that could be image sources:
+ * This function validates URLs:
  * - Absolute URLs: http://, https://
- * - Relative URLs: starting with / followed by alphanumeric characters
+ * - Relative URLs: starting with / followed by path characters (no spaces)
  *
  * @param value - String to check
  * @returns true if the string is a valid URL pattern
  *
  * @example
  * ```ts
- * isValidUrl("https://example.com/image.jpg") // true
- * isValidUrl("/assets/image.jpg") // true
+ * isValidUrl("https://example.com/document.pdf") // true
+ * isValidUrl("/assets/file.pdf") // true
  * isValidUrl("/some random text") // false
  * isValidUrl("not a url") // false
  * ```
@@ -50,18 +42,4 @@ export function isValidUrl(value: string): boolean {
   }
 
   return false;
-}
-
-/**
- * Generates a fallback SVG data URL for broken images
- *
- * @param size - Size of the square SVG in pixels
- * @param message - Message to display in the SVG
- * @returns Data URL string for the SVG
- */
-export function getImageFallbackUrl(
-  size: number = IMAGE_CONSTANTS.FALLBACK_IMAGE_SIZE,
-  message = "Image not found",
-) {
-  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'%3E%3Crect fill='%23f0f0f0' width='${size}' height='${size}'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='12'%3E${encodeURIComponent(message)}%3C/text%3E%3C/svg%3E`;
 }

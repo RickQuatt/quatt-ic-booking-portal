@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isValidUrl, getImageFallbackUrl, IMAGE_CONSTANTS } from "./urlUtils";
+import { isValidUrl } from "./urlUtils";
 
 describe("urlUtils", () => {
   describe("isValidUrl", () => {
@@ -43,52 +43,6 @@ describe("urlUtils", () => {
     it("handles edge cases", () => {
       expect(isValidUrl("/")).toBe(true); // Root path
       expect(isValidUrl("//example.com")).toBe(false); // Protocol-relative URL
-    });
-  });
-
-  describe("getImageFallbackUrl", () => {
-    it("generates a valid SVG data URL with default values", () => {
-      const fallbackUrl = getImageFallbackUrl();
-      expect(fallbackUrl).toContain("data:image/svg+xml");
-      expect(fallbackUrl).toContain(
-        String(IMAGE_CONSTANTS.FALLBACK_IMAGE_SIZE),
-      );
-      expect(fallbackUrl).toContain("Image%20not%20found");
-    });
-
-    it("generates a valid SVG data URL with custom size", () => {
-      const fallbackUrl = getImageFallbackUrl(200);
-      expect(fallbackUrl).toContain("data:image/svg+xml");
-      expect(fallbackUrl).toContain("200");
-    });
-
-    it("generates a valid SVG data URL with custom message", () => {
-      const fallbackUrl = getImageFallbackUrl(120, "Custom message");
-      expect(fallbackUrl).toContain("data:image/svg+xml");
-      expect(fallbackUrl).toContain("Custom%20message");
-    });
-
-    it("properly encodes special characters in message", () => {
-      const fallbackUrl = getImageFallbackUrl(120, "Error: File not found!");
-      expect(fallbackUrl).toContain("data:image/svg+xml");
-      // Check that special characters are encoded
-      expect(fallbackUrl).toContain("Error");
-      expect(fallbackUrl).toContain("File");
-    });
-  });
-
-  describe("IMAGE_CONSTANTS", () => {
-    it("has expected constant values", () => {
-      expect(IMAGE_CONSTANTS.THUMBNAIL_HEIGHT).toBe(120);
-      expect(IMAGE_CONSTANTS.FALLBACK_IMAGE_SIZE).toBe(120);
-    });
-
-    it("constants are readonly", () => {
-      // TypeScript will prevent this at compile time, but verify at runtime too
-      expect(() => {
-        // @ts-expect-error - Testing runtime immutability
-        IMAGE_CONSTANTS.THUMBNAIL_HEIGHT = 200;
-      }).toThrow();
     });
   });
 });

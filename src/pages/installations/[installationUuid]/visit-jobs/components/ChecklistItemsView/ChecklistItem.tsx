@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { fadeInVariants } from "@/lib/animations";
 import { isValidUrl } from "@/utils/urlUtils";
 import { ExternalLink } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface ChecklistItemProps {
   question: string;
@@ -35,7 +36,10 @@ export function ChecklistItem({
       variants={fadeInVariants}
       initial="initial"
       animate="animate"
-      className={`grid grid-cols-1 md:grid-cols-2 gap-3 p-3 border-b border-border last:border-b-0 ${className}`}
+      className={cn(
+        "grid grid-cols-1 md:grid-cols-2 gap-3 p-3 border-b border-border last:border-b-0",
+        className,
+      )}
     >
       {/* Question */}
       <div className="font-medium text-sm text-gray-700 dark:text-gray-300">

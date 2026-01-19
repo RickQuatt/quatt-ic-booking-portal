@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { staggerContainerVariants } from "@/lib/animations";
 import { ChecklistItem } from "./ChecklistItem";
+import { cn } from "@/lib/utils";
 
 export interface ChecklistItemsViewProps {
   data: { [key: string]: string | string[] } | null | undefined;
@@ -42,7 +43,10 @@ export function ChecklistItemsView({
       variants={staggerContainerVariants}
       initial="initial"
       animate="animate"
-      className={`overflow-hidden bg-white dark:bg-dark-foreground ${className}`}
+      className={cn(
+        "overflow-hidden bg-white dark:bg-dark-foreground",
+        className,
+      )}
     >
       {entries.map(([question, answer], index) => (
         <div
