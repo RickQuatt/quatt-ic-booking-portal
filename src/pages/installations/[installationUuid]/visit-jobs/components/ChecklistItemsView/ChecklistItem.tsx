@@ -62,10 +62,10 @@ export function ChecklistItem({
                   href={value}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 hover:underline"
+                  className="inline-flex items-center gap-1 hover:underline break-all"
                 >
-                  View Link
-                  <ExternalLink className="h-3 w-3" />
+                  {value}
+                  <ExternalLink className="h-3 w-3 flex-shrink-0" />
                 </a>
               </Button>
             );

@@ -24,12 +24,13 @@ describe("ChecklistItem", () => {
     expect(screen.getByText("Item 3")).toBeInTheDocument();
   });
 
-  it("renders single URL as clickable link", () => {
+  it("renders single URL as clickable link with URL text", () => {
     const url = "https://example.com/document.pdf";
     render(<ChecklistItem question="Documentation" answer={url} />);
 
-    const link = screen.getByRole("link", { name: /View Link/i });
+    const link = screen.getByRole("link");
     expect(link).toBeInTheDocument();
+    expect(link).toHaveTextContent(url);
     expect(link).toHaveAttribute("href", url);
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
@@ -43,10 +44,11 @@ describe("ChecklistItem", () => {
     ];
     render(<ChecklistItem question="Documents" answer={urls} />);
 
-    const links = screen.getAllByRole("link", { name: /View Link/i });
+    const links = screen.getAllByRole("link");
     expect(links).toHaveLength(3);
     urls.forEach((url, index) => {
       expect(links[index]).toHaveAttribute("href", url);
+      expect(links[index]).toHaveTextContent(url);
     });
   });
 
@@ -61,8 +63,9 @@ describe("ChecklistItem", () => {
     const url = "/assets/document.pdf";
     render(<ChecklistItem question="Local Document" answer={url} />);
 
-    const link = screen.getByRole("link", { name: /View Link/i });
+    const link = screen.getByRole("link");
     expect(link).toBeInTheDocument();
+    expect(link).toHaveTextContent(url);
     expect(link).toHaveAttribute("href", url);
   });
 
@@ -84,9 +87,9 @@ describe("ChecklistItem", () => {
 
     expect(screen.getByText("Text value")).toBeInTheDocument();
     expect(screen.getByText("Another text")).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /View Link/i }),
-    ).toBeInTheDocument();
+    const link = screen.getByRole("link");
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveTextContent("https://example.com/doc.pdf");
   });
 
   it("does not treat strings with spaces after / as links", () => {

@@ -53,11 +53,13 @@ describe("ChecklistItemsView", () => {
     expect(screen.getByText("John Doe")).toBeInTheDocument();
     expect(screen.getByText("Documents")).toBeInTheDocument();
 
-    // Check that links are rendered
-    const links = screen.getAllByRole("link", { name: /View Link/i });
+    // Check that links are rendered with URL text
+    const links = screen.getAllByRole("link");
     expect(links).toHaveLength(2);
     expect(links[0]).toHaveAttribute("href", "https://example.com/doc1.pdf");
+    expect(links[0]).toHaveTextContent("https://example.com/doc1.pdf");
     expect(links[1]).toHaveAttribute("href", "https://example.com/doc2.pdf");
+    expect(links[1]).toHaveTextContent("https://example.com/doc2.pdf");
   });
 
   it("handles mixed content with URLs and text", () => {
@@ -76,8 +78,9 @@ describe("ChecklistItemsView", () => {
     expect(screen.getByText("All checks passed")).toBeInTheDocument();
 
     // URL as link
-    const link = screen.getByRole("link", { name: /View Link/i });
+    const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "https://example.com/doc.pdf");
+    expect(link).toHaveTextContent("https://example.com/doc.pdf");
   });
 
   it("applies zebra striping to items", () => {
