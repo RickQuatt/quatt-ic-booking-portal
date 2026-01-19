@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { motion } from "framer-motion";
 import { $api } from "@/openapi-client/context";
@@ -6,7 +6,8 @@ import { Loader } from "@/components/shared/Loader";
 import { ErrorText } from "@/components/shared/ErrorText";
 import { Button } from "@/components/ui/Button";
 import { fadeInVariants } from "@/lib/animations";
-import { VisitJobCard } from "./components";
+import { VisitJobCard, VisitJobFilters } from "./components";
+import type { VisitJobFilters as VisitJobFiltersType } from "./components";
 import { ArrowLeft } from "lucide-react";
 
 export interface VisitJobsPageProps {
@@ -29,6 +30,9 @@ export function VisitJobsPage({ installationUuid }: VisitJobsPageProps) {
     };
   }, [searchString]);
 
+  // Filter state
+  const [filters, setFilters] = useState<VisitJobFiltersType>({});
+
   // Fetch visit jobs
   const { data, isLoading, error, refetch } = $api.useQuery(
     "get",
@@ -44,8 +48,26 @@ export function VisitJobsPage({ installationUuid }: VisitJobsPageProps) {
   const visitJobs = data?.result || [];
   const isFilteredByJobId = !!queryParams.jobUid;
 
+  // Extract unique job types for the filter dropdown
+  const availableJobTypes = useMemo(() => {
+    const types = visitJobs
+      .map((job) => job.jobType)
+      .filter((type): type is string => type !== null);
+    return Array.from(new Set(types)).sort();
+  }, [visitJobs]);
+
+  // Client-side filtering by job type
+  const filteredJobs = useMemo(() => {
+    if (!filters.jobType) return visitJobs;
+    return visitJobs.filter((job) => job.jobType === filters.jobType);
+  }, [visitJobs, filters]);
+
   const handleViewAllJobs = () => {
     setLocation(`/installations/${installationUuid}/visit-jobs`);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({});
   };
 
   // Error state
@@ -109,12 +131,23 @@ export function VisitJobsPage({ installationUuid }: VisitJobsPageProps) {
                 </Button>
               )}
               <span className="text-sm text-muted-foreground bg-gray-100 dark:bg-dark-foreground px-3 py-1.5 rounded-full">
-                {visitJobs.length} {visitJobs.length === 1 ? "job" : "jobs"}{" "}
-                found
+                {filteredJobs.length}{" "}
+                {filteredJobs.length === 1 ? "job" : "jobs"} found
               </span>
             </div>
           </div>
         </div>
+
+        {/* Filters */}
+        {visitJobs.length > 0 && (
+          <VisitJobFilters
+            availableJobTypes={availableJobTypes}
+            filters={filters}
+            onFiltersChange={setFilters}
+            onClearAll={handleClearFilters}
+            jobCount={filteredJobs.length}
+          />
+        )}
 
         {/* Jobs List */}
         <div className="space-y-4">
@@ -134,8 +167,24 @@ export function VisitJobsPage({ installationUuid }: VisitJobsPageProps) {
                 </Button>
               )}
             </div>
+          ) : filteredJobs.length === 0 ? (
+            <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-lg border border-border">
+              <p className="text-muted-foreground">
+                No jobs match the selected filters.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearFilters}
+                className="mt-4"
+              >
+                Clear Filters
+              </Button>
+            </div>
           ) : (
-            visitJobs.map((job) => <VisitJobCard key={job.jobUid} job={job} />)
+            filteredJobs.map((job) => (
+              <VisitJobCard key={job.jobUid} job={job} />
+            ))
           )}
         </div>
       </motion.div>
