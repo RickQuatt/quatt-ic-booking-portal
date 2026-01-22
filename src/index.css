@@ -43,6 +43,9 @@
   --card: 0 0% 100%; /* Pure white cards */
   --card-foreground: 222.2 84% 4.9%;
 
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+
   --primary: 222.2 47.4% 11.2%;
   --primary-foreground: 210 40% 98%;
 
@@ -73,6 +76,9 @@
   --card: 220 18% 13%; /* Slightly lighter cards for separation */
   --card-foreground: 210 40% 98%;
 
+  --popover: 0 0% 0%; /* Black background for maximum contrast */
+  --popover-foreground: 210 40% 98%;
+
   --color-header: #434649;
 
   --primary: 210 40% 98%;
@@ -81,10 +87,10 @@
   --secondary: 217.2 32.6% 17.5%;
   --secondary-foreground: 210 40% 98%;
 
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
+  --muted: 217.2 32.6% 22%; /* Lighter for calendar hover states */
+  --muted-foreground: 215 20.2% 80%; /* Brighter text for calendar dates */
 
-  --accent: 217.2 32.6% 17.5%;
+  --accent: 217.2 32.6% 22%; /* Lighter accent for calendar hover/today */
   --accent-foreground: 210 40% 98%;
 
   --destructive: 0 62.8% 30.6%;
