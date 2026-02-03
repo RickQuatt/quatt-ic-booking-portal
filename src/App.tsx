@@ -22,6 +22,7 @@ import { DynamicPricingPage } from "./pages/dynamic-pricing/page";
 import { DeviceListPage } from "./pages/devices/page";
 import { VisitJobsPage } from "./pages/installations/[installationUuid]/visit-jobs/page";
 import { BulkJobPage } from "./pages/bulkJob/page";
+import { UtilitiesPage } from "./pages/utilities/page";
 import { $api } from "@/openapi-client/context";
 import { Toaster } from "@/components/ui/Sonner";
 
@@ -114,6 +115,9 @@ function App() {
           </Route>
           <Route path="/bulkJob">
             <BulkJobPage />
+          </Route>
+          <Route path="/utilities">
+            <UtilitiesPage />
           </Route>
           <Route path="/cics/:cicId">
             {(params) => {
