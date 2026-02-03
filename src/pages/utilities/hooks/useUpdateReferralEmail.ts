@@ -34,9 +34,7 @@ export function useUpdateReferralEmail({
             toast.error("User has no Referral Rock member account");
             break;
           case "REFERRAL_MEMBER_EMAIL_ALREADY_EXISTS":
-            toast.error(
-              "A referral member with this email already exists",
-            );
+            toast.error("A referral member with this email already exists");
             break;
           default:
             toast.error("Failed to update referral email");

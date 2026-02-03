@@ -23,7 +23,7 @@ export function useUpdateInstallationSettings({
 }: UseUpdateInstallationSettingsOptions) {
   const mutation = $api.useMutation(
     "put",
-    "/admin/installation/{installationUuid}",
+    "/admin/installation/{installationId}",
     {
       onSuccess: () => {
         toast.success("Settings updated successfully");
@@ -38,7 +38,7 @@ export function useUpdateInstallationSettings({
 
   const updateSettings = (data: UpdateAdminInstallation) => {
     mutation.mutate({
-      params: { path: { installationUuid } },
+      params: { path: { installationId: installationUuid } },
       body: data,
     });
   };

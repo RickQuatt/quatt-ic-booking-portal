@@ -6,9 +6,9 @@ export function useGetInstallationDetails(installationUuid: string) {
     error: installationDetailsError,
     isPending: isLoadingInstallationDetails,
     refetch: refetchInstallationDetails,
-  } = $api.useQuery("get", "/admin/installation/{installationUuid}", {
+  } = $api.useQuery("get", "/admin/installation/{installationId}", {
     params: {
-      path: { installationUuid },
+      path: { installationId: installationUuid },
     },
   });
 
