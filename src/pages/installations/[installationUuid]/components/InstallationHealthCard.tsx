@@ -73,6 +73,31 @@ const formatStatus = (
 };
 
 /**
+ * Format restart status with colored indicator and count
+ */
+const formatRestartStatus = (healthCheck: {
+  status: "ok" | "warning" | "error";
+  count: number;
+  message?: string | null;
+}): React.ReactNode => {
+  const isWarning = healthCheck.status === "warning";
+  const icon = isWarning ? "⚠" : "✓";
+  const colorClass = isWarning
+    ? "text-yellow-600 dark:text-yellow-400"
+    : "text-green-600 dark:text-green-400";
+
+  const displayText =
+    healthCheck.message ||
+    `${healthCheck.count} restart${healthCheck.count !== 1 ? "s" : ""}`;
+
+  return (
+    <span className={colorClass}>
+      {icon} {displayText}
+    </span>
+  );
+};
+
+/**
  * Installation Health Checks Card
  * Displays system health metrics, device connections, and connectivity status
  */
@@ -294,23 +319,7 @@ export function InstallationHealthCard({
           {healthCheckCicNumberOfRestarts && (
             <DataRow
               label="CIC Restarts last 24h"
-              value={
-                <>
-                  <span
-                    className={
-                      healthCheckCicNumberOfRestarts.status === "warning"
-                        ? "text-yellow-600 dark:text-yellow-400"
-                        : "text-green-600 dark:text-green-400"
-                    }
-                  >
-                    {healthCheckCicNumberOfRestarts.status === "warning"
-                      ? "⚠"
-                      : "✓"}{" "}
-                    {healthCheckCicNumberOfRestarts.message ||
-                      `${healthCheckCicNumberOfRestarts.count} restart${healthCheckCicNumberOfRestarts.count !== 1 ? "s" : ""}`}
-                  </span>
-                </>
-              }
+              value={formatRestartStatus(healthCheckCicNumberOfRestarts)}
             />
           )}
         </div>
