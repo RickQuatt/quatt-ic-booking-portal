@@ -296,14 +296,18 @@ export function InstallationHealthCard({
               label="CIC Restarts last 24h"
               value={
                 <>
-                  {formatStatus(
-                    healthCheckCicNumberOfRestarts.status === "warning"
-                      ? "warning"
-                      : "correct",
-                    healthCheckCicNumberOfRestarts.message || undefined,
-                  )}
-                  <span className="ml-2">
-                    ({healthCheckCicNumberOfRestarts.count})
+                  <span
+                    className={
+                      healthCheckCicNumberOfRestarts.status === "warning"
+                        ? "text-yellow-600 dark:text-yellow-400"
+                        : "text-green-600 dark:text-green-400"
+                    }
+                  >
+                    {healthCheckCicNumberOfRestarts.status === "warning"
+                      ? "⚠"
+                      : "✓"}{" "}
+                    {healthCheckCicNumberOfRestarts.message ||
+                      `${healthCheckCicNumberOfRestarts.count} restart${healthCheckCicNumberOfRestarts.count !== 1 ? "s" : ""}`}
                   </span>
                 </>
               }
