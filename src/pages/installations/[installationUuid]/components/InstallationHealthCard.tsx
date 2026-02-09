@@ -37,7 +37,12 @@ const healthcheckTextByStatusForConnectivity: Record<
 };
 
 /**
- * Format status with colored indicator (returns ReactNode for DataRow)
+ * Format connection status with colored indicator (returns ReactNode for DataRow)
+ *
+ * Used for device connection checks (WiFi, Ethernet, Heat Pumps, Thermostat, Boiler)
+ * Uses CicHealthCheckStatus: "correct" | "warning" | "error" | "notApplicable"
+ *
+ * For individual healthcheck objects (like restart counts), use formatRestartStatus() instead.
  */
 const formatStatus = (
   status: CicHealthCheckStatus,
@@ -75,8 +80,13 @@ const formatStatus = (
 
 /**
  * Format restart status with colored indicator and count
- * Note: Uses CicHealthCheck.status ("ok" | "warning" | "error")
- * which differs from CicHealthCheckStatus ("correct" | "warning" | "error" | "notApplicable")
+ *
+ * IMPORTANT: Backend API inconsistency
+ * - Individual healthcheck objects use: CicHealthCheck["status"] = "ok" | "warning" | "error"
+ * - Aggregate health entries use: CicHealthCheckStatus = "correct" | "warning" | "error" | "notApplicable"
+ *
+ * This function handles the CicHealthCheck status format used by restart count healthchecks.
+ * The formatStatus() function handles the CicHealthCheckStatus format used by connection checks.
  */
 const formatRestartStatus = (healthCheck: {
   status: CicHealthCheck["status"];
