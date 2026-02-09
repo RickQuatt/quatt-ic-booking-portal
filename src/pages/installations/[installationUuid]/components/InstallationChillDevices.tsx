@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import type { components } from "@/openapi-client/types/api/v1";
 import { CardContainer, DataRow } from "@/components/shared/DetailPage";
 import {
@@ -6,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/Accordion";
+import { Button } from "@/components/ui/Button";
 import { useChillDevices } from "../hooks/useChillDevices";
 import {
   formatRunningMode,
@@ -28,14 +30,20 @@ type ChillDevice = components["schemas"]["ChillDevice"];
 
 export interface InstallationChillDevicesProps {
   installation: AdminInstallationDetail;
+  installationUuid: string;
 }
 
 interface ChillDeviceCardProps {
   device: ChillDevice;
+  installationUuid: string;
   index: number;
 }
 
-function ChillDeviceCard({ device, index }: ChillDeviceCardProps) {
+function ChillDeviceCard({
+  device,
+  installationUuid,
+  index,
+}: ChillDeviceCardProps) {
   const { metrics } = device;
   const deviceName = device.name || device.serialNumber;
   const title = `🌡️ Chill Device${index > 0 ? ` #${index + 1}` : ""} - ${deviceName}`;
@@ -66,6 +74,15 @@ function ChillDeviceCard({ device, index }: ChillDeviceCardProps) {
                 label="Device Status"
                 value={formatDeviceStatus(device.status)}
               />
+              <div className="pt-2">
+                <Link
+                  href={`/replace-chill-interface-board?installationUuid=${installationUuid}&deviceUuid=${device.uuid}`}
+                >
+                  <Button variant="outline" size="sm">
+                    Replace Interface Board
+                  </Button>
+                </Link>
+              </div>
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -228,6 +245,7 @@ function ChillDeviceCard({ device, index }: ChillDeviceCardProps) {
  */
 export function InstallationChillDevices({
   installation,
+  installationUuid,
 }: InstallationChillDevicesProps) {
   const { chillDevices } = useChillDevices(installation);
 
@@ -238,7 +256,12 @@ export function InstallationChillDevices({
   return (
     <>
       {chillDevices.map((device, index) => (
-        <ChillDeviceCard key={device.uuid} device={device} index={index} />
+        <ChillDeviceCard
+          key={device.uuid}
+          device={device}
+          installationUuid={installationUuid}
+          index={index}
+        />
       ))}
     </>
   );
