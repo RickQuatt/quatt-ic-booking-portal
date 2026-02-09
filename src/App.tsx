@@ -23,6 +23,7 @@ import { DeviceListPage } from "./pages/devices/page";
 import { VisitJobsPage } from "./pages/installations/[installationUuid]/visit-jobs/page";
 import { BulkJobPage } from "./pages/bulkJob/page";
 import { UtilitiesPage } from "./pages/utilities/page";
+import { ReplaceChillInterfaceBoardPage } from "./pages/replace-chill-interface-board/page";
 import { $api } from "@/openapi-client/context";
 import { Toaster } from "@/components/ui/Sonner";
 
@@ -118,6 +119,9 @@ function App() {
           </Route>
           <Route path="/utilities">
             <UtilitiesPage />
+          </Route>
+          <Route path="/replace-chill-interface-board">
+            <ReplaceChillInterfaceBoardPage />
           </Route>
           <Route path="/cics/:cicId">
             {(params) => {

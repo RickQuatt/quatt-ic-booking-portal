@@ -39,8 +39,9 @@ Configuration is in `components.json`.
 
 These pages are not accessible from the sidebar navigation:
 
-| Page       | Path                    | Description                                          |
-| ---------- | ----------------------- | ---------------------------------------------------- |
-| MQTT Debug | `/cics/{cicUuid}/debug` | MQTT command interface for CICs                      |
-| Bulk Jobs  | `/bulkJob`              | Submit bulk operations for installations             |
-| Utilities  | `/utilities`            | Support utilities (e.g., Referral Rock email update) |
+| Page                          | Path                             | Description                                          |
+| ----------------------------- | -------------------------------- | ---------------------------------------------------- |
+| MQTT Debug                    | `/cics/{cicUuid}/debug`          | MQTT command interface for CICs                      |
+| Bulk Jobs                     | `/bulkJob`                       | Submit bulk operations for installations             |
+| Utilities                     | `/utilities`                     | Support utilities (e.g., Referral Rock email update) |
+| Replace Chill Interface Board | `/replace-chill-interface-board` | Replace a chill interface board for a device         |

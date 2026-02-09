@@ -131,7 +131,10 @@ export function InstallationDetailPage({
             <InstallationHomeBattery installation={installation} />
 
             {/* Chill Devices */}
-            <InstallationChillDevices installation={installation} />
+            <InstallationChillDevices
+              installation={installation}
+              installationUuid={installationUuid}
+            />
 
             {/* Dongle Devices */}
             <InstallationDongleDevices installation={installation} />
