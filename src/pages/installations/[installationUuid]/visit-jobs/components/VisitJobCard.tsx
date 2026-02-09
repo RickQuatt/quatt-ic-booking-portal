@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "wouter";
 import type { components } from "@/openapi-client/types/api/v1";
 import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -106,14 +105,14 @@ export function VisitJobCard({ job }: VisitJobCardProps) {
         {/* Job ID */}
         <div className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground font-medium">Job ID:</span>
-          <Link
+          <a
             href={`https://quatt.my.skedulo.com/job/${job.jobUid}`}
             className="text-primary hover:underline font-mono"
             target="_blank"
             rel="noopener noreferrer"
           >
             {job.jobUid}
-          </Link>
+          </a>
           <Button
             variant="ghost"
             size="sm"
