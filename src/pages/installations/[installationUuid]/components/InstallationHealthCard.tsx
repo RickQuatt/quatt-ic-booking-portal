@@ -4,6 +4,7 @@ import { $api } from "@/openapi-client/context";
 
 type BoilerType = components["schemas"]["BoilerType"];
 type CicHealthCheckStatus = components["schemas"]["CicHealthCheckStatus"];
+type CicHealthCheck = components["schemas"]["CicHealthCheck"];
 type DeviceConnectionStatuses =
   components["schemas"]["DeviceConnectionStatuses"];
 type InternetConnectionStatuses =
@@ -36,7 +37,12 @@ const healthcheckTextByStatusForConnectivity: Record<
 };
 
 /**
- * Format status with colored indicator (returns ReactNode for DataRow)
+ * Format connection status with colored indicator (returns ReactNode for DataRow)
+ *
+ * Used for device connection checks (WiFi, Ethernet, Heat Pumps, Thermostat, Boiler)
+ * Uses CicHealthCheckStatus: "correct" | "warning" | "error" | "notApplicable"
+ *
+ * For individual healthcheck objects (like restart counts), use formatRestartStatus() instead.
  */
 const formatStatus = (
   status: CicHealthCheckStatus,
@@ -68,6 +74,50 @@ const formatStatus = (
   return (
     <span className={colorClass}>
       {indicator} {text}
+    </span>
+  );
+};
+
+/**
+ * Format restart status with colored indicator and count
+ *
+ * IMPORTANT: Backend API inconsistency
+ * - Individual healthcheck objects use: CicHealthCheck["status"] = "ok" | "warning" | "error"
+ * - Aggregate health entries use: CicHealthCheckStatus = "correct" | "warning" | "error" | "notApplicable"
+ *
+ * This function handles the CicHealthCheck status format used by restart count healthchecks.
+ * The formatStatus() function handles the CicHealthCheckStatus format used by connection checks.
+ */
+const formatRestartStatus = (healthCheck: {
+  status: CicHealthCheck["status"];
+  count: number;
+  message?: string | null;
+}): React.ReactNode => {
+  // Map CicHealthCheck status to icon and color
+  const statusConfig = {
+    ok: {
+      icon: "✓",
+      colorClass: "text-green-600 dark:text-green-400",
+    },
+    warning: {
+      icon: "⚠",
+      colorClass: "text-yellow-600 dark:text-yellow-400",
+    },
+    error: {
+      icon: "✗",
+      colorClass: "text-red-600 dark:text-red-400",
+    },
+  } as const;
+
+  const config = statusConfig[healthCheck.status];
+
+  const displayText =
+    healthCheck.message ||
+    `${healthCheck.count} restart${healthCheck.count !== 1 ? "s" : ""}`;
+
+  return (
+    <span className={config.colorClass}>
+      {config.icon} {displayText}
     </span>
   );
 };
@@ -294,19 +344,7 @@ export function InstallationHealthCard({
           {healthCheckCicNumberOfRestarts && (
             <DataRow
               label="CIC Restarts last 24h"
-              value={
-                <>
-                  {formatStatus(
-                    healthCheckCicNumberOfRestarts.status === "warning"
-                      ? "warning"
-                      : "correct",
-                    healthCheckCicNumberOfRestarts.message || undefined,
-                  )}
-                  <span className="ml-2">
-                    ({healthCheckCicNumberOfRestarts.count})
-                  </span>
-                </>
-              }
+              value={formatRestartStatus(healthCheckCicNumberOfRestarts)}
             />
           )}
         </div>
