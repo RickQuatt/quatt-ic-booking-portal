@@ -277,13 +277,17 @@ export function InstallationHeader({
             {installation.activeCic &&
               chillDevice &&
               "serialNumber" in chillDevice &&
-              "eui64" in chillDevice && (
+              typeof chillDevice.serialNumber === "string" &&
+              chillDevice.serialNumber &&
+              "eui64" in chillDevice &&
+              typeof chillDevice.eui64 === "string" &&
+              chillDevice.eui64 && (
                 <Button variant="outline" size="sm" disabled={isLoading}>
                   <a
                     href={getGrafanaChillStatsDashboardLink(
                       installation.activeCic,
-                      chillDevice.serialNumber as string,
-                      chillDevice.eui64 as string,
+                      chillDevice.serialNumber,
+                      chillDevice.eui64,
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
