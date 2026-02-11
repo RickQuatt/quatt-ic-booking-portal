@@ -28,39 +28,36 @@ export const getEnvironment = (): {
   };
 };
 
-export function getGrafanaDataPerCICLink(id: string) {
+function buildGrafanaUrl(dashboardPath: string, params: string): string {
   const env = getEnvironment();
+  const baseUrl =
+    env.isLocal || env.isDevelopment
+      ? "https://g-d4ebd27178.grafana-workspace.eu-west-1.amazonaws.com"
+      : env.isStaging
+        ? "https://g-2048f245a4.grafana-workspace.eu-west-1.amazonaws.com"
+        : "https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com";
+  return `${baseUrl}/d/${dashboardPath}?${params}`;
+}
 
-  if (env.isLocal || env.isDevelopment) {
-    return `https://g-d4ebd27178.grafana-workspace.eu-west-1.amazonaws.com/d/clickhouse-data-per-cic/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
-  } else if (env.isStaging) {
-    return `https://g-2048f245a4.grafana-workspace.eu-west-1.amazonaws.com/d/clickhouse-data-per-cic/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
-  }
-
-  return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/clickhouse-data-per-cic/clickhouse-data-per-cic?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
+export function getGrafanaDataPerCICLink(id: string) {
+  return buildGrafanaUrl(
+    "clickhouse-data-per-cic/clickhouse-data-per-cic",
+    `var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`,
+  );
 }
 
 export function getGrafanaAllEDashboardLink(id: string) {
-  const env = getEnvironment();
-  if (env.isLocal || env.isDevelopment) {
-    return `https://g-d4ebd27178.grafana-workspace.eu-west-1.amazonaws.com/d/all-e-dashboard/all-e-dashboard?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
-  }
-  if (env.isStaging) {
-    return `https://g-2048f245a4.grafana-workspace.eu-west-1.amazonaws.com/d/all-e-dashboard/all-e-dashboard?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
-  }
-  return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/all-e-dashboard/all-e-dashboard?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
+  return buildGrafanaUrl(
+    "all-e-dashboard/all-e-dashboard",
+    `var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`,
+  );
 }
 
 export function getGrafanaDiagnosticsLink(id: string) {
-  const env = getEnvironment();
-
-  if (env.isLocal || env.isDevelopment) {
-    return `https://g-d4ebd27178.grafana-workspace.eu-west-1.amazonaws.com/d/clickhouse-diagnostics/clickhouse-diagnostics?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
-  } else if (env.isStaging) {
-    return `https://g-2048f245a4.grafana-workspace.eu-west-1.amazonaws.com/d/clickhouse-diagnostics/clickhouse-diagnostics?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
-  }
-
-  return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/clickhouse-diagnostics/clickhouse-diagnostics?var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`;
+  return buildGrafanaUrl(
+    "clickhouse-diagnostics/clickhouse-diagnostics",
+    `var-cic_uuid=${id}&from=now-6h&to=now&orgId=1&refresh=30s`,
+  );
 }
 
 export function getHubspotSearchOrderLink(orderNumber: string) {
@@ -103,16 +100,10 @@ export function getGrafanaChillStatsDashboardLink(
   serialNumber: string,
   eui64: string,
 ) {
-  const env = getEnvironment();
-  const params = `orgId=1&refresh=30s&var-cic_uuid=${cicId}&var-serialNumber=${serialNumber}&var-eui64=${eui64}`;
-
-  if (env.isLocal || env.isDevelopment) {
-    return `https://g-d4ebd27178.grafana-workspace.eu-west-1.amazonaws.com/d/chill-stats-dashboard/chill-stats-dashboard?${params}`;
-  }
-  if (env.isStaging) {
-    return `https://g-2048f245a4.grafana-workspace.eu-west-1.amazonaws.com/d/chill-stats-dashboard/chill-stats-dashboard?${params}`;
-  }
-  return `https://g-736ff2fef7.grafana-workspace.eu-west-1.amazonaws.com/d/chill-stats-dashboard/chill-stats-dashboard?${params}`;
+  return buildGrafanaUrl(
+    "chill-stats-dashboard/chill-stats-dashboard",
+    `orgId=1&refresh=30s&var-cic_uuid=${cicId}&var-serialNumber=${serialNumber}&var-eui64=${eui64}`,
+  );
 }
 
 export function getRetoolBatteryDashboardLink(batterySn: string) {
