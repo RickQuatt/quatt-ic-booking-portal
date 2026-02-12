@@ -75,6 +75,33 @@ export function InstallationSettingsModal({
       .number({ message: requiredFieldText })
       .min(1)
       .max(2),
+    chMaxWaterTemperature: z.coerce
+      .number()
+      .optional()
+      .nullable()
+      .refine(
+        (val) => {
+          if (val === null || val === undefined) return true;
+          const config = installation?.chMaxWaterTemperature;
+          if (!config) return true;
+          return val >= config.minValue && val <= config.maxValue;
+        },
+        {
+          message: `Value must be between ${installation?.chMaxWaterTemperature?.minValue}°C and ${installation?.chMaxWaterTemperature?.maxValue}°C`,
+        },
+      )
+      .refine(
+        (val) => {
+          if (val === null || val === undefined) return true;
+          const config = installation?.chMaxWaterTemperature;
+          if (!config) return true;
+          // Validate increment
+          return (val - config.minValue) % config.increment === 0;
+        },
+        {
+          message: `Value must be in increments of ${installation?.chMaxWaterTemperature?.increment}°C`,
+        },
+      ),
   });
 
   type InstallationSettingsFormData = z.infer<
@@ -93,6 +120,8 @@ export function InstallationSettingsModal({
       boilerType: installation.boilerType ?? undefined,
       thermostatType: installation.thermostatType ?? undefined,
       numberOfHeatPumps: installation.numberOfHeatPumps ?? undefined,
+      chMaxWaterTemperature:
+        installation?.chMaxWaterTemperature?.value ?? undefined,
     },
   });
 
@@ -110,7 +139,26 @@ export function InstallationSettingsModal({
       delete data.dayMaxSoundLevel;
       delete data.nightMaxSoundLevel;
     }
-    updateSettings(data as components["schemas"]["UpdateAdminInstallation"]);
+
+    // Prepare the update payload, converting null to undefined for API compatibility
+    const updatePayload: components["schemas"]["UpdateAdminInstallation"] = {
+      ratedMaximumHousePower: data.ratedMaximumHousePower,
+      maximumHeatingOutdoorTemperature: data.maximumHeatingOutdoorTemperature,
+      dayMaxSoundLevel: data.dayMaxSoundLevel ?? undefined,
+      nightMaxSoundLevel: data.nightMaxSoundLevel ?? undefined,
+      silentMode: data.silentMode ?? undefined,
+      boilerType: data.boilerType ?? undefined,
+      thermostatType: data.thermostatType ?? undefined,
+      numberOfHeatPumps: data.numberOfHeatPumps,
+      chMaxWaterTemperature:
+        data.chMaxWaterTemperature !== undefined &&
+        data.chMaxWaterTemperature !== null
+          ? { value: data.chMaxWaterTemperature }
+          : undefined,
+    };
+
+    // Update all installation settings including chMaxWaterTemperature
+    updateSettings(updatePayload);
   };
 
   return (
@@ -333,6 +381,59 @@ export function InstallationSettingsModal({
                 </FormItem>
               )}
             />
+
+            {/* Max Water Temperature - Only show if supported */}
+            {installation?.chMaxWaterTemperature &&
+              (() => {
+                const config = installation.chMaxWaterTemperature;
+                return (
+                  <FormField
+                    control={form.control}
+                    name="chMaxWaterTemperature"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Max Water Temperature (°C)
+                          <span className="text-xs text-gray-500 ml-2">
+                            Range: {config.minValue}°C - {config.maxValue}°C
+                            {config.increment > 1 &&
+                              ` (step: ${config.increment}°C)`}
+                          </span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={config.minValue}
+                            max={config.maxValue}
+                            step={config.increment}
+                            className="bg-gray-50 dark:bg-dark-foreground"
+                            {...field}
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(e.target.valueAsNumber)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        {config.hasOnOffBoiler && (
+                          <p className="text-xs text-amber-600">
+                            ⚠️ Warning: Installation has an on/off boiler
+                          </p>
+                        )}
+                        {config.heatpumpMaxTemperatureWarning &&
+                          field.value &&
+                          field.value >
+                            config.heatpumpMaxTemperatureWarning && (
+                            <p className="text-xs text-amber-600">
+                              ⚠️ Warning: Value exceeds heat pump physical limit
+                              ({config.heatpumpMaxTemperatureWarning}°C)
+                            </p>
+                          )}
+                      </FormItem>
+                    )}
+                  />
+                );
+              })()}
 
             <DialogFooter>
               <Button

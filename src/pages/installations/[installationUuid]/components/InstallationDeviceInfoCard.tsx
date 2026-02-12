@@ -109,6 +109,44 @@ export function InstallationDeviceInfoCard({
               </Badge>
             }
           />
+          {installation.lowLevelBoilerControl && (
+            <>
+              <DataRow
+                label="Low Level Boiler Control"
+                value={
+                  <Badge
+                    variant={
+                      installation.lowLevelBoilerControl.enabled
+                        ? "success"
+                        : "secondary"
+                    }
+                  >
+                    {installation.lowLevelBoilerControl.enabled
+                      ? "Enabled"
+                      : "Disabled"}
+                  </Badge>
+                }
+              />
+              <DataRow
+                label="Room Temperature Thermostat"
+                value={
+                  <Badge
+                    variant={
+                      installation.lowLevelBoilerControl
+                        .isRoomTemperatureThermostat
+                        ? "default"
+                        : "secondary"
+                    }
+                  >
+                    {installation.lowLevelBoilerControl
+                      .isRoomTemperatureThermostat
+                      ? "Yes"
+                      : "No"}
+                  </Badge>
+                }
+              />
+            </>
+          )}
         </div>
       </div>
     </div>
