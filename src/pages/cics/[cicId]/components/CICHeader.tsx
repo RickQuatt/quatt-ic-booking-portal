@@ -228,7 +228,7 @@ export function CICHeader({
                 className="flex items-center gap-2"
               >
                 <ExternalLink className="h-4 w-4" />
-                Grafana
+                Grafana - Data per CIC
               </a>
             </Button>
             <Button variant="outline" size="sm" disabled={isLoading}>
@@ -239,7 +239,7 @@ export function CICHeader({
                 className="flex items-center gap-2"
               >
                 <ExternalLink className="h-4 w-4" />
-                BETA - Unified Dashboard
+                Grafana - Unified Dashboard (BETA)
               </a>
             </Button>
             {isAllE && (
