@@ -9,6 +9,7 @@ import { formatDateDistance } from "@/utils/formatDate";
 import {
   getGrafanaAllEDashboardLink,
   getGrafanaDataPerCICLink,
+  getGrafanaUnifiedDashboardLink,
   getHubspotSearchOrderLink,
   getMenderLink,
 } from "@/constants/externalLinks";
@@ -228,6 +229,17 @@ export function CICHeader({
               >
                 <ExternalLink className="h-4 w-4" />
                 Grafana
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" disabled={isLoading}>
+              <a
+                href={getGrafanaUnifiedDashboardLink(cicData.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                BETA - Unified Dashboard
               </a>
             </Button>
             {isAllE && (

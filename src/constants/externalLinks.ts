@@ -106,6 +106,13 @@ export function getGrafanaChillStatsDashboardLink(
   );
 }
 
+export function getGrafanaUnifiedDashboardLink(cicId: string) {
+  return buildGrafanaUrl(
+    "unified-customer-dashboard/unified-customer-dashboard",
+    `orgId=1&refresh=30s&var-cic_uuid=${cicId}`,
+  );
+}
+
 export function getRetoolBatteryDashboardLink(batterySn: string) {
   return `https://quatt.retool.com/app/battery-dashboard?_environment=production&battery_sn=${batterySn}`;
 }
