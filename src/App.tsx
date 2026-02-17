@@ -21,6 +21,7 @@ import { MQTTDebuggerPage } from "./pages/cics/[cicId]/mqtt-debugger/page";
 import { DynamicPricingPage } from "./pages/dynamic-pricing/page";
 import { DeviceListPage } from "./pages/devices/page";
 import { VisitJobsPage } from "./pages/installations/[installationUuid]/visit-jobs/page";
+import { InsightsPageWrapper } from "./pages/installations/[installationUuid]/insights";
 import { BulkJobPage } from "./pages/bulkJob/page";
 import { UtilitiesPage } from "./pages/utilities/page";
 import { ReplaceChillInterfaceBoardPage } from "./pages/replace-chill-interface-board/page";
@@ -137,6 +138,11 @@ function App() {
             {(params) => {
               return <CICMqttDebugPageWrapper cicId={params.cicId} />;
             }}
+          </Route>
+          <Route path="/installations/:installationUuid/insights">
+            {(params) => (
+              <InsightsPageWrapper installationUuid={params.installationUuid} />
+            )}
           </Route>
           <Route path="/installations/:installationUuid/visit-jobs">
             {(params) => (

@@ -2766,6 +2766,36 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/admin/installation/{installationUuid}/insights": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get heating insights for an installation (admin, bypasses eligibility checks) */
+    get: operations["AdminGetInstallationInsights"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          installationUuid: components["parameters"]["InstallationUuid"];
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        204: components["responses"]["CORSPreflightResponse"];
+      };
+    };
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/users/{userId}/referral-email": {
     parameters: {
       query?: never;
@@ -4881,6 +4911,7 @@ export interface components {
       | "COMMISSIONING_IDENTIFICATION_HEAT_PUMP_UNIDENTIFIED"
       | "COMMISSIONING_IDENTIFICATION_ODU_UNIDENTIFIED"
       | "COMMISSIONING_IDENTIFICATION_FLOW_TEMPERATURE_SENSOR_UNIDENTIFIED"
+      | "COMMISSIONING_IDENTIFICATION_HP_TEMP_SENSOR_FAILURE"
       | "COMMISSIONING_HEAT_PUMP_NOT_FINISHED"
       | "PAIRING_NOT_POSSIBLE"
       | "INTERNAL_SERVER_ERROR"
@@ -5051,10 +5082,15 @@ export interface components {
       | "TRY_TO_SET_THERMOSTAT_TYPE_TO_NULL_ON_EXISTING_INSTALLATION_WITH_THERMOSTAT_TYPE_SET"
       | "RIG_NOT_FOUND"
       | "UNSUPPORTED_ACTION_ON_RIG"
+      | "CANNOT_UNPAIR_DEVICE_DURING_COMMISSIONING"
       | "REFERRAL_ROCK_API_ERROR"
+<<<<<<< HEAD
       | "REFERRAL_MEMBER_ASSIGNED_TO_ANOTHER_USER"
       | "INVALID_MAX_WATER_TEMPERATURE"
       | "INVALID_MAX_WATER_TEMPERATURE_FOR_INSTALLATION";
+=======
+      | "REFERRAL_MEMBER_ASSIGNED_TO_ANOTHER_USER";
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
     ErrorResponse: components["schemas"]["Error"];
     ErrorResponseResult: {
       /** @example Unexpected error */
@@ -7503,6 +7539,14 @@ export interface components {
     Period: {
       type: components["schemas"]["PeriodType"];
       /**
+<<<<<<< HEAD
+=======
+       * @description String representation of the period (e.g., "2026" for a year, "2026-01" for a month, "2026-01-27" for a day)
+       * @example 2026-01-27
+       */
+      key: string;
+      /**
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
        * Format: date-time
        * @description Inclusive start of period (ISO 8601)
        * @example 2026-01-27T00:00:00+01:00
@@ -7515,6 +7559,49 @@ export interface components {
        */
       to: string;
     };
+<<<<<<< HEAD
+=======
+    /** @description Information about available data range for pagination */
+    PeriodAvailability: {
+      /**
+       * Format: date-time
+       * @description Earliest date/time with available data (ISO 8601)
+       * @example 2025-06-15T00:00:00Z
+       */
+      startAt: string;
+      /**
+       * Format: date-time
+       * @description Latest date/time with available data (ISO 8601)
+       * @example 2026-01-27T23:59:59Z
+       */
+      endAt: string;
+      /**
+       * @description Minimum period key with available data
+       * @example 2025-06-15
+       */
+      minKey: string;
+      /**
+       * @description Maximum period key with available data
+       * @example 2026-01-27
+       */
+      maxKey: string;
+    };
+    /** @description Abstract timeseries response schema for insights endpoints with common properties */
+    AbstractTimeseriesResponse: {
+      granularity: components["schemas"]["Granularity"];
+      period: components["schemas"]["Period"];
+      periodAvailability: components["schemas"]["PeriodAvailability"];
+    };
+    /** @description Abstract timeseries item with common properties for all timeseries items */
+    AbstractTimeseriesItem: {
+      /**
+       * Format: date-time
+       * @description Start timestamp of timeserie data point (ISO 8601)
+       * @example 2026-01-27T00:00:00+01:00
+       */
+      startAt: string;
+    };
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
     /**
      * @description Describes what the battery is currently doing.
      *     - BALANCING_THE_GRID: Battery is participating in grid frequency regulation
@@ -7541,6 +7628,7 @@ export interface components {
       | "REDUCING_POWER_PEAKS"
       | "UNDETERMINED_ACTION"
       | "UNKNOWN";
+<<<<<<< HEAD
     /** @description Timeseries data point for Home Battery */
     HomeBatteryTimeseriesItem: {
       /**
@@ -7549,6 +7637,18 @@ export interface components {
        * @example 2026-01-27T00:00:00+01:00
        */
       startAt: string;
+=======
+    /**
+     * @description Indicates the current power flow direction of the battery.
+     *     - CHARGING: Battery is charging (receiving energy)
+     *     - DISCHARGING: Battery is discharging (releasing energy)
+     *     - IDLE: Battery is idle (no power flow)
+     * @example CHARGING
+     * @enum {string}
+     */
+    PowerFlowDirection: "CHARGING" | "DISCHARGING" | "IDLE";
+    HomeBatteryTimeseriesItem: components["schemas"]["AbstractTimeseriesItem"] & {
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
       /**
        * @description State of charge (0-100)
        * @example 80
@@ -7561,6 +7661,7 @@ export interface components {
        * @example 12.0084
        */
       powerKw: number;
+<<<<<<< HEAD
     };
     /** @description Home Battery timeseries response */
     HomeBatteryTimeseriesResponse: {
@@ -7571,6 +7672,11 @@ export interface components {
       timeseriesLengthInSeconds: number;
       granularity: components["schemas"]["Granularity"];
       period: components["schemas"]["Period"];
+=======
+      powerFlowDirection: components["schemas"]["PowerFlowDirection"];
+    };
+    HomeBatteryTimeseriesResponse: components["schemas"]["AbstractTimeseriesResponse"] & {
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
       /** @description Array of timeseries data points (ordered by startAt ascending) */
       timeseries: components["schemas"]["HomeBatteryTimeseriesItem"][];
     };
@@ -7654,6 +7760,7 @@ export interface components {
       lastUpdatedAt: string;
     };
     /** @description Timeseries data point for savings */
+<<<<<<< HEAD
     SavingsTimeseriesItem: {
       /**
        * Format: date-time
@@ -7671,6 +7778,11 @@ export interface components {
       timeseriesLengthInSeconds: number;
       granularity: components["schemas"]["Granularity"];
       period: components["schemas"]["Period"];
+=======
+    SavingsTimeseriesItem: components["schemas"]["AbstractTimeseriesItem"] &
+      components["schemas"]["SavingsAggregated"];
+    SavingsTimeseriesResponse: components["schemas"]["AbstractTimeseriesResponse"] & {
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
       /** @description Aggregated savings for the entire period */
       aggregated: components["schemas"]["SavingsAggregated"];
       /** @description Array of timeseries data points (ordered by startAt ascending) */
@@ -7716,6 +7828,7 @@ export interface components {
       gridExportKWh: number;
     };
     /** @description Timeseries data point for energy flow */
+<<<<<<< HEAD
     EnergyFlowTimeseriesItem: {
       /**
        * Format: date-time
@@ -7733,6 +7846,11 @@ export interface components {
       timeseriesLengthInSeconds: number;
       granularity: components["schemas"]["Granularity"];
       period: components["schemas"]["Period"];
+=======
+    EnergyFlowTimeseriesItem: components["schemas"]["AbstractTimeseriesItem"] &
+      components["schemas"]["EnergyFlowAggregated"];
+    EnergyFlowTimeseriesResponse: components["schemas"]["AbstractTimeseriesResponse"] & {
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
       /** @description Aggregated energy flows for the entire period */
       aggregated: components["schemas"]["EnergyFlowAggregated"];
       /** @description Array of timeseries data points (ordered by startAt ascending) */
@@ -7761,12 +7879,26 @@ export interface components {
        */
       chargeStatePercent: number;
       /**
+<<<<<<< HEAD
+=======
+       * Format: float
+       * @description Power in kW (positive = charging, negative = discharging)
+       * @example 12.0084
+       */
+      powerKw: number;
+      powerFlowDirection: components["schemas"]["PowerFlowDirection"];
+      /**
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
        * Format: date-time
        * @description Timestamp of last measurement (ISO 8601)
        * @example 2026-01-27T10:00:00Z
        */
       lastMeasurementAt: string;
+<<<<<<< HEAD
     };
+=======
+    } | null;
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
     /** @description Current status of the home battery in the installation */
     HomeBatteryStatusResponse: {
       /**
@@ -10592,7 +10724,10 @@ export interface operations {
            *         "took": 0.15
            *       },
            *       "result": {
+<<<<<<< HEAD
            *         "timeseriesLengthInSeconds": 2592000,
+=======
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *         "granularity": "MONTH",
            *         "period": {
            *           "type": "YEAR",
@@ -10693,7 +10828,10 @@ export interface operations {
            *         "took": 0.15
            *       },
            *       "result": {
+<<<<<<< HEAD
            *         "timeseriesLengthInSeconds": 86400,
+=======
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *         "granularity": "DAY",
            *         "period": {
            *           "type": "MONTH",
@@ -10796,7 +10934,10 @@ export interface operations {
            *         "took": 0.15
            *       },
            *       "result": {
+<<<<<<< HEAD
            *         "timeseriesLengthInSeconds": 900,
+=======
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *         "granularity": "QUARTER_HOUR",
            *         "period": {
            *           "type": "DAY",
@@ -10997,7 +11138,10 @@ export interface operations {
            *         "took": 0.12
            *       },
            *       "result": {
+<<<<<<< HEAD
            *         "timeseriesLengthInSeconds": 2592000,
+=======
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *         "granularity": "MONTH",
            *         "period": {
            *           "type": "YEAR",
@@ -11121,7 +11265,10 @@ export interface operations {
            *         "took": 0.12
            *       },
            *       "result": {
+<<<<<<< HEAD
            *         "timeseriesLengthInSeconds": 86400,
+=======
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *         "granularity": "DAY",
            *         "period": {
            *           "type": "MONTH",
@@ -11243,7 +11390,10 @@ export interface operations {
            *         "took": 0.12
            *       },
            *       "result": {
+<<<<<<< HEAD
            *         "timeseriesLengthInSeconds": 2592000,
+=======
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *         "granularity": "MONTH",
            *         "period": {
            *           "type": "YEAR",
@@ -11358,7 +11508,10 @@ export interface operations {
            *         "took": 0.12
            *       },
            *       "result": {
+<<<<<<< HEAD
            *         "timeseriesLengthInSeconds": 86400,
+=======
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *         "granularity": "DAY",
            *         "period": {
            *           "type": "MONTH",
@@ -11475,7 +11628,10 @@ export interface operations {
            *         "took": 0.15
            *       },
            *       "result": {
+<<<<<<< HEAD
            *         "timeseriesLengthInSeconds": 900,
+=======
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *         "granularity": "QUARTER_HOUR",
            *         "period": {
            *           "type": "DAY",
@@ -11597,6 +11753,11 @@ export interface operations {
            *           "live": {
            *             "controlAction": "BALANCING_THE_GRID",
            *             "chargeStatePercent": 75,
+<<<<<<< HEAD
+=======
+           *             "powerKw": 12.0084,
+           *             "powerFlowDirection": "DISCHARGING",
+>>>>>>> f70e788 (feat: add installation insights page with shareable URLs and interactive charts)
            *             "lastMeasurementAt": "2026-01-27T10:00:00Z"
            *           },
            *           "lastUpdatedAt": "2026-01-27T10:00:00Z"
@@ -12471,6 +12632,7 @@ export interface operations {
     responses: {
       200: components["responses"]["InstallerCic"];
       401: components["responses"]["Unauthorized"];
+      403: components["responses"]["Forbidden"];
       404: components["responses"]["NotFound"];
       500: components["responses"]["Unexpected"];
     };
@@ -13674,6 +13836,20 @@ export interface operations {
             | components["schemas"]["ErrorInstallationNotFound"];
         };
       };
+      /** @description Cannot unpair device during active commissioning */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?: "CANNOT_UNPAIR_DEVICE_DURING_COMMISSIONING";
+            };
+          };
+        };
+      };
       500: components["responses"]["Unexpected"];
     };
   };
@@ -13908,6 +14084,20 @@ export interface operations {
           "application/json":
             | components["schemas"]["ErrorThreadDeviceNotFoundInInstallation"]
             | components["schemas"]["ErrorInstallationNotFound"];
+        };
+      };
+      /** @description Cannot unpair device during active commissioning */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?: "CANNOT_UNPAIR_DEVICE_DURING_COMMISSIONING";
+            };
+          };
         };
       };
       500: components["responses"]["Unexpected"];
@@ -16401,6 +16591,39 @@ export interface operations {
           };
         };
       };
+    };
+  };
+  AdminGetInstallationInsights: {
+    parameters: {
+      query: {
+        /** @description From date */
+        from: components["schemas"]["Date"];
+        /** @description Timeframe to get */
+        timeframe: "day" | "week" | "month" | "year" | "all";
+      };
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationUuid: components["parameters"]["InstallationUuid"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: components["responses"]["Insights"];
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      404: components["responses"]["NotFound"];
     };
   };
   AdminPatchUserReferralEmail: {

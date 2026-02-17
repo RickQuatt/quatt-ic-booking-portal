@@ -3,7 +3,7 @@ import type { components } from "@/openapi-client/types/api/v1";
 import { StickyHeader } from "@/components/shared/DetailPage";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { ExternalLink, ClipboardCopy, Flame } from "lucide-react";
+import { ExternalLink, ClipboardCopy, Flame, BarChart3 } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { formatDateDistance } from "@/utils/formatDate";
 import {
@@ -312,6 +312,16 @@ export function InstallationHeader({
                   </a>
                 </Button>
               )}
+            {installation.insightsStartAt && (
+              <Link href={`/installations/${installation.externalId}/insights`}>
+                <Button variant="outline" size="sm" disabled={isLoading}>
+                  <span className="flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Insights
+                  </span>
+                </Button>
+              </Link>
+            )}
             {isHomeBattery && batterySn && (
               <Button variant="outline" size="sm" disabled={isLoading}>
                 <a
