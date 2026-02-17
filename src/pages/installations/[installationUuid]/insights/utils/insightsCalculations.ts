@@ -175,7 +175,10 @@ export function calculateTickValues(
       const hpHeat = positiveOrZero(data?.hpHeat);
       const hpElectric = positiveOrZero(data?.hpElectric);
       // Normalize HP heat by subtracting electricity to prevent double-counting
+      // This ensures we show only the heat output, not the electrical input
       const normalizedHpHeat = Math.max(hpHeat - hpElectric, 0);
+      // Add visual spacer between HP and boiler bars when both are present
+      // Spacer is 2% of the largest total value to create separation in the chart
       const spacer =
         isPositive(data?.hpHeat) && isPositive(data?.boilerHeat)
           ? Math.round(totals.largestTotal * TICK_SPACER_RATIO)

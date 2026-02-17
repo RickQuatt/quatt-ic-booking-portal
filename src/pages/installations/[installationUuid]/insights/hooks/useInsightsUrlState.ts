@@ -55,7 +55,8 @@ export function useInsightsUrlState({
           hasChanges = true;
         }
       } catch {
-        // Invalid date, ignore
+        // Intentionally ignore malformed date URLs - graceful degradation
+        // User will see default date instead of breaking the page
       }
     }
 
