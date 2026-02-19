@@ -108,12 +108,15 @@ export function OutsideTemperatureChart({
 }: OutsideTemperatureChartProps) {
   const isDay = timeGranularity === "day";
 
-  const chartData = useMemo(() => {
-    if (data.length === 0) return null;
+  // Extract temperature data
+  const { labels, temperatures, minTemps, maxTemps } = useMemo(() => {
+    if (data.length === 0)
+      return { labels: [], temperatures: [], minTemps: [], maxTemps: [] };
 
     // Find first valid entry to get the start date
     const firstEntry = data.find((d) => d);
-    if (!firstEntry) return null;
+    if (!firstEntry)
+      return { labels: [], temperatures: [], minTemps: [], maxTemps: [] };
 
     const fromDate = new Date(firstEntry.timestamp);
     const timeUnit = INSIGHTS_TIME_UNITS[timeGranularity];
@@ -158,6 +161,12 @@ export function OutsideTemperatureChart({
       minTemps.push(dataPoint?.minTemperatureOutside ?? null);
       maxTemps.push(dataPoint?.maxTemperatureOutside ?? null);
     }
+
+    return { labels, temperatures, minTemps, maxTemps };
+  }, [data, timeGranularity]);
+
+  const chartData = useMemo(() => {
+    if (labels.length === 0) return null;
 
     if (isDay) {
       return {
@@ -207,7 +216,7 @@ export function OutsideTemperatureChart({
         },
       ],
     };
-  }, [data, timeGranularity, isDay]);
+  }, [labels, temperatures, minTemps, maxTemps, isDay]);
 
   const lineOptions = useMemo<ChartOptions<"line">>(
     () => ({
@@ -266,12 +275,14 @@ export function OutsideTemperatureChart({
         tooltip: {
           callbacks: {
             label: (context) => {
-              const value = context.parsed.y;
+              const dataIndex = context.dataIndex;
+              const min = minTemps[dataIndex];
+              const max = maxTemps[dataIndex];
 
-              if (!value || !Array.isArray(value)) return "";
+              if (min == null || max == null) return "";
 
-              const [min, max] = value;
-              return `${min?.toFixed(1)}°C - ${max?.toFixed(1)}°C`;
+              // Return array of strings for multi-line tooltip (max first, then min)
+              return [`Max: ${max.toFixed(1)}°C`, `Min: ${min.toFixed(1)}°C`];
             },
             title: (tooltipItems) => {
               return tooltipItems[0]?.label || "";
@@ -280,7 +291,7 @@ export function OutsideTemperatureChart({
         },
       },
     }),
-    [],
+    [minTemps, maxTemps],
   );
 
   if (!chartData) return null;
