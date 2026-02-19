@@ -78,7 +78,7 @@ export function HeatDistributionChart({
           ticks: {
             maxRotation: 0,
             autoSkip: true,
-            maxTicksLimit: 12,
+            maxTicksLimit: 24,
           },
         },
         y: {
