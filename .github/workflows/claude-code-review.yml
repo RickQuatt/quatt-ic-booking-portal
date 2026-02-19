@@ -3,21 +3,10 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-
+    if: ${{ !contains(github.event.pull_request.title, '[skip-review]') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,55 +18,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-
-          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4.1)
-          # model: "claude-opus-4-1-20250805"
-
-          # Allow dependabot to trigger code reviews
           allowed_bots: "dependabot"
-
-          # Direct prompt for automated review (no @claude mention needed)
-
-          direct_prompt: |
-            You are a Principal Software engineer specialized in building robust solutions at scale, 
-              please review this pull request and provide feedback on:
-            - Code quality and best practices (DRY, KISS, YAGNI)
-            - Potential bugs or issues
-            - Performance considerations
-            - Security concerns
-            - Test coverage
-
-            Be constructive, concise and helpful in your feedback. The review should only highlight criticisms on the work, 
-            we can keep out anything else as this will create too much fluff.
-
-          # Optional: Use sticky comments to make Claude reuse the same comment on subsequent pushes to the same PR
           use_sticky_comment: true
 
-          # Optional: Customize review based on file types
-          # direct_prompt: |
-          #   Review this PR focusing on:
-          #   - For TypeScript files: Type safety and proper interface usage
-          #   - For API endpoints: Security, input validation, and error handling
-          #   - For React components: Performance, accessibility, and best practices
-          #   - For tests: Coverage, edge cases, and test quality
+          direct_prompt: |
+            Review this pull request. Read the CLAUDE.md file first to understand project standards.
 
-          # Optional: Different prompts for different authors
-          # direct_prompt: |
-          #   ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' &&
-          #   'Welcome! Please review this PR from a first-time contributor. Be encouraging and provide detailed explanations for any suggestions.' ||
-          #   'Please provide a thorough code review focusing on our coding standards and best practices.' }}
+            ## Response format
 
-          # Optional: Add specific tools for running tests or linting
-          # allowed_tools: "Bash(npm run test),Bash(npm run lint),Bash(npm run typecheck)"
+            Scale your response to the PR:
+            - Trivial changes (renames, label updates, config tweaks): one sentence like "No issues found." or a brief note if something is actually wrong. Do NOT manufacture feedback.
+            - Small changes (< 50 lines): a short list of issues if any exist, otherwise 1-2 sentences.
+            - Large changes (50+ lines, new features): a structured review, but still only covering actual issues.
 
-          # Optional: Skip review for certain conditions
-          # if: |
-          #   !contains(github.event.pull_request.title, '[skip-review]') &&
-          #   !contains(github.event.pull_request.title, '[WIP]')
+            ## Rules
+
+            1. ONLY flag real problems. If there are no issues, say "No issues found" and stop. Do NOT pad the review.
+            2. NEVER include: todo checklists, "positive aspects" sections, summaries of what changed (the diff already shows this), security/performance assessments unless there's an actual vulnerability or bottleneck, approval/rejection recommendations.
+            3. For each issue: state what's wrong, why it matters, and suggest a fix. Reference file:line.
+            4. Do NOT suggest adding tests. This repo does not have tests yet.
+            5. Do NOT suggest extracting helpers/utilities unless there are 3+ existing instances of duplication.
+            6. Do NOT contradict yourself (e.g., flagging something then saying "actually this is fine").
+            7. Do NOT suggest improvements that aren't problems (e.g., "consider using X" when the current approach works correctly).
+
+            ## What to look for (in priority order)
+
+            1. Bugs and logic errors
+            2. Security vulnerabilities (XSS, injection, auth bypass, exposed secrets)
+            3. Breaking changes or regressions
+            4. Missing error handling for user-facing features
+            5. TypeScript type safety (any types, unsafe casts, missing null checks)
+            6. Violations of project patterns defined in CLAUDE.md
