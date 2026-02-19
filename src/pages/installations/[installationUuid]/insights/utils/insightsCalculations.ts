@@ -120,8 +120,39 @@ function formatTickDate(date: Date, unit: DateUnit | "hour"): string {
 }
 
 /**
+ * Calculate the number of ticks for a given time granularity.
+ * Always returns the full period regardless of available data.
+ */
+function getNumTicksForGranularity(
+  timeGranularity: TimeGranularity,
+  fromDate: Date,
+): number {
+  switch (timeGranularity) {
+    case "day":
+      return 24; // 24 hours
+    case "week":
+      return 7; // 7 days
+    case "month": {
+      // Number of days in the month
+      const year = fromDate.getFullYear();
+      const month = fromDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      return daysInMonth;
+    }
+    case "year":
+      return 12; // 12 months
+    case "all": {
+      // Calculate years from start to end
+      const now = new Date();
+      return differenceInYears(now, fromDate) + 1;
+    }
+  }
+}
+
+/**
  * Calculate tick values from insights graph data.
  * Ported from mobile app: usePresenter.ts
+ * Modified to always show the full period (24h, 7 days, full month, etc.)
  */
 export function calculateTickValues(
   insights: InsightsResponse | undefined,
@@ -135,11 +166,10 @@ export function calculateTickValues(
     return { tickValues: [], largestTotal: 0, largestTotalHeatPower: 0 };
   }
 
-  const { graph, from, to } = insights;
+  const { graph, from } = insights;
   const timeUnit = INSIGHTS_TIME_UNITS[selectedTimeGranularity];
 
   const fromDate = new Date(from);
-  const toDate = new Date(to);
 
   // Calculate the max totals across all graph entries
   const totals = graph.reduce(
@@ -163,7 +193,8 @@ export function calculateTickValues(
     { largestTotal: 0, largestTotalHeatPower: 0 },
   );
 
-  const numTicks = duration(fromDate, toDate, timeUnit) + 1;
+  // Always show the full period, regardless of API response
+  const numTicks = getNumTicksForGranularity(selectedTimeGranularity, fromDate);
 
   const tickValues: Tick[] = Array.from({ length: numTicks }).map(
     (_, index) => {

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { formatCurrency } from "../utils/insightsFormatting";
+import { formatCurrency, formatPower } from "../utils/insightsFormatting";
 
 interface SavingsCardProps {
   isExpanded: boolean;
@@ -12,6 +12,7 @@ interface SavingsCardProps {
   electricityCostSavings?: number | null;
   co2GasSaved?: number | null;
   co2ElectricitySavings: number;
+  quattElectricityConsumed?: number | null;
   hasTariffs: boolean;
 }
 
@@ -25,6 +26,7 @@ export function SavingsCard({
   electricityCostSavings,
   co2GasSaved,
   co2ElectricitySavings,
+  quattElectricityConsumed,
   hasTariffs,
 }: SavingsCardProps) {
   const isNegativeSavings = totalCostSavings != null && totalCostSavings < 0;
@@ -74,50 +76,66 @@ export function SavingsCard({
 
         {/* Expanded details */}
         {isExpanded && hasTariffs && (
-          <div className="mt-4 space-y-2 border-t pt-4 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Gas saved</span>
-              <span>{formatCurrency(gasCostSavings)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                Quatt electricity cost
-              </span>
-              <span>-{formatCurrency(electricityCostSavings)}</span>
-            </div>
-            <div className="flex justify-between border-t pt-2 font-medium">
-              <span>Total savings</span>
-              <span>{formatCurrency(totalCostSavings)}</span>
-            </div>
-
-            {(co2GasSaved != null || co2ElectricitySavings > 0) && (
-              <div className="mt-3 space-y-1 border-t pt-3">
-                <p className="text-xs font-medium text-muted-foreground">
-                  CO₂ breakdown
-                </p>
+          <div className="mt-6 space-y-5 border-t pt-6">
+            {/* Gas saved by using Quatt */}
+            <div>
+              <div className="mb-2 text-sm font-medium">
+                Gas saved by using Quatt
+              </div>
+              <div className="grid grid-cols-3 gap-4 text-base">
+                <span className="font-semibold">
+                  {formatCurrency(gasCostSavings)}
+                </span>
+                <span className="text-muted-foreground">
+                  {gasSavings.toFixed(gasSavings >= 100 ? 0 : 2)} m³
+                </span>
                 {co2GasSaved != null && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Gas CO₂ saved</span>
-                    <span>
-                      {co2GasSaved.toFixed(co2GasSaved >= 100 ? 0 : 2)} kg
-                    </span>
-                  </div>
-                )}
-                {co2ElectricitySavings > 0 && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">
-                      Electricity CO₂
-                    </span>
-                    <span>
-                      {co2ElectricitySavings.toFixed(
-                        co2ElectricitySavings >= 100 ? 0 : 2,
-                      )}{" "}
-                      kg
-                    </span>
-                  </div>
+                  <span className="text-muted-foreground">
+                    {co2GasSaved.toFixed(co2GasSaved >= 100 ? 0 : 2)} kg CO₂
+                  </span>
                 )}
               </div>
-            )}
+            </div>
+
+            {/* Quatt consumption */}
+            <div>
+              <div className="mb-2 text-sm font-medium">Quatt consumption</div>
+              <div className="grid grid-cols-3 gap-4 text-base">
+                <span className="font-semibold">
+                  {formatCurrency(electricityCostSavings)}
+                </span>
+                {quattElectricityConsumed != null && (
+                  <span className="text-muted-foreground">
+                    {formatPower(quattElectricityConsumed).value}{" "}
+                    {formatPower(quattElectricityConsumed).label}
+                  </span>
+                )}
+                {co2ElectricitySavings > 0 && (
+                  <span className="text-muted-foreground">
+                    {co2ElectricitySavings.toFixed(
+                      co2ElectricitySavings >= 100 ? 0 : 2,
+                    )}{" "}
+                    kg CO₂
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Total savings */}
+            <div className="border-t pt-5">
+              <div className="mb-2 text-sm font-medium">Total savings</div>
+              <div className="grid grid-cols-3 gap-4 text-base">
+                <span className="font-semibold">
+                  = {formatCurrency(totalCostSavings)}
+                </span>
+                <span></span>
+                {co2Savings > 0 && (
+                  <span className="text-muted-foreground">
+                    {co2Savings.toFixed(co2Savings >= 100 ? 0 : 2)} kg CO₂
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </CardContent>
