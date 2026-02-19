@@ -187,6 +187,7 @@ export function InsightsPage({
                   electricityCostSavings={presenter.electricityCostSavings}
                   co2GasSaved={presenter.co2GasSaved}
                   co2ElectricitySavings={presenter.co2ElectricitySavings}
+                  quattElectricityConsumed={presenter.quattElectricityConsumed}
                   hasTariffs={presenter.hasTariffs}
                 />
                 <COPCard
