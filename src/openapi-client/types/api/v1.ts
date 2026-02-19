@@ -456,6 +456,176 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/me/installation/{installationId}/insights/homeBattery/{year}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get Home Battery timeseries data for a specific year (monthly granularity) */
+    get: operations["GetHomeBatteryTimeseriesYear"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/insights/homeBattery/{year}/{month}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get Home Battery timeseries data for a specific month (daily granularity) */
+    get: operations["GetHomeBatteryTimeseriesMonth"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/insights/homeBattery/{year}/{month}/{day}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get Home Battery timeseries data for a specific day (15-minute granularity) */
+    get: operations["GetHomeBatteryTimeseriesDay"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/insights/savings/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get cumulative savings overview and yesterday's savings */
+    get: operations["GetSavingsOverview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/insights/savings/{year}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get savings timeseries data for a specific year (monthly granularity) */
+    get: operations["GetSavingsTimeseriesYear"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/insights/savings/{year}/{month}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get savings timeseries data for a specific month (daily granularity) */
+    get: operations["GetSavingsTimeseriesMonth"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/insights/energyFlow/{year}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get energy flow timeseries data for a specific year (monthly granularity) */
+    get: operations["GetEnergyFlowTimeseriesYear"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/insights/energyFlow/{year}/{month}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get energy flow timeseries data for a specific month (daily granularity) */
+    get: operations["GetEnergyFlowTimeseriesMonth"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/insights/energyFlow/{year}/{month}/{day}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get energy flow timeseries data for a specific day (15-minute granularity) */
+    get: operations["GetEnergyFlowTimeseriesDay"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/me/installation/{installationId}/homeBattery/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get current status of all Home Batteries in the installation */
+    get: operations["GetHomeBatteryStatus"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/me/installation/{installationId}": {
     parameters: {
       query?: never;
@@ -472,6 +642,23 @@ export interface paths {
     head?: never;
     /** @description This endpoint will be used to update the name of the home battery installation. */
     patch: operations["patchInstallation"];
+    trace?: never;
+  };
+  "/me/installation/{installationId}/solarCapacitykWp": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description Update the solar capacity (kWp) for a Home Battery installation */
+    patch: operations["PatchInstallationSolarCapacity"];
     trace?: never;
   };
   "/me/referral": {
@@ -2558,6 +2745,36 @@ export interface paths {
     };
     /** @description Get visit job information for installation from Snowflake */
     get: operations["AdminGetInstallationVisitJobs"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          installationUuid: components["parameters"]["InstallationUuid"];
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        204: components["responses"]["CORSPreflightResponse"];
+      };
+    };
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/installation/{installationUuid}/insights": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Get heating insights for an installation (admin, bypasses eligibility checks) */
+    get: operations["AdminGetInstallationInsights"];
     put?: never;
     post?: never;
     delete?: never;
@@ -4676,6 +4893,7 @@ export interface components {
       | "COMMISSIONING_IDENTIFICATION_HEAT_PUMP_UNIDENTIFIED"
       | "COMMISSIONING_IDENTIFICATION_ODU_UNIDENTIFIED"
       | "COMMISSIONING_IDENTIFICATION_FLOW_TEMPERATURE_SENSOR_UNIDENTIFIED"
+      | "COMMISSIONING_IDENTIFICATION_HP_TEMP_SENSOR_FAILURE"
       | "COMMISSIONING_HEAT_PUMP_NOT_FINISHED"
       | "PAIRING_NOT_POSSIBLE"
       | "INTERNAL_SERVER_ERROR"
@@ -4846,8 +5064,9 @@ export interface components {
       | "TRY_TO_SET_THERMOSTAT_TYPE_TO_NULL_ON_EXISTING_INSTALLATION_WITH_THERMOSTAT_TYPE_SET"
       | "RIG_NOT_FOUND"
       | "UNSUPPORTED_ACTION_ON_RIG"
+      | "CANNOT_UNPAIR_DEVICE_DURING_COMMISSIONING"
       | "REFERRAL_ROCK_API_ERROR"
-      | "REFERRAL_MEMBER_EMAIL_ALREADY_EXISTS";
+      | "REFERRAL_MEMBER_ASSIGNED_TO_ANOTHER_USER";
     ErrorResponse: components["schemas"]["Error"];
     ErrorResponseResult: {
       /** @example Unexpected error */
@@ -4997,7 +5216,7 @@ export interface components {
           | "reducingPowerPeaks"
           | "undeterminedAction"
           | null;
-        controlMode?: components["schemas"]["ControlMode"];
+        controlMode?: components["schemas"]["InsightsControlMode"];
       } | null;
       /** @description Insights about the home battery building's energy savings and control actions */
       currentBuildingInsights?: {
@@ -5068,13 +5287,19 @@ export interface components {
        * @example v1.2.3
        */
       pcbHwVersion: string;
+      connectionStatus: components["schemas"]["ThreadConnectionStatus"];
       metrics?: components["schemas"]["BaseChillMetrics"];
     };
     /**
      * @example ALL_ELECTRIC
      * @enum {string}
      */
-    DevicesConfiguration: "HYBRID" | "HYBRID_BETA" | "ALL_ELECTRIC" | "CHILL";
+    DevicesConfiguration:
+      | "HYBRID"
+      | "HYBRID_BETA"
+      | "ALL_ELECTRIC"
+      | "CHILL"
+      | "HOME_BATTERY";
     /** @example DEV-7f24b2d2-a261-4c53-bc61-4e06a836d690 */
     DeviceUuid: string;
     /** @example HB-M-01-FC12345-12-012345 */
@@ -5149,6 +5374,8 @@ export interface components {
       forced: boolean;
       installationUuid: components["schemas"]["InstallationUuid"];
       installerUuid: components["schemas"]["Uuid"];
+      /** @description The requested device configuration for this commissioning */
+      devicesConfiguration: components["schemas"]["DevicesConfiguration"];
     };
     Commissioning: components["schemas"]["BaseCommissioning"] & {
       tests: components["schemas"]["BaseCommissioningTest"][];
@@ -5478,6 +5705,11 @@ export interface components {
       endedAt: components["schemas"]["NullableDateTime"];
       /** @example false */
       forced: boolean;
+      /**
+       * @description Human-readable error message explaining why test failed
+       * @example CHILL device disconnected from thread network. Please check CHILL device power and reconnect before continuing.
+       */
+      errorReason?: string | null;
       commissioningUuid: components["schemas"]["CommissioningUuid"];
       type: components["schemas"]["CommissioningTestType"];
       installerUuid: components["schemas"]["Uuid"];
@@ -6712,7 +6944,7 @@ export interface components {
      * @example chargingCheapEnergy
      * @enum {string|null}
      */
-    ControlAction:
+    InsightsControlAction:
       | "balancingTheGrid"
       | "chargingCheapEnergy"
       | "storingSolarEnergy"
@@ -6833,6 +7065,12 @@ export interface components {
       status: components["schemas"]["InstallationStatus"];
       zipCode: components["schemas"]["NullableZipCode"];
       installationType: components["schemas"]["InstallationType"];
+      /**
+       * Format: float
+       * @description Solar capacity in kilowatt-peak (kWp). Null if not set.
+       * @example 6.5
+       */
+      solarCapacitykWp?: number | null;
       devices?: (components["schemas"]["Device"] & {
         name: string;
       })[];
@@ -7175,7 +7413,7 @@ export interface components {
      * @example profitOptimization
      * @enum {string|null}
      */
-    ControlMode: "profitOptimization" | "noControl" | null;
+    InsightsControlMode: "profitOptimization" | "noControl" | null;
     /** @description Insights about the home battery, including its current power output/input, charge state, and control action. */
     HomeBatteryInsights: {
       timestamp: components["schemas"]["Datetime"];
@@ -7190,8 +7428,8 @@ export interface components {
        * @example 80
        */
       chargeState: number | null;
-      controlAction: components["schemas"]["ControlAction"];
-      controlMode: components["schemas"]["ControlMode"];
+      controlAction: components["schemas"]["InsightsControlAction"];
+      controlMode: components["schemas"]["InsightsControlMode"];
     };
     /** @description Insights about the home battery building's energy savings and control actions */
     BuildingInsights: {
@@ -7216,7 +7454,7 @@ export interface components {
        * @example 5
        */
       savingsGridBalancingYesterday: number | null;
-      controlAction: components["schemas"]["ControlAction"];
+      controlAction: components["schemas"]["InsightsControlAction"];
       /**
        * @description Total cumulative savings from all activities
        * @example 156.78
@@ -7229,6 +7467,348 @@ export interface components {
       totalSavingsYesterday: number | null;
     };
     /**
+     * @description Time resolution of data points in timeseries responses
+     * @example QUARTER_HOUR
+     * @enum {string}
+     */
+    Granularity: "QUARTER_HOUR" | "DAY" | "MONTH" | "YEAR";
+    /**
+     * @description Type of time period being requested
+     * @example DAY
+     * @enum {string}
+     */
+    PeriodType: "DAY" | "MONTH" | "YEAR";
+    /** @description Information about the requested period */
+    Period: {
+      type: components["schemas"]["PeriodType"];
+      /**
+       * @description String representation of the period (e.g., "2026" for a year, "2026-01" for a month, "2026-01-27" for a day)
+       * @example 2026-01-27
+       */
+      key: string;
+      /**
+       * Format: date-time
+       * @description Inclusive start of period (ISO 8601)
+       * @example 2026-01-27T00:00:00+01:00
+       */
+      from: string;
+      /**
+       * Format: date-time
+       * @description End of period (ISO 8601)
+       * @example 2026-01-27T23:59:59+01:00
+       */
+      to: string;
+    };
+    /** @description Information about available data range for pagination */
+    PeriodAvailability: {
+      /**
+       * Format: date-time
+       * @description Earliest date/time with available data (ISO 8601)
+       * @example 2025-06-15T00:00:00Z
+       */
+      startAt: string;
+      /**
+       * Format: date-time
+       * @description Latest date/time with available data (ISO 8601)
+       * @example 2026-01-27T23:59:59Z
+       */
+      endAt: string;
+      /**
+       * @description Minimum period key with available data
+       * @example 2025-06-15
+       */
+      minKey: string;
+      /**
+       * @description Maximum period key with available data
+       * @example 2026-01-27
+       */
+      maxKey: string;
+    };
+    /** @description Abstract timeseries response schema for insights endpoints with common properties */
+    AbstractTimeseriesResponse: {
+      granularity: components["schemas"]["Granularity"];
+      period: components["schemas"]["Period"];
+      periodAvailability: components["schemas"]["PeriodAvailability"];
+    };
+    /** @description Abstract timeseries item with common properties for all timeseries items */
+    AbstractTimeseriesItem: {
+      /**
+       * Format: date-time
+       * @description Start timestamp of timeserie data point (ISO 8601)
+       * @example 2026-01-27T00:00:00+01:00
+       */
+      startAt: string;
+    };
+    /**
+     * @description Describes what the battery is currently doing.
+     *     - BALANCING_THE_GRID: Battery is participating in grid frequency regulation
+     *     - CHARGING_CHEAP_ENERGY: Battery is charging during low electricity prices
+     *     - STORING_SOLAR_ENERGY: Battery is storing energy from solar panels
+     *     - SELLING_HIGH_PRICES: Battery is discharging to sell energy at high prices
+     *     - USING_BATTERY_ENERGY: Battery is discharging to power the house
+     *     - WAITING_TO_CHARGE: Battery is idle, waiting for optimal time to charge
+     *     - WAITING_TO_DISCHARGE: Battery is idle, waiting for optimal time to discharge
+     *     - REDUCING_POWER_PEAKS: Battery is reducing power peaks to avoid high demand charges
+     *     - UNDETERMINED_ACTION: Action cannot be determined from current data
+     *     - UNKNOWN: State unknown (fallback, should rarely occur)
+     * @example CHARGING_CHEAP_ENERGY
+     * @enum {string}
+     */
+    ControlAction:
+      | "BALANCING_THE_GRID"
+      | "CHARGING_CHEAP_ENERGY"
+      | "STORING_SOLAR_ENERGY"
+      | "SELLING_HIGH_PRICES"
+      | "USING_BATTERY_ENERGY"
+      | "WAITING_TO_CHARGE"
+      | "WAITING_TO_DISCHARGE"
+      | "REDUCING_POWER_PEAKS"
+      | "UNDETERMINED_ACTION"
+      | "UNKNOWN";
+    /**
+     * @description Indicates the current power flow direction of the battery.
+     *     - CHARGING: Battery is charging (receiving energy)
+     *     - DISCHARGING: Battery is discharging (releasing energy)
+     *     - IDLE: Battery is idle (no power flow)
+     * @example CHARGING
+     * @enum {string}
+     */
+    PowerFlowDirection: "CHARGING" | "DISCHARGING" | "IDLE";
+    HomeBatteryTimeseriesItem: components["schemas"]["AbstractTimeseriesItem"] & {
+      /**
+       * @description State of charge (0-100)
+       * @example 80
+       */
+      chargeStatePercent: number;
+      controlAction: components["schemas"]["ControlAction"];
+      /**
+       * Format: float
+       * @description Power in kW (positive = charging, negative = discharging)
+       * @example 12.0084
+       */
+      powerKw: number;
+      powerFlowDirection: components["schemas"]["PowerFlowDirection"];
+    };
+    HomeBatteryTimeseriesResponse: components["schemas"]["AbstractTimeseriesResponse"] & {
+      /** @description Array of timeseries data points (ordered by startAt ascending) */
+      timeseries: components["schemas"]["HomeBatteryTimeseriesItem"][];
+    };
+    /** @description Savings aggregated data with VAT variants */
+    SavingsAggregated: {
+      /**
+       * Format: float
+       * @description Average VAT rate for the period (%)
+       * @example 21
+       */
+      avgVatPercent: number;
+      /**
+       * @description Home Battery savings (incl. VAT) in cents
+       * @example 5000
+       */
+      homeBatterySavingsCentsInclVat: number;
+      /**
+       * @description Solar savings (incl. VAT) in cents. Null if no solar.
+       * @example 4000
+       */
+      solarSavingsCentsInclVat: number | null;
+      /**
+       * @description Grid balancing savings (incl. VAT) in cents
+       * @example 3345
+       */
+      imbalanceSavingsCentsInclVat: number;
+      /**
+       * @description Sum of all savings (incl. VAT) in cents
+       * @example 12345
+       */
+      totalSavingsCentsInclVat: number;
+      /**
+       * @description Home Battery savings (excl. VAT) in cents
+       * @example 5000
+       */
+      homeBatterySavingsCentsExclVat: number;
+      /**
+       * @description Solar savings (excl. VAT) in cents. Null if no solar.
+       * @example 4000
+       */
+      solarSavingsCentsExclVat: number | null;
+      /**
+       * @description Grid balancing savings (excl. VAT) in cents
+       * @example 3345
+       */
+      imbalanceSavingsCentsExclVat: number;
+      /**
+       * @description Sum of all savings (excl. VAT) in cents
+       * @example 12345
+       */
+      totalSavingsCentsExclVat: number;
+    };
+    /** @description Cumulative savings with period information */
+    CumulativeSavings: components["schemas"]["SavingsAggregated"] & {
+      /** @description Period covered by cumulative savings */
+      period: {
+        /**
+         * Format: date-time
+         * @description Start of cumulative period (ISO 8601)
+         * @example 2025-06-15T00:00:00Z
+         */
+        from: string;
+        /**
+         * Format: date-time
+         * @description End of cumulative period (ISO 8601)
+         * @example 2026-01-26T23:59:59Z
+         */
+        to: string;
+      };
+    };
+    /** @description Savings overview response */
+    SavingsOverviewResponse: {
+      cumulative: components["schemas"]["CumulativeSavings"];
+      /** @description Yesterday's savings aggregated data. May be null if no data available. */
+      yesterday?: components["schemas"]["SavingsAggregated"];
+      /**
+       * Format: date-time
+       * @description When data was last updated
+       * @example 2026-01-27T00:00:00Z
+       */
+      lastUpdatedAt: string;
+    };
+    /** @description Timeseries data point for savings */
+    SavingsTimeseriesItem: components["schemas"]["AbstractTimeseriesItem"] &
+      components["schemas"]["SavingsAggregated"];
+    SavingsTimeseriesResponse: components["schemas"]["AbstractTimeseriesResponse"] & {
+      /** @description Aggregated savings for the entire period */
+      aggregated: components["schemas"]["SavingsAggregated"];
+      /** @description Array of timeseries data points (ordered by startAt ascending) */
+      timeseries: components["schemas"]["SavingsTimeseriesItem"][];
+    };
+    /** @description Energy flow aggregated data */
+    EnergyFlowAggregated: {
+      /**
+       * Format: float
+       * @description Energy charged into battery (kWh)
+       * @example 35.5
+       */
+      batteryChargedKWh: number;
+      /**
+       * Format: float
+       * @description Energy discharged from battery (kWh)
+       * @example 32
+       */
+      batteryDischargedKWh: number;
+      /**
+       * Format: float
+       * @description Solar energy produced (kWh). Null if no solar.
+       * @example 45
+       */
+      solarProductionKWh?: number | null;
+      /**
+       * Format: float
+       * @description House consumption (kWh)
+       * @example 80
+       */
+      houseConsumptionKWh: number;
+      /**
+       * Format: float
+       * @description Energy imported from grid (kWh)
+       * @example 38
+       */
+      gridImportKWh: number;
+      /**
+       * Format: float
+       * @description Energy exported to grid (kWh)
+       * @example 5.5
+       */
+      gridExportKWh: number;
+    };
+    /** @description Timeseries data point for energy flow */
+    EnergyFlowTimeseriesItem: components["schemas"]["AbstractTimeseriesItem"] &
+      components["schemas"]["EnergyFlowAggregated"];
+    EnergyFlowTimeseriesResponse: components["schemas"]["AbstractTimeseriesResponse"] & {
+      /** @description Aggregated energy flows for the entire period */
+      aggregated: components["schemas"]["EnergyFlowAggregated"];
+      /** @description Array of timeseries data points (ordered by startAt ascending) */
+      timeseries: components["schemas"]["EnergyFlowTimeseriesItem"][];
+    };
+    /**
+     * @description Describes the battery's optimization strategy.
+     *     - PROFIT_OPTIMIZATION: Battery optimizes for maximum financial savings
+     *     - SELF_CONSUMPTION: Battery prioritizes using self-generated solar energy
+     *     - NO_CONTROL: Battery is not being actively controlled by EMS
+     *     - UNKNOWN: Control mode unknown (fallback, should rarely occur)
+     * @example PROFIT_OPTIMIZATION
+     * @enum {string}
+     */
+    ControlMode:
+      | "PROFIT_OPTIMIZATION"
+      | "SELF_CONSUMPTION"
+      | "NO_CONTROL"
+      | "UNKNOWN";
+    /** @description Live/real-time data for a Home Battery */
+    HomeBatteryLiveData: {
+      controlAction: components["schemas"]["ControlAction"];
+      /**
+       * @description Current state of charge (0-100)
+       * @example 75
+       */
+      chargeStatePercent: number;
+      /**
+       * Format: float
+       * @description Power in kW (positive = charging, negative = discharging)
+       * @example 12.0084
+       */
+      powerKw: number;
+      powerFlowDirection: components["schemas"]["PowerFlowDirection"];
+      /**
+       * Format: date-time
+       * @description Timestamp of last measurement (ISO 8601)
+       * @example 2026-01-27T10:00:00Z
+       */
+      lastMeasurementAt: string;
+    } | null;
+    /** @description Current status of the home battery in the installation */
+    HomeBatteryStatusResponse: {
+      /**
+       * @description Device UUID
+       * @example DEV-xxx
+       */
+      uuid: string;
+      /**
+       * @description User-friendly name
+       * @example Home Battery 1
+       */
+      name: string;
+      /**
+       * @description Serial number of the Home Battery
+       * @example 123456789
+       */
+      serial: string;
+      controlMode: components["schemas"]["ControlMode"];
+      /**
+       * Format: float
+       * @description Home Battery capacity in kWh
+       * @example 10
+       */
+      capacityKWh: number;
+      /**
+       * Format: float
+       * @description Inverter power in kW
+       * @example 5.2
+       */
+      inverterPowerKw: number;
+      /**
+       * @description Whether the Home Battery is connected
+       * @example true
+       */
+      connected: boolean;
+      live: components["schemas"]["HomeBatteryLiveData"];
+      /**
+       * Format: date-time
+       * @description When data was last updated
+       * @example 2026-01-27T10:00:00Z
+       */
+      lastUpdatedAt: string;
+    };
+    /**
      * @description CIC UUID format with uppercase prefix "CIC-" followed by lowercase UUID (e.g., CIC-86e47370-56da-599d-9ab8-d24bd25ae03a)
      * @example CIC-7f24b2d2-a261-4c53-bc61-4e06a836d690
      */
@@ -7238,6 +7818,15 @@ export interface components {
      * @enum {string}
      */
     HeatBatterySize: "medium" | "large" | "extra_large";
+    /**
+     * @description Connection status of thread device:
+     *     - connected: Device is actively communicating
+     *     - pending: Device recently paired, waiting for first connection
+     *     - disconnected: Device is not connected to thread network
+     * @example connected
+     * @enum {string}
+     */
+    ThreadConnectionStatus: "connected" | "pending" | "disconnected";
     DongleDevice: components["schemas"]["BaseDevice"] & {
       /** @enum {string} */
       type: "DONGLE";
@@ -7262,6 +7851,7 @@ export interface components {
        * @example v1.2.3
        */
       pcbHwVersion: string;
+      connectionStatus: components["schemas"]["ThreadConnectionStatus"];
     };
     /**
      * @description The running mode of the CHILL cooling device
@@ -8914,6 +9504,12 @@ export interface components {
      * @example CHILL
      */
     threadDeviceType: "CHILL" | "DONGLE";
+    /** @description Year (4 digits) */
+    Year: number;
+    /** @description Month (1-12) */
+    Month: number;
+    /** @description Day (1-31) */
+    Day: number;
     EUI64: components["schemas"]["EUI64"];
     userId: string;
   };
@@ -9935,6 +10531,1085 @@ export interface operations {
       500: components["responses"]["Unexpected"];
     };
   };
+  GetHomeBatteryTimeseriesYear: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        /** @description Year (4 digits) */
+        year: components["parameters"]["Year"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Timeseries data for Home Battery activity (monthly granularity) */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.15
+           *       },
+           *       "result": {
+           *         "granularity": "MONTH",
+           *         "period": {
+           *           "type": "YEAR",
+           *           "from": "2026-01-01T00:00:00+01:00",
+           *           "to": "2026-12-31T23:59:59+01:00"
+           *         },
+           *         "timeseries": [
+           *           {
+           *             "startAt": "2026-01-01T00:00:00+01:00",
+           *             "chargeStatePercent": 75,
+           *             "controlAction": "CHARGING_CHEAP_ENERGY",
+           *             "powerKw": 350.5
+           *           },
+           *           {
+           *             "startAt": "2026-02-01T00:00:00+01:00",
+           *             "chargeStatePercent": 78,
+           *             "controlAction": "STORING_SOLAR_ENERGY",
+           *             "powerKw": 420.2
+           *           }
+           *         ]
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["HomeBatteryTimeseriesResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found, not a Home Battery installation, or period not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE"
+                | "PERIOD_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetHomeBatteryTimeseriesMonth: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        /** @description Year (4 digits) */
+        year: components["parameters"]["Year"];
+        /** @description Month (1-12) */
+        month: components["parameters"]["Month"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Timeseries data for Home Battery activity (daily granularity) */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.15
+           *       },
+           *       "result": {
+           *         "granularity": "DAY",
+           *         "period": {
+           *           "type": "MONTH",
+           *           "from": "2026-01-01T00:00:00+01:00",
+           *           "to": "2026-01-31T23:59:59+01:00"
+           *         },
+           *         "timeseries": [
+           *           {
+           *             "startAt": "2026-01-01T00:00:00+01:00",
+           *             "chargeStatePercent": 75,
+           *             "controlAction": "CHARGING_CHEAP_ENERGY",
+           *             "powerKw": 10.5
+           *           },
+           *           {
+           *             "startAt": "2026-01-02T00:00:00+01:00",
+           *             "chargeStatePercent": 80,
+           *             "controlAction": "STORING_SOLAR_ENERGY",
+           *             "powerKw": 8.2
+           *           }
+           *         ]
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["HomeBatteryTimeseriesResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found, not a Home Battery installation, or period not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE"
+                | "PERIOD_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetHomeBatteryTimeseriesDay: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        /** @description Year (4 digits) */
+        year: components["parameters"]["Year"];
+        /** @description Month (1-12) */
+        month: components["parameters"]["Month"];
+        /** @description Day (1-31) */
+        day: components["parameters"]["Day"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Timeseries data for Home Battery activity (15-minute granularity) */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.15
+           *       },
+           *       "result": {
+           *         "granularity": "QUARTER_HOUR",
+           *         "period": {
+           *           "type": "DAY",
+           *           "from": "2026-01-27T00:00:00+01:00",
+           *           "to": "2026-01-27T23:59:59+01:00"
+           *         },
+           *         "timeseries": [
+           *           {
+           *             "startAt": "2026-01-27T00:00:00+01:00",
+           *             "chargeStatePercent": 80,
+           *             "controlAction": "CHARGING_CHEAP_ENERGY",
+           *             "powerKw": 12.0084
+           *           },
+           *           {
+           *             "startAt": "2026-01-27T00:15:00+01:00",
+           *             "chargeStatePercent": 82,
+           *             "controlAction": "CHARGING_CHEAP_ENERGY",
+           *             "powerKw": -5.7584
+           *           }
+           *         ]
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["HomeBatteryTimeseriesResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found, not a Home Battery installation, or period not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE"
+                | "PERIOD_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetSavingsOverview: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Cumulative savings and yesterday's savings breakdown */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.08
+           *       },
+           *       "result": {
+           *         "cumulative": {
+           *           "avgVatPercent": 21,
+           *           "homeBatterySavingsCentsInclVat": 5000,
+           *           "solarSavingsCentsInclVat": 4000,
+           *           "imbalanceSavingsCentsInclVat": 3345,
+           *           "totalSavingsCentsInclVat": 12345,
+           *           "homeBatterySavingsCentsExclVat": 4132,
+           *           "solarSavingsCentsExclVat": 3305,
+           *           "imbalanceSavingsCentsExclVat": 2764,
+           *           "totalSavingsCentsExclVat": 10201,
+           *           "period": {
+           *             "from": "2025-06-15T00:00:00Z",
+           *             "to": "2026-01-26T23:59:59Z"
+           *           }
+           *         },
+           *         "yesterday": {
+           *           "avgVatPercent": 21,
+           *           "homeBatterySavingsCentsInclVat": 100,
+           *           "solarSavingsCentsInclVat": 80,
+           *           "imbalanceSavingsCentsInclVat": 54,
+           *           "totalSavingsCentsInclVat": 234,
+           *           "homeBatterySavingsCentsExclVat": 82,
+           *           "solarSavingsCentsExclVat": 66,
+           *           "imbalanceSavingsCentsExclVat": 45,
+           *           "totalSavingsCentsExclVat": 193
+           *         },
+           *         "lastUpdatedAt": "2026-01-27T00:00:00Z"
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["SavingsOverviewResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found or not a Home Battery installation */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetSavingsTimeseriesYear: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        /** @description Year (4 digits) */
+        year: components["parameters"]["Year"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Savings timeseries data (monthly granularity) */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.12
+           *       },
+           *       "result": {
+           *         "granularity": "MONTH",
+           *         "period": {
+           *           "type": "YEAR",
+           *           "from": "2026-01-01T00:00:00+01:00",
+           *           "to": "2026-12-31T23:59:59+01:00"
+           *         },
+           *         "aggregated": {
+           *           "avgVatPercent": 21,
+           *           "homeBatterySavingsCentsInclVat": 30000,
+           *           "solarSavingsCentsInclVat": 24000,
+           *           "imbalanceSavingsCentsInclVat": 18000,
+           *           "totalSavingsCentsInclVat": 72000,
+           *           "homeBatterySavingsCentsExclVat": 24793,
+           *           "solarSavingsCentsExclVat": 19835,
+           *           "imbalanceSavingsCentsExclVat": 14876,
+           *           "totalSavingsCentsExclVat": 59504
+           *         },
+           *         "timeseries": [
+           *           {
+           *             "startAt": "2026-01-01T00:00:00+01:00",
+           *             "avgVatPercent": 21,
+           *             "homeBatterySavingsCentsInclVat": 2500,
+           *             "solarSavingsCentsInclVat": 2000,
+           *             "imbalanceSavingsCentsInclVat": 1500,
+           *             "totalSavingsCentsInclVat": 6000,
+           *             "homeBatterySavingsCentsExclVat": 2066,
+           *             "solarSavingsCentsExclVat": 1653,
+           *             "imbalanceSavingsCentsExclVat": 1239,
+           *             "totalSavingsCentsExclVat": 4958
+           *           },
+           *           {
+           *             "startAt": "2026-02-01T00:00:00+01:00",
+           *             "avgVatPercent": 21,
+           *             "homeBatterySavingsCentsInclVat": 2600,
+           *             "solarSavingsCentsInclVat": 2100,
+           *             "imbalanceSavingsCentsInclVat": 1600,
+           *             "totalSavingsCentsInclVat": 6300,
+           *             "homeBatterySavingsCentsExclVat": 2149,
+           *             "solarSavingsCentsExclVat": 1736,
+           *             "imbalanceSavingsCentsExclVat": 1322,
+           *             "totalSavingsCentsExclVat": 5207
+           *           }
+           *         ]
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["SavingsTimeseriesResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found, not a Home Battery installation, or period not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE"
+                | "PERIOD_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetSavingsTimeseriesMonth: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        /** @description Year (4 digits) */
+        year: components["parameters"]["Year"];
+        /** @description Month (1-12) */
+        month: components["parameters"]["Month"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Savings timeseries data (daily granularity) */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.12
+           *       },
+           *       "result": {
+           *         "granularity": "DAY",
+           *         "period": {
+           *           "type": "MONTH",
+           *           "from": "2026-01-01T00:00:00+01:00",
+           *           "to": "2026-01-31T23:59:59+01:00"
+           *         },
+           *         "aggregated": {
+           *           "avgVatPercent": 21,
+           *           "homeBatterySavingsCentsInclVat": 2500,
+           *           "solarSavingsCentsInclVat": 2000,
+           *           "imbalanceSavingsCentsInclVat": 1500,
+           *           "totalSavingsCentsInclVat": 6000,
+           *           "homeBatterySavingsCentsExclVat": 2066,
+           *           "solarSavingsCentsExclVat": 1653,
+           *           "imbalanceSavingsCentsExclVat": 1239,
+           *           "totalSavingsCentsExclVat": 4958
+           *         },
+           *         "timeseries": [
+           *           {
+           *             "startAt": "2026-01-27T00:00:00+01:00",
+           *             "avgVatPercent": 21,
+           *             "homeBatterySavingsCentsInclVat": 100,
+           *             "solarSavingsCentsInclVat": 80,
+           *             "imbalanceSavingsCentsInclVat": 50,
+           *             "totalSavingsCentsInclVat": 230,
+           *             "homeBatterySavingsCentsExclVat": 82,
+           *             "solarSavingsCentsExclVat": 66,
+           *             "imbalanceSavingsCentsExclVat": 41,
+           *             "totalSavingsCentsExclVat": 189
+           *           },
+           *           {
+           *             "startAt": "2026-01-28T00:00:00+01:00",
+           *             "avgVatPercent": 21,
+           *             "homeBatterySavingsCentsInclVat": 100,
+           *             "solarSavingsCentsInclVat": 80,
+           *             "imbalanceSavingsCentsInclVat": 50,
+           *             "totalSavingsCentsInclVat": 230,
+           *             "homeBatterySavingsCentsExclVat": 82,
+           *             "solarSavingsCentsExclVat": 66,
+           *             "imbalanceSavingsCentsExclVat": 41,
+           *             "totalSavingsCentsExclVat": 189
+           *           }
+           *         ]
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["SavingsTimeseriesResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found, not a Home Battery installation, or period not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE"
+                | "PERIOD_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetEnergyFlowTimeseriesYear: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        /** @description Year (4 digits) */
+        year: components["parameters"]["Year"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Energy flow timeseries data (monthly granularity) */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.12
+           *       },
+           *       "result": {
+           *         "granularity": "MONTH",
+           *         "period": {
+           *           "type": "YEAR",
+           *           "from": "2026-01-01T00:00:00+01:00",
+           *           "to": "2026-12-31T23:59:59+01:00"
+           *         },
+           *         "aggregated": {
+           *           "batteryChargedKWh": 13200,
+           *           "batteryDischargedKWh": 11760,
+           *           "solarProductionKWh": 16800,
+           *           "houseConsumptionKWh": 30000,
+           *           "gridImportKWh": 14400,
+           *           "gridExportKWh": 2160
+           *         },
+           *         "timeseries": [
+           *           {
+           *             "startAt": "2026-01-01T00:00:00+01:00",
+           *             "batteryChargedKWh": 1100,
+           *             "batteryDischargedKWh": 980,
+           *             "solarProductionKWh": 1400,
+           *             "houseConsumptionKWh": 2500,
+           *             "gridImportKWh": 1200,
+           *             "gridExportKWh": 180
+           *           },
+           *           {
+           *             "startAt": "2026-02-01T00:00:00+01:00",
+           *             "batteryChargedKWh": 1050,
+           *             "batteryDischargedKWh": 950,
+           *             "solarProductionKWh": 1300,
+           *             "houseConsumptionKWh": 2400,
+           *             "gridImportKWh": 1150,
+           *             "gridExportKWh": 200
+           *           }
+           *         ]
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["EnergyFlowTimeseriesResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found, not a Home Battery installation, or period not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE"
+                | "PERIOD_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetEnergyFlowTimeseriesMonth: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        /** @description Year (4 digits) */
+        year: components["parameters"]["Year"];
+        /** @description Month (1-12) */
+        month: components["parameters"]["Month"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Energy flow timeseries data (daily granularity) */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.12
+           *       },
+           *       "result": {
+           *         "granularity": "DAY",
+           *         "period": {
+           *           "type": "MONTH",
+           *           "from": "2026-01-01T00:00:00+01:00",
+           *           "to": "2026-01-31T23:59:59+01:00"
+           *         },
+           *         "aggregated": {
+           *           "batteryChargedKWh": 1100,
+           *           "batteryDischargedKWh": 980,
+           *           "solarProductionKWh": 1400,
+           *           "houseConsumptionKWh": 2500,
+           *           "gridImportKWh": 1200,
+           *           "gridExportKWh": 180
+           *         },
+           *         "timeseries": [
+           *           {
+           *             "startAt": "2026-01-01T00:00:00+01:00",
+           *             "batteryChargedKWh": 35.5,
+           *             "batteryDischargedKWh": 32,
+           *             "solarProductionKWh": 45,
+           *             "houseConsumptionKWh": 80,
+           *             "gridImportKWh": 38,
+           *             "gridExportKWh": 5.5
+           *           },
+           *           {
+           *             "startAt": "2026-01-02T00:00:00+01:00",
+           *             "batteryChargedKWh": 36,
+           *             "batteryDischargedKWh": 33.5,
+           *             "solarProductionKWh": 48,
+           *             "houseConsumptionKWh": 82,
+           *             "gridImportKWh": 36,
+           *             "gridExportKWh": 6
+           *           }
+           *         ]
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["EnergyFlowTimeseriesResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found, not a Home Battery installation, or period not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE"
+                | "PERIOD_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetEnergyFlowTimeseriesDay: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+        /** @description Year (4 digits) */
+        year: components["parameters"]["Year"];
+        /** @description Month (1-12) */
+        month: components["parameters"]["Month"];
+        /** @description Day (1-31) */
+        day: components["parameters"]["Day"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Energy flow timeseries data (15-minute granularity) */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.15
+           *       },
+           *       "result": {
+           *         "granularity": "QUARTER_HOUR",
+           *         "period": {
+           *           "type": "DAY",
+           *           "from": "2026-01-27T00:00:00+01:00",
+           *           "to": "2026-01-27T23:59:59+01:00"
+           *         },
+           *         "aggregated": {
+           *           "batteryChargedKWh": 35.5,
+           *           "batteryDischargedKWh": 32,
+           *           "solarProductionKWh": 45,
+           *           "houseConsumptionKWh": 80,
+           *           "gridImportKWh": 38,
+           *           "gridExportKWh": 5.5
+           *         },
+           *         "timeseries": [
+           *           {
+           *             "startAt": "2026-01-27T00:00:00+01:00",
+           *             "batteryChargedKWh": 5,
+           *             "batteryDischargedKWh": 4.5,
+           *             "solarProductionKWh": 6.5,
+           *             "houseConsumptionKWh": 12,
+           *             "gridImportKWh": 6,
+           *             "gridExportKWh": 0.5
+           *           },
+           *           {
+           *             "startAt": "2026-01-27T00:15:00+01:00",
+           *             "batteryChargedKWh": 5.2,
+           *             "batteryDischargedKWh": 4.8,
+           *             "solarProductionKWh": 7,
+           *             "houseConsumptionKWh": 11.5,
+           *             "gridImportKWh": 5,
+           *             "gridExportKWh": 1
+           *           }
+           *         ]
+           *       }
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["EnergyFlowTimeseriesResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found, not a Home Battery installation, or period not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY"
+                | "INSTALLATION_INSIGHTS_NOT_AVAILABLE"
+                | "PERIOD_NOT_FOUND";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  GetHomeBatteryStatus: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Current status of all Home Batteries in the installation */
+      200: {
+        headers: {
+          /**
+           * @description HTTP caching directives for the response.
+           *     - private: Response is user-specific, only cacheable by client (not shared caches)
+           *     - max-age: How long the response is fresh (in seconds)
+           *     - stale-while-revalidate: Serve stale content while fetching fresh data in background
+           */
+          "Cache-Control"?: string;
+          /** @description Timestamp of last data change. */
+          "Last-Modified"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          /**
+           * @example {
+           *       "meta": {
+           *         "status": 200,
+           *         "took": 0.05
+           *       },
+           *       "result": [
+           *         {
+           *           "uuid": "DEV-xxx",
+           *           "name": "Home Battery 1",
+           *           "serial": "123456789",
+           *           "controlMode": "PROFIT_OPTIMIZATION",
+           *           "capacityKWh": 10,
+           *           "inverterPowerKw": 5.2,
+           *           "connected": true,
+           *           "live": {
+           *             "controlAction": "BALANCING_THE_GRID",
+           *             "chargeStatePercent": 75,
+           *             "powerKw": 12.0084,
+           *             "powerFlowDirection": "DISCHARGING",
+           *             "lastMeasurementAt": "2026-01-27T10:00:00Z"
+           *           },
+           *           "lastUpdatedAt": "2026-01-27T10:00:00Z"
+           *         }
+           *       ]
+           *     }
+           */
+          "application/json": {
+            meta: components["schemas"]["ResponseMeta"];
+            result: components["schemas"]["HomeBatteryStatusResponse"];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found or not a Home Battery installation */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY";
+            };
+          };
+        };
+      };
+      500: components["responses"]["Unexpected"];
+    };
+  };
   getInstallation: {
     parameters: {
       query?: never;
@@ -10063,6 +11738,82 @@ export interface operations {
       401: components["responses"]["Unauthorized"];
       403: components["responses"]["UserHasNoPermission"];
       404: components["responses"]["InstallationNotFound"];
+      500: components["responses"]["Unexpected"];
+    };
+  };
+  PatchInstallationSolarCapacity: {
+    parameters: {
+      query?: never;
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationId: components["parameters"]["InstallationId"];
+      };
+      cookie?: never;
+    };
+    /** @description The new solar capacity value */
+    requestBody: {
+      content: {
+        "application/json": {
+          /**
+           * Format: float
+           * @description Solar capacity in kilowatt-peak (kWp). Can be equal to 0 to remove the solar capacity setting.
+           * @example 6.5
+           */
+          solarCapacitykWp: number;
+        };
+      };
+    };
+    responses: {
+      /** @description Solar capacity successfully updated */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid solar capacity value */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponseResult"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?: "INVALID_SOLAR_CAPACITY";
+            };
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      /** @description Installation not found or not a Home Battery installation */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?:
+                | "INSTALLATION_NOT_FOUND"
+                | "INSTALLATION_NOT_HOME_BATTERY";
+            };
+          };
+        };
+      };
       500: components["responses"]["Unexpected"];
     };
   };
@@ -10699,6 +12450,7 @@ export interface operations {
     responses: {
       200: components["responses"]["InstallerCic"];
       401: components["responses"]["Unauthorized"];
+      403: components["responses"]["Forbidden"];
       404: components["responses"]["NotFound"];
       500: components["responses"]["Unexpected"];
     };
@@ -11902,6 +13654,20 @@ export interface operations {
             | components["schemas"]["ErrorInstallationNotFound"];
         };
       };
+      /** @description Cannot unpair device during active commissioning */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?: "CANNOT_UNPAIR_DEVICE_DURING_COMMISSIONING";
+            };
+          };
+        };
+      };
       500: components["responses"]["Unexpected"];
     };
   };
@@ -12136,6 +13902,20 @@ export interface operations {
           "application/json":
             | components["schemas"]["ErrorThreadDeviceNotFoundInInstallation"]
             | components["schemas"]["ErrorInstallationNotFound"];
+        };
+      };
+      /** @description Cannot unpair device during active commissioning */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"] & {
+            result?: {
+              /** @enum {string} */
+              errorCode?: "CANNOT_UNPAIR_DEVICE_DURING_COMMISSIONING";
+            };
+          };
         };
       };
       500: components["responses"]["Unexpected"];
@@ -14631,6 +16411,39 @@ export interface operations {
       };
     };
   };
+  AdminGetInstallationInsights: {
+    parameters: {
+      query: {
+        /** @description From date */
+        from: components["schemas"]["Date"];
+        /** @description Timeframe to get */
+        timeframe: "day" | "week" | "month" | "year" | "all";
+      };
+      header?: {
+        /**
+         * @description Semantic version of the client application.
+         *     Used by the backend to determine available features based on client version.
+         */
+        "X-Client-Version"?: components["parameters"]["X-Client-Version"];
+        /**
+         * @description Platform identifier for the client application.
+         *     Used by the backend to determine platform-specific feature availability.
+         */
+        "X-Client-Platform"?: components["parameters"]["X-Client-Platform"];
+      };
+      path: {
+        installationUuid: components["parameters"]["InstallationUuid"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: components["responses"]["Insights"];
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["UserHasNoPermission"];
+      404: components["responses"]["NotFound"];
+    };
+  };
   AdminPatchUserReferralEmail: {
     parameters: {
       query?: never;
@@ -14696,7 +16509,7 @@ export interface operations {
           };
         };
       };
-      /** @description A referral member with this email already exists */
+      /** @description The referral member found by this email is already assigned to another user */
       409: {
         headers: {
           [name: string]: unknown;
@@ -14705,7 +16518,7 @@ export interface operations {
           "application/json": components["schemas"]["Error"] & {
             result?: {
               /** @enum {string} */
-              errorCode?: "REFERRAL_MEMBER_EMAIL_ALREADY_EXISTS";
+              errorCode?: "REFERRAL_MEMBER_ASSIGNED_TO_ANOTHER_USER";
             };
           };
         };
