@@ -68,9 +68,7 @@ export function useInsightsUrlState({
       onTimeGranularityChange(granularityParam as TimeGranularity);
       hasChanges = true;
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run on mount
+  }, [minimumDate, maximumDate, onDateChange, onTimeGranularityChange]);
 
   // Update URL when state changes
   const updateUrl = useCallback(
