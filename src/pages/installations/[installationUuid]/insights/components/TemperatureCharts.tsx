@@ -213,6 +213,10 @@ export function OutsideTemperatureChart({
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
       scales: {
         x: {
           grid: { display: false },
@@ -227,8 +231,11 @@ export function OutsideTemperatureChart({
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (context) =>
-              `${context.dataset.label}: ${context.parsed.y?.toFixed(1)}°C`,
+            label: (context) => {
+              const value = context.parsed.y;
+              if (value == null) return "";
+              return `${context.dataset.label}: ${value.toFixed(1)}°C`;
+            },
           },
         },
       },
@@ -240,6 +247,10 @@ export function OutsideTemperatureChart({
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
       scales: {
         x: {
           grid: { display: false },
@@ -362,6 +373,10 @@ export function RoomTemperatureChart({ data }: RoomTemperatureChartProps) {
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
       scales: {
         x: {
           grid: { display: false },
@@ -376,8 +391,11 @@ export function RoomTemperatureChart({ data }: RoomTemperatureChartProps) {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (context) =>
-              `${context.dataset.label}: ${context.parsed.y?.toFixed(1)}°C`,
+            label: (context) => {
+              const value = context.parsed.y;
+              if (value == null) return "";
+              return `${context.dataset.label}: ${value.toFixed(1)}°C`;
+            },
           },
         },
       },
@@ -470,6 +488,10 @@ export function WaterTemperatureChart({ data }: WaterTemperatureChartProps) {
     () => ({
       responsive: true,
       maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
       scales: {
         x: {
           grid: { display: false },
@@ -484,8 +506,11 @@ export function WaterTemperatureChart({ data }: WaterTemperatureChartProps) {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (context) =>
-              `${context.dataset.label}: ${context.parsed.y?.toFixed(1)}°C`,
+            label: (context) => {
+              const value = context.parsed.y;
+              if (value == null) return "";
+              return `${context.dataset.label}: ${value.toFixed(1)}°C`;
+            },
           },
         },
       },
