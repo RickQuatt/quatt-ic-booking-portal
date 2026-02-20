@@ -25,7 +25,15 @@ export function InstallationCicHistory({
 }: InstallationCicHistoryProps) {
   const { cicState } = installation;
 
-  if (!cicState || cicState.length === 0) {
+  // Deduplicate consecutive entries with the same cicId + status
+  const deduplicatedCicState = cicState?.filter(
+    (state, index, arr) =>
+      index === 0 ||
+      state.cicId !== arr[index - 1].cicId ||
+      state.status !== arr[index - 1].status,
+  );
+
+  if (!deduplicatedCicState || deduplicatedCicState.length === 0) {
     return (
       <div className="py-8 text-center text-gray-500 dark:text-gray-400">
         No CIC history available
@@ -44,7 +52,7 @@ export function InstallationCicHistory({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {cicState.map((state, index) => (
+          {deduplicatedCicState.map((state, index) => (
             <TableRow key={state.id || index}>
               <TableCell className="font-medium">{state.cicId}</TableCell>
               <TableCell>{formatDateTime(new Date(state.startAt))}</TableCell>
