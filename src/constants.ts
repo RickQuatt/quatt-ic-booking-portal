@@ -22,7 +22,7 @@ export const kpiToLabel = {
   cpuTemperature: "CPU temperature",
   loadAverage: "Load average",
   watchdog: "Watchdog",
-  minimumCop: "Minimum COP is too high",
+  minimumCop: "Tariff COP optimization",
   supervisoryControlMode: "Controller in normal operation",
   heatpumpErrors: "Error flag from heatpump",
   numberOfRestarts: "Number of restarts",

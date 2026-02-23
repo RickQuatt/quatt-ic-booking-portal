@@ -90,7 +90,7 @@ export function KpiHealthChart({ data }: KpiHealthChartProps) {
                 case "watchdog":
                   return "Last value of watchdog code is within the defined limits";
                 case "minimumCop":
-                  return 'Verify if customer has not disabled the "use tariff-based optimization" feature AND minimum COP based on user tarrifs has a correct value';
+                  return "Green: tariff COP optimization is active. Warning: heat pump currently limited (boiler is cheaper). Error: minimumCOP not set (tariff optimization disabled or not configured).";
                 case "supervisoryControlMode":
                   return "Controller is in normal operation mode";
                 case "heatpumpErrors":
