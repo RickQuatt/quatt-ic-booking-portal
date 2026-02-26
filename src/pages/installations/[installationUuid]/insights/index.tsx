@@ -35,7 +35,9 @@ export function InsightsPageWrapper({
       installationUuid={installationUuid}
       installationName={installationDetails.name ?? undefined}
       cicId={installationDetails.activeCic ?? undefined}
-      insightsStartAt={installationDetails.insightsStartAt}
+      insightsStartAt={
+        installationDetails.insightsStartAt ?? installationDetails.installedAt
+      }
     />
   );
 }
