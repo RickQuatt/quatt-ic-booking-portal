@@ -45,6 +45,7 @@ export function InstallationSettingsModal({
   open,
   onOpenChange,
 }: InstallationSettingsModalProps) {
+  const isAllElectric = installation.type?.includes("ALL_ELECTRIC") ?? false;
   const requiredFieldText = "This field is required";
 
   const installationSettingsSchema = z.object({
@@ -146,7 +147,7 @@ export function InstallationSettingsModal({
       dayMaxSoundLevel: data.dayMaxSoundLevel ?? undefined,
       nightMaxSoundLevel: data.nightMaxSoundLevel ?? undefined,
       silentMode: data.silentMode ?? undefined,
-      boilerType: data.boilerType ?? undefined,
+      boilerType: isAllElectric ? undefined : (data.boilerType ?? undefined),
       thermostatType: data.thermostatType ?? undefined,
       numberOfHeatPumps: data.numberOfHeatPumps,
       chMaxWaterTemperature:
@@ -302,31 +303,33 @@ export function InstallationSettingsModal({
               />
             )}
 
-            {/* Boiler Type */}
-            <FormField
-              control={form.control}
-              name="boilerType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Boiler Type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value ?? undefined}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="bg-gray-50 dark:bg-dark-foreground">
-                        <SelectValue placeholder="Select boiler type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="opentherm">Opentherm</SelectItem>
-                      <SelectItem value="on_off">On/Off</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Boiler Type - Hidden for All Electric installations */}
+            {!isAllElectric && (
+              <FormField
+                control={form.control}
+                name="boilerType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Boiler Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value ?? undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-gray-50 dark:bg-dark-foreground">
+                          <SelectValue placeholder="Select boiler type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="opentherm">Opentherm</SelectItem>
+                        <SelectItem value="on_off">On/Off</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/* Thermostat Type */}
             <FormField
