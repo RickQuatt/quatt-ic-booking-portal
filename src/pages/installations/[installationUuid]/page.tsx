@@ -190,7 +190,7 @@ export function InstallationDetailPage({
             )}
 
             {/* Latest Non-Hybrid Commissioning */}
-            {installation.externalId && (
+            {isAllE && installation.externalId && (
               <InstallationCommissioning
                 installationId={installation.externalId}
               />
