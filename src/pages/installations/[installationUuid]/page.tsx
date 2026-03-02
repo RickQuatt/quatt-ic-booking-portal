@@ -167,11 +167,6 @@ export function InstallationDetailPage({
                 onToggle={setIsZuperEnabled}
               />
             )} */}
-
-            {/* Notes */}
-            {installation.externalId && (
-              <InstallationNotes installationId={installation.externalId} />
-            )}
           </div>
 
           {/* Sidebar Column */}
@@ -187,6 +182,11 @@ export function InstallationDetailPage({
                 rebootLabel={rebootLabel}
                 isLoading={isLoading}
               />
+            )}
+
+            {/* Notes */}
+            {installation.externalId && (
+              <InstallationNotes installationId={installation.externalId} />
             )}
 
             {/* Latest Non-Hybrid Commissioning */}
