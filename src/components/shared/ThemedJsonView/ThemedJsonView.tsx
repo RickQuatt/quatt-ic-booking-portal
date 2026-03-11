@@ -79,7 +79,20 @@ export function ThemedJsonView({
         displayObjectSize={displayObjectSize}
         enableClipboard={enableClipboard}
         onCopied={onCopied}
-      />
+      >
+        <JsonView.Null
+          render={(_props, { type }) =>
+            type === "value" ? (
+              <span
+                className="w-rjv-value"
+                style={{ color: "var(--w-rjv-type-null-color, #d33682)" }}
+              >
+                null
+              </span>
+            ) : undefined
+          }
+        />
+      </JsonView>
 
       <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
         <DialogContent className="flex h-[100vh] w-[100vw] max-w-none flex-col bg-white dark:bg-dark-foreground">
@@ -94,7 +107,20 @@ export function ThemedJsonView({
               displayObjectSize={displayObjectSize}
               enableClipboard={enableClipboard}
               onCopied={onCopied}
-            />
+            >
+              <JsonView.Null
+                render={(_props, { type }) =>
+                  type === "value" ? (
+                    <span
+                      className="w-rjv-value"
+                      style={{ color: "var(--w-rjv-type-null-color, #d33682)" }}
+                    >
+                      null
+                    </span>
+                  ) : undefined
+                }
+              />
+            </JsonView>
           </div>
         </DialogContent>
       </Dialog>
