@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import type { components } from "@/openapi-client/types/api/v1";
 import { ConnectionStatus } from "./components/ConnectionStatus";
@@ -8,6 +8,8 @@ import { useMqttDebugStream } from "./hooks/useMqttDebugStream";
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeInVariants } from "@/lib/animations";
+import { $api } from "@/openapi-client/context";
+import { toast } from "@/lib/toast";
 
 type AdminCic = components["schemas"]["AdminCic"];
 
@@ -27,6 +29,23 @@ export function MQTTDebuggerPage({ data: { id } }: MQTTDebuggerPageProps) {
       cicId: id,
       enabled: isStreamEnabled,
     });
+
+  const sendCommandMutation = $api.useMutation(
+    "post",
+    "/admin/cic/{cicId}/command",
+  );
+
+  const handleStartLiveView = useCallback(async () => {
+    try {
+      await sendCommandMutation.mutateAsync({
+        params: { path: { cicId: id } },
+        body: { type: "startLiveView" },
+      });
+      toast.success("Live view command sent successfully (30 minutes)");
+    } catch {
+      toast.error("Failed to start live view session.");
+    }
+  }, [id, sendCommandMutation]);
 
   const handleStart = () => {
     setIsStreamEnabled(true);
@@ -110,6 +129,7 @@ export function MQTTDebuggerPage({ data: { id } }: MQTTDebuggerPageProps) {
             onStop={handleStop}
             onClear={clearMessages}
             onExportMessages={handleExportMessages}
+            onStartLiveView={handleStartLiveView}
             messageCount={messages.length}
           />
 

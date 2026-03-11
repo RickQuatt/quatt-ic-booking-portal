@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { Play, Square, Download, Trash2 } from "lucide-react";
+import { Play, Square, Download, Trash2, Radio } from "lucide-react";
 
 interface MqttControlsProps {
   isStreaming: boolean;
@@ -7,6 +7,7 @@ interface MqttControlsProps {
   onStop: () => void;
   onClear: () => void;
   onExportMessages: () => void;
+  onStartLiveView: () => void;
   messageCount: number;
 }
 
@@ -16,6 +17,7 @@ export function MqttControls({
   onStop,
   onClear,
   onExportMessages,
+  onStartLiveView,
   messageCount,
 }: MqttControlsProps) {
   return (
@@ -32,6 +34,10 @@ export function MqttControls({
             Stop Streaming
           </Button>
         )}
+        <Button onClick={onStartLiveView} variant="outline" className="gap-2">
+          <Radio className="h-4 w-4" />
+          Start LiveView (30min)
+        </Button>
       </div>
 
       <div className="flex items-center gap-3">
