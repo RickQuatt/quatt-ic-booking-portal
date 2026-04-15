@@ -11,11 +11,4 @@ else
   npm run build:development
 fi
 
-# Build Storybook and copy to dist/storybook
-echo "Building Storybook..."
-npm run build-storybook
-
-echo "Copying Storybook to dist/storybook..."
-cp -r storybook-static dist/storybook
-
-echo "Build complete. Storybook available at /storybook/"
+echo "Build complete."
