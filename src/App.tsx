@@ -1,67 +1,87 @@
-import { useState, useEffect } from "react";
-import { Route } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Loader } from "@/components/shared/Loader";
 import { Toaster } from "@/components/ui/Sonner";
-import { HomePage } from "./pages/home/page";
+
+// Booking pages (public, no sidebar)
+import { BookingHubPage } from "./pages/book/page";
+import { KennismakingPage } from "./pages/book/kennismaking/page";
+import { ReschedulePage } from "./pages/book/kennismaking/reschedule/page";
+import { CancelPage } from "./pages/book/kennismaking/cancel/page";
+import { TrainingPage } from "./pages/book/training/page";
+import { AgreementPage } from "./pages/book/agreement/page";
+import { InstallPage } from "./pages/book/install/page";
+
+// Admin page
+import { AdminPage } from "./pages/admin/page";
 
 const queryClient = new QueryClient();
 
-function App() {
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Check if middleware already handled authentication (session cookie exists)
-    const hasSessionCookie = document.cookie.includes("session=");
-
-    if (hasSessionCookie) {
-      setIsAuthenticated(true);
-      setLoading(false);
-      return;
-    }
-
-    // If running in plain Vite dev mode (no middleware), show unauthenticated state
-    // In production, the middleware would have already redirected to login
-    setLoading(false);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold">Not Authenticated</h1>
-          <p className="text-muted-foreground">
-            Run with{" "}
-            <code className="bg-muted px-2 py-1 rounded">
-              npm run dev:with-auth
-            </code>{" "}
-            to enable authentication, or deploy to Cloudflare Pages.
-          </p>
+/**
+ * Booking layout: clean, no sidebar, partner-facing.
+ */
+function BookingLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-[#F7F5F0]">
+      <header className="bg-white border-b border-[#E8E4DD]">
+        <div className="max-w-5xl mx-auto px-6 py-4">
+          <a href="/book" className="inline-block">
+            <span className="text-xl font-extrabold text-[#1A1A1A] tracking-tight">
+              Quatt
+            </span>
+            <span className="ml-2 text-xs font-semibold text-[#8A8580] uppercase tracking-wider">
+              Installatiepartners
+            </span>
+          </a>
         </div>
-      </div>
+      </header>
+      <main>{children}</main>
+    </div>
+  );
+}
+
+function App() {
+  const [location] = useLocation();
+
+  // Booking routes get the clean public layout
+  const isBookingRoute = location.startsWith("/book");
+
+  if (isBookingRoute) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <BookingLayout>
+          <Switch>
+            <Route path="/book" component={BookingHubPage} />
+            <Route path="/book/kennismaking" component={KennismakingPage} />
+            <Route path="/book/kennismaking/reschedule" component={ReschedulePage} />
+            <Route path="/book/kennismaking/cancel" component={CancelPage} />
+            <Route path="/book/training" component={TrainingPage} />
+            <Route path="/book/agreement" component={AgreementPage} />
+            <Route path="/book/install" component={InstallPage} />
+          </Switch>
+        </BookingLayout>
+        <Toaster />
+      </QueryClientProvider>
     );
   }
 
+  // Admin route
+  if (location.startsWith("/admin")) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Switch>
+          <Route path="/admin" component={AdminPage} />
+        </Switch>
+        <Toaster />
+      </QueryClientProvider>
+    );
+  }
+
+  // Default: redirect to booking hub
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <main className="flex-1 overflow-auto md:ml-0 mt-14 md:mt-0">
-          {/* Add your routes here */}
-          <Route path="/" component={HomePage} />
-          <Route path="/home" component={HomePage} />
-        </main>
-      </div>
+      <BookingLayout>
+        <BookingHubPage />
+      </BookingLayout>
       <Toaster />
     </QueryClientProvider>
   );

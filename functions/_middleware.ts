@@ -117,6 +117,20 @@ const PUBLIC_PATHS = [
   "/robots.txt",
 ];
 
+/**
+ * Prefixes that are accessible WITHOUT Google OAuth.
+ * Booking pages are partner-facing and public.
+ * Admin routes (/admin, /api/admin/*) still require auth.
+ */
+const PUBLIC_PREFIXES = [
+  "/book",
+  "/api/bookings",
+  "/api/slots",
+  "/api/sessions",
+  "/api/agreements",
+  "/api/admin/auth", // admin token login endpoint must be reachable
+];
+
 function isValidReturnUrl(url: string): boolean {
   if (!url) return false;
   if (!url.startsWith("/") || url.startsWith("//")) return false;
@@ -181,6 +195,11 @@ export const onRequest = async (context: {
   const url = new URL(request.url);
 
   if (PUBLIC_PATHS.includes(url.pathname)) {
+    return next();
+  }
+
+  // Public booking pages and their API routes -- no auth required
+  if (PUBLIC_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))) {
     return next();
   }
 
