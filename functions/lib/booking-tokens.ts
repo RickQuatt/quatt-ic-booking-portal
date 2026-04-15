@@ -42,7 +42,7 @@ async function hmacSign(secret: string, payload: string): Promise<string> {
   return hexEncode(signature);
 }
 
-async function timingSafeCompare(a: string, b: string): Promise<boolean> {
+export async function timingSafeCompare(a: string, b: string): Promise<boolean> {
   const encoder = new TextEncoder();
   const aBytes = encoder.encode(a);
   const bBytes = encoder.encode(b);
