@@ -44,3 +44,7 @@ task-context
 .dev.vars
 *storybook.log
 storybook-static
+
+# Supabase CLI temp state
+supabase/.temp/
+

@@ -1,0 +1,42 @@
+# Local dev secrets for `npm run dev:with-auth` AND source for ./scripts/set-secrets.sh.
+# Copy to .dev.vars (gitignored) and fill in real values.
+# After populating, push to CF Pages with: ./scripts/set-secrets.sh production
+#
+# Source for real values: 1Password, the legacy Vercel project's env, or generate fresh.
+
+# --- Auth / sessions ---
+SESSION_SECRET=                       # openssl rand -hex 32
+ADMIN_TOKENS=                         # comma-separated admin login tokens
+BOOKING_SECRET=                       # openssl rand -hex 32 (HMAC for cancel/reschedule links)
+
+# --- App identity ---
+APP_NAME=Quatt Booking Portal
+BASE_URL=https://quatt-booking-portal.pages.dev
+
+# --- Google OAuth (for /admin and any future @quatt.io-gated routes) ---
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REFRESH_TOKEN=                 # service-account refresh token for Calendar/Sheets
+
+# --- Google Calendar ---
+IC_CALENDAR_ID=                       # shared IC team calendar
+TRAINING_CALENDAR_ID=                 # training sessions calendar
+
+# --- Google Sheets (booking + agreement logs) ---
+IC_BOOKINGS_SHEET_ID=
+IC_AGREEMENTS_SHEET_ID=
+
+# --- Supabase (bookings DB) ---
+SUPABASE_URL=
+SUPABASE_KEY=                         # service-role key (server-side only)
+
+# --- Email (Resend) ---
+RESEND_API_KEY=
+EMAIL_FROM=Quatt Installatiepartners <noreply@quatt.io>
+
+# --- Slack (booking notifications) ---
+SLACK_BOT_TOKEN=                      # xoxb-... bot token
+SLACK_CHANNEL_ID=                     # channel for AM booking pings
+
+# --- HubSpot (Forms API submissions) ---
+HUBSPOT_KENNISMAKING_FORM_ID=8b37c550-9d07-46a2-9653-b03459437901

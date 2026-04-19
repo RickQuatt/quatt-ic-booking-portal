@@ -26,6 +26,11 @@ import {
   sendTrainingConfirmation,
   sendFirstInstallConfirmation,
 } from "../../lib/email";
+import {
+  rateLimit,
+  rateLimitResponse,
+  originMatchesHost,
+} from "../../lib/rate-limit";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,7 +38,19 @@ export const onRequestPost = async (context: {
   request: Request;
   env: Env;
 }) => {
-  const { env } = context;
+  const { env, request } = context;
+
+  if (!originMatchesHost(request)) {
+    return Response.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
+  const rl = await rateLimit(env.RATE_LIMIT, request, {
+    bucket: "bookings",
+    max: 5,
+    windowSeconds: 600, // 5 bookings per IP per 10 min
+  });
+  if (!rl.ok) return rateLimitResponse(rl);
+
   const body = await context.request.json() as Record<string, unknown>;
   const { type } = body;
 

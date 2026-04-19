@@ -1,4 +1,5 @@
 import { jwtVerify } from "jose";
+import { withSecurityHeaders } from "./lib/security-headers";
 
 interface Env {
   SESSION_SECRET: string;
@@ -186,11 +187,11 @@ function getSessionCookie(request: Request): string | null {
   return sessionCookie.split("=")[1];
 }
 
-export const onRequest = async (context: {
+async function handle(context: {
   request: Request;
   next: () => Promise<Response>;
   env: Env;
-}) => {
+}): Promise<Response> {
   const { request, next, env } = context;
   const url = new URL(request.url);
 
@@ -265,4 +266,13 @@ export const onRequest = async (context: {
   }
 
   return next();
+}
+
+export const onRequest = async (context: {
+  request: Request;
+  next: () => Promise<Response>;
+  env: Env;
+}) => {
+  const response = await handle(context);
+  return withSecurityHeaders(response, context.request);
 };

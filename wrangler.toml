@@ -2,3 +2,8 @@ name = "quatt-booking-portal"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
+
+# Per-IP sliding-window rate limiter for public booking endpoints.
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "22755dbd571f485590292d58aa995788"

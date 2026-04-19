@@ -1,4 +1,5 @@
 import { jwtVerify, SignJWT } from "jose";
+import { rateLimit, rateLimitResponse } from "../lib/rate-limit";
 
 // Google's public keys for verifying ID tokens
 const GOOGLE_JWKS_URL = "https://www.googleapis.com/oauth2/v3/certs";
@@ -11,6 +12,7 @@ interface Env {
   GOOGLE_CLIENT_ID: string;
   SESSION_SECRET: string;
   ALLOWED_EMAIL_DOMAIN?: string;
+  RATE_LIMIT?: KVNamespace;
 }
 
 async function getGooglePublicKeys(): Promise<any> {
@@ -91,6 +93,14 @@ export const onRequestPost = async (context: {
   env: Env;
 }) => {
   const { request, env } = context;
+
+  // Throttle login attempts to slow brute-force on stolen Google credentials.
+  const rl = await rateLimit(env.RATE_LIMIT, request, {
+    bucket: "login",
+    max: 10,
+    windowSeconds: 300,
+  });
+  if (!rl.ok) return rateLimitResponse(rl);
 
   try {
     const body = (await request.json()) as SessionRequest;

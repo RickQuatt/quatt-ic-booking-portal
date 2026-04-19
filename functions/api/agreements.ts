@@ -5,6 +5,11 @@
 import { getSupabase } from "../lib/supabase";
 import { appendAgreementRow } from "../lib/google-sheets";
 import { sendSlackNotification } from "../lib/slack";
+import {
+  rateLimit,
+  rateLimitResponse,
+  originMatchesHost,
+} from "../lib/rate-limit";
 import type { Env } from "../lib/types";
 
 const HUBSPOT_PORTAL_ID = "25848718";
@@ -38,7 +43,19 @@ export const onRequestPost = async (context: {
   request: Request;
   env: Env;
 }) => {
-  const { env } = context;
+  const { env, request } = context;
+
+  if (!originMatchesHost(request)) {
+    return Response.json({ error: "Invalid origin" }, { status: 403 });
+  }
+
+  const rl = await rateLimit(env.RATE_LIMIT, request, {
+    bucket: "agreements",
+    max: 3,
+    windowSeconds: 600, // 3 agreement signs per IP per 10 min
+  });
+  if (!rl.ok) return rateLimitResponse(rl);
+
   const body = await context.request.json() as Record<string, unknown>;
 
   const {

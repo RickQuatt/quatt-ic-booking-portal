@@ -38,6 +38,9 @@ export interface Env {
   SESSION_SECRET: string;
   APP_NAME: string;
   ADMIN_TOKENS: string; // comma-separated list
+
+  // Rate limiting (KV namespace; bound in wrangler.toml)
+  RATE_LIMIT?: KVNamespace;
 }
 
 // --- Booking domain types ---
