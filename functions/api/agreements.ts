@@ -116,8 +116,9 @@ export const onRequestPost = async (context: {
       signedAt: new Date().toISOString(), dealId: dealId || "",
     }).catch((e) => console.error("Agreement sheet write failed:", e));
 
-    // Submit to HubSpot Forms API (non-blocking)
-    submitToHubSpot(env, {
+    // Submit to HubSpot Forms API (non-blocking).
+    // On failure, alert Rick via Slack so Partner Progression doesn't silently miss the signal.
+    const hubspotFields: Record<string, string> = {
       email,
       firstname: contactPerson.split(" ")[0],
       lastname: contactPerson.split(" ").slice(1).join(" "),
@@ -126,7 +127,24 @@ export const onRequestPost = async (context: {
       address: `${address}, ${postcode} ${city}`,
       kvkNumber,
       btwNumber,
-    }).catch((e) => console.error("HubSpot form submission failed:", e));
+    };
+    if (dealId) {
+      hubspotFields.ic_agreement_deal_id = dealId;
+    }
+    submitToHubSpot(env, hubspotFields).catch((e) => {
+      console.error("HubSpot form submission failed:", e);
+      sendSlackNotification(
+        env,
+        `*ALERT: HubSpot agreement form submission failed*\n` +
+        `Partner saw success but the form did NOT reach HubSpot. Partner Progression will not fire.\n` +
+        `Email: ${email}\n` +
+        `Company: ${companyName}\n` +
+        (dealId ? `Deal ID: ${dealId}\n` : "No dealId in payload\n") +
+        `Error: ${e instanceof Error ? e.message : String(e)}`,
+      ).catch((slackErr) =>
+        console.error("Slack alert for HubSpot failure also failed:", slackErr),
+      );
+    });
 
     // Slack notification (non-blocking)
     sendSlackNotification(
