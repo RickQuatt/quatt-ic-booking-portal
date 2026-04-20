@@ -31,6 +31,8 @@ export interface Env {
 
   // HubSpot
   HUBSPOT_KENNISMAKING_FORM_ID: string;
+  HUBSPOT_TRAINING_FORM_ID: string;
+  HUBSPOT_TRAINING_ATTENDED_FORM_ID: string;
 
   // Auth / tokens
   BOOKING_SECRET: string;

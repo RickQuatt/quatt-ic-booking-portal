@@ -18,7 +18,10 @@ import {
   formatIntroCallNotification,
   formatFirstInstallNotification,
 } from "../../lib/slack";
-import { setKennismakingBooked } from "../../lib/hubspot-forms";
+import {
+  setKennismakingBooked,
+  setTrainingBooked,
+} from "../../lib/hubspot-forms";
 import { signBookingAction } from "../../lib/booking-tokens";
 import {
   sendKennismakingConfirmation,
@@ -170,6 +173,11 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
       env, env.TRAINING_CALENDAR_ID, session.calendar_event_id, partnerEmail, partnerName,
     ).catch((e) => console.error("Calendar attendee add failed:", e));
   }
+
+  // HubSpot: flip ic__training_booked + legacy_date_of_first_appointment_booked (non-blocking)
+  setTrainingBooked(env, partnerEmail, undefined, session.date).catch((e) =>
+    console.error("HubSpot training-booked push failed:", e),
+  );
 
   // Write to Google Sheet (non-blocking)
   appendBookingRow(env, {
