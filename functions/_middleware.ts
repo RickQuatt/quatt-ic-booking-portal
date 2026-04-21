@@ -126,6 +126,7 @@ const PUBLIC_PATHS = [
 const PUBLIC_PREFIXES = [
   "/book",
   "/training",
+  "/assets", // Vite-built JS/CSS/fonts referenced from every public page
   "/api/bookings",
   "/api/slots",
   "/api/sessions",
