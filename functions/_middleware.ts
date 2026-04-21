@@ -125,10 +125,12 @@ const PUBLIC_PATHS = [
  */
 const PUBLIC_PREFIXES = [
   "/book",
+  "/training",
   "/api/bookings",
   "/api/slots",
   "/api/sessions",
   "/api/agreements",
+  "/api/training",
   "/api/admin/auth", // admin token login endpoint must be reachable
 ];
 
