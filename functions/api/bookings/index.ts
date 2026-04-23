@@ -22,6 +22,7 @@ import {
   setKennismakingBooked,
   setTrainingBooked,
 } from "../../lib/hubspot-forms";
+import { postWalleosBooking } from "../../lib/walleos";
 import { signBookingAction } from "../../lib/booking-tokens";
 import {
   sendKennismakingConfirmation,
@@ -178,6 +179,19 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
   setTrainingBooked(env, partnerEmail, undefined, session.date).catch((e) =>
     console.error("HubSpot training-booked push failed:", e),
   );
+
+  // Wall-E OS milestone (non-blocking, feature-flagged off until env is set)
+  postWalleosBooking(env, {
+    event_id: `booking-training-${booking?.id ?? session.id}`,
+    event_type: "training_booked",
+    partner_email: partnerEmail,
+    session: {
+      session_id: String(session.id),
+      start_at: session.date,
+      url: session.calendar_event_url ?? undefined,
+      host: "Mitchell van Kleef",
+    },
+  }).catch((e) => console.error("Wall-E OS training-booked push failed:", e));
 
   // Write to Google Sheet (non-blocking)
   appendBookingRow(env, {
@@ -343,6 +357,19 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
       console.error("HubSpot Forms API failed:", e),
     );
 
+    // Wall-E OS milestone (non-blocking, feature-flagged off until env is set)
+    postWalleosBooking(env, {
+      event_id: `booking-kennismaking-${booking.id}`,
+      event_type: "kennismaking_booked",
+      partner_email: partnerEmail,
+      hubspot_deal_id: hubspotDealId || undefined,
+      session: {
+        session_id: String(booking.id),
+        start_at: slotStart,
+        host: am.name,
+      },
+    }).catch((e) => console.error("Wall-E OS kennismaking-booked push failed:", e));
+
     // Google Sheet (non-blocking)
     appendBookingRow(env, {
       type: "intro_call",
@@ -450,6 +477,19 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
   setKennismakingBooked(env, partnerEmail, hubspotDealId, preferredDate).catch((e) =>
     console.error("HubSpot Forms API failed:", e),
   );
+
+  // Wall-E OS milestone (non-blocking, feature-flagged off until env is set)
+  postWalleosBooking(env, {
+    event_id: `booking-kennismaking-${booking.id}`,
+    event_type: "kennismaking_booked",
+    partner_email: partnerEmail,
+    hubspot_deal_id: hubspotDealId || undefined,
+    session: {
+      session_id: String(booking.id),
+      start_at: `${preferredDate}T09:00:00Z`, // time slot not resolved yet
+      host: assignedAm.name,
+    },
+  }).catch((e) => console.error("Wall-E OS kennismaking-booked push failed:", e));
 
   // Google Sheet (non-blocking)
   appendBookingRow(env, {
