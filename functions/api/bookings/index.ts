@@ -602,6 +602,18 @@ async function handleFirstInstallBooking(env: Env, body: Record<string, unknown>
     address: installationAddress, preferredWeek,
   }).catch((e) => console.error("First install confirmation email failed:", e));
 
+  // Wall-E OS milestone (non-blocking, feature-flagged off until env is set)
+  postWalleosBooking(env, {
+    event_id: `booking-first-install-${booking.id}`,
+    event_type: "first_install_booked",
+    partner_email: partnerEmail,
+    session: {
+      session_id: String(booking.id),
+      start_at: preferredWeek, // week id; completion milestone arrives via AM confirm
+      host: assignedAm.name,
+    },
+  }).catch((e) => console.error("Wall-E OS first_install_booked push failed:", e));
+
   return Response.json({
     success: true,
     booking: {

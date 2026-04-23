@@ -19,10 +19,13 @@
 import type { Env } from "./types";
 
 export type WalleosMilestone =
+  | "agreement_signed"
   | "kennismaking_booked"
   | "kennismaking_completed"
   | "training_booked"
-  | "training_completed";
+  | "training_completed"
+  | "first_install_booked"
+  | "first_install_completed";
 
 export interface WalleosBookingEvent {
   /** Stable id; same event retried -> idempotent. */
