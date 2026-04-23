@@ -13,6 +13,7 @@
  */
 
 import { setTrainingAttended } from "../../lib/hubspot-forms";
+import { postWalleosBooking } from "../../lib/walleos";
 import {
   rateLimit,
   rateLimitResponse,
@@ -61,6 +62,21 @@ export const onRequestPost = async (context: {
   }
 
   await setTrainingAttended(env, email);
+
+  // Wall-E OS milestone (non-blocking, feature-flagged off until env is set).
+  // Training check-in = training_completed. Check-in timestamps land in evidence
+  // via session.start_at so the milestone row is deduped on the event_id.
+  const now = new Date().toISOString();
+  postWalleosBooking(env, {
+    event_id: `training-checkin-${email}-${now.slice(0, 10)}`,
+    event_type: "training_completed",
+    partner_email: email,
+    session: {
+      session_id: `checkin-${now}`,
+      start_at: now,
+      host: "self-service check-in",
+    },
+  }).catch((e) => console.error("Wall-E OS training_completed push failed:", e));
 
   return Response.json({ success: true });
 };

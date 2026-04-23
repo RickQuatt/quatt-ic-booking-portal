@@ -43,6 +43,19 @@ export interface Env {
 
   // Rate limiting (KV namespace; bound in wrangler.toml)
   RATE_LIMIT?: KVNamespace;
+
+  // Signed partner agreements (D1). Replaces Supabase for the agreement flow.
+  DB?: D1Database;
+
+  // Signed partnerovereenkomst PDFs (R2).
+  AGREEMENTS?: R2Bucket;
+
+  // Wall-E OS bridge. When WALLEOS_URL + WALLEOS_WEBHOOK_SECRET are set,
+  // every kennismaking/training booking also POSTs to Wall-E OS so the
+  // platform sees milestones in real time alongside the existing HubSpot
+  // Forms push. Non-blocking -- HubSpot stays the primary sink.
+  WALLEOS_URL?: string;
+  WALLEOS_WEBHOOK_SECRET?: string;
 }
 
 // --- Booking domain types ---
