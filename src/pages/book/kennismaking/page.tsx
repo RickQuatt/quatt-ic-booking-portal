@@ -172,7 +172,9 @@ export function KennismakingPage() {
     }
 
     try {
-      const res = await fetch("/api/bookings", {
+      // Forward ?test=1 from page URL to API to short-circuit side effects during QA.
+      const testFlag = getSearchParam("test") === "1" ? "?test=1" : "";
+      const res = await fetch(`/api/bookings${testFlag}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -201,56 +203,42 @@ export function KennismakingPage() {
   if (result) {
     const isConfirmed = result.status === "confirmed";
     return (
-      <div className="max-w-lg mx-auto px-6 py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#1A7A6B]/10 flex items-center justify-center mx-auto">
-          <svg className="w-8 h-8 text-[#1A7A6B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
+      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+        <div className="max-w-lg mx-auto px-6 py-16 text-center">
+          <div className="w-14 h-14 rounded-full bg-quatt-success-bg flex items-center justify-center mx-auto">
+            <svg className="w-7 h-7 text-quatt-success-text" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="mt-6 text-[28px] font-semibold text-quatt-ink tracking-[-0.04em]">
+            {isConfirmed ? "Je afspraak is bevestigd" : "Terugbelverzoek ontvangen"}
+          </h1>
+          <div className="mt-6 bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 text-left space-y-2">
+            {isConfirmed && result.slotStart && (
+              <>
+                <DetailRow label="Datum" value={formatDateNL(result.slotStart.split("T")[0])} />
+                <DetailRow label="Tijd" value={`${formatTime(result.slotStart)} - ${formatTime(result.slotEnd!)}`} />
+              </>
+            )}
+            <DetailRow label="Account manager" value={result.assignedAm} />
+            {result.location && <DetailRow label="Locatie" value={result.location} />}
+            {result.meetLink && (
+              <DetailRow
+                label="Google Meet"
+                value={
+                  <a href={result.meetLink} className="text-quatt-orange hover:underline">
+                    {result.meetLink}
+                  </a>
+                }
+              />
+            )}
+          </div>
+          <p className="mt-5 text-[14px] text-quatt-text-secondary">
+            {isConfirmed
+              ? "Je ontvangt een agenda-uitnodiging per e-mail."
+              : "Je account manager neemt binnen 1 werkdag contact met je op."}
+          </p>
         </div>
-        <h1 className="mt-6 text-2xl font-bold text-[#1A1A1A]">
-          {isConfirmed ? "Je afspraak is bevestigd!" : "Terugbelverzoek ontvangen!"}
-        </h1>
-        <div className="mt-6 bg-white rounded-xl border border-[#E8E4DD] p-5 text-left">
-          <table className="w-full text-sm">
-            <tbody>
-              {isConfirmed && result.slotStart && (
-                <>
-                  <tr>
-                    <td className="py-2 text-[#8A8580] pr-4">Datum</td>
-                    <td className="py-2 font-semibold">{formatDateNL(result.slotStart.split("T")[0])}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 text-[#8A8580] pr-4">Tijd</td>
-                    <td className="py-2 font-semibold">{formatTime(result.slotStart)} - {formatTime(result.slotEnd!)}</td>
-                  </tr>
-                </>
-              )}
-              <tr>
-                <td className="py-2 text-[#8A8580] pr-4">Account manager</td>
-                <td className="py-2 font-semibold">{result.assignedAm}</td>
-              </tr>
-              {result.location && (
-                <tr>
-                  <td className="py-2 text-[#8A8580] pr-4">Locatie</td>
-                  <td className="py-2 font-semibold">{result.location}</td>
-                </tr>
-              )}
-              {result.meetLink && (
-                <tr>
-                  <td className="py-2 text-[#8A8580] pr-4">Google Meet</td>
-                  <td className="py-2 font-semibold">
-                    <a href={result.meetLink} className="text-[#FF6933] hover:underline">{result.meetLink}</a>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-4 text-sm text-[#8A8580]">
-          {isConfirmed
-            ? "Je ontvangt een agenda-uitnodiging per e-mail."
-            : "Je account manager neemt binnen 1 werkdag contact met je op."}
-        </p>
       </div>
     );
   }
@@ -260,59 +248,62 @@ export function KennismakingPage() {
   const minDateStr = minDate.toISOString().split("T")[0];
 
   return (
-    <div>
-      <section className="bg-white">
-        <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] tracking-tight">
+    <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+      <div className="max-w-3xl mx-auto px-6 py-12 md:py-14">
+        <header className="mb-8">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+            Kennismakingsgesprek
+          </p>
+          <h1 className="text-[32px] md:text-[40px] font-semibold text-quatt-ink leading-[1.1] tracking-[-0.04em]">
             Plan een kennismakingsgesprek
           </h1>
-          <p className="mt-3 text-[#8A8580] max-w-lg leading-relaxed">
+          <p className="mt-3 text-[16px] text-quatt-text-secondary max-w-lg leading-relaxed">
             Kies hoe je kennis wilt maken met Quatt. We plannen het gesprek op een moment dat jou uitkomt.
           </p>
-        </div>
-      </section>
+        </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Step 1: Meeting format */}
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-[#1A1A1A]">Hoe wil je kennismaken?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <section>
+            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+              Hoe wil je kennismaken?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {MEETING_OPTIONS.map((option) => (
                 <button
                   key={option.id}
                   type="button"
                   onClick={() => handleFormatSelect(option.id)}
-                  className={`text-left p-6 rounded-xl border-2 transition-all duration-200 ${
+                  className={`text-left p-5 rounded-[14px] border transition-all duration-150 ${
                     selectedFormat === option.id
-                      ? "border-[#FF6933] bg-white shadow-md"
-                      : "border-[#E8E4DD] bg-white hover:shadow-md"
+                      ? "border-quatt-orange bg-white shadow-card-hover ring-1 ring-quatt-orange/30"
+                      : "border-quatt-border-light bg-white shadow-card hover:shadow-card-hover"
                   }`}
                 >
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                    style={{ backgroundColor: option.accentColor }}
+                    className="w-11 h-11 rounded-[12px] flex items-center justify-center mb-4"
+                    style={{ backgroundColor: `${option.accentColor}20`, color: option.accentColor }}
                   >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                       {option.id === "showroom" && (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       )}
                       {option.id === "online" && (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       )}
                       {option.id === "site_visit" && (
                         <>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </>
                       )}
                     </svg>
                   </div>
-                  <h3 className="font-bold text-[#1A1A1A]">{option.title}</h3>
-                  <p className="mt-1.5 text-sm text-[#8A8580] leading-relaxed">{option.description}</p>
+                  <h3 className="text-[15px] font-semibold text-quatt-ink tracking-[-0.01em]">{option.title}</h3>
+                  <p className="mt-1 text-[13px] text-quatt-text-secondary leading-relaxed">{option.description}</p>
                   {selectedFormat === option.id && (
-                    <div className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-[#FF6933]">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <div className="mt-3 flex items-center gap-1 text-[12px] font-semibold text-quatt-orange">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                       </svg>
                       Geselecteerd
@@ -321,55 +312,45 @@ export function KennismakingPage() {
                 </button>
               ))}
             </div>
-          </div>
+          </section>
 
           {selectedFormat && (
             <>
               {/* AM info */}
               {selectedFormat === "showroom" && (
-                <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-xl border border-[#E8E4DD]">
-                  <div className="w-10 h-10 rounded-full bg-[#1A7A6B] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">RP</div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#1A1A1A]">Je gesprek is met {AM_CONFIG[0].name}</p>
-                    <p className="text-sm text-[#8A8580]">{AM_CONFIG[0].role}</p>
-                  </div>
-                </div>
+                <AmInfoCard
+                  avatars={[{ initials: "RP", color: "#1A7A6B" }]}
+                  title={`Je gesprek is met ${AM_CONFIG[0].name}`}
+                  subtitle={AM_CONFIG[0].role}
+                />
               )}
               {selectedFormat === "online" && (
-                <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-xl border border-[#E8E4DD]">
-                  <div className="flex -space-x-2">
-                    {AM_CONFIG.map((am) => (
-                      <div key={am.email} className="w-10 h-10 rounded-full bg-[#FF6933] flex items-center justify-center text-white font-bold text-sm border-2 border-white">
-                        {am.name.split(" ").map((n) => n[0]).join("")}
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#1A1A1A]">Je spreekt met {AM_CONFIG.map((a) => a.name.split(" ")[0]).join(" of ")}</p>
-                    <p className="text-sm text-[#8A8580]">Beschikbaarheid hangt af van de gekozen datum</p>
-                  </div>
-                </div>
+                <AmInfoCard
+                  avatars={AM_CONFIG.map((am) => ({
+                    initials: am.name.split(" ").map((n) => n[0]).join(""),
+                    color: "#FF6933",
+                  }))}
+                  title={`Je spreekt met ${AM_CONFIG.map((a) => a.name.split(" ")[0]).join(" of ")}`}
+                  subtitle="Beschikbaarheid hangt af van de gekozen datum"
+                />
               )}
               {selectedFormat === "site_visit" && (
-                <div className="flex items-center gap-3 px-5 py-4 bg-white rounded-xl border border-[#E8E4DD]">
-                  <div className="flex -space-x-2">
-                    {AM_CONFIG.map((am) => (
-                      <div key={am.email} className="w-10 h-10 rounded-full bg-[#97B9BF] flex items-center justify-center text-white font-bold text-sm border-2 border-white">
-                        {am.name.split(" ").map((n) => n[0]).join("")}
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#1A1A1A]">Een van onze account managers neemt contact met je op</p>
-                    <p className="text-sm text-[#8A8580]">We plannen samen een geschikt moment in</p>
-                  </div>
-                </div>
+                <AmInfoCard
+                  avatars={AM_CONFIG.map((am) => ({
+                    initials: am.name.split(" ").map((n) => n[0]).join(""),
+                    color: "#97B9BF",
+                  }))}
+                  title="Een van onze account managers neemt contact met je op"
+                  subtitle="We plannen samen een geschikt moment in"
+                />
               )}
 
               {/* Step 2: Contact details */}
-              <div className="space-y-3">
-                <h2 className="text-lg font-bold text-[#1A1A1A]">Je gegevens</h2>
-                <div className="bg-white rounded-xl border border-[#E8E4DD] p-6 space-y-4">
+              <section>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+                  Je gegevens
+                </h2>
+                <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <InputField name="partnerName" label="Naam" required placeholder="Jan de Vries" defaultValue={prefill.name} />
                     <InputField name="companyName" label="Bedrijfsnaam" required placeholder="Installatiebedrijf BV" defaultValue={prefill.company} />
@@ -377,32 +358,34 @@ export function KennismakingPage() {
                     <InputField name="partnerPhone" label="Telefoonnummer" type="tel" required placeholder="06-12345678" defaultValue={prefill.phone} />
                   </div>
                 </div>
-              </div>
+              </section>
 
               {/* Step 3: Slot picker (showroom / online) */}
               {needsSlotPicker && (
-                <div className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#1A1A1A]">Kies een datum en tijd</h2>
+                <section>
+                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+                    Kies een datum en tijd
+                  </h2>
 
                   {selectedFormat === "showroom" && (
-                    <div className="bg-white rounded-xl border border-[#E8E4DD] p-5">
+                    <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-4 mb-3">
                       <div className="flex items-start gap-3">
-                        <svg className="w-5 h-5 text-[#1A7A6B] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <svg className="w-5 h-5 text-quatt-green mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         <div>
-                          <p className="font-semibold text-[#1A1A1A]">Quatt B.V.</p>
-                          <p className="text-[#8A8580]">Kon. Wilhelminaplein 29, 1062HJ Amsterdam</p>
+                          <p className="text-[14px] font-semibold text-quatt-ink">Quatt B.V.</p>
+                          <p className="text-[14px] text-quatt-text-secondary">Kon. Wilhelminaplein 29, 1062HJ Amsterdam</p>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  <div className="bg-white rounded-xl border border-[#E8E4DD] p-6 space-y-6">
+                  <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 space-y-5">
                     <div>
-                      <label htmlFor="_slotDate" className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">
-                        Datum<span className="text-[#FF6933] ml-0.5">*</span>
+                      <label htmlFor="_slotDate" className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">
+                        Datum<span className="text-quatt-orange ml-0.5">*</span>
                       </label>
                       <input
                         id="_slotDate"
@@ -411,15 +394,15 @@ export function KennismakingPage() {
                         min={minDateStr}
                         value={selectedDate}
                         onChange={handleDateChange}
-                        className="w-full sm:w-72 rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200"
+                        className="w-full sm:w-72 rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150"
                       />
                       {selectedDate && (
-                        <p className="mt-2 text-sm text-[#8A8580]">{formatDateNL(selectedDate)}</p>
+                        <p className="mt-2 text-[13px] text-quatt-text-secondary">{formatDateNL(selectedDate)}</p>
                       )}
                     </div>
 
                     {slotsLoading && (
-                      <div className="flex items-center gap-2 text-[#8A8580] text-sm">
+                      <div className="flex items-center gap-2 text-quatt-text-secondary text-[13px]">
                         <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -428,21 +411,21 @@ export function KennismakingPage() {
                       </div>
                     )}
 
-                    {slotsError && <p className="text-[#8A8580] text-sm">{slotsError}</p>}
+                    {slotsError && <p className="text-quatt-text-secondary text-[13px]">{slotsError}</p>}
 
                     {slots.length > 0 && (
                       <div>
-                        <label className="block text-sm font-semibold text-[#1A1A1A]/60 mb-3">Beschikbare tijden</label>
+                        <label className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">Beschikbare tijden</label>
                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                           {slots.map((slot) => (
                             <button
                               key={slot.start}
                               type="button"
                               onClick={() => setSelectedSlot(slot)}
-                              className={`px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                              className={`px-3 py-2 rounded-[10px] text-[13px] font-semibold transition-all duration-150 ${
                                 selectedSlot?.start === slot.start
-                                  ? "bg-[#FF6933] text-white shadow-sm"
-                                  : "bg-[#F7F5F0] border-2 border-[#E8E4DD] text-[#1A1A1A] hover:border-[#FF6933]"
+                                  ? "bg-quatt-orange text-white shadow-sm"
+                                  : "bg-white border-[1.5px] border-quatt-border-mid text-quatt-ink hover:border-quatt-orange"
                               }`}
                             >
                               {formatTime(slot.start)}
@@ -450,7 +433,7 @@ export function KennismakingPage() {
                           ))}
                         </div>
                         {selectedSlot && (
-                          <div className="mt-4 flex items-center gap-2 text-sm text-[#1A7A6B] font-medium">
+                          <div className="mt-4 flex items-center gap-2 text-[13px] text-quatt-green font-medium">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                             </svg>
@@ -460,26 +443,28 @@ export function KennismakingPage() {
                       </div>
                     )}
                   </div>
-                </div>
+                </section>
               )}
 
               {/* Step 3 alt: Callback flow (site_visit) */}
               {selectedFormat === "site_visit" && (
-                <div className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#1A1A1A]">Waar en wanneer?</h2>
-                  <div className="bg-white rounded-xl border border-[#E8E4DD] p-6 space-y-4">
+                <section>
+                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+                    Waar en wanneer?
+                  </h2>
+                  <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 space-y-4">
                     <InputField name="location" label="Adres (bezoeklocatie)" required placeholder="Straatnaam 1, 1234AB Plaatsnaam" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <InputField name="preferredDate" label="Voorkeursweek" type="date" required min={minDateStr} />
                       <div>
-                        <label htmlFor="preferredTimeSlot" className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">
-                          Voorkeurstijd<span className="text-[#FF6933] ml-0.5">*</span>
+                        <label htmlFor="preferredTimeSlot" className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">
+                          Voorkeurstijd<span className="text-quatt-orange ml-0.5">*</span>
                         </label>
                         <select
                           id="preferredTimeSlot"
                           name="preferredTimeSlot"
                           required
-                          className="w-full rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200"
+                          className="w-full rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150"
                         >
                           <option value="">Kies een moment</option>
                           <option value="morning">Ochtend (9:00 - 12:00)</option>
@@ -488,25 +473,25 @@ export function KennismakingPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </section>
               )}
 
               {/* Notes */}
-              <div className="space-y-3">
-                <div className="bg-white rounded-xl border border-[#E8E4DD] p-6">
-                  <label htmlFor="notes" className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">Opmerkingen</label>
+              <section>
+                <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5">
+                  <label htmlFor="notes" className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">Opmerkingen</label>
                   <textarea
                     id="notes"
                     name="notes"
                     rows={3}
                     placeholder="Waar wil je het over hebben? Heb je al ervaring met warmtepompen?"
-                    className="w-full rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200 resize-none"
+                    className="w-full rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150 resize-none"
                   />
                 </div>
-              </div>
+              </section>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+                <div className="bg-quatt-error-bg border border-quatt-error-border rounded-[12px] p-3.5 text-[13px] text-quatt-error-text">
                   {error}
                 </div>
               )}
@@ -514,7 +499,7 @@ export function KennismakingPage() {
               <button
                 type="submit"
                 disabled={submitting || (needsSlotPicker && !selectedSlot)}
-                className="w-full bg-[#FF6933] text-white font-semibold rounded-full px-8 py-3.5 text-base hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="w-full bg-quatt-orange text-white font-semibold rounded-full px-6 py-3.5 text-[15px] hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 shadow-card"
               >
                 {submitting
                   ? "Bezig met versturen..."
@@ -530,6 +515,49 @@ export function KennismakingPage() {
   );
 }
 
+// --- Helper components ---
+
+function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-[10px] bg-quatt-bg px-3 py-2">
+      <span className="text-[12px] font-medium uppercase tracking-wider text-quatt-text-secondary">
+        {label}
+      </span>
+      <span className="text-[14px] font-semibold text-quatt-ink text-right">{value}</span>
+    </div>
+  );
+}
+
+function AmInfoCard({
+  avatars,
+  title,
+  subtitle,
+}: {
+  avatars: { initials: string; color: string }[];
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 bg-white rounded-[14px] border border-quatt-border-light shadow-card">
+      <div className="flex -space-x-2">
+        {avatars.map((av, i) => (
+          <div
+            key={i}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-[12px] border-2 border-white"
+            style={{ backgroundColor: av.color }}
+          >
+            {av.initials}
+          </div>
+        ))}
+      </div>
+      <div>
+        <p className="text-[14px] font-semibold text-quatt-ink">{title}</p>
+        <p className="text-[13px] text-quatt-text-secondary">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
 // --- Reusable input component ---
 
 function InputField({
@@ -540,8 +568,8 @@ function InputField({
 }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">
-        {label}{required && <span className="text-[#FF6933] ml-0.5">*</span>}
+      <label htmlFor={name} className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">
+        {label}{required && <span className="text-quatt-orange ml-0.5">*</span>}
       </label>
       <input
         id={name}
@@ -551,7 +579,7 @@ function InputField({
         placeholder={placeholder}
         defaultValue={defaultValue}
         min={min}
-        className="w-full rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200"
+        className="w-full rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150"
       />
     </div>
   );

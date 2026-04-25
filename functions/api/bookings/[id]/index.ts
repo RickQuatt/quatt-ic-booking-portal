@@ -3,8 +3,8 @@
  * Token-authenticated booking lookup for partner-facing pages.
  */
 
-import { getSupabase } from "../../../lib/supabase";
 import { verifyBookingAction } from "../../../lib/booking-tokens";
+import { getBookingById } from "../../../lib/d1-bookings";
 import type { Env } from "../../../lib/types";
 
 export const onRequestGet = async (context: {
@@ -27,18 +27,10 @@ export const onRequestGet = async (context: {
     return Response.json({ error: "Ongeldige of verlopen link" }, { status: 403 });
   }
 
-  const supabase = getSupabase(context.env);
-
-  const { data: booking } = await supabase
-    .from("bookings")
-    .select("*")
-    .eq("id", id)
-    .single();
-
+  const booking = await getBookingById(context.env, id);
   if (!booking) {
     return Response.json({ error: "Boeking niet gevonden" }, { status: 404 });
   }
-
   if (booking.partner_email !== email) {
     return Response.json({ error: "Ongeldige link" }, { status: 403 });
   }

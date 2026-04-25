@@ -8,9 +8,9 @@ export interface BrandProps {
 
 /**
  * Quatt Brand Logo Component
- * Inline SVG that changes color based on theme
- * - Light mode: Gray/Black
- * - Dark mode: Quatt Primary Green
+ * Inline SVG that inherits color from parent via `fill-current`.
+ * Defaults to quatt-ink in light mode and white in dark mode -- never the lime
+ * accent color, which was a template leftover that misrepresented the brand.
  *
  * @param type - "text" for full wordmark, "logo" for Q only (default: "text")
  */
@@ -22,7 +22,7 @@ export const Brand = ({ className, type = "text" }: BrandProps) => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox={isLogo ? "0 0 65 65" : "0 0 247.89 61.34"}
       className={cn(
-        "fill-current text-gray-900 dark:text-quatt-primary",
+        "fill-current text-quatt-ink dark:text-white",
         className,
       )}
       aria-label={isLogo ? "Quatt logo" : "Quatt"}

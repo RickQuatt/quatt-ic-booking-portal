@@ -131,8 +131,10 @@ const PUBLIC_PREFIXES = [
   "/api/slots",
   "/api/sessions",
   "/api/agreements",
+  "/api/agreement/", // GET /api/agreement/:version/pdf (unsigned template)
   "/api/training",
   "/api/admin/auth", // admin token login endpoint must be reachable
+  "/api/admin/sessions/sync", // machine-to-machine sync (admin_token auth only, no Google)
 ];
 
 function isValidReturnUrl(url: string): boolean {

@@ -1,3 +1,13 @@
+# quatt-booking-portal — Cloudflare Pages config
+#
+# Resource IDs below are account-specific. To provision on a different
+# Cloudflare account, run: ./scripts/cloudflare-bootstrap.sh
+# The script creates KV + D1 + R2 on whatever account you're
+# `wrangler login`'d to and prints the IDs to paste back here.
+#
+# Currently deployed to Rick's personal CF account (00b0aa2c...505b).
+# See DEPLOYMENT.md for full inventory + migration playbook.
+
 name = "quatt-booking-portal"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
@@ -7,3 +17,14 @@ pages_build_output_dir = "dist"
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
 id = "22755dbd571f485590292d58aa995788"
+
+# Signed partner agreements (audit + lookup). Schema: migrations/d1/
+[[d1_databases]]
+binding = "DB"
+database_name = "quatt-booking-portal-db"
+database_id = "63babf7e-937d-488e-8ef2-a645c31599a4"
+
+# Signed partnerovereenkomst PDFs (per-sign snapshot + signature + partner fields).
+[[r2_buckets]]
+binding = "AGREEMENTS"
+bucket_name = "quatt-agreements"
