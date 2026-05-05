@@ -1,6 +1,11 @@
 /**
- * /book/training -- Training session selection + booking.
- * Premium-utility design matching AM Toolkit.
+ * /book/training        -- Hybrid track training booking
+ * /book/training/alle   -- All-e track training booking (same component, track="alle")
+ *
+ * Track is the only thing that differs between the two routes: it filters which
+ * sessions render (via ?track= on /api/sessions) and changes the page copy.
+ * The booking POST itself doesn't carry a track field -- the API derives it
+ * from the chosen session.id (D1 row carries `track`).
  */
 
 import { useState, useEffect } from "react";
@@ -23,6 +28,36 @@ interface BookingResult {
   location: string;
 }
 
+type Track = "hybrid" | "alle";
+
+interface CopySet {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  emptyState: string;
+  submitLabel: string;
+}
+
+const COPY_BY_TRACK: Record<Track, CopySet> = {
+  hybrid: {
+    eyebrow: "Installatie Training",
+    heading: "Plan je Quatt training",
+    intro: "Kies een trainingsdatum en vul je gegevens in om een plek te reserveren.",
+    emptyState:
+      "Er zijn momenteel geen trainingen beschikbaar. Neem contact op met je account manager.",
+    submitLabel: "Training boeken",
+  },
+  alle: {
+    eyebrow: "All-e Installatietraining",
+    heading: "Plan je All-e training",
+    intro:
+      "De All-e training is gericht op de Quatt All-Electric. Kies een datum en vul je gegevens in om een plek te reserveren.",
+    emptyState:
+      "Er zijn nog geen All-e trainingen ingepland. Neem contact op met je account manager voor de eerstvolgende datum.",
+    submitLabel: "All-e training boeken",
+  },
+};
+
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr + "T00:00:00");
   return date.toLocaleDateString("nl-NL", {
@@ -37,13 +72,15 @@ function getSearchParam(name: string): string {
   return new URLSearchParams(window.location.search).get(name) || "";
 }
 
-export function TrainingPage() {
+export function TrainingPage({ track = "hybrid" }: { track?: Track } = {}) {
+  const copy = COPY_BY_TRACK[track];
   const prefill = {
     name: getSearchParam("name"),
     company: getSearchParam("company"),
     email: getSearchParam("email"),
     phone: getSearchParam("phone"),
     kvk: getSearchParam("kvk"),
+    dealId: getSearchParam("dealId"),
   };
 
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
@@ -53,8 +90,36 @@ export function TrainingPage() {
   const [result, setResult] = useState<BookingResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Agreement-first gate. We must verify the partner has signed the
+  // partnerovereenkomst before we let them pick a training session.
+  // Lookup is by email OR dealId (whichever is present in the URL).
+  // If nothing is identifiable, treat as "not signed" -- safest default.
+  const [agreementCheck, setAgreementCheck] = useState<
+    "checking" | "signed" | "not-signed"
+  >("checking");
+
   useEffect(() => {
-    fetch("/api/sessions")
+    const params = new URLSearchParams();
+    if (prefill.email) params.set("email", prefill.email);
+    if (prefill.dealId) params.set("dealId", prefill.dealId);
+    if (!params.toString()) {
+      setAgreementCheck("not-signed");
+      return;
+    }
+    fetch(`/api/agreement-status?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data: { signed?: boolean }) => {
+        setAgreementCheck(data?.signed ? "signed" : "not-signed");
+      })
+      .catch(() => {
+        // Be conservative on error: force the agreement step.
+        setAgreementCheck("not-signed");
+      });
+  }, [prefill.email, prefill.dealId]);
+
+  useEffect(() => {
+    if (agreementCheck !== "signed") return;
+    fetch(`/api/sessions?track=${track}`)
       .then((r) => r.json())
       .then((data) => {
         setSessions(data);
@@ -64,7 +129,7 @@ export function TrainingPage() {
         setError("Kon trainingen niet laden. Probeer het later opnieuw.");
         setLoading(false);
       });
-  }, []);
+  }, [track, agreementCheck]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -83,6 +148,7 @@ export function TrainingPage() {
       companyName: form.get("companyName"),
       kvkNumber: form.get("kvkNumber") || undefined,
       notes: form.get("notes") || undefined,
+      dealId: prefill.dealId || undefined,
     };
 
     try {
@@ -94,6 +160,12 @@ export function TrainingPage() {
       });
 
       const json = await res.json();
+
+      if (res.status === 412 && json?.redirect) {
+        // Defensive: server says agreement not signed. Send them to /book/agreement.
+        window.location.href = json.redirect;
+        return;
+      }
 
       if (!res.ok) {
         setError(json.error || "Boeking mislukt");
@@ -107,6 +179,52 @@ export function TrainingPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (agreementCheck === "checking") {
+    return (
+      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+        <div className="max-w-lg mx-auto px-6 py-16 text-center text-[14px] text-quatt-text-secondary">
+          Even kijken of je overeenkomst al getekend is…
+        </div>
+      </div>
+    );
+  }
+
+  if (agreementCheck === "not-signed") {
+    const params = new URLSearchParams();
+    if (prefill.email) params.set("email", prefill.email);
+    if (prefill.company) params.set("company", prefill.company);
+    if (prefill.dealId) params.set("dealId", prefill.dealId);
+    params.set("returnTo", "training");
+    const agreementHref = `/book/agreement?${params.toString()}`;
+    return (
+      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+        <div className="max-w-lg mx-auto px-6 py-16">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+            Eerste stap
+          </p>
+          <h1 className="text-[28px] font-semibold text-quatt-ink tracking-[-0.04em] leading-[1.15]">
+            Eerst de partnerovereenkomst tekenen
+          </h1>
+          <p className="mt-4 text-[15px] text-quatt-text-secondary leading-relaxed">
+            Voordat je een training kunt inplannen, moet de partnerovereenkomst
+            getekend zijn. Dit kost een paar minuten. Daarna stuur ik je
+            automatisch terug naar de trainingspagina.
+          </p>
+          <a
+            href={agreementHref}
+            className="mt-7 inline-flex items-center justify-center rounded-full bg-quatt-orange text-white text-[15px] font-semibold px-7 py-3 shadow-sm hover:opacity-95 transition"
+          >
+            Teken de overeenkomst
+          </a>
+          <p className="mt-5 text-[13px] text-quatt-text-secondary">
+            Al getekend en kom je hier ondanks dat? Open de link uit de e-mail
+            van Quatt opnieuw, of neem contact op met je AM.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (result) {
@@ -135,13 +253,13 @@ export function TrainingPage() {
       <div className="max-w-3xl mx-auto px-6 py-12 md:py-14">
         <header className="mb-8">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
-            Installatie Training
+            {copy.eyebrow}
           </p>
           <h1 className="text-[32px] md:text-[40px] font-semibold text-quatt-ink leading-[1.1] tracking-[-0.04em]">
-            Plan je Quatt training
+            {copy.heading}
           </h1>
           <p className="mt-3 text-[16px] text-quatt-text-secondary max-w-lg leading-relaxed">
-            Kies een trainingsdatum en vul je gegevens in om een plek te reserveren.
+            {copy.intro}
           </p>
         </header>
 
@@ -152,7 +270,7 @@ export function TrainingPage() {
         ) : sessions.length === 0 ? (
           <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-8 text-center">
             <p className="text-[14px] text-quatt-text-secondary">
-              Er zijn momenteel geen trainingen beschikbaar. Neem contact op met je account manager.
+              {copy.emptyState}
             </p>
           </div>
         ) : (
@@ -235,7 +353,7 @@ export function TrainingPage() {
                   disabled={submitting}
                   className="w-full bg-quatt-orange text-white font-semibold rounded-full px-6 py-3.5 text-[15px] hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 shadow-card"
                 >
-                  {submitting ? "Bezig met boeken..." : "Training boeken"}
+                  {submitting ? "Bezig met boeken..." : copy.submitLabel}
                 </button>
               </form>
             )}

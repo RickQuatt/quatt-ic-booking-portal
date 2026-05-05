@@ -131,6 +131,7 @@ const PUBLIC_PREFIXES = [
   "/api/slots",
   "/api/sessions",
   "/api/agreements",
+  "/api/agreement-status", // public lookup: has-this-partner-signed-the-agreement gate
   "/api/agreement/", // GET /api/agreement/:version/pdf (unsigned template)
   "/api/training",
   "/api/admin/auth", // admin token login endpoint must be reachable

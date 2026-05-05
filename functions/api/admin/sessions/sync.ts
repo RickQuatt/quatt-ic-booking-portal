@@ -1,12 +1,14 @@
 /**
  * POST /api/admin/sessions/sync
  *
- * Reads upcoming events from the `Trainingen` Google Calendar (env.TRAINING_CALENDAR_ID)
- * and upserts them into the D1 `training_sessions` table so /book/training can render
- * them as bookable sessions. Sessions not present in the calendar (but still open in
- * the DB with a future date) get marked as `cancelled`.
+ * Reads upcoming events from each training Google Calendar and upserts them into
+ * the D1 `training_sessions` table so /book/training (Hybrid) and /book/training/alle
+ * (All-e) can render bookable sessions. Sessions not present in their source calendar
+ * (but still open in the DB with a future date) get marked as `cancelled`.
  *
- * The Trainingen Google Calendar is the source of truth; the portal mirrors it.
+ * Each Google Calendar is the source of truth for its track:
+ *   hybrid -> env.TRAINING_CALENDAR_ID       ("Quatt Installatie Trainingen")
+ *   alle   -> env.ALLE_TRAINING_CALENDAR_ID  ("All-e Installatietraining")
  *
  * Capacity parsing: reads "Max: N" / "Max deelnemers: N" / "Capacity: N" from the
  * event description. Defaults to 8 if not present.
@@ -22,7 +24,7 @@ import {
   requireDb,
   upsertSessionByCalendarEventId,
 } from "../../../lib/d1-bookings";
-import type { Env } from "../../../lib/types";
+import type { Env, TrainingTrack } from "../../../lib/types";
 
 const VIRTUAL_HORIZON_DAYS = 90;
 
@@ -36,7 +38,7 @@ function dateOnly(d: Date): string {
 }
 
 const DEFAULT_MAX_CAPACITY = 8;
-const DEFAULT_LOCATION = "Quatt HQ, Amsterdam";
+const DEFAULT_LOCATION = "Quatt Lab -- Schakelstraat 17, Amsterdam";
 
 function parseMaxCapacity(description: string | undefined): number {
   if (!description) return DEFAULT_MAX_CAPACITY;
@@ -98,6 +100,241 @@ function extractTime(iso: string): string {
   return iso.slice(11, 16);
 }
 
+interface TrackSyncSummary {
+  track: TrainingTrack;
+  calendar_id: string;
+  calendar_events_seen: number;
+  all_day_ignored: number;
+  non_training_ignored: number;
+  inserted: number;
+  updated: number;
+  unchanged: number;
+  cancelled: number;
+  virtual_inserted: number;
+  virtual_skipped_existing: number;
+  virtual_cancelled: number;
+  template_used: {
+    title: string;
+    start_time: string;
+    end_time: string;
+    location: string;
+    max_capacity: number;
+  };
+  errors: string[];
+}
+
+/**
+ * Sync a single Google Calendar -> D1 for one training track.
+ * Each track is independent: D1 stale-detection and virtual-session generation
+ * are scoped to the track, so an empty All-e calendar will never cancel Hybrid
+ * sessions and vice versa.
+ */
+async function syncTrackCalendar(
+  env: Env,
+  track: TrainingTrack,
+  calendarId: string,
+  dumpEvents?: { id: string; summary: string; start: string; end: string; isAllDay: boolean; status: string; location?: string; wouldBeBookable: boolean }[],
+): Promise<TrackSyncSummary> {
+  const sum: TrackSyncSummary = {
+    track,
+    calendar_id: calendarId,
+    calendar_events_seen: 0,
+    all_day_ignored: 0,
+    non_training_ignored: 0,
+    inserted: 0,
+    updated: 0,
+    unchanged: 0,
+    cancelled: 0,
+    virtual_inserted: 0,
+    virtual_skipped_existing: 0,
+    virtual_cancelled: 0,
+    template_used: {
+      title: "",
+      start_time: "",
+      end_time: "",
+      location: "",
+      max_capacity: 0,
+    },
+    errors: [],
+  };
+
+  let events;
+  try {
+    events = await listUpcomingEvents(env, calendarId, 120);
+  } catch (e) {
+    sum.errors.push(`list ${track}: ${e instanceof Error ? e.message : String(e)}`);
+    return sum;
+  }
+
+  sum.calendar_events_seen = events.length;
+  sum.all_day_ignored = events.filter((e) => e.isAllDay).length;
+  sum.non_training_ignored = events.filter(
+    (e) => !e.isAllDay && e.status !== "cancelled" && !isBookableTraining(e.summary),
+  ).length;
+
+  if (dumpEvents) {
+    for (const e of events) {
+      dumpEvents.push({
+        id: e.id,
+        summary: e.summary,
+        start: e.start,
+        end: e.end,
+        isAllDay: e.isAllDay,
+        status: e.status,
+        location: e.location,
+        wouldBeBookable:
+          e.status !== "cancelled" && !e.isAllDay && isBookableTraining(e.summary),
+      });
+    }
+  }
+
+  const bookable = events.filter(
+    (e) => e.status !== "cancelled" && !e.isAllDay && isBookableTraining(e.summary),
+  );
+  const bookableIds = new Set(bookable.map((e) => e.id));
+
+  for (const event of bookable) {
+    const spotsFromTitle = parseSpotsFromTitle(event.summary);
+    const title = cleanTitle(event.summary);
+    const maxCapacity = spotsFromTitle?.maxCapacity ?? parseMaxCapacity(event.description);
+
+    try {
+      const result = await upsertSessionByCalendarEventId(env, {
+        title,
+        date: extractDate(event.start),
+        start_time: extractTime(event.start),
+        end_time: extractTime(event.end),
+        location: event.location || DEFAULT_LOCATION,
+        max_capacity: maxCapacity,
+        calendar_event_id: event.id,
+        status: "open",
+        track,
+      });
+      if (result === "inserted") sum.inserted += 1;
+      else if (result === "updated") sum.updated += 1;
+      else sum.unchanged += 1;
+
+      // If Calendly seeded a spot count in the title, persist it so the booking
+      // page shows accurate spots-remaining. Only on first insert.
+      if (spotsFromTitle && result === "inserted") {
+        await requireDb(env)
+          .prepare(
+            `UPDATE training_sessions SET current_bookings = ?, updated_at = datetime('now') WHERE calendar_event_id = ?`,
+          )
+          .bind(spotsFromTitle.currentBookings, event.id)
+          .run();
+      }
+    } catch (e) {
+      sum.errors.push(`${event.id}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  // Cancel rows whose GCal event disappeared or was cancelled -- scoped to this track.
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const stale = await requireDb(env)
+    .prepare(
+      `SELECT id, calendar_event_id FROM training_sessions
+         WHERE date >= ? AND status != 'cancelled' AND track = ? AND calendar_event_id IS NOT NULL`,
+    )
+    .bind(todayIso, track)
+    .all<{ id: string; calendar_event_id: string | null }>();
+
+  for (const s of stale.results || []) {
+    if (s.calendar_event_id && !bookableIds.has(s.calendar_event_id)) {
+      try {
+        await cancelSession(env, s.id);
+        sum.cancelled += 1;
+      } catch (e) {
+        sum.errors.push(`cancel ${s.id}: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+  }
+
+  // Virtual sessions: synthesize bookable days when the calendar has neither a
+  // training event nor a Block placeholder. Per-track template + per-track scope.
+  const blockDates = new Set<string>();
+  const realEventDates = new Set<string>();
+  for (const ev of events) {
+    if (ev.status === "cancelled") continue;
+    if (ev.isAllDay) continue;
+    const dt = ev.start.slice(0, 10);
+    if (isBookableTraining(ev.summary)) realEventDates.add(dt);
+    else blockDates.add(dt);
+  }
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const horizon = new Date(today);
+  horizon.setUTCDate(horizon.getUTCDate() + VIRTUAL_HORIZON_DAYS);
+
+  const template = await getLatestTrainingTemplate(env, track);
+  sum.template_used = template;
+
+  // All-e is explicit-schedule-only: only events Rick puts on the calendar are
+  // bookable. Hybrid keeps its "every unblocked weekday is bookable" behavior
+  // because it runs continuously; All-e runs as discrete announced sessions.
+  const skipVirtuals = track === "alle";
+
+  const virtualDates = new Set<string>();
+  if (!skipVirtuals) {
+    for (
+      let cursor = new Date(today);
+      cursor < horizon;
+      cursor.setUTCDate(cursor.getUTCDate() + 1)
+    ) {
+      if (!isWeekday(cursor)) continue;
+      const ds = dateOnly(cursor);
+      if (blockDates.has(ds)) continue;
+      if (realEventDates.has(ds)) continue;
+      virtualDates.add(ds);
+
+      const existing = await getVirtualSessionByDate(env, ds, track);
+      if (existing) {
+        sum.virtual_skipped_existing += 1;
+        continue;
+      }
+
+      try {
+        await insertVirtualSession(env, {
+          date: ds,
+          title: template.title,
+          start_time: template.start_time,
+          end_time: template.end_time,
+          location: template.location,
+          max_capacity: template.max_capacity,
+          track,
+        });
+        sum.virtual_inserted += 1;
+      } catch (e) {
+        sum.errors.push(`virtual ${ds}: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+  }
+
+  // Cancel virtual sessions for THIS track that are no longer in the unblocked
+  // set AND have zero bookings.
+  const virtualStale = await requireDb(env)
+    .prepare(
+      `SELECT id, date, current_bookings FROM training_sessions
+         WHERE calendar_event_id IS NULL AND status != 'cancelled' AND date >= ? AND track = ?`,
+    )
+    .bind(dateOnly(today), track)
+    .all<{ id: string; date: string; current_bookings: number }>();
+
+  for (const vs of virtualStale.results || []) {
+    if (!skipVirtuals && virtualDates.has(vs.date)) continue;
+    if (vs.current_bookings > 0) continue;
+    try {
+      await cancelSession(env, vs.id);
+      sum.virtual_cancelled += 1;
+    } catch (e) {
+      sum.errors.push(`virtual-cancel ${vs.id}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  return sum;
+}
+
 export const onRequestPost = async (context: {
   request: Request;
   env: Env;
@@ -118,212 +355,33 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "D1 binding missing" }, { status: 500 });
   }
 
-  let events;
-  try {
-    events = await listUpcomingEvents(env, env.TRAINING_CALENDAR_ID, 120);
-  } catch (e) {
-    console.error("Failed to list calendar events:", e);
-    return Response.json(
-      { error: "Could not read Trainingen calendar", detail: String(e) },
-      { status: 502 },
-    );
+  const dump = new URL(request.url).searchParams.get("dump") === "1";
+  const dumpEvents = dump ? [] : undefined;
+
+  const tracks: { track: TrainingTrack; calendarId: string }[] = [
+    { track: "hybrid", calendarId: env.TRAINING_CALENDAR_ID },
+  ];
+  if (env.ALLE_TRAINING_CALENDAR_ID) {
+    tracks.push({ track: "alle", calendarId: env.ALLE_TRAINING_CALENDAR_ID });
   }
 
-  // Debug mode: POST /api/admin/sessions/sync?dump=1 returns every event seen
-  // (with title / times / isAllDay / status) and skips the D1 upsert. Used to
-  // diagnose why an expected event isn't being imported.
-  const dump = new URL(request.url).searchParams.get("dump") === "1";
+  const results: TrackSyncSummary[] = [];
+  for (const t of tracks) {
+    const r = await syncTrackCalendar(env, t.track, t.calendarId, dumpEvents);
+    results.push(r);
+  }
+
   if (dump) {
     return Response.json({
-      total: events.length,
-      events: events
-        .sort((a, b) => a.start.localeCompare(b.start))
-        .map((e) => ({
-          id: e.id,
-          summary: e.summary,
-          start: e.start,
-          end: e.end,
-          isAllDay: e.isAllDay,
-          status: e.status,
-          location: e.location,
-          wouldBeBookable:
-            e.status !== "cancelled" && !e.isAllDay && isBookableTraining(e.summary),
-        })),
+      total: dumpEvents!.length,
+      events: dumpEvents!.sort((a, b) => a.start.localeCompare(b.start)),
+      tracks: results.map((r) => ({ track: r.track, calendar_id: r.calendar_id, seen: r.calendar_events_seen })),
     });
   }
 
-  // Only bookable events: confirmed/tentative AND not all-day AND not a Block
-  // placeholder. Any other timed event on the Trainingen calendar counts as a
-  // bookable training.
-  const bookable = events.filter(
-    (e) => e.status !== "cancelled" && !e.isAllDay && isBookableTraining(e.summary),
-  );
-  const bookableIds = new Set(bookable.map((e) => e.id));
-
-  const summary = {
-    calendar_events_seen: events.length,
-    all_day_ignored: events.filter((e) => e.isAllDay).length,
-    non_training_ignored: events.filter(
-      (e) => !e.isAllDay && e.status !== "cancelled" && !isBookableTraining(e.summary),
-    ).length,
-    inserted: 0,
-    updated: 0,
-    unchanged: 0,
-    cancelled: 0,
-    errors: [] as string[],
-  };
-
-  for (const event of bookable) {
-    const spotsFromTitle = parseSpotsFromTitle(event.summary);
-    const title = cleanTitle(event.summary);
-    const maxCapacity = spotsFromTitle?.maxCapacity ?? parseMaxCapacity(event.description);
-
-    try {
-      const result = await upsertSessionByCalendarEventId(env, {
-        title,
-        date: extractDate(event.start),
-        start_time: extractTime(event.start),
-        end_time: extractTime(event.end),
-        location: event.location || DEFAULT_LOCATION,
-        max_capacity: maxCapacity,
-        calendar_event_id: event.id,
-        status: "open",
-      });
-      if (result === "inserted") summary.inserted += 1;
-      else if (result === "updated") summary.updated += 1;
-      else summary.unchanged += 1;
-
-      // If Calendly seeded a spot count in the title, persist it so /book/training
-      // shows accurate spots-remaining for migrated events. Only apply on first
-      // insert -- don't overwrite partner bookings that accumulated in D1.
-      if (spotsFromTitle && result === "inserted") {
-        await requireDb(env)
-          .prepare(
-            `UPDATE training_sessions SET current_bookings = ?, updated_at = datetime('now') WHERE calendar_event_id = ?`,
-          )
-          .bind(spotsFromTitle.currentBookings, event.id)
-          .run();
-      }
-    } catch (e) {
-      summary.errors.push(`${event.id}: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  }
-
-  // Cancel D1 rows whose GCal event disappeared or was cancelled.
-  const todayIso = new Date().toISOString().slice(0, 10);
-  const stale = await requireDb(env)
-    .prepare(
-      `SELECT id, calendar_event_id FROM training_sessions WHERE date >= ? AND status != 'cancelled'`,
-    )
-    .bind(todayIso)
-    .all<{ id: string; calendar_event_id: string | null }>();
-
-  for (const s of stale.results || []) {
-    if (s.calendar_event_id && !bookableIds.has(s.calendar_event_id)) {
-      try {
-        await cancelSession(env, s.id);
-        summary.cancelled += 1;
-      } catch (e) {
-        summary.errors.push(`cancel ${s.id}: ${e instanceof Error ? e.message : String(e)}`);
-      }
-    }
-  }
-
-  // ---------------------------------------------------------------------
-  // Virtual sessions: when Rick removes a "Block" from a weekday, that day
-  // becomes bookable using the most recent training as a template. We
-  // synthesize a session in D1 (no calendar_event_id yet); a real Google
-  // Calendar event is created lazily on the first partner booking.
-  // ---------------------------------------------------------------------
-
-  const blockDates = new Set<string>(); // dates with a Block event
-  const realEventDates = new Set<string>(); // dates with a non-Block training event
-  for (const ev of events) {
-    if (ev.status === "cancelled") continue;
-    if (ev.isAllDay) continue; // Block placeholders are timed in this calendar
-    const dt = ev.start.slice(0, 10);
-    if (isBookableTraining(ev.summary)) realEventDates.add(dt);
-    else blockDates.add(dt); // Block / OOO / etc.
-  }
-
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  const horizon = new Date(today);
-  horizon.setUTCDate(horizon.getUTCDate() + VIRTUAL_HORIZON_DAYS);
-
-  const template = await getLatestTrainingTemplate(env);
-
-  const virtualDates = new Set<string>();
-  let virtualInserted = 0;
-  let virtualSkipped = 0;
-
-  for (let cursor = new Date(today); cursor < horizon; cursor.setUTCDate(cursor.getUTCDate() + 1)) {
-    if (!isWeekday(cursor)) continue;
-    const ds = dateOnly(cursor);
-    if (blockDates.has(ds)) continue; // still blocked
-    if (realEventDates.has(ds)) continue; // a real timed training already covers this day
-    virtualDates.add(ds);
-
-    const existing = await getVirtualSessionByDate(env, ds);
-    if (existing) {
-      virtualSkipped += 1;
-      continue;
-    }
-
-    try {
-      await insertVirtualSession(env, {
-        date: ds,
-        title: template.title,
-        start_time: template.start_time,
-        end_time: template.end_time,
-        location: template.location,
-        max_capacity: template.max_capacity,
-      });
-      virtualInserted += 1;
-    } catch (e) {
-      summary.errors.push(`virtual ${ds}: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  }
-
-  // Cancel virtual sessions that are no longer in the unblocked set AND have
-  // zero bookings (preserving any session that already saw partner traffic).
-  const virtualStale = await requireDb(env)
-    .prepare(
-      `SELECT id, date, current_bookings FROM training_sessions
-         WHERE calendar_event_id IS NULL AND status != 'cancelled' AND date >= ?`,
-    )
-    .bind(dateOnly(today))
-    .all<{ id: string; date: string; current_bookings: number }>();
-
-  let virtualCancelled = 0;
-  for (const vs of virtualStale.results || []) {
-    if (virtualDates.has(vs.date)) continue;
-    if (vs.current_bookings > 0) continue; // never cancel a session with bookings
-    try {
-      await cancelSession(env, vs.id);
-      virtualCancelled += 1;
-    } catch (e) {
-      summary.errors.push(`virtual-cancel ${vs.id}: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  }
-
-  const extendedSummary = {
-    ...summary,
-    virtual_inserted: virtualInserted,
-    virtual_skipped_existing: virtualSkipped,
-    virtual_cancelled: virtualCancelled,
-    template_used: {
-      title: template.title,
-      start_time: template.start_time,
-      end_time: template.end_time,
-      location: template.location,
-      max_capacity: template.max_capacity,
-    },
-  };
-
   return Response.json({
     success: true,
-    summary: extendedSummary,
+    tracks: results,
     syncedAt: new Date().toISOString(),
   });
 };

@@ -13,8 +13,9 @@ export const onRequestGet = async (context: {
   request: Request;
   env: Env;
   params: { id: string };
+  waitUntil: (promise: Promise<unknown>) => void;
 }) => {
-  const { env, request, params } = context;
+  const { env, request, params, waitUntil } = context;
 
   if (!originMatchesHost(request)) {
     return Response.json({ error: "Invalid origin" }, { status: 403 });
@@ -51,6 +52,16 @@ export const onRequestGet = async (context: {
     return Response.json({ error: "PDF bestand niet gevonden." }, { status: 404 });
   }
 
+  // Audit log: one row per successful fetch. waitUntil keeps the D1 write
+  // alive after the Response returns -- floating promises get killed by the
+  // Pages Functions runtime and the row never lands. Closes the
+  // "who downloaded the contract when?" legal-readiness gap.
+  waitUntil(
+    logAccess(env, id, request).catch((e) =>
+      console.error("agreement access log write failed:", e),
+    ),
+  );
+
   const safeCompany = (row.company_name || "Partner")
     .replace(/[^a-zA-Z0-9-]+/g, "-")
     .slice(0, 60);
@@ -64,3 +75,33 @@ export const onRequestGet = async (context: {
     },
   });
 };
+
+function uuidv4(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+function trimOrNull(s: string | null, max: number): string | null {
+  if (!s) return null;
+  return s.length > max ? s.slice(0, max) : s;
+}
+
+async function logAccess(env: Env, agreementId: string, request: Request): Promise<void> {
+  if (!env.DB) return;
+  await env.DB.prepare(
+    `INSERT INTO agreement_access_log (id, agreement_id, accessed_ip, user_agent, referer)
+     VALUES (?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      uuidv4(),
+      agreementId,
+      request.headers.get("CF-Connecting-IP"),
+      trimOrNull(request.headers.get("User-Agent"), 256),
+      trimOrNull(request.headers.get("Referer"), 256),
+    )
+    .run();
+}

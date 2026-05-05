@@ -4,7 +4,12 @@
  */
 
 import { googleFetch } from "./google-auth";
-import { IC_COLORS, type CalendarEventMeta, type Env } from "./types";
+import {
+  IC_COLORS,
+  TRAINING_CORE_ATTENDEES,
+  type CalendarEventMeta,
+  type Env,
+} from "./types";
 
 const CALENDAR_BASE = "https://www.googleapis.com/calendar/v3";
 
@@ -30,12 +35,18 @@ export async function createTrainingEvent(
     endTime: string;
     location: string;
     maxCapacity: number;
+    /** Calendar to create on. Defaults to the Hybrid (Trainingen) calendar. */
+    calendarId?: string;
+    /** Title prefix used in the GCal event summary. Defaults to Hybrid. */
+    titlePrefix?: string;
   },
 ): Promise<string | null> {
+  const calendarId = params.calendarId ?? env.TRAINING_CALENDAR_ID;
+  const prefix = params.titlePrefix ?? "Quatt Installatie Training";
   const body = {
-    summary: `Quatt Installatie Training -- ${params.title}`,
+    summary: `${prefix} -- ${params.title}`,
     location: params.location,
-    description: `Quatt Installatie Training\nMax deelnemers: ${params.maxCapacity}\n\nManaged by IC Booking Portal`,
+    description: `${prefix}\nMax deelnemers: ${params.maxCapacity}\n\nManaged by IC Booking Portal`,
     start: {
       dateTime: `${params.date}T${params.startTime}:00`,
       timeZone: "Europe/Amsterdam",
@@ -45,11 +56,14 @@ export async function createTrainingEvent(
       timeZone: "Europe/Amsterdam",
     },
     colorId: IC_COLORS.training_followup,
+    // Always seed the training event with Ralph, Mitchell, Rick + the Quatt
+    // Lab room so the trainer team is on every training and the room is booked.
+    attendees: TRAINING_CORE_ATTENDEES.map((a) => ({ ...a })),
   };
 
   const res = await googleFetch(
     env,
-    `${CALENDAR_BASE}/calendars/${encodeURIComponent(env.TRAINING_CALENDAR_ID)}/events?sendUpdates=none`,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events?sendUpdates=externalOnly`,
     { method: "POST", body: JSON.stringify(body) },
   );
 
@@ -60,6 +74,46 @@ export async function createTrainingEvent(
 
   const data = (await res.json()) as { id: string };
   return data.id;
+}
+
+/**
+ * Idempotently ensure Ralph, Mitchell, Rick and the Quatt Lab resource are on
+ * a training event. Run on every training booking so an event Rick created
+ * by hand (without the team pre-attached) gets backfilled on first signup.
+ * Internal attendees are added silently; only newly-added external partners
+ * receive an invite via the separate addAttendeeToEvent call.
+ */
+export async function ensureTrainingCoreAttendees(
+  env: Env,
+  calendarId: string,
+  eventId: string,
+): Promise<void> {
+  const getRes = await googleFetch(
+    env,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`,
+  );
+  if (!getRes.ok) return;
+
+  const event = (await getRes.json()) as {
+    attendees?: { email: string; displayName?: string; resource?: boolean }[];
+  };
+  const current = event.attendees || [];
+  const haveEmails = new Set(current.map((a) => a.email.toLowerCase()));
+  const missing = TRAINING_CORE_ATTENDEES.filter(
+    (a) => !haveEmails.has(a.email.toLowerCase()),
+  );
+  if (missing.length === 0) return;
+
+  await googleFetch(
+    env,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=none`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        attendees: [...current, ...missing.map((a) => ({ ...a }))],
+      }),
+    },
+  );
 }
 
 export async function addAttendeeToEvent(
@@ -87,10 +141,13 @@ export async function addAttendeeToEvent(
   // Skip if already present
   if (currentAttendees.some((a) => a.email === attendeeEmail)) return;
 
-  // Patch with new attendee
+  // Patch with new attendee. sendUpdates=externalOnly emails the new partner
+  // (external to quatt.io) a Google Calendar invite so the event lands in
+  // their own calendar; internal trainers/AMs already on the attendee list
+  // don't get re-notified each time a partner signs up.
   await googleFetch(
     env,
-    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=none`,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=externalOnly`,
     {
       method: "PATCH",
       body: JSON.stringify({

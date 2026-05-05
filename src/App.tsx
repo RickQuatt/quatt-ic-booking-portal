@@ -8,6 +8,7 @@ import { KennismakingPage } from "./pages/book/kennismaking/page";
 import { ReschedulePage } from "./pages/book/kennismaking/reschedule/page";
 import { CancelPage } from "./pages/book/kennismaking/cancel/page";
 import { TrainingPage } from "./pages/book/training/page";
+import { ChillRedirectPage } from "./pages/book/training/chill/page";
 import { AgreementPage } from "./pages/book/agreement/page";
 import { InstallPage } from "./pages/book/install/page";
 import { TrainingCheckInPage } from "./pages/training/check-in/page";
@@ -61,7 +62,13 @@ function App() {
             <Route path="/book/kennismaking" component={KennismakingPage} />
             <Route path="/book/kennismaking/reschedule" component={ReschedulePage} />
             <Route path="/book/kennismaking/cancel" component={CancelPage} />
-            <Route path="/book/training" component={TrainingPage} />
+            <Route path="/book/training">
+              <TrainingPage />
+            </Route>
+            <Route path="/book/training/alle">
+              <TrainingPage track="alle" />
+            </Route>
+            <Route path="/book/training/chill" component={ChillRedirectPage} />
             <Route path="/book/agreement" component={AgreementPage} />
             <Route path="/book/install" component={InstallPage} />
             <Route path="/training/check-in" component={TrainingCheckInPage} />

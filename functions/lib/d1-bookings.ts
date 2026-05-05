@@ -3,7 +3,7 @@
  * Supabase is never touched by anything that imports from here.
  */
 
-import type { Env } from "./types";
+import type { Env, TrainingTrack } from "./types";
 
 export function requireDb(env: Env): D1Database {
   if (!env.DB) throw new Error("D1 binding 'DB' missing");
@@ -32,15 +32,32 @@ export interface TrainingSessionRow {
   current_bookings: number;
   calendar_event_id: string | null;
   status: string;
+  track: string; // 'hybrid' | 'alle' -- see types.ts TrainingTrack
   created_at: string;
   updated_at: string;
 }
 
-export async function listUpcomingOpenSessions(env: Env): Promise<TrainingSessionRow[]> {
+export async function listUpcomingOpenSessions(
+  env: Env,
+  track?: TrainingTrack,
+): Promise<TrainingSessionRow[]> {
   // Include both 'open' and 'full' so partners see full sessions as "Vol" instead of
   // those sessions vanishing -- frontend /book/training renders the Vol badge when
   // spotsRemaining <= 0. 'cancelled' + 'completed' remain hidden.
+  // When `track` is supplied, results are filtered to that track. Without it,
+  // returns all tracks (used by admin views).
   const today = new Date().toISOString().slice(0, 10);
+  if (track) {
+    const res = await requireDb(env)
+      .prepare(
+        `SELECT * FROM training_sessions
+           WHERE status IN ('open', 'full') AND date >= ? AND track = ?
+           ORDER BY date ASC, start_time ASC`,
+      )
+      .bind(today, track)
+      .all<TrainingSessionRow>();
+    return res.results || [];
+  }
   const res = await requireDb(env)
     .prepare(
       `SELECT * FROM training_sessions
@@ -59,6 +76,7 @@ export async function listUpcomingOpenSessions(env: Env): Promise<TrainingSessio
  */
 export async function getLatestTrainingTemplate(
   env: Env,
+  track: TrainingTrack = "hybrid",
 ): Promise<{
   title: string;
   start_time: string;
@@ -70,10 +88,11 @@ export async function getLatestTrainingTemplate(
     .prepare(
       `SELECT title, start_time, end_time, location, max_capacity
          FROM training_sessions
-         WHERE status != 'cancelled' AND calendar_event_id IS NOT NULL
+         WHERE status != 'cancelled' AND calendar_event_id IS NOT NULL AND track = ?
          ORDER BY date DESC, created_at DESC
          LIMIT 1`,
     )
+    .bind(track)
     .first<{
       title: string;
       start_time: string;
@@ -84,10 +103,10 @@ export async function getLatestTrainingTemplate(
 
   return (
     row ?? {
-      title: "Installatie Training Quatt",
+      title: track === "alle" ? "All-e Installatietraining" : "Installatie Training Quatt",
       start_time: "10:00",
       end_time: "16:00",
-      location: "Schakelstraat 17, Amsterdam",
+      location: "Quatt Lab -- Schakelstraat 17, Amsterdam",
       max_capacity: 11,
     }
   );
@@ -96,12 +115,13 @@ export async function getLatestTrainingTemplate(
 export async function getVirtualSessionByDate(
   env: Env,
   date: string,
+  track: TrainingTrack = "hybrid",
 ): Promise<TrainingSessionRow | null> {
   return await requireDb(env)
     .prepare(
-      `SELECT * FROM training_sessions WHERE date = ? AND calendar_event_id IS NULL AND status != 'cancelled' LIMIT 1`,
+      `SELECT * FROM training_sessions WHERE date = ? AND calendar_event_id IS NULL AND status != 'cancelled' AND track = ? LIMIT 1`,
     )
-    .bind(date)
+    .bind(date, track)
     .first<TrainingSessionRow>();
 }
 
@@ -114,14 +134,15 @@ export async function insertVirtualSession(
     end_time: string;
     location: string;
     max_capacity: number;
+    track?: TrainingTrack;
   },
 ): Promise<string> {
   const id = uuidv4();
   await requireDb(env)
     .prepare(
       `INSERT INTO training_sessions
-       (id, title, date, start_time, end_time, location, max_capacity, current_bookings, calendar_event_id, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 0, NULL, 'open')`,
+       (id, title, date, start_time, end_time, location, max_capacity, current_bookings, calendar_event_id, status, track)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0, NULL, 'open', ?)`,
     )
     .bind(
       id,
@@ -131,6 +152,7 @@ export async function insertVirtualSession(
       row.end_time,
       row.location,
       row.max_capacity,
+      row.track ?? "hybrid",
     )
     .run();
   return id;
@@ -174,17 +196,19 @@ export async function upsertSessionByCalendarEventId(
     max_capacity: number;
     calendar_event_id: string;
     status: string;
+    track?: TrainingTrack;
   },
 ): Promise<"inserted" | "updated" | "unchanged"> {
   const db = requireDb(env);
   const existing = await getSessionByCalendarEventId(env, row.calendar_event_id);
+  const track: TrainingTrack = row.track ?? "hybrid";
 
   if (!existing) {
     await db
       .prepare(
         `INSERT INTO training_sessions
-         (id, title, date, start_time, end_time, location, max_capacity, current_bookings, calendar_event_id, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+         (id, title, date, start_time, end_time, location, max_capacity, current_bookings, calendar_event_id, status, track)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`,
       )
       .bind(
         uuidv4(),
@@ -196,6 +220,7 @@ export async function upsertSessionByCalendarEventId(
         row.max_capacity,
         row.calendar_event_id,
         row.status,
+        track,
       )
       .run();
     return "inserted";
@@ -208,13 +233,14 @@ export async function upsertSessionByCalendarEventId(
     existing.end_time === row.end_time &&
     existing.location === row.location &&
     existing.max_capacity === row.max_capacity &&
-    existing.status === row.status;
+    existing.status === row.status &&
+    existing.track === track;
   if (unchanged) return "unchanged";
 
   await db
     .prepare(
       `UPDATE training_sessions
-       SET title=?, date=?, start_time=?, end_time=?, location=?, max_capacity=?, status=?, updated_at=datetime('now')
+       SET title=?, date=?, start_time=?, end_time=?, location=?, max_capacity=?, status=?, track=?, updated_at=datetime('now')
        WHERE id=?`,
     )
     .bind(
@@ -225,6 +251,7 @@ export async function upsertSessionByCalendarEventId(
       row.location,
       row.max_capacity,
       row.status,
+      track,
       existing.id,
     )
     .run();

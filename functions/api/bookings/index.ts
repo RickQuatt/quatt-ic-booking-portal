@@ -12,10 +12,11 @@ import {
   createICEvent,
   createTrainingEvent,
   createFirstInstallHold,
+  ensureTrainingCoreAttendees,
   getFreeBusy,
   buildMetaBlock,
 } from "../../lib/google-calendar";
-import { IC_COLORS, AM_CONFIG, type Env } from "../../lib/types";
+import { IC_COLORS, AM_CONFIG, type Env, type TrainingTrack } from "../../lib/types";
 import { appendBookingRow } from "../../lib/google-sheets";
 import {
   sendSlackNotification,
@@ -49,6 +50,7 @@ import {
   updateBookingCalendar,
   updateBookingSheetRow,
 } from "../../lib/d1-bookings";
+import { hasSignedAgreement } from "../../lib/d1-agreements";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -125,7 +127,7 @@ export const onRequestPost = async (context: {
 // ---------------------------------------------------------------------------
 
 async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
-  const { sessionId, partnerName, partnerEmail, partnerPhone, companyName, kvkNumber, notes } =
+  const { sessionId, partnerName, partnerEmail, partnerPhone, companyName, kvkNumber, notes, dealId } =
     body as {
       sessionId: string;
       partnerName: string;
@@ -134,10 +136,36 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
       companyName: string;
       kvkNumber?: string;
       notes?: string;
+      dealId?: string;
     };
 
   if (!sessionId || !partnerName || !partnerEmail || !partnerPhone || !companyName) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  // Agreement-first gate: training booking requires a signed agreement
+  // for the partner (matched by email OR dealId per Rick's call --
+  // dealId is per-installer-company, so once anyone at the company has
+  // signed, others can book training without re-signing).
+  const agreement = await hasSignedAgreement(env, {
+    email: partnerEmail,
+    dealId,
+  });
+  if (!agreement.signed) {
+    const params = new URLSearchParams();
+    if (partnerEmail) params.set("email", partnerEmail);
+    if (companyName) params.set("company", companyName);
+    if (dealId) params.set("dealId", dealId);
+    params.set("returnTo", "training");
+    return Response.json(
+      {
+        error: "agreement-not-signed",
+        message:
+          "Eerst de partnerovereenkomst tekenen, daarna kun je je training inplannen.",
+        redirect: `/book/agreement?${params.toString()}`,
+      },
+      { status: 412 },
+    );
   }
 
   const session = await getSessionById(env, sessionId);
@@ -177,19 +205,34 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
 
   await incrementSessionBookings(env, sessionId);
 
+  // Track-aware calendar routing. Each track has its own Google Calendar:
+  //   hybrid -> env.TRAINING_CALENDAR_ID
+  //   alle   -> env.ALLE_TRAINING_CALENDAR_ID
+  // Sessions on the All-e calendar are tagged track='alle' by the sync route.
+  const sessionTrack = (session.track as TrainingTrack) || "hybrid";
+  const trackCalendarId =
+    sessionTrack === "alle" && env.ALLE_TRAINING_CALENDAR_ID
+      ? env.ALLE_TRAINING_CALENDAR_ID
+      : env.TRAINING_CALENDAR_ID;
+  const trackTitlePrefix =
+    sessionTrack === "alle" ? "All-e Installatietraining" : "Quatt Installatie Training";
+
   // Calendar sync. The session may be EITHER:
   //   1. A real (calendar-backed) session -- just attach partner as attendee.
   //   2. A virtual session created by sync when Rick removed a "Block" from the
-  //      Trainingen calendar. No event exists yet -> create one, then attach.
-  //
-  // Both cases run async (non-blocking). On lazy-create the partner is the first
-  // attendee; subsequent partners booking the same session take the simple
-  // attach-attendee path because calendar_event_id is now persisted.
+  //      track's calendar. No event exists yet -> create one, then attach.
+  // For real events we ALSO idempotently ensure Ralph/Mitchell/Rick + Quatt
+  // Lab room are on the event, in case the calendar entry was created by hand
+  // without them.
   if (session.calendar_event_id) {
+    const eventId = session.calendar_event_id;
+    ensureTrainingCoreAttendees(env, trackCalendarId, eventId).catch((e) =>
+      console.error("Core training attendee backfill failed:", e),
+    );
     addAttendeeToEvent(
       env,
-      env.TRAINING_CALENDAR_ID,
-      session.calendar_event_id,
+      trackCalendarId,
+      eventId,
       partnerEmail,
       partnerName,
     ).catch((e) => console.error("Calendar attendee add failed:", e));
@@ -203,6 +246,8 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
           endTime: session.end_time,
           location: session.location,
           maxCapacity: session.max_capacity,
+          calendarId: trackCalendarId,
+          titlePrefix: trackTitlePrefix,
         });
         if (newEventId) {
           await env.DB!.prepare(
@@ -212,7 +257,7 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
             .run();
           await addAttendeeToEvent(
             env,
-            env.TRAINING_CALENDAR_ID,
+            trackCalendarId,
             newEventId,
             partnerEmail,
             partnerName,
@@ -224,8 +269,8 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
     })();
   }
 
-  // HubSpot: flip ic__training_booked + legacy_date_of_first_appointment_booked (non-blocking)
-  setTrainingBooked(env, partnerEmail, undefined, session.date).catch((e) =>
+  // HubSpot: flip ic__training_booked + ic__training_track (non-blocking)
+  setTrainingBooked(env, partnerEmail, undefined, session.date, sessionTrack).catch((e) =>
     console.error("HubSpot training-booked push failed:", e),
   );
 

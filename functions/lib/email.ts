@@ -210,14 +210,48 @@ export async function sendTrainingConfirmation(
     sessionDate: string;
     sessionTime: string;
     location: string;
+    /**
+     * When true the email appends a "vergeet de partnerovereenkomst niet"
+     * section with a CTA to /book/agreement. Used by the AM-reserved flow
+     * where the partner books a training before signing the agreement.
+     */
+     agreementPending?: boolean;
+     dealId?: string;
   },
 ): Promise<void> {
-  const { to, partnerName, sessionDate, sessionTime, location } = params;
+  const { to, partnerName, sessionDate, sessionTime, location, agreementPending, dealId } = params;
+
+  const agreementUrl = (() => {
+    if (!agreementPending) return null;
+    const baseUrl = env.BASE_URL || "";
+    const qs = new URLSearchParams();
+    if (to) qs.set("email", to);
+    if (dealId) qs.set("dealId", dealId);
+    qs.set("returnTo", "training-reserved");
+    return `${baseUrl}/book/agreement?${qs.toString()}`;
+  })();
+
+  const agreementBlock = agreementUrl
+    ? `
+    <div style="margin-top:24px;padding:20px;border-radius:12px;background:#FFF4EE;border:1px solid #FFD6C2;">
+      <p style="margin:0 0 8px;font-size:15px;font-weight:600;color:#1A1A1A;">Nog 1 stap: teken de partnerovereenkomst</p>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.5;color:#5C5751;">
+        Je trainingsplek staat gereserveerd. Voordat de training start hebben we je getekende partnerovereenkomst nodig.
+      </p>
+      <a href="${agreementUrl}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#FF6933;color:#fff;text-decoration:none;font-weight:600;font-size:14px;">
+        Teken partnerovereenkomst
+      </a>
+    </div>`
+    : "";
+
+  const intro = agreementPending
+    ? `Hoi ${partnerName.split(" ")[0]}, je trainingsplek is gereserveerd door je accountmanager. Tot dan!`
+    : `Hoi ${partnerName.split(" ")[0]}, je bent aangemeld voor de Quatt producttraining. Tot dan!`;
 
   const content = `
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;">Je training is bevestigd</h1>
     <p style="margin:0 0 24px;color:#8A8580;font-size:15px;line-height:1.5;">
-      Hoi ${partnerName.split(" ")[0]}, je bent aangemeld voor de Quatt producttraining. Tot dan!
+      ${intro}
     </p>
     <table style="width:100%;border-collapse:collapse;border-top:1px solid #E8E4DD;border-bottom:1px solid #E8E4DD;margin-bottom:24px;">
       ${detailRow("Datum", formatDateNL(sessionDate))}
@@ -226,7 +260,8 @@ export async function sendTrainingConfirmation(
     </table>
     <p style="margin:0;color:#8A8580;font-size:14px;line-height:1.5;">
       Je ontvangt ook een agenda-uitnodiging. Neem je laptop mee voor het praktijkgedeelte.
-    </p>`;
+    </p>
+    ${agreementBlock}`;
 
   await sendEmail(
     env,

@@ -5,16 +5,27 @@
  * here. Submits email + name + company. On success, attendance is recorded
  * and the post-training email sequence unlocks in Partner Progression.
  *
+ * Track-aware: trainers use a track-specific QR -- /training/check-in for
+ * Hybrid, /training/check-in?track=alle for All-e. The track flows to the
+ * API which picks the matching HubSpot Forms-API submission target.
+ *
  * Always shows a friendly success screen -- the endpoint is silent on miss
  * so we don't leak whether an email exists in our database.
  */
 
 import { useState } from "react";
 
+function parseTrack(): "hybrid" | "alle" {
+  if (typeof window === "undefined") return "hybrid";
+  const v = new URLSearchParams(window.location.search).get("track");
+  return v === "alle" ? "alle" : "hybrid";
+}
+
 export function TrainingCheckInPage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const track = parseTrack();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,6 +37,7 @@ export function TrainingCheckInPage() {
       email: String(form.get("email") || "").trim(),
       name: String(form.get("name") || "").trim(),
       company: String(form.get("company") || "").trim(),
+      track,
     };
 
     if (!payload.email || !payload.name || !payload.company) {
@@ -109,7 +121,7 @@ export function TrainingCheckInPage() {
           </svg>
         </div>
         <h1 className="text-2xl md:text-3xl font-semibold tracking-[-0.04em] text-[#131A20]">
-          Training check-in
+          {track === "alle" ? "All-e training check-in" : "Training check-in"}
         </h1>
         <p className="mt-2 text-[15px] text-[#4D4D4A] leading-relaxed">
           Vul je gegevens in om je aanwezigheid te registreren.

@@ -22,6 +22,7 @@ export function AgreementPage() {
   const prefillEmail = getSearchParam("email");
   const prefillCompany = getSearchParam("company");
   const version = getSearchParam("version") || AGREEMENT_VERSION;
+  const returnTo = getSearchParam("returnTo");
 
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{
@@ -119,37 +120,67 @@ export function AgreementPage() {
   }
 
   if (result) {
+    const trainingHref = (() => {
+      if (returnTo !== "training") return null;
+      const params = new URLSearchParams();
+      const emailVal = (prefillEmail || "").trim();
+      const companyVal = (result.companyName || prefillCompany || "").trim();
+      if (emailVal) params.set("email", emailVal);
+      if (companyVal) params.set("company", companyVal);
+      if (dealId) params.set("dealId", dealId);
+      return `/book/training?${params.toString()}`;
+    })();
+
     return (
       <div className="max-w-2xl mx-auto px-6 py-16">
-        <div className="rounded-[14px] bg-[#e8f5e9] border border-[#1A7A6B]/20 p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto shadow-sm">
-            <svg className="w-8 h-8 text-[#2e7d32]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <div className="rounded-[20px] bg-white border border-[#E8E4DD] shadow-card p-8 md:p-10 text-center">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
+            style={{
+              backgroundColor: "rgba(255,105,51,0.10)",
+              boxShadow: "inset 0 0 0 1px rgba(255,105,51,0.2)",
+            }}
+          >
+            <svg className="w-8 h-8 text-[#FF6933]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="mt-5 text-[22px] font-semibold text-[#1b5e20] tracking-[-0.02em]">
+          <h1 className="mt-6 text-[26px] md:text-[28px] font-semibold text-[#131A20] tracking-[-0.03em]">
             Overeenkomst ondertekend
           </h1>
-          <p className="mt-2 text-[15px] text-[#2e7d32]">
+          <p className="mt-3 text-[15px] text-[#4D4D4A] leading-[1.6]">
             Bedankt, {result.companyName}. Je ontvangt de ondertekende overeenkomst per e-mail.
           </p>
-          <p className="mt-4 text-[14px] text-[#545454]">
-            Je Quatt partnermanager neemt binnen enkele dagen contact op voor de volgende stappen.
+          <p className="mt-2 text-[14px] text-[#8A8580] leading-[1.55]">
+            {trainingHref
+              ? "Volgende stap: plan je installatietraining in."
+              : "Je Quatt partnermanager neemt binnen enkele dagen contact op voor de volgende stappen."}
           </p>
 
-          {result.downloadUrl && (
-            <a
-              href={result.downloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-6 bg-[#FF6933] text-white font-semibold rounded-full px-6 py-3 text-[15px] hover:brightness-95 transition-all duration-150"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Download ondertekende overeenkomst
-            </a>
-          )}
+          <div className="mt-7 flex flex-col sm:flex-row gap-3 items-center justify-center">
+            {trainingHref && (
+              <a
+                href={trainingHref}
+                className="inline-flex items-center justify-center bg-[#FF6933] text-white font-semibold rounded-full px-7 py-3 text-[15px] hover:brightness-95 transition-all duration-150 shadow-card"
+              >
+                Plan nu je training
+              </a>
+            )}
+
+            {result.downloadUrl && (
+              <a
+                href={result.downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-white border border-[#E8E4DD] text-[#131A20] font-semibold rounded-full px-6 py-3 text-[14px] hover:border-[#FF6933]/40 hover:text-[#FF6933] transition-all duration-150"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download overeenkomst
+              </a>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -215,49 +246,27 @@ export function AgreementPage() {
         </section>
 
         <section>
-          <h2 className="text-[16px] font-semibold text-[#131A20] mb-4">De overeenkomst</h2>
-          <div className="bg-white rounded-[14px] border border-[#E8E4DD] p-6">
-            <p className="text-[15px] text-[#131A20]/85 leading-relaxed">
-              Deze overeenkomst regelt de samenwerking tussen jou als installatiepartner en
-              Quatt Installaties B.V. Je tekent een raamovereenkomst waarin onder andere het volgende is vastgelegd:
-            </p>
-            <ul className="mt-4 space-y-2 text-[14px] text-[#131A20]/85">
-              <li className="flex gap-3">
-                <span className="text-[#FF6933] font-bold shrink-0">—</span>
-                <span>Werkzaamheden, opdrachten en oplevering van installaties</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#FF6933] font-bold shrink-0">—</span>
-                <span>Prijzen, facturering en betalingstermijnen (BIJLAGE 3)</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#FF6933] font-bold shrink-0">—</span>
-                <span>Verantwoordelijkheden, aansprakelijkheid en verzekering</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#FF6933] font-bold shrink-0">—</span>
-                <span>Anti-concurrentie-, anti-corruptie- en vertrouwelijkheidsbepalingen</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#FF6933] font-bold shrink-0">—</span>
-                <span>Verwerkersovereenkomst (BIJLAGE 4) en The Quatt Way of Working (BIJLAGE 5)</span>
-              </li>
-            </ul>
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="text-[16px] font-semibold text-[#131A20]">De overeenkomst</h2>
             <a
               href={`/api/agreement/${AGREEMENT_VERSION}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-6 bg-[#131A20] text-white rounded-full px-5 py-3 text-[14px] font-semibold hover:bg-[#1A1A1A] transition-colors"
+              className="text-[13px] font-semibold text-[#FF6933] hover:underline"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Lees de volledige overeenkomst (PDF)
+              Open in nieuw tabblad
             </a>
-            <p className="mt-3 text-[12px] text-[#8A8580]">
-              Versie {AGREEMENT_VERSION} · laatst herzien {updatedAtLabel}
-            </p>
           </div>
+          <div className="bg-white rounded-[14px] border border-[#E8E4DD] overflow-hidden">
+            <iframe
+              src={`/api/agreement/${AGREEMENT_VERSION}/pdf#view=FitH`}
+              className="w-full h-[80vh] border-0"
+              title={`Reseller Overeenkomst Warmtepompen v${AGREEMENT_VERSION}`}
+            />
+          </div>
+          <p className="mt-3 text-[12px] text-[#8A8580]">
+            Reseller Overeenkomst Warmtepompen, versie {AGREEMENT_VERSION} · laatst herzien {updatedAtLabel}. Door hieronder te tekenen ga je akkoord met de volledige tekst zoals hierboven weergegeven.
+          </p>
         </section>
 
         <section>
@@ -282,6 +291,10 @@ export function AgreementPage() {
         <section>
           <h2 className="text-[16px] font-semibold text-[#131A20] mb-4">Ondertekening</h2>
           <div className="bg-white rounded-[14px] border border-[#E8E4DD] p-6">
+            <div className="mb-4 rounded-[10px] bg-[#FFF3EE] border border-[#FF6933]/20 px-4 py-3 text-[13px] text-[#131A20] leading-[1.5]">
+              <strong className="font-semibold">Je tekent hieronder, niet in de PDF zelf.</strong>{" "}
+              Wij plakken je handtekening automatisch in het ondertekeningsvak op pagina 3.
+            </div>
             <p className="text-[14px] text-[#8A8580] mb-3">
               Teken je handtekening hieronder. Gebruik de muis of vingertop.
             </p>

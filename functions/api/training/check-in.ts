@@ -19,7 +19,7 @@ import {
   rateLimitResponse,
   originMatchesHost,
 } from "../../lib/rate-limit";
-import type { Env } from "../../lib/types";
+import type { Env, TrainingTrack } from "../../lib/types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -50,6 +50,8 @@ export const onRequestPost = async (context: {
   const email = String(body.email ?? "").trim().toLowerCase();
   const name = String(body.name ?? "").trim();
   const company = String(body.company ?? "").trim();
+  const rawTrack = String(body.track ?? "hybrid").trim().toLowerCase();
+  const track: TrainingTrack = rawTrack === "alle" ? "alle" : "hybrid";
 
   if (!email || !name || !company) {
     return Response.json(
@@ -61,7 +63,7 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "Ongeldig e-mailadres" }, { status: 400 });
   }
 
-  await setTrainingAttended(env, email);
+  await setTrainingAttended(env, email, track);
 
   // Wall-E OS milestone (non-blocking, feature-flagged off until env is set).
   // Training check-in = training_completed. Check-in timestamps land in evidence

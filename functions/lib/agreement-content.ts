@@ -1,16 +1,31 @@
 /**
- * Canonical Quatt Partnerovereenkomst (installatiepartner raamovereenkomst), v2.
+ * Canonical Quatt Reseller Overeenkomst Warmtepompen, v1.1.
  *
- * Static HTML fragment rendered inline on /book/agreement and embedded into the signed PDF.
- * Source: Partnerovereenkomst docx (2024-11-27). Partner-specific fields stripped.
+ * Since 2026-04-30 we no longer regenerate the contract body in code. The
+ * canonical legal document is a static PDF stored in R2 (key below). Partners
+ * see + sign that exact PDF via /book/agreement; the Worker stamps signature
+ * + naam + datum into the page-3 signature box and persists the result.
  *
- * Update by replacing this export and bumping AGREEMENT_VERSION.
- * Never edit without legal review.
+ * `AGREEMENT_HTML` and `AGREEMENT_PLAINTEXT` below are retained ONLY as a
+ * frozen text snapshot stored in the D1 `agreement_html_snapshot` column
+ * for legal traceability ("what did the partner read?"). They no longer
+ * drive any rendering. To ship a new version: upload the new PDF to R2,
+ * bump RESELLER_TEMPLATE_R2_KEY + AGREEMENT_VERSION + AGREEMENT_UPDATED_AT,
+ * and refresh the snapshot text below if the wording materially changed.
  */
 
-export const AGREEMENT_VERSION = "2";
+export const AGREEMENT_VERSION = "1.1";
 
-export const AGREEMENT_UPDATED_AT = "2026-04-23";
+export const AGREEMENT_UPDATED_AT = "2026-04-30";
+
+/**
+ * R2 key for the canonical legal PDF. Uploaded once via:
+ *   wrangler r2 object put quatt-agreements/agreements-templates/reseller-v1.1.pdf \
+ *     --file "<local-path-to-Reseller-overeenkomst-warmtepomp-v.1.1.pdf>"
+ * Lives in the existing AGREEMENTS R2 bucket; the `agreements-templates/` prefix
+ * keeps templates separate from signed agreements at `agreements/{year}/...`.
+ */
+export const RESELLER_TEMPLATE_R2_KEY = "agreements-templates/reseller-v1.1.pdf";
 
 export const AGREEMENT_HTML = `
 <h2>Partnerovereenkomst</h2>

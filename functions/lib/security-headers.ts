@@ -4,7 +4,8 @@
  * Why each header:
  *   CSP                       prevents XSS by whitelisting script/style/connect origins
  *   Strict-Transport-Security forces HTTPS for 1 year incl. subdomains
- *   X-Frame-Options DENY      blocks clickjacking via iframes
+ *   X-Frame-Options SAMEORIGIN allows same-origin iframes (PDF preview on
+ *                              /book/agreement) but blocks third-party clickjacking
  *   X-Content-Type-Options    blocks MIME sniffing
  *   Referrer-Policy           leaks no path/query data to off-site links
  *   Permissions-Policy        denies camera/mic/geo/payment by default
@@ -20,8 +21,10 @@ const CSP_DIRECTIVES = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: https: blob:",
   "connect-src 'self' https://accounts.google.com",
-  "frame-src https://accounts.google.com",
-  "frame-ancestors 'none'",
+  // Same-origin iframes allowed (PDF preview on /book/agreement); Google
+  // Identity bootstrap kept on the allowlist.
+  "frame-src 'self' https://accounts.google.com",
+  "frame-ancestors 'self'",
   "base-uri 'self'",
   "form-action 'self'",
   "object-src 'none'",
@@ -31,7 +34,7 @@ const CSP_DIRECTIVES = [
 const SECURITY_HEADERS: Record<string, string> = {
   "Content-Security-Policy": CSP_DIRECTIVES,
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
-  "X-Frame-Options": "DENY",
+  "X-Frame-Options": "SAMEORIGIN",
   "X-Content-Type-Options": "nosniff",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy":

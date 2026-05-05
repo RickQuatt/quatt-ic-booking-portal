@@ -15,11 +15,13 @@ export interface Env {
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_REFRESH_TOKEN: string;
   IC_CALENDAR_ID: string;
-  TRAINING_CALENDAR_ID: string;
+  TRAINING_CALENDAR_ID: string; // Hybrid track ("Quatt Installatie Trainingen")
+  ALLE_TRAINING_CALENDAR_ID?: string; // All-e track ("All-e Installatietraining"). Optional during rollout.
 
   // Email (Resend)
   RESEND_API_KEY: string;
   EMAIL_FROM: string;
+  RESEND_OVERRIDE_TO?: string; // Stopgap: route every confirmation to this address with no bcc.
 
   // Slack
   SLACK_BOT_TOKEN: string;
@@ -31,8 +33,12 @@ export interface Env {
 
   // HubSpot
   HUBSPOT_KENNISMAKING_FORM_ID: string;
-  HUBSPOT_TRAINING_FORM_ID: string;
-  HUBSPOT_TRAINING_ATTENDED_FORM_ID: string;
+  HUBSPOT_TRAINING_FORM_ID: string; // Hybrid track booked
+  HUBSPOT_TRAINING_ATTENDED_FORM_ID: string; // Hybrid track attended
+  // All-e track forms (clones of the Hybrid forms). Optional during rollout --
+  // if unset, All-e bookings/attendance fall back to the Hybrid forms.
+  HUBSPOT_TRAINING_ALLE_FORM_ID?: string;
+  HUBSPOT_TRAINING_ALLE_ATTENDED_FORM_ID?: string;
 
   // Auth / tokens
   BOOKING_SECRET: string;
@@ -40,6 +46,12 @@ export interface Env {
   SESSION_SECRET: string;
   APP_NAME: string;
   ADMIN_TOKENS: string; // comma-separated list
+
+  // Server-to-server secret used by the AM toolkit's "Reserveer training"
+  // proxy when calling /api/internal/reserve-training. Set via
+  // `wrangler secret put RESERVE_SECRET`. The endpoint refuses requests
+  // when this is unset (fail closed).
+  RESERVE_SECRET?: string;
 
   // Rate limiting (KV namespace; bound in wrangler.toml)
   RATE_LIMIT?: KVNamespace;
@@ -65,11 +77,19 @@ export type BookingType = "training" | "intro_call" | "first_install";
 export type BookingStatus =
   | "confirmed"
   | "pending_am_confirmation"
+  | "reserved_unsigned" // AM-reserved before partnerovereenkomst signature
   | "cancelled"
   | "completed"
   | "no_show";
 
 export type SessionStatus = "open" | "full" | "completed" | "cancelled";
+
+/**
+ * Training track. `hybrid` = existing Hybrid curriculum (Trainingen calendar).
+ * `alle` = All-Electric curriculum (All-e Installatietraining calendar, since 2026-04-29).
+ * `quatt_chill` is NOT stored in D1 -- /book/training/chill redirects to a HubSpot RSVP form.
+ */
+export type TrainingTrack = "hybrid" | "alle";
 
 export interface TrainingSession {
   id: string;
@@ -82,6 +102,7 @@ export interface TrainingSession {
   currentBookings: number;
   calendarEventId: string | null;
   status: SessionStatus;
+  track: TrainingTrack;
 }
 
 export interface Booking {
@@ -151,6 +172,28 @@ export const AM_CONFIG = [
     role: "Installatiepartnermanager",
   },
 ] as const;
+
+/**
+ * Internal team that must always be on a training event: the two AMs (Ralph,
+ * Mitchell) and Rick. Plus the Quatt Lab learning-room resource so the room
+ * is booked automatically. Used by the booking flow to ensure every training
+ * event ships with this minimum attendee set, regardless of who created the
+ * underlying GCal entry.
+ */
+export const TRAINING_CORE_ATTENDEES: ReadonlyArray<{
+  email: string;
+  displayName?: string;
+  resource?: boolean;
+}> = [
+  { email: "ralph@quatt.io", displayName: "Ralph Peper" },
+  { email: "mitchell.k@quatt.io", displayName: "Mitchell van Kleef" },
+  { email: "rick@quatt.io", displayName: "Rick Hakkaart" },
+  {
+    email: "c_1883vm271ib7cg47n7ranf6tqf3oe@resource.calendar.google.com",
+    displayName: "Quatt Lab-0-Learning Lab (25)",
+    resource: true,
+  },
+];
 
 // Calendar color IDs (Google Calendar v3)
 export const IC_COLORS = {
