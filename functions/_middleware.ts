@@ -136,6 +136,7 @@ const PUBLIC_PREFIXES = [
   "/api/training",
   "/api/admin/auth", // admin token login endpoint must be reachable
   "/api/admin/sessions/sync", // machine-to-machine sync (admin_token auth only, no Google)
+  "/api/internal/", // server-to-server endpoints, gated by RESERVE_SECRET (no Google session)
 ];
 
 function isValidReturnUrl(url: string): boolean {
