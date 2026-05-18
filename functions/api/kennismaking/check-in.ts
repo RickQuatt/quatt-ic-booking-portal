@@ -1,25 +1,27 @@
 /**
- * POST /api/training/check-in
+ * POST /api/kennismaking/check-in
  *
- * Public endpoint hit when a partner scans the QR on the trainer's slide.
- * Flips contact `ic__training_completed=true` in HubSpot via the Forms API.
- * A HubSpot sync workflow copies that to the associated deal, which
- * Partner Progression Branch D uses to trigger the post-training sequence.
+ * Public endpoint hit when a partner scans the QR on the AM's kennismaking
+ * slide / printed card. Records `kennismaking_completed` in Wall-E OS, which
+ * then writes `ic__kennismaking_completed=true` on the HubSpot deal via the
+ * property-drain worker.
  *
- * No authentication, no Supabase lookup. Rick explicitly accepted the
- * self-verify risk: anyone with a known IC contact email can mark themselves
- * attended. The fallout (AM sees a surprise task or progression mail) is
- * cheaper than adding friction to the training room check-in flow.
+ * Mirror of /api/training/check-in but for kennismaking. No HubSpot Forms-API
+ * call (kennismaking_completed has no contact mirror today -- Wall-E OS does
+ * the direct deal-property write via the v2 outbox path).
+ *
+ * No authentication, no Supabase lookup. Same self-verify risk Rick accepted
+ * for /training/check-in: anyone with a known IC contact email can mark
+ * themselves attended.
  */
 
-import { setTrainingAttended } from "../../lib/hubspot-forms";
 import { postWalleosBooking } from "../../lib/walleos";
 import {
   rateLimit,
   rateLimitResponse,
   originMatchesHost,
 } from "../../lib/rate-limit";
-import type { Env, TrainingTrack } from "../../lib/types";
+import type { Env } from "../../lib/types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -34,7 +36,7 @@ export const onRequestPost = async (context: {
   }
 
   const rl = await rateLimit(env.RATE_LIMIT, request, {
-    bucket: "training-checkin",
+    bucket: "kennismaking-checkin",
     max: 20,
     windowSeconds: 60,
   });
@@ -50,8 +52,6 @@ export const onRequestPost = async (context: {
   const email = String(body.email ?? "").trim().toLowerCase();
   const name = String(body.name ?? "").trim();
   const company = String(body.company ?? "").trim();
-  const rawTrack = String(body.track ?? "hybrid").trim().toLowerCase();
-  const track: TrainingTrack = rawTrack === "alle" ? "alle" : "hybrid";
 
   if (!email || !name || !company) {
     return Response.json(
@@ -63,23 +63,24 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "Ongeldig e-mailadres" }, { status: 400 });
   }
 
-  await setTrainingAttended(env, email, track);
-
   // Wall-E OS milestone (non-blocking, feature-flagged off until env is set).
-  // Training check-in = training_completed. Check-in timestamps land in evidence
-  // via session.start_at so the milestone row is deduped on the event_id.
+  // Kennismaking check-in = kennismaking_completed. Wall-E OS resolves the
+  // partner by email, records the milestone, and emits a v2 hubspot_outbox
+  // row that the property-drain worker flushes to HubSpot as
+  // ic__kennismaking_completed=true on the deal.
   const now = new Date().toISOString();
   postWalleosBooking(env, {
-    event_id: `training-checkin-${email}-${now.slice(0, 10)}`,
-    event_type: "training_completed",
+    event_id: `kennismaking-checkin-${email}-${now.slice(0, 10)}`,
+    event_type: "kennismaking_completed",
     partner_email: email,
     session: {
       session_id: `checkin-${now}`,
       start_at: now,
       host: "self-service check-in",
-      product_line: track === "alle" ? "all_e" : "quatt_heat_pump",
     },
-  }).catch((e) => console.error("Wall-E OS training_completed push failed:", e));
+  }).catch((e) =>
+    console.error("Wall-E OS kennismaking_completed push failed:", e),
+  );
 
   return Response.json({ success: true });
 };

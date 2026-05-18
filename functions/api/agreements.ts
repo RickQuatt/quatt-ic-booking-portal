@@ -61,6 +61,11 @@ async function sendAgreementPdfEmail(
   contactPerson: string,
 ): Promise<void> {
   const from = env.EMAIL_FROM || "Quatt Installatiepartners <onboarding@resend.dev>";
+  const baseUrl = (env.BASE_URL || "https://booking.quatt.io").replace(/\/$/, "");
+  const trainingParams = new URLSearchParams();
+  if (to) trainingParams.set("email", to);
+  if (companyName) trainingParams.set("company", companyName);
+  const trainingHref = `${baseUrl}/book/training?${trainingParams.toString()}`;
   // Weekend stopgap: route every confirmation to RESEND_OVERRIDE_TO when set,
   // and drop the bcc. Lets the Resend sandbox deliver while booking.quatt.io
   // domain verification is pending (Monday). Delete the secret to revert.
@@ -80,7 +85,10 @@ async function sendAgreementPdfEmail(
       <h1 style="font-size:22px;margin:0 0 16px 0;color:#1A1A1A;">Bedankt voor het ondertekenen</h1>
       <p style="font-size:15px;line-height:1.6;color:#1A1A1A;">Beste ${contactPerson},</p>
       <p style="font-size:15px;line-height:1.6;color:#1A1A1A;">Je hebt zojuist de Quatt partnerovereenkomst ondertekend namens <strong>${companyName}</strong>. Een kopie van de ondertekende overeenkomst vind je in de bijlage van deze mail.</p>
-      <p style="font-size:15px;line-height:1.6;color:#1A1A1A;">Je Quatt partnermanager neemt binnen enkele dagen contact met je op over de volgende stappen.</p>
+      <p style="font-size:15px;line-height:1.6;color:#1A1A1A;"><strong>Volgende stap:</strong> plan je installatietraining in. Daarna ben je klaar om te starten als Quatt partner.</p>
+      <p style="margin:24px 0;text-align:center;">
+        <a href="${trainingHref}" style="display:inline-block;background:#FF6933;color:#fff;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:999px;font-size:15px;">Plan je training</a>
+      </p>
       <p style="font-size:15px;line-height:1.6;color:#1A1A1A;margin-top:24px;">Met vriendelijke groet,<br>Team Quatt Installatiepartners</p>
     </div>
     <div style="margin-top:24px;padding:0 4px;color:#8A8580;font-size:13px;line-height:1.6;">

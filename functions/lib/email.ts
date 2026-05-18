@@ -15,13 +15,24 @@ async function sendEmail(
     env.EMAIL_FROM ||
     "Quatt Installatiepartners <onboarding@resend.dev>";
 
+  // Mirrors agreements.ts: route every confirmation to RESEND_OVERRIDE_TO when
+  // set, until a Quatt sender domain is verified in Resend. Without this, the
+  // sandbox sender (onboarding@resend.dev) 403s on every non-rick@ recipient.
+  const overrideTo = env.RESEND_OVERRIDE_TO;
+  const effectiveTo = overrideTo || to;
+  if (overrideTo) {
+    console.log(
+      `[booking-email] OVERRIDE active: routing to ${overrideTo} instead of ${to}`,
+    );
+  }
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
     },
-    body: JSON.stringify({ from, to, subject, html }),
+    body: JSON.stringify({ from, to: effectiveTo, subject, html }),
   });
 
   if (!res.ok) {

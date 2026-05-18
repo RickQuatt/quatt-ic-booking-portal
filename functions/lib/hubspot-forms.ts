@@ -8,6 +8,20 @@ import type { Env, TrainingTrack } from "./types";
 const PORTAL_ID = "25848718";
 
 /**
+ * Map booking-portal track to the HubSpot multi-checkbox product-line value.
+ * `ic__trained_products` / `ic__training_booked_products` options:
+ *   - quatt_heat_pump (Hybrid Single + Duo + Duo Expansion)  <- track="hybrid"
+ *   - all_e           (Single + Duo + Expansion)             <- track="alle"
+ *   - chill                                                  <- track="chill" (future; Chill flow is external today)
+ *   - home_battery                                           <- not in booking portal
+ */
+function trackToProductLine(track: TrainingTrack): string {
+  if (track === "alle") return "all_e";
+  if ((track as string) === "chill") return "chill";
+  return "quatt_heat_pump";
+}
+
+/**
  * Pick the right form GUID per track. Each track has its own dedicated form so
  * HubSpot's submission log -- queryable from lists/workflows/dynamic content --
  * preserves a per-track history without needing any new contact properties.
@@ -97,6 +111,11 @@ export async function setTrainingBooked(
   const fields: { name: string; value: string }[] = [
     { name: "email", value: email },
     { name: "ic__training_booked", value: "true" },
+    // Per-product-line tracking. Forms API multi-checkbox semantics OVERWRITE
+    // (not append), so a partner who books Hybrid then All-E will end the day
+    // with just "all_e" -- the Wall-E OS canonical-writer follow-up
+    // (MASTER-BUILD-PLAN-2026-05-15 Move 8) fixes this with read-modify-write.
+    { name: "ic__training_booked_products", value: trackToProductLine(track) },
   ];
 
   if (dealId) {
@@ -152,6 +171,8 @@ export async function setTrainingAttended(
   const fields: { name: string; value: string }[] = [
     { name: "email", value: email },
     { name: "ic__training_completed", value: "true" },
+    // Per-product-line tracking. Same OVERWRITE caveat as setTrainingBooked.
+    { name: "ic__trained_products", value: trackToProductLine(track) },
   ];
 
   const res = await fetch(

@@ -32,6 +32,7 @@ import { appendBookingRow } from "../../lib/google-sheets";
 import { setTrainingBooked } from "../../lib/hubspot-forms";
 import { postWalleosBooking } from "../../lib/walleos";
 import { sendTrainingConfirmation } from "../../lib/email";
+import { alertOnFailure } from "../../lib/slack";
 import {
   findActiveSessionBookingForEmail,
   getSessionById,
@@ -62,8 +63,12 @@ interface ReserveTrainingBody {
   assignedAm: string;
 }
 
-export const onRequestPost = async (context: { request: Request; env: Env }) => {
-  const { env, request } = context;
+export const onRequestPost = async (context: {
+  request: Request;
+  env: Env;
+  waitUntil: (promise: Promise<unknown>) => void;
+}) => {
+  const { env, request, waitUntil } = context;
 
   if (!env.RESERVE_SECRET) {
     console.error("RESERVE_SECRET unset; refusing reserve request");
@@ -165,90 +170,123 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   const trackTitlePrefix =
     sessionTrack === "alle" ? "All-e Installatietraining" : "Quatt Installatie Training";
 
-  // Calendar attach (non-blocking) -- mirrors handleTrainingBooking.
+  // Calendar attach -- mirrors handleTrainingBooking.
   if (session.calendar_event_id) {
     const eventId = session.calendar_event_id;
-    ensureTrainingCoreAttendees(env, trackCalendarId, eventId).catch((e) =>
-      console.error("Core training attendee backfill failed:", e),
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Core training attendee backfill",
+        ensureTrainingCoreAttendees(env, trackCalendarId, eventId),
+      ),
     );
-    addAttendeeToEvent(env, trackCalendarId, eventId, partnerEmail, partnerName).catch((e) =>
-      console.error("Calendar attendee add failed:", e),
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Calendar attendee add (reserve)",
+        addAttendeeToEvent(env, trackCalendarId, eventId, partnerEmail, partnerName),
+      ),
     );
   } else {
-    (async () => {
-      try {
-        const newEventId = await createTrainingEvent(env, {
-          title: session.title,
-          date: session.date,
-          startTime: session.start_time,
-          endTime: session.end_time,
-          location: session.location,
-          maxCapacity: session.max_capacity,
-          calendarId: trackCalendarId,
-          titlePrefix: trackTitlePrefix,
-        });
-        if (newEventId) {
-          await env.DB!.prepare(
-            `UPDATE training_sessions SET calendar_event_id = ?, updated_at = datetime('now') WHERE id = ?`,
-          )
-            .bind(newEventId, sessionId)
-            .run();
-          await addAttendeeToEvent(env, trackCalendarId, newEventId, partnerEmail, partnerName);
-        }
-      } catch (e) {
-        console.error("Lazy training calendar event creation failed:", e);
-      }
-    })();
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Lazy training calendar event creation (reserve)",
+        (async () => {
+          const newEventId = await createTrainingEvent(env, {
+            title: session.title,
+            date: session.date,
+            startTime: session.start_time,
+            endTime: session.end_time,
+            location: session.location,
+            maxCapacity: session.max_capacity,
+            calendarId: trackCalendarId,
+            titlePrefix: trackTitlePrefix,
+          });
+          if (newEventId) {
+            await env.DB!.prepare(
+              `UPDATE training_sessions SET calendar_event_id = ?, updated_at = datetime('now') WHERE id = ?`,
+            )
+              .bind(newEventId, sessionId)
+              .run();
+            await addAttendeeToEvent(env, trackCalendarId, newEventId, partnerEmail, partnerName);
+          }
+        })(),
+      ),
+    );
   }
 
   // HubSpot: flip ic__training_booked so PP Branch AV picks the deal up.
-  setTrainingBooked(env, partnerEmail, dealId, session.date, sessionTrack).catch((e) =>
-    console.error("HubSpot training-booked push failed:", e),
+  // ctx.waitUntil keeps the worker alive until the POST settles -- without
+  // it, CF Pages may terminate the function after Response is returned and
+  // the form submission silently drops (root cause of 2026-05-07 Younes miss).
+  waitUntil(
+    alertOnFailure(
+      env,
+      "HubSpot training-booked (AM reserve)",
+      setTrainingBooked(env, partnerEmail, dealId, session.date, sessionTrack),
+    ),
   );
 
-  // Wall-E OS milestone (non-blocking)
-  postWalleosBooking(env, {
-    event_id: `booking-training-${booking.id}`,
-    event_type: "training_booked",
-    partner_email: partnerEmail,
-    hubspot_deal_id: dealId || undefined,
-    session: {
-      session_id: String(session.id),
-      start_at: session.date,
-      host: "Mitchell van Kleef",
-    },
-  }).catch((e) => console.error("Wall-E OS training-booked push failed:", e));
+  // Wall-E OS milestone
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Wall-E OS training_booked (AM reserve)",
+      postWalleosBooking(env, {
+        event_id: `booking-training-${booking.id}`,
+        event_type: "training_booked",
+        partner_email: partnerEmail,
+        hubspot_deal_id: dealId || undefined,
+        session: {
+          session_id: String(session.id),
+          start_at: session.date,
+          host: "Mitchell van Kleef",
+        },
+      }),
+    ),
+  );
 
-  // Audit row in Google Sheet (non-blocking). Use status flag so Rick can
-  // filter "reserved without agreement" reservations later.
-  appendBookingRow(env, {
-    type: "training",
-    partnerName,
-    email: partnerEmail,
-    phone: partnerPhone || "",
-    company: companyName,
-    date: session.date,
-    am: assignedAm,
-    status: "reserved_unsigned",
-    hubspotDealId: dealId || "",
-  })
-    .then((rowId) => {
-      if (rowId) updateBookingSheetRow(env, booking.id, rowId).catch(() => {});
-    })
-    .catch((e) => console.error("Sheet write failed:", e));
+  // Audit row in Google Sheet. Use status flag so Rick can filter
+  // "reserved without agreement" reservations later.
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Bookings sheet append (AM reserve)",
+      appendBookingRow(env, {
+        type: "training",
+        partnerName,
+        email: partnerEmail,
+        phone: partnerPhone || "",
+        company: companyName,
+        date: session.date,
+        am: assignedAm,
+        status: "reserved_unsigned",
+        hubspotDealId: dealId || "",
+      }).then((rowId) => {
+        if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+      }),
+    ),
+  );
 
   // NO Slack notification. AM already sees the action in the AM toolkit.
 
-  // Confirmation email with agreement-pending CTA (non-blocking).
-  sendTrainingConfirmation(env, {
-    to: partnerEmail,
-    partnerName,
-    sessionDate: session.date,
-    sessionTime: `${session.start_time} - ${session.end_time}`,
-    location: session.location || "",
-    agreementPending: true,
-    dealId,
-  }).catch((e) => console.error("Training confirmation email failed:", e));
+  // Confirmation email with agreement-pending CTA.
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Training confirmation email (AM reserve)",
+      sendTrainingConfirmation(env, {
+        to: partnerEmail,
+        partnerName,
+        sessionDate: session.date,
+        sessionTime: `${session.start_time} - ${session.end_time}`,
+        location: session.location || "",
+        agreementPending: true,
+        dealId,
+      }),
+    ),
+  );
 
   return Response.json({
     success: true,

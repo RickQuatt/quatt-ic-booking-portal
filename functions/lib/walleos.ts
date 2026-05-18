@@ -47,6 +47,19 @@ export interface WalleosBookingEvent {
     end_at?: string;
     url?: string;
     host?: string;
+    /**
+     * Product line this training/booking is for. Required for training_*
+     * events post-2026-05-18 (multi-product trainings start Wed 2026-05-20).
+     * Wall-E OS stores this on partner_milestones.product_line and uses it
+     * to drive the HubSpot ic__trained_products / ic__training_booked_products
+     * multi-checkbox writes via the canonical drain (follow-up Move 8).
+     * Values mirror the HubSpot multi-checkbox options:
+     *   - "quatt_heat_pump" (Hybrid)
+     *   - "all_e"
+     *   - "chill"
+     *   - "home_battery"
+     */
+    product_line?: "quatt_heat_pump" | "all_e" | "chill" | "home_battery";
   };
 }
 

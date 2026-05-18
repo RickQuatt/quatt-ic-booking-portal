@@ -13,15 +13,16 @@ import {
 import { IC_COLORS, AM_CONFIG, type Env } from "../../../lib/types";
 import { setKennismakingBooked } from "../../../lib/hubspot-forms";
 import { sendRescheduleConfirmation } from "../../../lib/email";
-import { sendSlackNotification, formatRescheduleNotification } from "../../../lib/slack";
+import { sendSlackNotification, formatRescheduleNotification, alertOnFailure } from "../../../lib/slack";
 import { getBookingById, rescheduleBooking } from "../../../lib/d1-bookings";
 
 export const onRequestPost = async (context: {
   request: Request;
   env: Env;
   params: Record<string, string>;
+  waitUntil: (promise: Promise<unknown>) => void;
 }) => {
-  const { env } = context;
+  const { env, waitUntil } = context;
   const id = context.params.id;
   const body = (await context.request.json()) as {
     token: string;
@@ -122,40 +123,56 @@ export const onRequestPost = async (context: {
     calendar_event_id: calResult.eventId,
   });
 
-  setKennismakingBooked(env, email, booking.hubspot_deal_id || undefined, newDate).catch((e) =>
-    console.error("HubSpot re-push failed:", e),
+  waitUntil(
+    alertOnFailure(
+      env,
+      "HubSpot kennismaking re-push (reschedule)",
+      setKennismakingBooked(env, email, booking.hubspot_deal_id || undefined, newDate),
+    ),
   );
 
   const rescheduleToken = await signBookingAction(env.BOOKING_SECRET, id, email, "reschedule");
   const cancelToken = await signBookingAction(env.BOOKING_SECRET, id, email, "cancel");
 
-  sendRescheduleConfirmation(env, {
-    to: email,
-    partnerName: booking.partner_name,
-    companyName: booking.company_name,
-    amName: am.name,
-    date: newDate,
-    startTime: newSlotStart,
-    endTime: newSlotEnd,
-    meetingFormat: meetingFormat as "showroom" | "online",
-    location: eventLocation || null,
-    meetLink: calResult.meetLink,
-    bookingId: id,
-    rescheduleToken,
-    cancelToken,
-  }).catch((e) => console.error("Reschedule confirmation email failed:", e));
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Reschedule confirmation email",
+      sendRescheduleConfirmation(env, {
+        to: email,
+        partnerName: booking.partner_name,
+        companyName: booking.company_name,
+        amName: am.name,
+        date: newDate,
+        startTime: newSlotStart,
+        endTime: newSlotEnd,
+        meetingFormat: meetingFormat as "showroom" | "online",
+        location: eventLocation || null,
+        meetLink: calResult.meetLink,
+        bookingId: id,
+        rescheduleToken,
+        cancelToken,
+      }),
+    ),
+  );
 
-  sendSlackNotification(
-    env,
-    formatRescheduleNotification({
-      partnerName: booking.partner_name,
-      companyName: booking.company_name,
-      oldDate: booking.preferred_date || "",
-      newDate,
-      newTime,
-      amName: am.name,
-    }),
-  ).catch((e) => console.error("Slack reschedule notification failed:", e));
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Slack reschedule notification",
+      sendSlackNotification(
+        env,
+        formatRescheduleNotification({
+          partnerName: booking.partner_name,
+          companyName: booking.company_name,
+          oldDate: booking.preferred_date || "",
+          newDate,
+          newTime,
+          amName: am.name,
+        }),
+      ),
+    ),
+  );
 
   return Response.json({
     success: true,

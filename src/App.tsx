@@ -12,6 +12,7 @@ import { ChillRedirectPage } from "./pages/book/training/chill/page";
 import { AgreementPage } from "./pages/book/agreement/page";
 import { InstallPage } from "./pages/book/install/page";
 import { TrainingCheckInPage } from "./pages/training/check-in/page";
+import { KennismakingCheckInPage } from "./pages/kennismaking/check-in/page";
 
 // Admin page
 import { AdminPage } from "./pages/admin/page";
@@ -49,11 +50,12 @@ function BookingLayout({ children }: { children: React.ReactNode }) {
 function App() {
   const [location] = useLocation();
 
-  // Booking + training check-in routes get the clean public layout
+  // Booking + training check-in + kennismaking check-in routes get the clean public layout
   const isBookingRoute = location.startsWith("/book");
   const isTrainingRoute = location.startsWith("/training");
+  const isKennismakingRoute = location.startsWith("/kennismaking");
 
-  if (isBookingRoute || isTrainingRoute) {
+  if (isBookingRoute || isTrainingRoute || isKennismakingRoute) {
     return (
       <QueryClientProvider client={queryClient}>
         <BookingLayout>
@@ -72,6 +74,7 @@ function App() {
             <Route path="/book/agreement" component={AgreementPage} />
             <Route path="/book/install" component={InstallPage} />
             <Route path="/training/check-in" component={TrainingCheckInPage} />
+            <Route path="/kennismaking/check-in" component={KennismakingCheckInPage} />
           </Switch>
         </BookingLayout>
         <Toaster />

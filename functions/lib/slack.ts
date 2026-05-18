@@ -5,6 +5,8 @@
 
 import type { Env } from "./types";
 
+const ALERT_CHANNEL_FALLBACK = "C0B2E5S1XHD"; // #wall-e-alerts -- single sink for silent-failure signals.
+
 export async function sendSlackNotification(
   env: Env,
   text: string,
@@ -31,6 +33,56 @@ export async function sendSlackNotification(
 
   const data = (await response.json()) as { ok: boolean };
   return data.ok === true;
+}
+
+/**
+ * Send to the central Wall-e alerts channel (#wall-e-alerts, C0B2E5S1XHD).
+ * Used for silent-failure signals: HubSpot Forms drops, Wall-e OS push fails,
+ * etc. Falls back to console.error when the bot token is missing so the alert
+ * never blocks the request path.
+ */
+export async function sendAlert(env: Env, text: string): Promise<void> {
+  if (!env.SLACK_BOT_TOKEN) {
+    console.error("[alert]", text);
+    return;
+  }
+  const channelId = env.SLACK_ALERT_CHANNEL_ID || ALERT_CHANNEL_FALLBACK;
+  try {
+    await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+      },
+      body: JSON.stringify({ channel: channelId, text, mrkdwn: true }),
+    });
+  } catch (e) {
+    console.error("[alert post failed]", text, e);
+  }
+}
+
+/**
+ * Wrap a fire-and-forget promise so any rejection lands in #wall-e-alerts.
+ * Use with ctx.waitUntil() at call sites so Cloudflare keeps the worker alive
+ * until the promise settles. Returns a void promise that never rejects.
+ */
+export function alertOnFailure<T>(
+  env: Env,
+  label: string,
+  p: Promise<T>,
+): Promise<void> {
+  return p.then(
+    () => undefined,
+    async (e) => {
+      const msg =
+        `:rotating_light: *${label}* failed\n` +
+        "```" +
+        (e instanceof Error ? `${e.message}\n${e.stack ?? ""}` : String(e)).slice(0, 1500) +
+        "```";
+      console.error(`[${label}]`, e);
+      await sendAlert(env, msg);
+    },
+  );
 }
 
 export function formatTrainingBookingNotification(params: {

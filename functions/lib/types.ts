@@ -26,6 +26,9 @@ export interface Env {
   // Slack
   SLACK_BOT_TOKEN: string;
   SLACK_CHANNEL_ID: string;
+  // Central sink for silent-failure alerts. Defaults to #wall-e-alerts
+  // (C0B2E5S1XHD) when unset, so missing config never silences the alerts.
+  SLACK_ALERT_CHANNEL_ID?: string;
 
   // Google Sheets
   IC_BOOKINGS_SHEET_ID: string;

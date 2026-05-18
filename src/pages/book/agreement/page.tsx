@@ -120,8 +120,10 @@ export function AgreementPage() {
   }
 
   if (result) {
+    // Always offer training as the next step -- the agreement→training flow
+    // is the canonical IC onboarding path. Previously gated on
+    // returnTo=training which left partners on a dead-end thank-you screen.
     const trainingHref = (() => {
-      if (returnTo !== "training") return null;
       const params = new URLSearchParams();
       const emailVal = (prefillEmail || "").trim();
       const companyVal = (result.companyName || prefillCompany || "").trim();
@@ -152,9 +154,7 @@ export function AgreementPage() {
             Bedankt, {result.companyName}. Je ontvangt de ondertekende overeenkomst per e-mail.
           </p>
           <p className="mt-2 text-[14px] text-[#8A8580] leading-[1.55]">
-            {trainingHref
-              ? "Volgende stap: plan je installatietraining in."
-              : "Je Quatt partnermanager neemt binnen enkele dagen contact op voor de volgende stappen."}
+            Volgende stap: plan je installatietraining in.
           </p>
 
           <div className="mt-7 flex flex-col sm:flex-row gap-3 items-center justify-center">

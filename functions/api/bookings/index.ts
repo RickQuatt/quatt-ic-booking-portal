@@ -23,6 +23,7 @@ import {
   formatTrainingBookingNotification,
   formatIntroCallNotification,
   formatFirstInstallNotification,
+  alertOnFailure,
 } from "../../lib/slack";
 import {
   setKennismakingBooked,
@@ -57,8 +58,9 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const onRequestPost = async (context: {
   request: Request;
   env: Env;
+  waitUntil: (promise: Promise<unknown>) => void;
 }) => {
-  const { env, request } = context;
+  const { env, request, waitUntil } = context;
 
   if (!originMatchesHost(request)) {
     return Response.json({ error: "Invalid origin" }, { status: 403 });
@@ -111,9 +113,9 @@ export const onRequestPost = async (context: {
   }
 
   try {
-    if (type === "training") return await handleTrainingBooking(env, body);
-    if (type === "intro_call") return await handleIntroCallBooking(env, body);
-    if (type === "first_install") return await handleFirstInstallBooking(env, body);
+    if (type === "training") return await handleTrainingBooking(env, body, waitUntil);
+    if (type === "intro_call") return await handleIntroCallBooking(env, body, waitUntil);
+    if (type === "first_install") return await handleFirstInstallBooking(env, body, waitUntil);
   } catch (error) {
     console.error("Booking error:", error);
     return Response.json({ error: "Booking failed. Please try again." }, { status: 500 });
@@ -126,7 +128,11 @@ export const onRequestPost = async (context: {
 // Training
 // ---------------------------------------------------------------------------
 
-async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
+async function handleTrainingBooking(
+  env: Env,
+  body: Record<string, unknown>,
+  waitUntil: (p: Promise<unknown>) => void,
+) {
   const { sessionId, partnerName, partnerEmail, partnerPhone, companyName, kvkNumber, notes, dealId } =
     body as {
       sessionId: string;
@@ -226,103 +232,138 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
   // without them.
   if (session.calendar_event_id) {
     const eventId = session.calendar_event_id;
-    ensureTrainingCoreAttendees(env, trackCalendarId, eventId).catch((e) =>
-      console.error("Core training attendee backfill failed:", e),
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Core training attendee backfill",
+        ensureTrainingCoreAttendees(env, trackCalendarId, eventId),
+      ),
     );
-    addAttendeeToEvent(
-      env,
-      trackCalendarId,
-      eventId,
-      partnerEmail,
-      partnerName,
-    ).catch((e) => console.error("Calendar attendee add failed:", e));
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Calendar attendee add (training)",
+        addAttendeeToEvent(env, trackCalendarId, eventId, partnerEmail, partnerName),
+      ),
+    );
   } else {
-    (async () => {
-      try {
-        const newEventId = await createTrainingEvent(env, {
-          title: session.title,
-          date: session.date,
-          startTime: session.start_time,
-          endTime: session.end_time,
-          location: session.location,
-          maxCapacity: session.max_capacity,
-          calendarId: trackCalendarId,
-          titlePrefix: trackTitlePrefix,
-        });
-        if (newEventId) {
-          await env.DB!.prepare(
-            `UPDATE training_sessions SET calendar_event_id = ?, updated_at = datetime('now') WHERE id = ?`,
-          )
-            .bind(newEventId, sessionId)
-            .run();
-          await addAttendeeToEvent(
-            env,
-            trackCalendarId,
-            newEventId,
-            partnerEmail,
-            partnerName,
-          );
-        }
-      } catch (e) {
-        console.error("Lazy training calendar event creation failed:", e);
-      }
-    })();
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Lazy training calendar event creation",
+        (async () => {
+          const newEventId = await createTrainingEvent(env, {
+            title: session.title,
+            date: session.date,
+            startTime: session.start_time,
+            endTime: session.end_time,
+            location: session.location,
+            maxCapacity: session.max_capacity,
+            calendarId: trackCalendarId,
+            titlePrefix: trackTitlePrefix,
+          });
+          if (newEventId) {
+            await env.DB!.prepare(
+              `UPDATE training_sessions SET calendar_event_id = ?, updated_at = datetime('now') WHERE id = ?`,
+            )
+              .bind(newEventId, sessionId)
+              .run();
+            await addAttendeeToEvent(
+              env,
+              trackCalendarId,
+              newEventId,
+              partnerEmail,
+              partnerName,
+            );
+          }
+        })(),
+      ),
+    );
   }
 
-  // HubSpot: flip ic__training_booked + ic__training_track (non-blocking)
-  setTrainingBooked(env, partnerEmail, undefined, session.date, sessionTrack).catch((e) =>
-    console.error("HubSpot training-booked push failed:", e),
+  // HubSpot: flip ic__training_booked. ctx.waitUntil keeps the worker alive
+  // until the POST settles -- without it CF Pages may terminate the function
+  // after Response is returned and the submission silently drops.
+  waitUntil(
+    alertOnFailure(
+      env,
+      "HubSpot training-booked (public booking)",
+      setTrainingBooked(env, partnerEmail, undefined, session.date, sessionTrack),
+    ),
   );
 
-  // Wall-E OS milestone (non-blocking)
-  postWalleosBooking(env, {
-    event_id: `booking-training-${booking.id}`,
-    event_type: "training_booked",
-    partner_email: partnerEmail,
-    session: {
-      session_id: String(session.id),
-      start_at: session.date,
-      host: "Mitchell van Kleef",
-    },
-  }).catch((e) => console.error("Wall-E OS training-booked push failed:", e));
+  // Wall-E OS milestone
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Wall-E OS training_booked push",
+      postWalleosBooking(env, {
+        event_id: `booking-training-${booking.id}`,
+        event_type: "training_booked",
+        partner_email: partnerEmail,
+        session: {
+          session_id: String(session.id),
+          start_at: session.date,
+          host: "Mitchell van Kleef",
+          product_line: sessionTrack === "alle" ? "all_e" : "quatt_heat_pump",
+        },
+      }),
+    ),
+  );
 
-  // Google Sheet (non-blocking)
-  appendBookingRow(env, {
-    type: "training",
-    partnerName,
-    email: partnerEmail,
-    phone: partnerPhone,
-    company: companyName,
-    date: session.date,
-    am: "Mitchell van Kleef",
-    status: "confirmed",
-    hubspotDealId: "",
-  })
-    .then((rowId) => {
-      if (rowId) updateBookingSheetRow(env, booking.id, rowId).catch(() => {});
-    })
-    .catch((e) => console.error("Sheet write failed:", e));
+  // Google Sheet
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Bookings sheet append (training)",
+      appendBookingRow(env, {
+        type: "training",
+        partnerName,
+        email: partnerEmail,
+        phone: partnerPhone,
+        company: companyName,
+        date: session.date,
+        am: "Mitchell van Kleef",
+        status: "confirmed",
+        hubspotDealId: "",
+      }).then((rowId) => {
+        if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+      }),
+    ),
+  );
 
-  // Slack (non-blocking)
-  sendSlackNotification(
-    env,
-    formatTrainingBookingNotification({
-      partnerName,
-      companyName,
-      trainingDate: `${session.date} ${session.start_time}`,
-      spotsRemaining: Math.max(0, session.max_capacity - session.current_bookings - 1),
-      totalSpots: session.max_capacity,
-    }),
-  ).catch((e) => console.error("Slack notification failed:", e));
+  // Slack booking notification (operational channel, separate from alerts)
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Slack training-booked notification",
+      sendSlackNotification(
+        env,
+        formatTrainingBookingNotification({
+          partnerName,
+          companyName,
+          trainingDate: `${session.date} ${session.start_time}`,
+          spotsRemaining: Math.max(0, session.max_capacity - session.current_bookings - 1),
+          totalSpots: session.max_capacity,
+        }),
+      ),
+    ),
+  );
 
-  // Confirmation email (non-blocking)
-  sendTrainingConfirmation(env, {
-    to: partnerEmail,
-    partnerName,
-    sessionDate: session.date,
-    sessionTime: `${session.start_time} - ${session.end_time}`,
-    location: session.location || "",
-  }).catch((e) => console.error("Training confirmation email failed:", e));
+  // Confirmation email
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Training confirmation email",
+      sendTrainingConfirmation(env, {
+        to: partnerEmail,
+        partnerName,
+        sessionDate: session.date,
+        sessionTime: `${session.start_time} - ${session.end_time}`,
+        location: session.location || "",
+      }),
+    ),
+  );
 
   return Response.json({
     success: true,
@@ -339,7 +380,11 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
 // Intro call (kennismaking)
 // ---------------------------------------------------------------------------
 
-async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
+async function handleIntroCallBooking(
+  env: Env,
+  body: Record<string, unknown>,
+  waitUntil: (p: Promise<unknown>) => void,
+) {
   const {
     partnerName,
     partnerEmail,
@@ -459,42 +504,56 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
       meeting_format: meetingFormat,
     });
 
-    // HubSpot (non-blocking)
-    setKennismakingBooked(env, partnerEmail, hubspotDealId, slotStart.split("T")[0]).catch((e) =>
-      console.error("HubSpot Forms API failed:", e),
+    // HubSpot
+    waitUntil(
+      alertOnFailure(
+        env,
+        "HubSpot kennismaking-booked (kalender slot)",
+        setKennismakingBooked(env, partnerEmail, hubspotDealId, slotStart.split("T")[0]),
+      ),
     );
 
-    // Wall-E OS milestone (non-blocking)
-    postWalleosBooking(env, {
-      event_id: `booking-kennismaking-${booking.id}`,
-      event_type: "kennismaking_booked",
-      partner_email: partnerEmail,
-      hubspot_deal_id: hubspotDealId || undefined,
-      session: {
-        session_id: String(booking.id),
-        start_at: slotStart,
-        host: am.name,
-      },
-    }).catch((e) => console.error("Wall-E OS kennismaking-booked push failed:", e));
+    // Wall-E OS milestone
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Wall-E OS kennismaking_booked push",
+        postWalleosBooking(env, {
+          event_id: `booking-kennismaking-${booking.id}`,
+          event_type: "kennismaking_booked",
+          partner_email: partnerEmail,
+          hubspot_deal_id: hubspotDealId || undefined,
+          session: {
+            session_id: String(booking.id),
+            start_at: slotStart,
+            host: am.name,
+          },
+        }),
+      ),
+    );
 
-    // Google Sheet (non-blocking)
-    appendBookingRow(env, {
-      type: "intro_call",
-      partnerName,
-      email: partnerEmail,
-      phone: partnerPhone,
-      company: companyName,
-      date: slotStart.split("T")[0],
-      am: am.name,
-      status: "confirmed",
-      hubspotDealId: "",
-    })
-      .then((rowId) => {
-        if (rowId) updateBookingSheetRow(env, booking.id, rowId).catch(() => {});
-      })
-      .catch((e) => console.error("Sheet write failed:", e));
+    // Google Sheet
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Bookings sheet append (intro_call)",
+        appendBookingRow(env, {
+          type: "intro_call",
+          partnerName,
+          email: partnerEmail,
+          phone: partnerPhone,
+          company: companyName,
+          date: slotStart.split("T")[0],
+          am: am.name,
+          status: "confirmed",
+          hubspotDealId: "",
+        }).then((rowId) => {
+          if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+        }),
+      ),
+    );
 
-    // Slack (non-blocking)
+    // Slack
     const slotTime = new Date(slotStart).toLocaleString("nl-NL", {
       weekday: "long",
       day: "numeric",
@@ -503,18 +562,24 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
       minute: "2-digit",
       timeZone: "Europe/Amsterdam",
     });
-    sendSlackNotification(
-      env,
-      formatIntroCallNotification({
-        partnerName,
-        companyName,
-        amName: am.name,
-        date: slotStart.split("T")[0],
-        time: slotTime,
-        phone: partnerPhone,
-        meetingFormat: formatLabels[meetingFormat],
-      }),
-    ).catch((e) => console.error("Slack notification failed:", e));
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Slack intro-call notification",
+        sendSlackNotification(
+          env,
+          formatIntroCallNotification({
+            partnerName,
+            companyName,
+            amName: am.name,
+            date: slotStart.split("T")[0],
+            time: slotTime,
+            phone: partnerPhone,
+            meetingFormat: formatLabels[meetingFormat],
+          }),
+        ),
+      ),
+    );
 
     // Tokens for reschedule/cancel links
     let rescheduleToken: string | undefined;
@@ -536,22 +601,28 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
       console.error("Token generation failed (BOOKING_SECRET missing?):", e);
     }
 
-    // Confirmation email (non-blocking)
-    sendKennismakingConfirmation(env, {
-      to: partnerEmail,
-      partnerName,
-      companyName,
-      amName: am.name,
-      date: slotStart.split("T")[0],
-      startTime: slotStart,
-      endTime: slotEnd,
-      meetingFormat: meetingFormat as "showroom" | "online",
-      location: eventLocation,
-      meetLink: calResult.meetLink,
-      bookingId: booking.id,
-      rescheduleToken,
-      cancelToken,
-    }).catch((e) => console.error("Kennismaking confirmation email failed:", e));
+    // Confirmation email
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Kennismaking confirmation email",
+        sendKennismakingConfirmation(env, {
+          to: partnerEmail,
+          partnerName,
+          companyName,
+          amName: am.name,
+          date: slotStart.split("T")[0],
+          startTime: slotStart,
+          endTime: slotEnd,
+          meetingFormat: meetingFormat as "showroom" | "online",
+          location: eventLocation,
+          meetLink: calResult.meetLink,
+          bookingId: booking.id,
+          rescheduleToken,
+          cancelToken,
+        }),
+      ),
+    );
 
     return Response.json({
       success: true,
@@ -597,65 +668,91 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
     meeting_format: meetingFormat || null,
   });
 
-  // HubSpot (non-blocking)
-  setKennismakingBooked(env, partnerEmail, hubspotDealId, preferredDate).catch((e) =>
-    console.error("HubSpot Forms API failed:", e),
+  // HubSpot (callback flow)
+  waitUntil(
+    alertOnFailure(
+      env,
+      "HubSpot kennismaking-booked (callback flow)",
+      setKennismakingBooked(env, partnerEmail, hubspotDealId, preferredDate),
+    ),
   );
 
-  // Wall-E OS milestone (non-blocking)
-  postWalleosBooking(env, {
-    event_id: `booking-kennismaking-${booking.id}`,
-    event_type: "kennismaking_booked",
-    partner_email: partnerEmail,
-    hubspot_deal_id: hubspotDealId || undefined,
-    session: {
-      session_id: String(booking.id),
-      start_at: `${preferredDate}T09:00:00Z`,
-      host: assignedAm.name,
-    },
-  }).catch((e) => console.error("Wall-E OS kennismaking-booked push failed:", e));
+  // Wall-E OS milestone
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Wall-E OS kennismaking_booked (callback flow)",
+      postWalleosBooking(env, {
+        event_id: `booking-kennismaking-${booking.id}`,
+        event_type: "kennismaking_booked",
+        partner_email: partnerEmail,
+        hubspot_deal_id: hubspotDealId || undefined,
+        session: {
+          session_id: String(booking.id),
+          start_at: `${preferredDate}T09:00:00Z`,
+          host: assignedAm.name,
+        },
+      }),
+    ),
+  );
 
-  // Google Sheet (non-blocking)
-  appendBookingRow(env, {
-    type: "intro_call",
-    partnerName,
-    email: partnerEmail,
-    phone: partnerPhone,
-    company: companyName,
-    date: preferredDate,
-    am: assignedAm.name,
-    status: "pending_am_confirmation",
-    hubspotDealId: "",
-  })
-    .then((rowId) => {
-      if (rowId) updateBookingSheetRow(env, booking.id, rowId).catch(() => {});
-    })
-    .catch((e) => console.error("Sheet write failed:", e));
+  // Google Sheet
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Bookings sheet append (callback intro_call)",
+      appendBookingRow(env, {
+        type: "intro_call",
+        partnerName,
+        email: partnerEmail,
+        phone: partnerPhone,
+        company: companyName,
+        date: preferredDate,
+        am: assignedAm.name,
+        status: "pending_am_confirmation",
+        hubspotDealId: "",
+      }).then((rowId) => {
+        if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+      }),
+    ),
+  );
 
-  // Slack (non-blocking)
+  // Slack
   const formatLabel = meetingFormat ? formatLabels[meetingFormat] : "Intro call";
-  sendSlackNotification(
-    env,
-    formatIntroCallNotification({
-      partnerName,
-      companyName,
-      amName: assignedAm.name,
-      date: preferredDate,
-      time: preferredTimeSlot || "n.t.b.",
-      phone: partnerPhone,
-      meetingFormat: formatLabel,
-    }),
-  ).catch((e) => console.error("Slack notification failed:", e));
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Slack intro-call notification (callback)",
+      sendSlackNotification(
+        env,
+        formatIntroCallNotification({
+          partnerName,
+          companyName,
+          amName: assignedAm.name,
+          date: preferredDate,
+          time: preferredTimeSlot || "n.t.b.",
+          phone: partnerPhone,
+          meetingFormat: formatLabel,
+        }),
+      ),
+    ),
+  );
 
-  // Confirmation email for site visits (non-blocking)
+  // Confirmation email for site visits
   if (meetingFormat === "site_visit" && location) {
-    sendSiteVisitConfirmation(env, {
-      to: partnerEmail,
-      partnerName,
-      companyName,
-      amName: assignedAm.name,
-      location,
-    }).catch((e) => console.error("Site visit confirmation email failed:", e));
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Site visit confirmation email",
+        sendSiteVisitConfirmation(env, {
+          to: partnerEmail,
+          partnerName,
+          companyName,
+          amName: assignedAm.name,
+          location,
+        }),
+      ),
+    );
   }
 
   return Response.json({
@@ -673,7 +770,11 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
 // First install
 // ---------------------------------------------------------------------------
 
-async function handleFirstInstallBooking(env: Env, body: Record<string, unknown>) {
+async function handleFirstInstallBooking(
+  env: Env,
+  body: Record<string, unknown>,
+  waitUntil: (p: Promise<unknown>) => void,
+) {
   const {
     partnerName,
     partnerEmail,
@@ -721,72 +822,96 @@ async function handleFirstInstallBooking(env: Env, body: Record<string, unknown>
     assigned_am: assignedAm.email,
   });
 
-  // Tentative week-long calendar hold on IC calendar (non-blocking)
-  createFirstInstallHold(env, {
-    companyName,
-    partnerName,
-    partnerEmail,
-    partnerPhone,
-    installationAddress,
-    preferredWeek,
-    amEmail: assignedAm.email,
-    notes,
-  })
-    .then((calendarEventId) => {
-      if (calendarEventId) {
-        updateBookingCalendar(env, booking.id, calendarEventId).catch(() => {});
-      }
-    })
-    .catch((e) => console.error("First install calendar hold failed:", e));
+  // Tentative week-long calendar hold on IC calendar
+  waitUntil(
+    alertOnFailure(
+      env,
+      "First install calendar hold",
+      createFirstInstallHold(env, {
+        companyName,
+        partnerName,
+        partnerEmail,
+        partnerPhone,
+        installationAddress,
+        preferredWeek,
+        amEmail: assignedAm.email,
+        notes,
+      }).then((calendarEventId) => {
+        if (calendarEventId) return updateBookingCalendar(env, booking.id, calendarEventId);
+      }),
+    ),
+  );
 
-  // Google Sheet (non-blocking)
-  appendBookingRow(env, {
-    type: "first_install",
-    partnerName,
-    email: partnerEmail,
-    phone: partnerPhone,
-    company: companyName,
-    date: preferredWeek,
-    am: assignedAm.name,
-    status: "pending_am_confirmation",
-    hubspotDealId: "",
-  })
-    .then((rowId) => {
-      if (rowId) updateBookingSheetRow(env, booking.id, rowId).catch(() => {});
-    })
-    .catch((e) => console.error("Sheet write failed:", e));
+  // Google Sheet
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Bookings sheet append (first_install)",
+      appendBookingRow(env, {
+        type: "first_install",
+        partnerName,
+        email: partnerEmail,
+        phone: partnerPhone,
+        company: companyName,
+        date: preferredWeek,
+        am: assignedAm.name,
+        status: "pending_am_confirmation",
+        hubspotDealId: "",
+      }).then((rowId) => {
+        if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+      }),
+    ),
+  );
 
-  // Slack (non-blocking)
-  sendSlackNotification(
-    env,
-    formatFirstInstallNotification({
-      partnerName,
-      companyName,
-      address: installationAddress,
-      preferredWeek,
-    }),
-  ).catch((e) => console.error("Slack notification failed:", e));
+  // Slack
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Slack first-install notification",
+      sendSlackNotification(
+        env,
+        formatFirstInstallNotification({
+          partnerName,
+          companyName,
+          address: installationAddress,
+          preferredWeek,
+        }),
+      ),
+    ),
+  );
 
-  // Confirmation email (non-blocking)
-  sendFirstInstallConfirmation(env, {
-    to: partnerEmail,
-    partnerName,
-    amName: assignedAm.name,
-    address: installationAddress,
-    preferredWeek,
-  }).catch((e) => console.error("First install confirmation email failed:", e));
+  // Confirmation email
+  waitUntil(
+    alertOnFailure(
+      env,
+      "First install confirmation email",
+      sendFirstInstallConfirmation(env, {
+        to: partnerEmail,
+        partnerName,
+        amName: assignedAm.name,
+        address: installationAddress,
+        preferredWeek,
+      }),
+    ),
+  );
 
-  // Wall-E OS milestone (non-blocking)
-  postWalleosBooking(env, {
-    event_id: `booking-first-install-${booking.id}`,
-    event_type: "first_install_booked",
-    partner_email: partnerEmail,
-    session: {
-      session_id: String(booking.id),
-      start_at: preferredWeek,
-      host: assignedAm.name,
-    },
-  }).catch((e) => console.error("Wall-E OS first_install_booked push failed:", e));
+  // Wall-E OS milestone
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Wall-E OS first_install_booked push",
+      postWalleosBooking(env, {
+        event_id: `booking-first-install-${booking.id}`,
+        event_type: "first_install_booked",
+        partner_email: partnerEmail,
+        session: {
+          session_id: String(booking.id),
+          start_at: preferredWeek,
+          host: assignedAm.name,
+        },
+      }),
+    ),
+  );
 
   return Response.json({
     success: true,
