@@ -7,19 +7,10 @@ import type { Env, TrainingTrack } from "./types";
 
 const PORTAL_ID = "25848718";
 
-/**
- * Map booking-portal track to the HubSpot multi-checkbox product-line value.
- * `ic__trained_products` / `ic__training_booked_products` options:
- *   - quatt_heat_pump (Hybrid Single + Duo + Duo Expansion)  <- track="hybrid"
- *   - all_e           (Single + Duo + Expansion)             <- track="alle"
- *   - chill                                                  <- track="chill" (future; Chill flow is external today)
- *   - home_battery                                           <- not in booking portal
- */
-function trackToProductLine(track: TrainingTrack): string {
-  if (track === "alle") return "all_e";
-  if ((track as string) === "chill") return "chill";
-  return "quatt_heat_pump";
-}
+// Per-product-line multi-checkbox writes (ic__trained_products /
+// ic__training_booked_products) moved to the Wall-E OS drain on 2026-05-22.
+// Booking portal still picks per-track form GUIDs below so the HubSpot
+// submission log preserves per-track history.
 
 /**
  * Pick the right form GUID per track. Each track has its own dedicated form so
@@ -111,11 +102,12 @@ export async function setTrainingBooked(
   const fields: { name: string; value: string }[] = [
     { name: "email", value: email },
     { name: "ic__training_booked", value: "true" },
-    // Per-product-line tracking. Forms API multi-checkbox semantics OVERWRITE
-    // (not append), so a partner who books Hybrid then All-E will end the day
-    // with just "all_e" -- the Wall-E OS canonical-writer follow-up
-    // (MASTER-BUILD-PLAN-2026-05-15 Move 8) fixes this with read-modify-write.
-    { name: "ic__training_booked_products", value: trackToProductLine(track) },
+    // ic__training_booked_products (multi-checkbox) is owned by the Wall-E OS
+    // drain via partner_milestones replay -- see
+    // ~/.claude/plans/do-bit-better-resrach-cosmic-ullman.md. The drain composes
+    // the full semicolon-joined value from all achieved training_booked
+    // milestones, so the Forms-API overwrite bug stops dropping prior products.
+    // Booking portal still owns the boolean ic__training_booked for immediate UX.
   ];
 
   if (dealId) {
@@ -171,8 +163,8 @@ export async function setTrainingAttended(
   const fields: { name: string; value: string }[] = [
     { name: "email", value: email },
     { name: "ic__training_completed", value: "true" },
-    // Per-product-line tracking. Same OVERWRITE caveat as setTrainingBooked.
-    { name: "ic__trained_products", value: trackToProductLine(track) },
+    // ic__trained_products (multi-checkbox) owned by the Wall-E OS drain via
+    // partner_milestones replay -- same pattern as ic__training_booked_products.
   ];
 
   const res = await fetch(
