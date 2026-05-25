@@ -1,14 +1,18 @@
 /**
  * POST /api/bookings/:id/cancel
- * Partner-facing cancel endpoint (HMAC token-authenticated).
+ * Partner-facing cancel endpoint (HMAC token-authenticated). D1-backed.
  */
 
-import { getSupabase } from "../../../lib/supabase";
 import { verifyBookingAction } from "../../../lib/booking-tokens";
 import { deleteCalendarEvent } from "../../../lib/google-calendar";
 import { sendCancellationConfirmation } from "../../../lib/email";
 import { sendSlackNotification, formatCancelNotification } from "../../../lib/slack";
 import { AM_CONFIG, type Env } from "../../../lib/types";
+import {
+  decrementSessionBookings,
+  getBookingById,
+  setBookingStatus,
+} from "../../../lib/d1-bookings";
 
 export const onRequestPost = async (context: {
   request: Request;
@@ -17,7 +21,7 @@ export const onRequestPost = async (context: {
 }) => {
   const { env } = context;
   const id = context.params.id;
-  const body = await context.request.json() as { token: string; email: string };
+  const body = (await context.request.json()) as { token: string; email: string };
   const { token, email } = body;
 
   if (!token || !email) {
@@ -29,64 +33,42 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "Ongeldige of verlopen link" }, { status: 403 });
   }
 
-  const supabase = getSupabase(env);
-
-  const { data: booking } = await supabase
-    .from("bookings")
-    .select("*")
-    .eq("id", id)
-    .single();
-
+  const booking = await getBookingById(env, id);
   if (!booking) {
     return Response.json({ error: "Boeking niet gevonden" }, { status: 404 });
   }
-
   if (booking.partner_email !== email) {
     return Response.json({ error: "Ongeldige link" }, { status: 403 });
   }
-
-  if (!["confirmed", "pending_am_confirmation"].includes(booking.status || "")) {
-    return Response.json({
-      error: "Deze boeking kan niet meer worden geannuleerd",
-      currentStatus: booking.status,
-    }, { status: 400 });
+  if (!["confirmed", "pending_am_confirmation"].includes(booking.status)) {
+    return Response.json(
+      {
+        error: "Deze boeking kan niet meer worden geannuleerd",
+        currentStatus: booking.status,
+      },
+      { status: 400 },
+    );
   }
 
-  // Update booking status
-  await supabase
-    .from("bookings")
-    .update({ status: "cancelled", updated_at: new Date().toISOString() })
-    .eq("id", id);
+  await setBookingStatus(env, id, "cancelled");
 
-  // Delete Google Calendar event (non-blocking)
-  if (booking.calendar_event_id) {
+  // Delete the calendar event. intro_call + first_install hold both live on IC_CALENDAR_ID;
+  // training attendee-removal is handled by the session flow, not a full delete.
+  if (booking.calendar_event_id && booking.type !== "training") {
     deleteCalendarEvent(env, env.IC_CALENDAR_ID, booking.calendar_event_id).catch((e) =>
       console.error("Calendar event deletion failed:", e),
     );
   }
 
-  // If training booking, decrement session count
-  if (booking.session_id) {
-    const { data: session } = await supabase
-      .from("training_sessions")
-      .select("current_bookings")
-      .eq("id", booking.session_id)
-      .single();
-
-    if (session) {
-      await supabase
-        .from("training_sessions")
-        .update({
-          current_bookings: Math.max((session.current_bookings ?? 1) - 1, 0),
-          status: "open",
-        })
-        .eq("id", booking.session_id);
-    }
+  // Training cancel: free the seat
+  if (booking.type === "training" && booking.session_id) {
+    decrementSessionBookings(env, booking.session_id).catch((e) =>
+      console.error("Session decrement failed:", e),
+    );
   }
 
   const am = AM_CONFIG.find((a) => a.email === booking.assigned_am) || AM_CONFIG[0];
 
-  // Cancellation email (non-blocking)
   sendCancellationConfirmation(env, {
     to: email,
     partnerName: booking.partner_name,
@@ -95,7 +77,6 @@ export const onRequestPost = async (context: {
     amName: am.name,
   }).catch((e) => console.error("Cancellation email failed:", e));
 
-  // Slack notification (non-blocking)
   sendSlackNotification(
     env,
     formatCancelNotification({

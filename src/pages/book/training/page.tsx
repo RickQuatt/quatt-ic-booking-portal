@@ -1,5 +1,11 @@
 /**
- * /book/training -- Training session selection + booking.
+ * /book/training        -- Hybrid track training booking
+ * /book/training/alle   -- All-e track training booking (same component, track="alle")
+ *
+ * Track is the only thing that differs between the two routes: it filters which
+ * sessions render (via ?track= on /api/sessions) and changes the page copy.
+ * The booking POST itself doesn't carry a track field -- the API derives it
+ * from the chosen session.id (D1 row carries `track`).
  */
 
 import { useState, useEffect } from "react";
@@ -22,10 +28,43 @@ interface BookingResult {
   location: string;
 }
 
+type Track = "hybrid" | "alle";
+
+interface CopySet {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  emptyState: string;
+  submitLabel: string;
+}
+
+const COPY_BY_TRACK: Record<Track, CopySet> = {
+  hybrid: {
+    eyebrow: "Installatie Training",
+    heading: "Plan je Quatt training",
+    intro: "Kies een trainingsdatum en vul je gegevens in om een plek te reserveren.",
+    emptyState:
+      "Er zijn momenteel geen trainingen beschikbaar. Neem contact op met je account manager.",
+    submitLabel: "Training boeken",
+  },
+  alle: {
+    eyebrow: "All-e Installatietraining",
+    heading: "Plan je All-e training",
+    intro:
+      "De All-e training is gericht op de Quatt All-Electric. Kies een datum en vul je gegevens in om een plek te reserveren.",
+    emptyState:
+      "Er zijn nog geen All-e trainingen ingepland. Neem contact op met je account manager voor de eerstvolgende datum.",
+    submitLabel: "All-e training boeken",
+  },
+};
+
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr + "T00:00:00");
   return date.toLocaleDateString("nl-NL", {
-    weekday: "long", day: "numeric", month: "long", year: "numeric",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
 }
 
@@ -33,13 +72,15 @@ function getSearchParam(name: string): string {
   return new URLSearchParams(window.location.search).get(name) || "";
 }
 
-export function TrainingPage() {
+export function TrainingPage({ track = "hybrid" }: { track?: Track } = {}) {
+  const copy = COPY_BY_TRACK[track];
   const prefill = {
     name: getSearchParam("name"),
     company: getSearchParam("company"),
     email: getSearchParam("email"),
     phone: getSearchParam("phone"),
     kvk: getSearchParam("kvk"),
+    dealId: getSearchParam("dealId"),
   };
 
   const [sessions, setSessions] = useState<TrainingSession[]>([]);
@@ -49,8 +90,36 @@ export function TrainingPage() {
   const [result, setResult] = useState<BookingResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Agreement-first gate. We must verify the partner has signed the
+  // partnerovereenkomst before we let them pick a training session.
+  // Lookup is by email OR dealId (whichever is present in the URL).
+  // If nothing is identifiable, treat as "not signed" -- safest default.
+  const [agreementCheck, setAgreementCheck] = useState<
+    "checking" | "signed" | "not-signed"
+  >("checking");
+
   useEffect(() => {
-    fetch("/api/sessions")
+    const params = new URLSearchParams();
+    if (prefill.email) params.set("email", prefill.email);
+    if (prefill.dealId) params.set("dealId", prefill.dealId);
+    if (!params.toString()) {
+      setAgreementCheck("not-signed");
+      return;
+    }
+    fetch(`/api/agreement-status?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data: { signed?: boolean }) => {
+        setAgreementCheck(data?.signed ? "signed" : "not-signed");
+      })
+      .catch(() => {
+        // Be conservative on error: force the agreement step.
+        setAgreementCheck("not-signed");
+      });
+  }, [prefill.email, prefill.dealId]);
+
+  useEffect(() => {
+    if (agreementCheck !== "signed") return;
+    fetch(`/api/sessions?track=${track}`)
       .then((r) => r.json())
       .then((data) => {
         setSessions(data);
@@ -60,7 +129,7 @@ export function TrainingPage() {
         setError("Kon trainingen niet laden. Probeer het later opnieuw.");
         setLoading(false);
       });
-  }, []);
+  }, [track, agreementCheck]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -79,16 +148,24 @@ export function TrainingPage() {
       companyName: form.get("companyName"),
       kvkNumber: form.get("kvkNumber") || undefined,
       notes: form.get("notes") || undefined,
+      dealId: prefill.dealId || undefined,
     };
 
     try {
-      const res = await fetch("/api/bookings", {
+      const testFlag = getSearchParam("test") === "1" ? "?test=1" : "";
+      const res = await fetch(`/api/bookings${testFlag}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       const json = await res.json();
+
+      if (res.status === 412 && json?.redirect) {
+        // Defensive: server says agreement not signed. Send them to /book/agreement.
+        window.location.href = json.redirect;
+        return;
+      }
 
       if (!res.ok) {
         setError(json.error || "Boeking mislukt");
@@ -104,105 +181,145 @@ export function TrainingPage() {
     }
   }
 
+  if (agreementCheck === "checking") {
+    return (
+      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+        <div className="max-w-lg mx-auto px-6 py-16 text-center text-[14px] text-quatt-text-secondary">
+          Even kijken of je overeenkomst al getekend is…
+        </div>
+      </div>
+    );
+  }
+
+  if (agreementCheck === "not-signed") {
+    const params = new URLSearchParams();
+    if (prefill.email) params.set("email", prefill.email);
+    if (prefill.company) params.set("company", prefill.company);
+    if (prefill.dealId) params.set("dealId", prefill.dealId);
+    params.set("returnTo", "training");
+    const agreementHref = `/book/agreement?${params.toString()}`;
+    return (
+      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+        <div className="max-w-lg mx-auto px-6 py-16">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+            Eerste stap
+          </p>
+          <h1 className="text-[28px] font-semibold text-quatt-ink tracking-[-0.04em] leading-[1.15]">
+            Eerst de partnerovereenkomst tekenen
+          </h1>
+          <p className="mt-4 text-[15px] text-quatt-text-secondary leading-relaxed">
+            Voordat je een training kunt inplannen, moet de partnerovereenkomst
+            getekend zijn. Dit kost een paar minuten. Daarna stuur ik je
+            automatisch terug naar de trainingspagina.
+          </p>
+          <a
+            href={agreementHref}
+            className="mt-7 inline-flex items-center justify-center rounded-full bg-quatt-orange text-white text-[15px] font-semibold px-7 py-3 shadow-sm hover:opacity-95 transition"
+          >
+            Teken de overeenkomst
+          </a>
+          <p className="mt-5 text-[13px] text-quatt-text-secondary">
+            Al getekend en kom je hier ondanks dat? Open de link uit de e-mail
+            van Quatt opnieuw, of neem contact op met je AM.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (result) {
     return (
-      <div className="max-w-lg mx-auto px-6 py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#1A7A6B]/10 flex items-center justify-center mx-auto">
-          <svg className="w-8 h-8 text-[#1A7A6B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
+      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+        <div className="max-w-lg mx-auto px-6 py-16 text-center">
+          <div className="w-14 h-14 rounded-full bg-quatt-success-bg flex items-center justify-center mx-auto">
+            <svg className="w-7 h-7 text-quatt-success-text" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="mt-6 text-[28px] font-semibold text-quatt-ink tracking-[-0.04em]">Boeking bevestigd</h1>
+          <div className="mt-6 bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 text-left space-y-2">
+            <DetailRow label="Datum" value={result.sessionDate} />
+            <DetailRow label="Tijd" value={result.sessionTime} />
+            <DetailRow label="Locatie" value={result.location} />
+          </div>
+          <p className="mt-5 text-[14px] text-quatt-text-secondary">Je ontvangt een agenda-uitnodiging via e-mail. Tot dan!</p>
         </div>
-        <h1 className="mt-6 text-2xl font-bold text-[#1A1A1A]">Boeking bevestigd!</h1>
-        <div className="mt-6 bg-white rounded-xl border border-[#E8E4DD] p-5 text-left">
-          <table className="w-full text-sm">
-            <tbody>
-              <tr>
-                <td className="py-2 text-[#8A8580] pr-4">Datum</td>
-                <td className="py-2 font-semibold">{result.sessionDate}</td>
-              </tr>
-              <tr>
-                <td className="py-2 text-[#8A8580] pr-4">Tijd</td>
-                <td className="py-2 font-semibold">{result.sessionTime}</td>
-              </tr>
-              <tr>
-                <td className="py-2 text-[#8A8580] pr-4">Locatie</td>
-                <td className="py-2 font-semibold">{result.location}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-4 text-sm text-[#8A8580]">Je ontvangt een agenda-uitnodiging via e-mail. Tot dan!</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <section className="bg-white">
-        <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] tracking-tight">Installatie Training</h1>
-          <p className="mt-3 text-[#8A8580] max-w-lg leading-relaxed">
-            Kies een trainingsdatum en vul je gegevens in om een plek te reserveren.
+    <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+      <div className="max-w-3xl mx-auto px-6 py-12 md:py-14">
+        <header className="mb-8">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+            {copy.eyebrow}
           </p>
-        </div>
-      </section>
+          <h1 className="text-[32px] md:text-[40px] font-semibold text-quatt-ink leading-[1.1] tracking-[-0.04em]">
+            {copy.heading}
+          </h1>
+          <p className="mt-3 text-[16px] text-quatt-text-secondary max-w-lg leading-relaxed">
+            {copy.intro}
+          </p>
+        </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-10 space-y-10">
         {loading ? (
-          <div className="text-center py-16 text-[#8A8580]">Trainingen laden...</div>
+          <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-8 text-center text-[14px] text-quatt-text-secondary">
+            Trainingen laden...
+          </div>
         ) : sessions.length === 0 ? (
-          <div className="bg-white rounded-xl border border-[#E8E4DD] p-10 text-center">
-            <p className="text-[#8A8580]">
-              Er zijn momenteel geen trainingen beschikbaar. Neem contact op met je account manager.
+          <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-8 text-center">
+            <p className="text-[14px] text-quatt-text-secondary">
+              {copy.emptyState}
             </p>
           </div>
         ) : (
-          <>
-            <div className="space-y-3">
-              <h2 className="text-lg font-bold text-[#1A1A1A]">Kies een datum</h2>
-              {sessions.map((session) => (
-                <button
-                  key={session.id}
-                  onClick={() => setSelectedSession(session)}
-                  disabled={session.spotsRemaining <= 0}
-                  className={`w-full text-left rounded-xl p-5 border-2 transition-all duration-200 ${
-                    selectedSession?.id === session.id
-                      ? "bg-white border-[#FF6933] shadow-sm"
-                      : session.spotsRemaining <= 0
-                        ? "bg-[#F7F5F0] border-[#E8E4DD] opacity-50 cursor-not-allowed"
-                        : "bg-white border-[#E8E4DD] hover:border-[#FF6933]/40"
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-semibold text-[#1A1A1A]">{formatDate(session.date)}</div>
-                      <div className="text-sm text-[#8A8580] mt-1">
-                        {session.startTime} - {session.endTime} &middot; {session.location}
-                      </div>
-                    </div>
-                    <span
-                      className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                        session.spotsRemaining <= 0
-                          ? "bg-red-50 text-red-600"
-                          : session.spotsRemaining <= 2
-                            ? "bg-[#FF6933]/10 text-[#FF6933]"
-                            : "bg-[#1A7A6B]/10 text-[#1A7A6B]"
+          <div className="space-y-8">
+            <section>
+              <h2 className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+                Kies een datum
+              </h2>
+              <div className="space-y-2.5">
+                {sessions.map((session) => {
+                  const isSelected = selectedSession?.id === session.id;
+                  const isFull = session.spotsRemaining <= 0;
+                  return (
+                    <button
+                      key={session.id}
+                      onClick={() => setSelectedSession(session)}
+                      disabled={isFull}
+                      className={`w-full text-left rounded-[14px] p-4 border transition-all duration-150 ${
+                        isSelected
+                          ? "bg-white border-quatt-orange shadow-card-hover ring-1 ring-quatt-orange/30"
+                          : isFull
+                            ? "bg-quatt-bg border-quatt-border-light opacity-60 cursor-not-allowed"
+                            : "bg-white border-quatt-border-light shadow-card hover:shadow-card-hover"
                       }`}
                     >
-                      {session.spotsRemaining <= 0
-                        ? "Vol"
-                        : `${session.spotsRemaining} ${session.spotsRemaining === 1 ? "plek" : "plekken"} vrij`}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+                      <div className="flex justify-between items-center gap-3">
+                        <div>
+                          <div className="text-[15px] font-semibold text-quatt-ink tracking-[-0.01em]">
+                            {formatDate(session.date)}
+                          </div>
+                          <div className="text-[13px] text-quatt-text-secondary mt-0.5">
+                            {session.startTime} - {session.endTime} &middot; {session.location}
+                          </div>
+                        </div>
+                        <SpotsBadge remaining={session.spotsRemaining} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
             {selectedSession && (
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="space-y-3">
-                  <h2 className="text-lg font-bold text-[#1A1A1A]">Je gegevens</h2>
-                  <div className="bg-white rounded-xl border border-[#E8E4DD] p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <section>
+                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+                    Je gegevens
+                  </h2>
+                  <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <InputField name="partnerName" label="Naam" required placeholder="Jan de Vries" defaultValue={prefill.name} />
                       <InputField name="companyName" label="Bedrijfsnaam" required placeholder="Installatiebedrijf BV" defaultValue={prefill.company} />
@@ -211,48 +328,95 @@ export function TrainingPage() {
                       <InputField name="kvkNumber" label="KvK-nummer" placeholder="Optioneel" defaultValue={prefill.kvk} />
                     </div>
                     <div>
-                      <label htmlFor="notes" className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">Opmerkingen</label>
+                      <label htmlFor="notes" className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">
+                        Opmerkingen
+                      </label>
                       <textarea
                         id="notes"
                         name="notes"
                         rows={3}
                         placeholder="Eventuele opmerkingen of vragen"
-                        className="w-full rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200 resize-none"
+                        className="w-full rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150 resize-none"
                       />
                     </div>
                   </div>
-                </div>
+                </section>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{error}</div>
+                  <div className="bg-quatt-error-bg border border-quatt-error-border rounded-[12px] p-3.5 text-[13px] text-quatt-error-text">
+                    {error}
+                  </div>
                 )}
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-[#FF6933] text-white font-semibold rounded-full px-8 py-3.5 text-base hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  className="w-full bg-quatt-orange text-white font-semibold rounded-full px-6 py-3.5 text-[15px] hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 shadow-card"
                 >
-                  {submitting ? "Bezig met boeken..." : "Training boeken"}
+                  {submitting ? "Bezig met boeken..." : copy.submitLabel}
                 </button>
               </form>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
   );
 }
 
+function SpotsBadge({ remaining }: { remaining: number }) {
+  if (remaining <= 0) {
+    return (
+      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-quatt-error-bg text-quatt-error-text border border-quatt-error-border">
+        Vol
+      </span>
+    );
+  }
+  if (remaining <= 2) {
+    return (
+      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-quatt-warning-bg text-quatt-warning-text border border-quatt-warning-border">
+        {remaining} {remaining === 1 ? "plek" : "plekken"}
+      </span>
+    );
+  }
+  return (
+    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-quatt-success-bg text-quatt-success-text">
+      {remaining} plekken vrij
+    </span>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-[10px] bg-quatt-bg px-3 py-2">
+      <span className="text-[12px] font-medium uppercase tracking-wider text-quatt-text-secondary">
+        {label}
+      </span>
+      <span className="text-[14px] font-semibold text-quatt-ink text-right">{value}</span>
+    </div>
+  );
+}
+
 function InputField({
-  name, label, type = "text", required, placeholder, defaultValue,
+  name,
+  label,
+  type = "text",
+  required,
+  placeholder,
+  defaultValue,
 }: {
-  name: string; label: string; type?: string; required?: boolean;
-  placeholder?: string; defaultValue?: string;
+  name: string;
+  label: string;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  defaultValue?: string;
 }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">
-        {label}{required && <span className="text-[#FF6933] ml-0.5">*</span>}
+      <label htmlFor={name} className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">
+        {label}
+        {required && <span className="text-quatt-orange ml-0.5">*</span>}
       </label>
       <input
         id={name}
@@ -261,7 +425,7 @@ function InputField({
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}
-        className="w-full rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200"
+        className="w-full rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150"
       />
     </div>
   );

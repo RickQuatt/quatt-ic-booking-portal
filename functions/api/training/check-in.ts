@@ -19,7 +19,7 @@ import {
   rateLimitResponse,
   originMatchesHost,
 } from "../../lib/rate-limit";
-import type { Env } from "../../lib/types";
+import type { Env, TrainingTrack } from "../../lib/types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -50,6 +50,8 @@ export const onRequestPost = async (context: {
   const email = String(body.email ?? "").trim().toLowerCase();
   const name = String(body.name ?? "").trim();
   const company = String(body.company ?? "").trim();
+  const rawTrack = String(body.track ?? "hybrid").trim().toLowerCase();
+  const track: TrainingTrack = rawTrack === "alle" ? "alle" : "hybrid";
 
   if (!email || !name || !company) {
     return Response.json(
@@ -61,7 +63,23 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "Ongeldig e-mailadres" }, { status: 400 });
   }
 
-  await setTrainingAttended(env, email);
+  await setTrainingAttended(env, email, track);
+
+  // Wall-E OS milestone (non-blocking, feature-flagged off until env is set).
+  // Training check-in = training_completed. Check-in timestamps land in evidence
+  // via session.start_at so the milestone row is deduped on the event_id.
+  const now = new Date().toISOString();
+  postWalleosBooking(env, {
+    event_id: `training-checkin-${email}-${now.slice(0, 10)}`,
+    event_type: "training_completed",
+    partner_email: email,
+    session: {
+      session_id: `checkin-${now}`,
+      start_at: now,
+      host: "self-service check-in",
+      product_line: track === "alle" ? "all_e" : "quatt_heat_pump",
+    },
+  }).catch((e) => console.error("Wall-E OS training_completed push failed:", e));
 
   // Wall-E OS milestone (non-blocking, feature-flagged off until env is set).
   // Training check-in = training_completed. Check-in timestamps land in evidence

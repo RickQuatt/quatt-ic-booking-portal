@@ -20,7 +20,8 @@ GOOGLE_REFRESH_TOKEN=                 # service-account refresh token for Calend
 
 # --- Google Calendar ---
 IC_CALENDAR_ID=                       # shared IC team calendar
-TRAINING_CALENDAR_ID=                 # training sessions calendar
+TRAINING_CALENDAR_ID=                 # Hybrid track ("Quatt Installatie Trainingen")
+ALLE_TRAINING_CALENDAR_ID=            # All-e track ("All-e Installatietraining"). Optional during rollout.
 
 # --- Google Sheets (booking + agreement logs) ---
 IC_BOOKINGS_SHEET_ID=
@@ -33,6 +34,10 @@ SUPABASE_KEY=                         # service-role key (server-side only)
 # --- Email (Resend) ---
 RESEND_API_KEY=
 EMAIL_FROM=Quatt Installatiepartners <noreply@quatt.io>
+# Stopgap: when set, the partner-agreement confirmation email is routed only to
+# this address with the partners@quatt.io bcc suppressed. Used while the
+# Resend domain (booking.quatt.io) verification is pending. Delete to revert.
+# RESEND_OVERRIDE_TO=rick@quatt.io
 
 # --- Slack (booking notifications) ---
 SLACK_BOT_TOKEN=                      # xoxb-... bot token
@@ -40,3 +45,10 @@ SLACK_CHANNEL_ID=                     # channel for AM booking pings
 
 # --- HubSpot (Forms API submissions) ---
 HUBSPOT_KENNISMAKING_FORM_ID=8b37c550-9d07-46a2-9653-b03459437901
+# Hybrid track (existing). Each track has its own form so submission history is
+# per-track without needing a contact property. All-e clones below.
+HUBSPOT_TRAINING_FORM_ID=dad37d01-481d-421b-952a-10c718bd7efd
+HUBSPOT_TRAINING_ATTENDED_FORM_ID=9f2318cc-cc2d-43c5-89c1-9334f8c83d44
+# All-e clones (created 2026-04-29). Same schema as the Hybrid forms.
+HUBSPOT_TRAINING_ALLE_FORM_ID=d3de52cf-9b52-4be4-8116-782ddb063b28
+HUBSPOT_TRAINING_ALLE_ATTENDED_FORM_ID=c89e9328-5174-4759-b47a-1c2738783b0f

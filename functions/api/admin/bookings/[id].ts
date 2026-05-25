@@ -1,9 +1,13 @@
 /**
- * PATCH /api/admin/bookings/:id -- update booking status
+ * PATCH /api/admin/bookings/:id -- update booking status (D1-backed).
  */
 
-import { getSupabase } from "../../../lib/supabase";
 import { validateAdmin } from "../../../lib/admin-auth";
+import {
+  decrementSessionBookings,
+  getBookingById,
+  requireDb,
+} from "../../../lib/d1-bookings";
 import type { Env } from "../../../lib/types";
 
 export const onRequestPatch = async (context: {
@@ -16,52 +20,59 @@ export const onRequestPatch = async (context: {
   }
 
   const id = context.params.id;
-  const body = await context.request.json() as { status?: string; hubspotDealId?: string };
+  const body = (await context.request.json()) as {
+    status?: string;
+    hubspotDealId?: string;
+  };
   const { status, hubspotDealId } = body;
 
-  const supabase = getSupabase(context.env);
-
-  const updates: Record<string, unknown> = {
-    updated_at: new Date().toISOString(),
-  };
-  if (status) updates.status = status;
-  if (hubspotDealId) updates.hubspot_deal_id = hubspotDealId;
-
-  const { data: updated, error } = await supabase
-    .from("bookings")
-    .update(updates)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error || !updated) {
-    return Response.json({ error: "Booking not found" }, { status: 404 });
+  const updates: string[] = [];
+  const values: (string | null)[] = [];
+  if (status) {
+    updates.push("status = ?");
+    values.push(status);
   }
+  if (hubspotDealId) {
+    updates.push("hubspot_deal_id = ?");
+    values.push(hubspotDealId);
+  }
+  if (updates.length === 0) {
+    return Response.json({ error: "Nothing to update" }, { status: 400 });
+  }
+  updates.push("updated_at = datetime('now')");
+  values.push(id);
 
-  // If cancelled and it was a training booking, decrement session count
-  if (status === "cancelled" && updated.session_id) {
-    const { data: session } = await supabase
-      .from("training_sessions")
-      .select("current_bookings")
-      .eq("id", updated.session_id)
-      .single();
+  try {
+    const db = requireDb(context.env);
+    const result = await db
+      .prepare(`UPDATE bookings SET ${updates.join(", ")} WHERE id = ?`)
+      .bind(...values)
+      .run();
 
-    if (session) {
-      await supabase
-        .from("training_sessions")
-        .update({
-          current_bookings: Math.max((session.current_bookings ?? 1) - 1, 0),
-          status: "open",
-        })
-        .eq("id", updated.session_id);
+    if (!result.meta.changes) {
+      return Response.json({ error: "Booking not found" }, { status: 404 });
     }
-  }
 
-  return Response.json({
-    id: updated.id,
-    type: updated.type,
-    status: updated.status,
-    partnerName: updated.partner_name,
-    companyName: updated.company_name,
-  });
+    const updated = await getBookingById(context.env, id);
+    if (!updated) {
+      return Response.json({ error: "Booking not found after update" }, { status: 404 });
+    }
+
+    if (status === "cancelled" && updated.session_id) {
+      decrementSessionBookings(context.env, updated.session_id).catch((e) =>
+        console.error("Session decrement failed:", e),
+      );
+    }
+
+    return Response.json({
+      id: updated.id,
+      type: updated.type,
+      status: updated.status,
+      partnerName: updated.partner_name,
+      companyName: updated.company_name,
+    });
+  } catch (e) {
+    console.error("Booking update failed:", e);
+    return Response.json({ error: "Update failed" }, { status: 500 });
+  }
 };

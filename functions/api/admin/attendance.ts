@@ -1,10 +1,15 @@
 /**
- * POST /api/admin/attendance -- mark attendance for a booking
+ * POST /api/admin/attendance -- mark attendance for a booking (D1-backed).
  */
 
-import { getSupabase } from "../../lib/supabase";
 import { updateBookingRow } from "../../lib/google-sheets";
 import { validateAdmin, getAdminToken } from "../../lib/admin-auth";
+import {
+  getBookingById,
+  requireDb,
+  setBookingStatus,
+  uuidv4,
+} from "../../lib/d1-bookings";
 import type { Env } from "../../lib/types";
 
 export const onRequestPost = async (context: {
@@ -15,59 +20,58 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await context.request.json() as { bookingId: string; attended: boolean; notes?: string };
+  const body = (await context.request.json()) as {
+    bookingId: string;
+    attended: boolean;
+    notes?: string;
+  };
   const { bookingId, attended, notes } = body;
 
   if (!bookingId || attended === undefined) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  const supabase = getSupabase(context.env);
-
-  // Get admin email from cookie (use token as identifier for simplicity)
   const adminToken = getAdminToken(context.request) || "admin";
+  const db = requireDb(context.env);
+  const now = new Date().toISOString();
+  const attendedInt = attended ? 1 : 0;
 
-  // Upsert attendance record
-  const { data: existing } = await supabase
-    .from("attendance")
-    .select("id")
-    .eq("booking_id", bookingId);
+  try {
+    const existing = await db
+      .prepare(`SELECT id FROM attendance WHERE booking_id = ? LIMIT 1`)
+      .bind(bookingId)
+      .first<{ id: string }>();
 
-  if (existing && existing.length > 0) {
-    await supabase
-      .from("attendance")
-      .update({
-        attended,
-        marked_by: adminToken,
-        marked_at: new Date().toISOString(),
-        notes: notes || null,
-      })
-      .eq("booking_id", bookingId);
-  } else {
-    await supabase.from("attendance").insert({
-      booking_id: bookingId,
-      attended,
-      marked_by: adminToken,
-      marked_at: new Date().toISOString(),
-      notes: notes || null,
-    });
+    if (existing) {
+      await db
+        .prepare(
+          `UPDATE attendance SET attended=?, marked_by=?, marked_at=?, notes=? WHERE id=?`,
+        )
+        .bind(attendedInt, adminToken, now, notes || null, existing.id)
+        .run();
+    } else {
+      await db
+        .prepare(
+          `INSERT INTO attendance (id, booking_id, attended, marked_by, marked_at, notes)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+        )
+        .bind(uuidv4(), bookingId, attendedInt, adminToken, now, notes || null)
+        .run();
+    }
+
+    const newStatus = attended ? "completed" : "no_show";
+    await setBookingStatus(context.env, bookingId, newStatus);
+
+    const booking = await getBookingById(context.env, bookingId);
+    if (booking?.sheet_row_id) {
+      updateBookingRow(context.env, booking.sheet_row_id, { status: newStatus }).catch((e) =>
+        console.error("Sheet update failed:", e),
+      );
+    }
+
+    return Response.json({ success: true, status: newStatus });
+  } catch (e) {
+    console.error("Attendance update failed:", e);
+    return Response.json({ error: "Update failed" }, { status: 500 });
   }
-
-  // Update booking status
-  const newStatus = attended ? "completed" : "no_show";
-  const { data: booking } = await supabase
-    .from("bookings")
-    .update({ status: newStatus, updated_at: new Date().toISOString() })
-    .eq("id", bookingId)
-    .select()
-    .single();
-
-  // Update Google Sheet (non-blocking)
-  if (booking?.sheet_row_id) {
-    updateBookingRow(context.env, booking.sheet_row_id, { status: newStatus }).catch((e) =>
-      console.error("Sheet update failed:", e),
-    );
-  }
-
-  return Response.json({ success: true, status: newStatus });
 };

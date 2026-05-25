@@ -22,12 +22,59 @@
 /* Tailwind v4: Enable class-based dark mode variant */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Tailwind v4: Register brand colors as theme utilities */
-/* This generates classes like bg-quatt-primary, text-quatt-dark, etc. */
+/*
+ * Quatt design tokens -- ported from quatt-am-toolkit/app/globals.css for consistency
+ * across the internal Quatt stack. Orange is the brand primary; neon is accent only.
+ *
+ * Legacy aliases (quatt-primary/secondary/dark) are kept pointing at the correct
+ * colors (orange/neon/forest) so any pre-existing references remain valid while
+ * new code uses the canonical names (quatt-orange, quatt-neon, quatt-forest, quatt-ink).
+ */
 @theme {
-  --color-quatt-primary: #ccf822; /* Electric Neon */
-  --color-quatt-secondary: #ff6933; /* Pumpkin Orange */
-  --color-quatt-dark: #071413; /* Forest Black */
+  /* Brand primary */
+  --color-quatt-orange: #FF6933;
+  --color-quatt-forest: #081412;
+  --color-quatt-ink: #131A20;
+  --color-quatt-neon: #D9FF5C;
+  --color-quatt-green: #1A7A6B;
+  --color-quatt-yellow: #F59E0B;
+
+  /* Backgrounds */
+  --color-quatt-bg: #F5F3F2;
+  --color-quatt-grey: #EDEDED;
+  --color-quatt-offwhite: #F7F7F7;
+
+  /* Text */
+  --color-quatt-text-secondary: #6B7280;
+  --color-quatt-text-muted: #9CA3AF;
+  --color-quatt-text-disabled: #D1D5DB;
+  --color-quatt-black: #131A20;
+
+  /* Borders */
+  --color-quatt-border-light: rgba(0, 0, 0, 0.06);
+  --color-quatt-border-mid: rgba(0, 0, 0, 0.12);
+
+  /* Status */
+  --color-quatt-red: #DC2626;
+  --color-quatt-error-text: #DC2626;
+  --color-quatt-error-bg: #FEF2F2;
+  --color-quatt-error-border: #FECACA;
+  --color-quatt-warning-text: #B45309;
+  --color-quatt-warning-bg: #FFFBEB;
+  --color-quatt-warning-border: #FDE68A;
+  --color-quatt-success-text: #047857;
+  --color-quatt-success-bg: #ECFDF5;
+  --color-quatt-selected-bg: #DBEAFE;
+
+  /* Shadows */
+  --shadow-card: 0px 2px 8px rgba(8, 20, 18, 0.08), 0px 1px 2px rgba(8, 20, 18, 0.04);
+  --shadow-card-hover: 0px 4px 16px rgba(8, 20, 18, 0.12), 0px 2px 4px rgba(8, 20, 18, 0.06);
+
+  /* Legacy aliases -- DO NOT use in new code. Kept so existing components keep building. */
+  --color-quatt-primary: #FF6933;   /* was #ccf822 (lime); corrected to brand orange */
+  --color-quatt-secondary: #D9FF5C; /* was #ff6933 (orange); moved to neon accent */
+  --color-quatt-dark: #081412;      /* was #071413; aligned with forest */
+
   --color-light-header: #d9d9d9;
   --color-light-foreground: #1a1a1a;
   --color-dark-header: #434649;

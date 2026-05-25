@@ -1,11 +1,14 @@
 /**
  * GET  /api/admin/sessions -- list all training sessions
- * POST /api/admin/sessions -- create a new training session
+ * POST /api/admin/sessions -- create a new training session (creates GCal event + D1 row)
+ *
+ * Prefer POST /api/admin/sessions/sync to pull from the Trainingen calendar instead
+ * of creating sessions by hand. This endpoint remains for the rare one-off case.
  */
 
-import { getSupabase } from "../../lib/supabase";
 import { createTrainingEvent } from "../../lib/google-calendar";
 import { validateAdmin } from "../../lib/admin-auth";
+import { listAllSessions, requireDb, uuidv4 } from "../../lib/d1-bookings";
 import type { Env } from "../../lib/types";
 
 export const onRequestGet = async (context: {
@@ -16,34 +19,26 @@ export const onRequestGet = async (context: {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const supabase = getSupabase(context.env);
-
-  const { data: sessions, error } = await supabase
-    .from("training_sessions")
-    .select("*")
-    .order("date", { ascending: false });
-
-  if (error) {
-    console.error("Sessions fetch error:", error);
+  try {
+    const sessions = await listAllSessions(context.env);
+    const mapped = sessions.map((s) => ({
+      id: s.id,
+      title: s.title,
+      date: s.date,
+      startTime: s.start_time,
+      endTime: s.end_time,
+      location: s.location,
+      maxCapacity: s.max_capacity,
+      currentBookings: s.current_bookings,
+      calendarEventId: s.calendar_event_id,
+      status: s.status,
+      createdAt: s.created_at,
+    }));
+    return Response.json(mapped);
+  } catch (e) {
+    console.error("Sessions fetch error:", e);
     return Response.json({ error: "Failed to load sessions" }, { status: 500 });
   }
-
-  // Map snake_case to camelCase for frontend
-  const mapped = (sessions || []).map((s) => ({
-    id: s.id,
-    title: s.title,
-    date: s.date,
-    startTime: s.start_time,
-    endTime: s.end_time,
-    location: s.location,
-    maxCapacity: s.max_capacity,
-    currentBookings: s.current_bookings,
-    calendarEventId: s.calendar_event_id,
-    status: s.status,
-    createdAt: s.created_at,
-  }));
-
-  return Response.json(mapped);
 };
 
 export const onRequestPost = async (context: {
@@ -54,17 +49,20 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await context.request.json() as Record<string, unknown>;
+  const body = (await context.request.json()) as Record<string, unknown>;
   const { title, date, startTime, endTime, location, maxCapacity } = body as {
-    title: string; date: string; startTime: string; endTime: string;
-    location?: string; maxCapacity?: number;
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    location?: string;
+    maxCapacity?: number;
   };
 
   if (!title || !date || !startTime || !endTime) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // Create Google Calendar event
   let calendarEventId: string | null = null;
   try {
     calendarEventId = await createTrainingEvent(context.env, {
@@ -79,38 +77,34 @@ export const onRequestPost = async (context: {
     console.error("Calendar event creation failed:", e);
   }
 
-  const supabase = getSupabase(context.env);
+  const id = uuidv4();
+  const resolvedLocation = location || "Quatt HQ, Amsterdam";
+  const resolvedMax = maxCapacity || 8;
 
-  const { data: session, error: insertErr } = await supabase
-    .from("training_sessions")
-    .insert({
-      title,
-      date,
-      start_time: startTime,
-      end_time: endTime,
-      location: location || "Quatt HQ, Amsterdam",
-      max_capacity: maxCapacity || 8,
-      calendar_event_id: calendarEventId,
-      status: "open",
-    })
-    .select()
-    .single();
-
-  if (insertErr || !session) {
-    console.error("Insert error:", insertErr);
+  try {
+    await requireDb(context.env)
+      .prepare(
+        `INSERT INTO training_sessions
+         (id, title, date, start_time, end_time, location, max_capacity, current_bookings, calendar_event_id, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, 'open')`,
+      )
+      .bind(id, title, date, startTime, endTime, resolvedLocation, resolvedMax, calendarEventId)
+      .run();
+  } catch (e) {
+    console.error("Insert error:", e);
     return Response.json({ error: "Session creation failed" }, { status: 500 });
   }
 
   return Response.json({
-    id: session.id,
-    title: session.title,
-    date: session.date,
-    startTime: session.start_time,
-    endTime: session.end_time,
-    location: session.location,
-    maxCapacity: session.max_capacity,
-    currentBookings: session.current_bookings,
-    calendarEventId: session.calendar_event_id,
-    status: session.status,
+    id,
+    title,
+    date,
+    startTime,
+    endTime,
+    location: resolvedLocation,
+    maxCapacity: resolvedMax,
+    currentBookings: 0,
+    calendarEventId,
+    status: "open",
   });
 };

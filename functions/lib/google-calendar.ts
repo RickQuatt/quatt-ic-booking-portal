@@ -4,7 +4,12 @@
  */
 
 import { googleFetch } from "./google-auth";
-import { IC_COLORS, type CalendarEventMeta, type Env } from "./types";
+import {
+  IC_COLORS,
+  TRAINING_CORE_ATTENDEES,
+  type CalendarEventMeta,
+  type Env,
+} from "./types";
 
 const CALENDAR_BASE = "https://www.googleapis.com/calendar/v3";
 
@@ -30,12 +35,18 @@ export async function createTrainingEvent(
     endTime: string;
     location: string;
     maxCapacity: number;
+    /** Calendar to create on. Defaults to the Hybrid (Trainingen) calendar. */
+    calendarId?: string;
+    /** Title prefix used in the GCal event summary. Defaults to Hybrid. */
+    titlePrefix?: string;
   },
 ): Promise<string | null> {
+  const calendarId = params.calendarId ?? env.TRAINING_CALENDAR_ID;
+  const prefix = params.titlePrefix ?? "Quatt Installatie Training";
   const body = {
-    summary: `Quatt Installatie Training -- ${params.title}`,
+    summary: `${prefix} -- ${params.title}`,
     location: params.location,
-    description: `Quatt Installatie Training\nMax deelnemers: ${params.maxCapacity}\n\nManaged by IC Booking Portal`,
+    description: `${prefix}\nMax deelnemers: ${params.maxCapacity}\n\nManaged by IC Booking Portal`,
     start: {
       dateTime: `${params.date}T${params.startTime}:00`,
       timeZone: "Europe/Amsterdam",
@@ -45,11 +56,14 @@ export async function createTrainingEvent(
       timeZone: "Europe/Amsterdam",
     },
     colorId: IC_COLORS.training_followup,
+    // Always seed the training event with Ralph, Mitchell, Rick + the Quatt
+    // Lab room so the trainer team is on every training and the room is booked.
+    attendees: TRAINING_CORE_ATTENDEES.map((a) => ({ ...a })),
   };
 
   const res = await googleFetch(
     env,
-    `${CALENDAR_BASE}/calendars/${encodeURIComponent(env.TRAINING_CALENDAR_ID)}/events?sendUpdates=none`,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events?sendUpdates=externalOnly`,
     { method: "POST", body: JSON.stringify(body) },
   );
 
@@ -60,6 +74,46 @@ export async function createTrainingEvent(
 
   const data = (await res.json()) as { id: string };
   return data.id;
+}
+
+/**
+ * Idempotently ensure Ralph, Mitchell, Rick and the Quatt Lab resource are on
+ * a training event. Run on every training booking so an event Rick created
+ * by hand (without the team pre-attached) gets backfilled on first signup.
+ * Internal attendees are added silently; only newly-added external partners
+ * receive an invite via the separate addAttendeeToEvent call.
+ */
+export async function ensureTrainingCoreAttendees(
+  env: Env,
+  calendarId: string,
+  eventId: string,
+): Promise<void> {
+  const getRes = await googleFetch(
+    env,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`,
+  );
+  if (!getRes.ok) return;
+
+  const event = (await getRes.json()) as {
+    attendees?: { email: string; displayName?: string; resource?: boolean }[];
+  };
+  const current = event.attendees || [];
+  const haveEmails = new Set(current.map((a) => a.email.toLowerCase()));
+  const missing = TRAINING_CORE_ATTENDEES.filter(
+    (a) => !haveEmails.has(a.email.toLowerCase()),
+  );
+  if (missing.length === 0) return;
+
+  await googleFetch(
+    env,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=none`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        attendees: [...current, ...missing.map((a) => ({ ...a }))],
+      }),
+    },
+  );
 }
 
 export async function addAttendeeToEvent(
@@ -87,10 +141,13 @@ export async function addAttendeeToEvent(
   // Skip if already present
   if (currentAttendees.some((a) => a.email === attendeeEmail)) return;
 
-  // Patch with new attendee
+  // Patch with new attendee. sendUpdates=externalOnly emails the new partner
+  // (external to quatt.io) a Google Calendar invite so the event lands in
+  // their own calendar; internal trainers/AMs already on the attendee list
+  // don't get re-notified each time a partner signs up.
   await googleFetch(
     env,
-    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=none`,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=externalOnly`,
     {
       method: "PATCH",
       body: JSON.stringify({
@@ -273,6 +330,178 @@ export async function findFreeSlot(
   }
 
   return null;
+}
+
+/**
+ * Create a TENTATIVE all-day "week hold" on the IC calendar for a first installation.
+ * The partner picks a preferred week (ISO format like "2026-W18"); we put a 5-day
+ * all-day block on the AM's calendar so the AM sees the request visually without
+ * blocking their free/busy. The AM then replaces this with a real appointment.
+ *
+ * Returns null on failure (non-blocking: booking still succeeds).
+ */
+export async function createFirstInstallHold(
+  env: Env,
+  params: {
+    companyName: string;
+    partnerName: string;
+    partnerEmail: string;
+    partnerPhone: string;
+    installationAddress: string;
+    preferredWeek: string; // "YYYY-Www"
+    amEmail: string;
+    notes?: string;
+  },
+): Promise<string | null> {
+  // Parse ISO week (e.g. "2026-W18") to Monday of that week (UTC date).
+  const match = /^(\d{4})-W(\d{2})$/.exec(params.preferredWeek.trim());
+  if (!match) return null;
+  const year = parseInt(match[1], 10);
+  const week = parseInt(match[2], 10);
+
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const jan4Dow = jan4.getUTCDay() || 7; // treat Sunday as 7
+  const week1Monday = new Date(jan4);
+  week1Monday.setUTCDate(jan4.getUTCDate() - jan4Dow + 1);
+  const monday = new Date(week1Monday);
+  monday.setUTCDate(week1Monday.getUTCDate() + (week - 1) * 7);
+
+  const mondayStr = monday.toISOString().slice(0, 10); // YYYY-MM-DD
+  const saturday = new Date(monday);
+  saturday.setUTCDate(monday.getUTCDate() + 5); // exclusive end = Saturday (covers Mon-Fri)
+  const saturdayStr = saturday.toISOString().slice(0, 10);
+
+  const meta = buildMetaBlock({
+    type: "first_install",
+    partner: params.companyName,
+    deal: "",
+    am: params.amEmail,
+    source: "booking-portal",
+    phone: params.partnerPhone,
+  });
+
+  const description = [
+    `Begeleiding bij eerste installatie door ${params.companyName}.`,
+    `Contact: ${params.partnerName} -- ${params.partnerEmail} -- ${params.partnerPhone}`,
+    `Locatie: ${params.installationAddress}`,
+    "",
+    "Dit is een TENTATIEVE week-hold. Plan een specifieke afspraak in tijdens de week en vervang dit event.",
+    params.notes ? `\nOpmerking partner:\n${params.notes}` : "",
+    "",
+    meta,
+  ].join("\n");
+
+  const body = {
+    summary: `IC First Install: ${params.companyName}`,
+    location: params.installationAddress,
+    description,
+    start: { date: mondayStr },
+    end: { date: saturdayStr },
+    status: "tentative",
+    transparency: "transparent", // does not block free/busy
+    colorId: IC_COLORS.first_install,
+    attendees: [{ email: params.amEmail }, { email: params.partnerEmail, displayName: params.partnerName }],
+    reminders: {
+      useDefault: false,
+      overrides: [
+        { method: "popup" as const, minutes: 48 * 60 }, // 2 days before
+      ],
+    },
+  };
+
+  try {
+    const res = await googleFetch(
+      env,
+      `${CALENDAR_BASE}/calendars/${encodeURIComponent(env.IC_CALENDAR_ID)}/events?sendUpdates=none`,
+      { method: "POST", body: JSON.stringify(body) },
+    );
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error(`First install hold event creation failed (${res.status}): ${text}`);
+      return null;
+    }
+
+    const data = (await res.json()) as { id: string };
+    return data.id;
+  } catch (e) {
+    console.error("First install hold event creation threw:", e);
+    return null;
+  }
+}
+
+/**
+ * List upcoming events from a calendar. Returns singleEvents (expanded recurrences),
+ * orderBy=startTime, from now to `daysAhead` in the future.
+ */
+export interface CalendarEventSummary {
+  id: string;
+  summary: string;
+  description?: string;
+  location?: string;
+  start: string; // ISO datetime (or YYYY-MM-DDT00:00:00 if all-day)
+  end: string; // ISO datetime (or YYYY-MM-DDT23:59:59 if all-day)
+  status: "confirmed" | "tentative" | "cancelled";
+  attendeeCount: number;
+  /** True when the Google event used start.date / end.date (no specific time). */
+  isAllDay: boolean;
+}
+
+export async function listUpcomingEvents(
+  env: Env,
+  calendarId: string,
+  daysAhead = 90,
+): Promise<CalendarEventSummary[]> {
+  const timeMin = new Date().toISOString();
+  const timeMax = new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000).toISOString();
+
+  const params = new URLSearchParams({
+    timeMin,
+    timeMax,
+    singleEvents: "true",
+    orderBy: "startTime",
+    maxResults: "250",
+  });
+
+  const res = await googleFetch(
+    env,
+    `${CALENDAR_BASE}/calendars/${encodeURIComponent(calendarId)}/events?${params.toString()}`,
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Calendar list failed (${res.status}): ${text}`);
+  }
+
+  const data = (await res.json()) as {
+    items?: Array<{
+      id: string;
+      summary?: string;
+      description?: string;
+      location?: string;
+      start?: { dateTime?: string; date?: string };
+      end?: { dateTime?: string; date?: string };
+      status?: string;
+      attendees?: Array<{ email?: string }>;
+    }>;
+  };
+
+  return (data.items || [])
+    .filter((e) => e.start?.dateTime || e.start?.date)
+    .map((e) => {
+      const isAllDay = !e.start?.dateTime && !!e.start?.date;
+      return {
+        id: e.id,
+        summary: e.summary || "(untitled)",
+        description: e.description,
+        location: e.location,
+        start: e.start?.dateTime || `${e.start?.date}T00:00:00`,
+        end: e.end?.dateTime || `${e.end?.date}T23:59:59`,
+        status: (e.status as CalendarEventSummary["status"]) || "confirmed",
+        attendeeCount: e.attendees?.length || 0,
+        isAllDay,
+      };
+    });
 }
 
 export async function deleteCalendarEvent(

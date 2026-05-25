@@ -1,22 +1,29 @@
 /**
  * GET  /api/bookings -- list bookings (unused publicly, kept for completeness)
- * POST /api/bookings -- create a new booking
+ * POST /api/bookings -- create a new booking (training / intro_call / first_install)
+ *
+ * Storage: Cloudflare D1 (see migrations/d1/0002_bookings_training.sql).
+ * Supabase is no longer touched from this file -- it lives only as a read-only
+ * archive of pre-migration data.
  */
 
-import { getSupabase } from "../../lib/supabase";
 import {
   addAttendeeToEvent,
   createICEvent,
+  createTrainingEvent,
+  createFirstInstallHold,
+  ensureTrainingCoreAttendees,
   getFreeBusy,
   buildMetaBlock,
 } from "../../lib/google-calendar";
-import { IC_COLORS, AM_CONFIG, type Env } from "../../lib/types";
+import { IC_COLORS, AM_CONFIG, type Env, type TrainingTrack } from "../../lib/types";
 import { appendBookingRow } from "../../lib/google-sheets";
 import {
   sendSlackNotification,
   formatTrainingBookingNotification,
   formatIntroCallNotification,
   formatFirstInstallNotification,
+  alertOnFailure,
 } from "../../lib/slack";
 import {
   setKennismakingBooked,
@@ -35,14 +42,25 @@ import {
   rateLimitResponse,
   originMatchesHost,
 } from "../../lib/rate-limit";
+import {
+  countBookingsByType,
+  findActiveSessionBookingForEmail,
+  getSessionById,
+  incrementSessionBookings,
+  insertBooking,
+  updateBookingCalendar,
+  updateBookingSheetRow,
+} from "../../lib/d1-bookings";
+import { hasSignedAgreement } from "../../lib/d1-agreements";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const onRequestPost = async (context: {
   request: Request;
   env: Env;
+  waitUntil: (promise: Promise<unknown>) => void;
 }) => {
-  const { env, request } = context;
+  const { env, request, waitUntil } = context;
 
   if (!originMatchesHost(request)) {
     return Response.json({ error: "Invalid origin" }, { status: 403 });
@@ -51,11 +69,11 @@ export const onRequestPost = async (context: {
   const rl = await rateLimit(env.RATE_LIMIT, request, {
     bucket: "bookings",
     max: 5,
-    windowSeconds: 600, // 5 bookings per IP per 10 min
+    windowSeconds: 600,
   });
   if (!rl.ok) return rateLimitResponse(rl);
 
-  const body = await context.request.json() as Record<string, unknown>;
+  const body = (await context.request.json()) as Record<string, unknown>;
   const { type } = body;
 
   if (!type || !["training", "intro_call", "first_install"].includes(type as string)) {
@@ -66,16 +84,41 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "Ongeldig e-mailadres" }, { status: 400 });
   }
 
+  // Test-mode short-circuit: ?test=1 returns a fake success WITHOUT writing anywhere.
+  const isTest = new URL(request.url).searchParams.get("test") === "1";
+  if (isTest) {
+    return Response.json({
+      success: true,
+      test: true,
+      booking: {
+        id: "test-booking-id",
+        sessionDate: type === "training" ? "vrijdag 1 januari 2027" : undefined,
+        sessionTime: type === "training" ? "09:00 - 12:00" : undefined,
+        location: "Quatt HQ, Amsterdam",
+        assignedAm: "Ralph",
+        slotStart: new Date(Date.now() + 86400000).toISOString(),
+        slotEnd: new Date(Date.now() + 86400000 + 30 * 60000).toISOString(),
+        status: "confirmed",
+        meetLink: "https://meet.google.com/test-test-test",
+      },
+    });
+  }
+
+  if (!env.DB) {
+    console.error("D1 binding missing");
+    return Response.json(
+      { error: "Opslag is tijdelijk niet beschikbaar." },
+      { status: 503 },
+    );
+  }
+
   try {
-    if (type === "training") return await handleTrainingBooking(env, body);
-    if (type === "intro_call") return await handleIntroCallBooking(env, body);
-    if (type === "first_install") return await handleFirstInstallBooking(env, body);
+    if (type === "training") return await handleTrainingBooking(env, body, waitUntil);
+    if (type === "intro_call") return await handleIntroCallBooking(env, body, waitUntil);
+    if (type === "first_install") return await handleFirstInstallBooking(env, body, waitUntil);
   } catch (error) {
     console.error("Booking error:", error);
-    return Response.json(
-      { error: "Booking failed. Please try again." },
-      { status: 500 },
-    );
+    return Response.json({ error: "Booking failed. Please try again." }, { status: 500 });
   }
 
   return Response.json({ error: "Unknown error" }, { status: 500 });
@@ -85,157 +128,242 @@ export const onRequestPost = async (context: {
 // Training
 // ---------------------------------------------------------------------------
 
-async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
-  const { sessionId, partnerName, partnerEmail, partnerPhone, companyName, kvkNumber, notes } = body as {
-    sessionId: string; partnerName: string; partnerEmail: string; partnerPhone: string;
-    companyName: string; kvkNumber?: string; notes?: string;
-  };
+async function handleTrainingBooking(
+  env: Env,
+  body: Record<string, unknown>,
+  waitUntil: (p: Promise<unknown>) => void,
+) {
+  const { sessionId, partnerName, partnerEmail, partnerPhone, companyName, kvkNumber, notes, dealId } =
+    body as {
+      sessionId: string;
+      partnerName: string;
+      partnerEmail: string;
+      partnerPhone: string;
+      companyName: string;
+      kvkNumber?: string;
+      notes?: string;
+      dealId?: string;
+    };
 
   if (!sessionId || !partnerName || !partnerEmail || !partnerPhone || !companyName) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  const supabase = getSupabase(env);
+  // Agreement-first gate: training booking requires a signed agreement
+  // for the partner (matched by email OR dealId per Rick's call --
+  // dealId is per-installer-company, so once anyone at the company has
+  // signed, others can book training without re-signing).
+  const agreement = await hasSignedAgreement(env, {
+    email: partnerEmail,
+    dealId,
+  });
+  if (!agreement.signed) {
+    const params = new URLSearchParams();
+    if (partnerEmail) params.set("email", partnerEmail);
+    if (companyName) params.set("company", companyName);
+    if (dealId) params.set("dealId", dealId);
+    params.set("returnTo", "training");
+    return Response.json(
+      {
+        error: "agreement-not-signed",
+        message:
+          "Eerst de partnerovereenkomst tekenen, daarna kun je je training inplannen.",
+        redirect: `/book/agreement?${params.toString()}`,
+      },
+      { status: 412 },
+    );
+  }
 
-  // Get session
-  const { data: session } = await supabase
-    .from("training_sessions")
-    .select("*")
-    .eq("id", sessionId)
-    .single();
-
+  const session = await getSessionById(env, sessionId);
   if (!session) {
     return Response.json({ error: "Training session not found" }, { status: 404 });
   }
-
   if (session.status !== "open") {
-    return Response.json({ error: "Training session is not open for bookings" }, { status: 400 });
+    return Response.json(
+      { error: "Training session is not open for bookings" },
+      { status: 400 },
+    );
   }
-
-  const currentCount = session.current_bookings ?? 0;
-  const maxCapacity = session.max_capacity ?? 8;
-
-  if (currentCount >= maxCapacity) {
+  if (session.current_bookings >= session.max_capacity) {
     return Response.json({ error: "Training session is full" }, { status: 400 });
   }
 
-  // Check duplicate
-  const { data: existing } = await supabase
-    .from("bookings")
-    .select("id, partner_email, status")
-    .eq("session_id", sessionId);
-
-  const isDuplicate = (existing || []).some(
-    (b) => b.partner_email === partnerEmail && b.status !== "cancelled",
-  );
-
-  if (isDuplicate) {
+  const duplicate = await findActiveSessionBookingForEmail(env, sessionId, partnerEmail);
+  if (duplicate) {
     return Response.json(
       { error: "You have already booked this training session" },
       { status: 400 },
     );
   }
 
-  // Insert booking
-  const { data: booking, error: insertErr } = await supabase
-    .from("bookings")
-    .insert({
-      type: "training",
-      session_id: sessionId,
-      partner_name: partnerName,
-      partner_email: partnerEmail,
-      partner_phone: partnerPhone,
-      company_name: companyName,
-      kvk_number: kvkNumber || null,
-      notes: notes || null,
-      status: "confirmed",
-      assigned_am: "mitchell.k@quatt.io",
-    })
-    .select()
-    .single();
+  const booking = await insertBooking(env, {
+    type: "training",
+    session_id: sessionId,
+    partner_name: partnerName,
+    partner_email: partnerEmail,
+    partner_phone: partnerPhone,
+    company_name: companyName,
+    kvk_number: kvkNumber || null,
+    notes: notes || null,
+    status: "confirmed",
+    assigned_am: "mitchell.k@quatt.io",
+  });
 
-  if (insertErr || !booking) {
-    console.error("Insert error:", insertErr);
-    return Response.json({ error: "Booking failed" }, { status: 500 });
-  }
+  await incrementSessionBookings(env, sessionId);
 
-  // Increment session count
-  await supabase
-    .from("training_sessions")
-    .update({
-      current_bookings: currentCount + 1,
-      status: currentCount + 1 >= maxCapacity ? "full" : "open",
-    })
-    .eq("id", sessionId);
+  // Track-aware calendar routing. Each track has its own Google Calendar:
+  //   hybrid -> env.TRAINING_CALENDAR_ID
+  //   alle   -> env.ALLE_TRAINING_CALENDAR_ID
+  // Sessions on the All-e calendar are tagged track='alle' by the sync route.
+  const sessionTrack = (session.track as TrainingTrack) || "hybrid";
+  const trackCalendarId =
+    sessionTrack === "alle" && env.ALLE_TRAINING_CALENDAR_ID
+      ? env.ALLE_TRAINING_CALENDAR_ID
+      : env.TRAINING_CALENDAR_ID;
+  const trackTitlePrefix =
+    sessionTrack === "alle" ? "All-e Installatietraining" : "Quatt Installatie Training";
 
-  // Add attendee to calendar (non-blocking)
+  // Calendar sync. The session may be EITHER:
+  //   1. A real (calendar-backed) session -- just attach partner as attendee.
+  //   2. A virtual session created by sync when Rick removed a "Block" from the
+  //      track's calendar. No event exists yet -> create one, then attach.
+  // For real events we ALSO idempotently ensure Ralph/Mitchell/Rick + Quatt
+  // Lab room are on the event, in case the calendar entry was created by hand
+  // without them.
   if (session.calendar_event_id) {
-    addAttendeeToEvent(
-      env, env.TRAINING_CALENDAR_ID, session.calendar_event_id, partnerEmail, partnerName,
-    ).catch((e) => console.error("Calendar attendee add failed:", e));
+    const eventId = session.calendar_event_id;
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Core training attendee backfill",
+        ensureTrainingCoreAttendees(env, trackCalendarId, eventId),
+      ),
+    );
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Calendar attendee add (training)",
+        addAttendeeToEvent(env, trackCalendarId, eventId, partnerEmail, partnerName),
+      ),
+    );
+  } else {
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Lazy training calendar event creation",
+        (async () => {
+          const newEventId = await createTrainingEvent(env, {
+            title: session.title,
+            date: session.date,
+            startTime: session.start_time,
+            endTime: session.end_time,
+            location: session.location,
+            maxCapacity: session.max_capacity,
+            calendarId: trackCalendarId,
+            titlePrefix: trackTitlePrefix,
+          });
+          if (newEventId) {
+            await env.DB!.prepare(
+              `UPDATE training_sessions SET calendar_event_id = ?, updated_at = datetime('now') WHERE id = ?`,
+            )
+              .bind(newEventId, sessionId)
+              .run();
+            await addAttendeeToEvent(
+              env,
+              trackCalendarId,
+              newEventId,
+              partnerEmail,
+              partnerName,
+            );
+          }
+        })(),
+      ),
+    );
   }
 
-  // HubSpot: flip ic__training_booked + legacy_date_of_first_appointment_booked (non-blocking)
-  setTrainingBooked(env, partnerEmail, undefined, session.date).catch((e) =>
-    console.error("HubSpot training-booked push failed:", e),
+  // HubSpot: flip ic__training_booked. ctx.waitUntil keeps the worker alive
+  // until the POST settles -- without it CF Pages may terminate the function
+  // after Response is returned and the submission silently drops.
+  waitUntil(
+    alertOnFailure(
+      env,
+      "HubSpot training-booked (public booking)",
+      setTrainingBooked(env, partnerEmail, undefined, session.date, sessionTrack),
+    ),
   );
 
-  // Wall-E OS milestone (non-blocking, feature-flagged off until env is set)
-  postWalleosBooking(env, {
-    event_id: `booking-training-${booking?.id ?? session.id}`,
-    event_type: "training_booked",
-    partner_email: partnerEmail,
-    session: {
-      session_id: String(session.id),
-      start_at: session.date,
-      url: session.calendar_event_url ?? undefined,
-      host: "Mitchell van Kleef",
-    },
-  }).catch((e) => console.error("Wall-E OS training-booked push failed:", e));
+  // Wall-E OS milestone
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Wall-E OS training_booked push",
+      postWalleosBooking(env, {
+        event_id: `booking-training-${booking.id}`,
+        event_type: "training_booked",
+        partner_email: partnerEmail,
+        session: {
+          session_id: String(session.id),
+          start_at: session.date,
+          host: "Mitchell van Kleef",
+          product_line: sessionTrack === "alle" ? "all_e" : "quatt_heat_pump",
+        },
+      }),
+    ),
+  );
 
-  // Write to Google Sheet (non-blocking)
-  appendBookingRow(env, {
-    type: "training",
-    partnerName,
-    email: partnerEmail,
-    phone: partnerPhone,
-    company: companyName,
-    date: session.date,
-    am: "Mitchell van Kleef",
-    status: "confirmed",
-    hubspotDealId: "",
-  })
-    .then((rowId) => {
-      if (rowId && booking.id) {
-        supabase
-          .from("bookings")
-          .update({ sheet_row_id: rowId })
-          .eq("id", booking.id)
-          .then(() => {});
-      }
-    })
-    .catch((e) => console.error("Sheet write failed:", e));
+  // Google Sheet
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Bookings sheet append (training)",
+      appendBookingRow(env, {
+        type: "training",
+        partnerName,
+        email: partnerEmail,
+        phone: partnerPhone,
+        company: companyName,
+        date: session.date,
+        am: "Mitchell van Kleef",
+        status: "confirmed",
+        hubspotDealId: "",
+      }).then((rowId) => {
+        if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+      }),
+    ),
+  );
 
-  // Slack (non-blocking)
-  sendSlackNotification(
-    env,
-    formatTrainingBookingNotification({
-      partnerName,
-      companyName,
-      trainingDate: `${session.date} ${session.start_time}`,
-      spotsRemaining: maxCapacity - (currentCount + 1),
-      totalSpots: maxCapacity,
-    }),
-  ).catch((e) => console.error("Slack notification failed:", e));
+  // Slack booking notification (operational channel, separate from alerts)
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Slack training-booked notification",
+      sendSlackNotification(
+        env,
+        formatTrainingBookingNotification({
+          partnerName,
+          companyName,
+          trainingDate: `${session.date} ${session.start_time}`,
+          spotsRemaining: Math.max(0, session.max_capacity - session.current_bookings - 1),
+          totalSpots: session.max_capacity,
+        }),
+      ),
+    ),
+  );
 
-  // Confirmation email (non-blocking)
-  sendTrainingConfirmation(env, {
-    to: partnerEmail,
-    partnerName,
-    sessionDate: session.date,
-    sessionTime: `${session.start_time} - ${session.end_time}`,
-    location: session.location || "",
-  }).catch((e) => console.error("Training confirmation email failed:", e));
+  // Confirmation email
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Training confirmation email",
+      sendTrainingConfirmation(env, {
+        to: partnerEmail,
+        partnerName,
+        sessionDate: session.date,
+        sessionTime: `${session.start_time} - ${session.end_time}`,
+        location: session.location || "",
+      }),
+    ),
+  );
 
   return Response.json({
     success: true,
@@ -252,16 +380,41 @@ async function handleTrainingBooking(env: Env, body: Record<string, unknown>) {
 // Intro call (kennismaking)
 // ---------------------------------------------------------------------------
 
-async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
+async function handleIntroCallBooking(
+  env: Env,
+  body: Record<string, unknown>,
+  waitUntil: (p: Promise<unknown>) => void,
+) {
   const {
-    partnerName, partnerEmail, partnerPhone, companyName, kvkNumber,
-    meetingFormat, slotStart, slotEnd, amEmail, location, notes, hubspotDealId,
-    preferredDate, preferredTimeSlot,
+    partnerName,
+    partnerEmail,
+    partnerPhone,
+    companyName,
+    kvkNumber,
+    meetingFormat,
+    slotStart,
+    slotEnd,
+    amEmail,
+    location,
+    notes,
+    hubspotDealId,
+    preferredDate,
+    preferredTimeSlot,
   } = body as {
-    partnerName: string; partnerEmail: string; partnerPhone: string; companyName: string;
-    kvkNumber?: string; meetingFormat?: string; slotStart?: string; slotEnd?: string;
-    amEmail?: string; location?: string; notes?: string; hubspotDealId?: string;
-    preferredDate?: string; preferredTimeSlot?: string;
+    partnerName: string;
+    partnerEmail: string;
+    partnerPhone: string;
+    companyName: string;
+    kvkNumber?: string;
+    meetingFormat?: string;
+    slotStart?: string;
+    slotEnd?: string;
+    amEmail?: string;
+    location?: string;
+    notes?: string;
+    hubspotDealId?: string;
+    preferredDate?: string;
+    preferredTimeSlot?: string;
   };
 
   if (!partnerName || !partnerEmail || !partnerPhone || !companyName) {
@@ -274,10 +427,13 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
     site_visit: `Terugbelverzoek${location ? ` - ${location}` : ""}`,
   };
 
-  const supabase = getSupabase(env);
-
   // --- Calendar-booked flow (showroom / online) ---
-  if ((meetingFormat === "showroom" || meetingFormat === "online") && slotStart && slotEnd && amEmail) {
+  if (
+    (meetingFormat === "showroom" || meetingFormat === "online") &&
+    slotStart &&
+    slotEnd &&
+    amEmail
+  ) {
     // Verify slot is still free
     const busyData = await getFreeBusy(env, [amEmail, env.IC_CALENDAR_ID], slotStart, slotEnd);
     const isBusy = [amEmail, env.IC_CALENDAR_ID].some((calId) => {
@@ -326,107 +482,158 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
     const formatNote = `[${formatLabels[meetingFormat]}]`;
     const combinedNotes = [formatNote, notes].filter(Boolean).join("\n") || null;
 
-    const { data: booking, error: insertErr } = await supabase
-      .from("bookings")
-      .insert({
-        type: "intro_call",
-        partner_name: partnerName,
-        partner_email: partnerEmail,
-        partner_phone: partnerPhone,
-        company_name: companyName,
-        kvk_number: kvkNumber || null,
-        preferred_date: slotStart.split("T")[0],
-        preferred_time_slot: new Date(slotStart).toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Amsterdam" }),
-        location: eventLocation || null,
-        notes: combinedNotes,
-        status: "confirmed",
-        calendar_event_id: calResult.eventId,
-        assigned_am: am.email,
-        hubspot_deal_id: hubspotDealId || null,
-      })
-      .select()
-      .single();
+    const booking = await insertBooking(env, {
+      type: "intro_call",
+      partner_name: partnerName,
+      partner_email: partnerEmail,
+      partner_phone: partnerPhone,
+      company_name: companyName,
+      kvk_number: kvkNumber || null,
+      preferred_date: slotStart.split("T")[0],
+      preferred_time_slot: new Date(slotStart).toLocaleTimeString("nl-NL", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Europe/Amsterdam",
+      }),
+      location: eventLocation || null,
+      notes: combinedNotes,
+      status: "confirmed",
+      calendar_event_id: calResult.eventId,
+      assigned_am: am.email,
+      hubspot_deal_id: hubspotDealId || null,
+      meeting_format: meetingFormat,
+    });
 
-    if (insertErr || !booking) {
-      console.error("Insert error:", insertErr);
-      return Response.json({ error: "Booking failed" }, { status: 500 });
-    }
-
-    // HubSpot (non-blocking)
-    setKennismakingBooked(env, partnerEmail, hubspotDealId, slotStart.split("T")[0]).catch((e) =>
-      console.error("HubSpot Forms API failed:", e),
+    // HubSpot
+    waitUntil(
+      alertOnFailure(
+        env,
+        "HubSpot kennismaking-booked (kalender slot)",
+        setKennismakingBooked(env, partnerEmail, hubspotDealId, slotStart.split("T")[0]),
+      ),
     );
 
-    // Wall-E OS milestone (non-blocking, feature-flagged off until env is set)
-    postWalleosBooking(env, {
-      event_id: `booking-kennismaking-${booking.id}`,
-      event_type: "kennismaking_booked",
-      partner_email: partnerEmail,
-      hubspot_deal_id: hubspotDealId || undefined,
-      session: {
-        session_id: String(booking.id),
-        start_at: slotStart,
-        host: am.name,
-      },
-    }).catch((e) => console.error("Wall-E OS kennismaking-booked push failed:", e));
+    // Wall-E OS milestone
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Wall-E OS kennismaking_booked push",
+        postWalleosBooking(env, {
+          event_id: `booking-kennismaking-${booking.id}`,
+          event_type: "kennismaking_booked",
+          partner_email: partnerEmail,
+          hubspot_deal_id: hubspotDealId || undefined,
+          session: {
+            session_id: String(booking.id),
+            start_at: slotStart,
+            host: am.name,
+          },
+        }),
+      ),
+    );
 
-    // Google Sheet (non-blocking)
-    appendBookingRow(env, {
-      type: "intro_call",
-      partnerName,
-      email: partnerEmail,
-      phone: partnerPhone,
-      company: companyName,
-      date: slotStart.split("T")[0],
-      am: am.name,
-      status: "confirmed",
-      hubspotDealId: "",
-    })
-      .then((rowId) => {
-        if (rowId && booking.id) {
-          supabase.from("bookings").update({ sheet_row_id: rowId }).eq("id", booking.id).then(() => {});
-        }
-      })
-      .catch((e) => console.error("Sheet write failed:", e));
+    // Google Sheet
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Bookings sheet append (intro_call)",
+        appendBookingRow(env, {
+          type: "intro_call",
+          partnerName,
+          email: partnerEmail,
+          phone: partnerPhone,
+          company: companyName,
+          date: slotStart.split("T")[0],
+          am: am.name,
+          status: "confirmed",
+          hubspotDealId: "",
+        }).then((rowId) => {
+          if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+        }),
+      ),
+    );
 
-    // Slack (non-blocking)
+    // Slack
     const slotTime = new Date(slotStart).toLocaleString("nl-NL", {
-      weekday: "long", day: "numeric", month: "long",
-      hour: "2-digit", minute: "2-digit", timeZone: "Europe/Amsterdam",
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Europe/Amsterdam",
     });
-    sendSlackNotification(
-      env,
-      formatIntroCallNotification({
-        partnerName, companyName, amName: am.name,
-        date: slotStart.split("T")[0], time: slotTime,
-        phone: partnerPhone, meetingFormat: formatLabels[meetingFormat],
-      }),
-    ).catch((e) => console.error("Slack notification failed:", e));
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Slack intro-call notification",
+        sendSlackNotification(
+          env,
+          formatIntroCallNotification({
+            partnerName,
+            companyName,
+            amName: am.name,
+            date: slotStart.split("T")[0],
+            time: slotTime,
+            phone: partnerPhone,
+            meetingFormat: formatLabels[meetingFormat],
+          }),
+        ),
+      ),
+    );
 
-    // Generate tokens for reschedule/cancel links
+    // Tokens for reschedule/cancel links
     let rescheduleToken: string | undefined;
     let cancelToken: string | undefined;
     try {
-      rescheduleToken = await signBookingAction(env.BOOKING_SECRET, booking.id, partnerEmail, "reschedule");
-      cancelToken = await signBookingAction(env.BOOKING_SECRET, booking.id, partnerEmail, "cancel");
+      rescheduleToken = await signBookingAction(
+        env.BOOKING_SECRET,
+        booking.id,
+        partnerEmail,
+        "reschedule",
+      );
+      cancelToken = await signBookingAction(
+        env.BOOKING_SECRET,
+        booking.id,
+        partnerEmail,
+        "cancel",
+      );
     } catch (e) {
       console.error("Token generation failed (BOOKING_SECRET missing?):", e);
     }
 
-    // Confirmation email (non-blocking)
-    sendKennismakingConfirmation(env, {
-      to: partnerEmail, partnerName, companyName, amName: am.name,
-      date: slotStart.split("T")[0], startTime: slotStart, endTime: slotEnd,
-      meetingFormat: meetingFormat as "showroom" | "online",
-      location: eventLocation, meetLink: calResult.meetLink,
-      bookingId: booking.id, rescheduleToken, cancelToken,
-    }).catch((e) => console.error("Kennismaking confirmation email failed:", e));
+    // Confirmation email
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Kennismaking confirmation email",
+        sendKennismakingConfirmation(env, {
+          to: partnerEmail,
+          partnerName,
+          companyName,
+          amName: am.name,
+          date: slotStart.split("T")[0],
+          startTime: slotStart,
+          endTime: slotEnd,
+          meetingFormat: meetingFormat as "showroom" | "online",
+          location: eventLocation,
+          meetLink: calResult.meetLink,
+          bookingId: booking.id,
+          rescheduleToken,
+          cancelToken,
+        }),
+      ),
+    );
 
     return Response.json({
       success: true,
       booking: {
-        id: booking.id, assignedAm: am.name, slotStart, slotEnd,
-        meetLink: calResult.meetLink, location: eventLocation, status: "confirmed",
+        id: booking.id,
+        assignedAm: am.name,
+        slotStart,
+        slotEnd,
+        meetLink: calResult.meetLink,
+        location: eventLocation,
+        status: "confirmed",
       },
     });
   }
@@ -437,97 +644,124 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
   }
 
   // Round-robin AM assignment
-  const { count } = await supabase
-    .from("bookings")
-    .select("*", { count: "exact", head: true })
-    .eq("type", "intro_call");
-
-  const amIndex = (count || 0) % AM_CONFIG.length;
+  const introCallCount = await countBookingsByType(env, "intro_call");
+  const amIndex = introCallCount % AM_CONFIG.length;
   const assignedAm = AM_CONFIG[amIndex];
 
   const formatNote = meetingFormat ? `[${formatLabels[meetingFormat]}]` : "";
   const combinedNotes = [formatNote, notes].filter(Boolean).join("\n") || null;
 
-  const { data: booking, error: insertErr } = await supabase
-    .from("bookings")
-    .insert({
-      type: "intro_call",
-      partner_name: partnerName,
-      partner_email: partnerEmail,
-      partner_phone: partnerPhone,
-      company_name: companyName,
-      kvk_number: kvkNumber || null,
-      preferred_date: preferredDate,
-      preferred_time_slot: preferredTimeSlot || null,
-      location: location || null,
-      notes: combinedNotes,
-      status: "pending_am_confirmation",
-      assigned_am: assignedAm.email,
-      hubspot_deal_id: hubspotDealId || null,
-    })
-    .select()
-    .single();
+  const booking = await insertBooking(env, {
+    type: "intro_call",
+    partner_name: partnerName,
+    partner_email: partnerEmail,
+    partner_phone: partnerPhone,
+    company_name: companyName,
+    kvk_number: kvkNumber || null,
+    preferred_date: preferredDate,
+    preferred_time_slot: preferredTimeSlot || null,
+    location: location || null,
+    notes: combinedNotes,
+    status: "pending_am_confirmation",
+    assigned_am: assignedAm.email,
+    hubspot_deal_id: hubspotDealId || null,
+    meeting_format: meetingFormat || null,
+  });
 
-  if (insertErr || !booking) {
-    console.error("Insert error:", insertErr);
-    return Response.json({ error: "Booking failed" }, { status: 500 });
-  }
-
-  // HubSpot (non-blocking)
-  setKennismakingBooked(env, partnerEmail, hubspotDealId, preferredDate).catch((e) =>
-    console.error("HubSpot Forms API failed:", e),
+  // HubSpot (callback flow)
+  waitUntil(
+    alertOnFailure(
+      env,
+      "HubSpot kennismaking-booked (callback flow)",
+      setKennismakingBooked(env, partnerEmail, hubspotDealId, preferredDate),
+    ),
   );
 
-  // Wall-E OS milestone (non-blocking, feature-flagged off until env is set)
-  postWalleosBooking(env, {
-    event_id: `booking-kennismaking-${booking.id}`,
-    event_type: "kennismaking_booked",
-    partner_email: partnerEmail,
-    hubspot_deal_id: hubspotDealId || undefined,
-    session: {
-      session_id: String(booking.id),
-      start_at: `${preferredDate}T09:00:00Z`, // time slot not resolved yet
-      host: assignedAm.name,
-    },
-  }).catch((e) => console.error("Wall-E OS kennismaking-booked push failed:", e));
+  // Wall-E OS milestone
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Wall-E OS kennismaking_booked (callback flow)",
+      postWalleosBooking(env, {
+        event_id: `booking-kennismaking-${booking.id}`,
+        event_type: "kennismaking_booked",
+        partner_email: partnerEmail,
+        hubspot_deal_id: hubspotDealId || undefined,
+        session: {
+          session_id: String(booking.id),
+          start_at: `${preferredDate}T09:00:00Z`,
+          host: assignedAm.name,
+        },
+      }),
+    ),
+  );
 
-  // Google Sheet (non-blocking)
-  appendBookingRow(env, {
-    type: "intro_call", partnerName, email: partnerEmail, phone: partnerPhone,
-    company: companyName, date: preferredDate, am: assignedAm.name,
-    status: "pending_am_confirmation", hubspotDealId: "",
-  })
-    .then((rowId) => {
-      if (rowId && booking.id) {
-        supabase.from("bookings").update({ sheet_row_id: rowId }).eq("id", booking.id).then(() => {});
-      }
-    })
-    .catch((e) => console.error("Sheet write failed:", e));
+  // Google Sheet
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Bookings sheet append (callback intro_call)",
+      appendBookingRow(env, {
+        type: "intro_call",
+        partnerName,
+        email: partnerEmail,
+        phone: partnerPhone,
+        company: companyName,
+        date: preferredDate,
+        am: assignedAm.name,
+        status: "pending_am_confirmation",
+        hubspotDealId: "",
+      }).then((rowId) => {
+        if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+      }),
+    ),
+  );
 
-  // Slack (non-blocking)
+  // Slack
   const formatLabel = meetingFormat ? formatLabels[meetingFormat] : "Intro call";
-  sendSlackNotification(
-    env,
-    formatIntroCallNotification({
-      partnerName, companyName, amName: assignedAm.name,
-      date: preferredDate, time: preferredTimeSlot || "n.t.b.",
-      phone: partnerPhone, meetingFormat: formatLabel,
-    }),
-  ).catch((e) => console.error("Slack notification failed:", e));
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Slack intro-call notification (callback)",
+      sendSlackNotification(
+        env,
+        formatIntroCallNotification({
+          partnerName,
+          companyName,
+          amName: assignedAm.name,
+          date: preferredDate,
+          time: preferredTimeSlot || "n.t.b.",
+          phone: partnerPhone,
+          meetingFormat: formatLabel,
+        }),
+      ),
+    ),
+  );
 
-  // Confirmation email for site visits (non-blocking)
+  // Confirmation email for site visits
   if (meetingFormat === "site_visit" && location) {
-    sendSiteVisitConfirmation(env, {
-      to: partnerEmail, partnerName, companyName,
-      amName: assignedAm.name, location,
-    }).catch((e) => console.error("Site visit confirmation email failed:", e));
+    waitUntil(
+      alertOnFailure(
+        env,
+        "Site visit confirmation email",
+        sendSiteVisitConfirmation(env, {
+          to: partnerEmail,
+          partnerName,
+          companyName,
+          amName: assignedAm.name,
+          location,
+        }),
+      ),
+    );
   }
 
   return Response.json({
     success: true,
     booking: {
-      id: booking.id, assignedAm: assignedAm.name,
-      preferredDate, status: "pending_am_confirmation",
+      id: booking.id,
+      assignedAm: assignedAm.name,
+      preferredDate,
+      status: "pending_am_confirmation",
     },
   });
 }
@@ -536,83 +770,148 @@ async function handleIntroCallBooking(env: Env, body: Record<string, unknown>) {
 // First install
 // ---------------------------------------------------------------------------
 
-async function handleFirstInstallBooking(env: Env, body: Record<string, unknown>) {
+async function handleFirstInstallBooking(
+  env: Env,
+  body: Record<string, unknown>,
+  waitUntil: (p: Promise<unknown>) => void,
+) {
   const {
-    partnerName, partnerEmail, partnerPhone, companyName,
-    kvkNumber, installationAddress, preferredWeek, notes,
+    partnerName,
+    partnerEmail,
+    partnerPhone,
+    companyName,
+    kvkNumber,
+    installationAddress,
+    preferredWeek,
+    notes,
   } = body as {
-    partnerName: string; partnerEmail: string; partnerPhone: string; companyName: string;
-    kvkNumber?: string; installationAddress: string; preferredWeek: string; notes?: string;
+    partnerName: string;
+    partnerEmail: string;
+    partnerPhone: string;
+    companyName: string;
+    kvkNumber?: string;
+    installationAddress: string;
+    preferredWeek: string;
+    notes?: string;
   };
 
-  if (!partnerName || !partnerEmail || !partnerPhone || !companyName || !installationAddress || !preferredWeek) {
+  if (
+    !partnerName ||
+    !partnerEmail ||
+    !partnerPhone ||
+    !companyName ||
+    !installationAddress ||
+    !preferredWeek
+  ) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
 
   const assignedAm = AM_CONFIG[0]; // Ralph
-  const supabase = getSupabase(env);
 
-  const { data: booking, error: insertErr } = await supabase
-    .from("bookings")
-    .insert({
-      type: "first_install",
-      partner_name: partnerName,
-      partner_email: partnerEmail,
-      partner_phone: partnerPhone,
-      company_name: companyName,
-      kvk_number: kvkNumber || null,
-      preferred_date: preferredWeek,
-      location: installationAddress,
-      notes: notes || null,
-      status: "pending_am_confirmation",
-      assigned_am: assignedAm.email,
-    })
-    .select()
-    .single();
-
-  if (insertErr || !booking) {
-    console.error("Insert error:", insertErr);
-    return Response.json({ error: "Booking failed" }, { status: 500 });
-  }
-
-  // Google Sheet (non-blocking)
-  appendBookingRow(env, {
-    type: "first_install", partnerName, email: partnerEmail, phone: partnerPhone,
-    company: companyName, date: preferredWeek, am: assignedAm.name,
-    status: "pending_am_confirmation", hubspotDealId: "",
-  })
-    .then((rowId) => {
-      if (rowId && booking.id) {
-        supabase.from("bookings").update({ sheet_row_id: rowId }).eq("id", booking.id).then(() => {});
-      }
-    })
-    .catch((e) => console.error("Sheet write failed:", e));
-
-  // Slack (non-blocking)
-  sendSlackNotification(
-    env,
-    formatFirstInstallNotification({
-      partnerName, companyName, address: installationAddress, preferredWeek,
-    }),
-  ).catch((e) => console.error("Slack notification failed:", e));
-
-  // Confirmation email (non-blocking)
-  sendFirstInstallConfirmation(env, {
-    to: partnerEmail, partnerName, amName: assignedAm.name,
-    address: installationAddress, preferredWeek,
-  }).catch((e) => console.error("First install confirmation email failed:", e));
-
-  // Wall-E OS milestone (non-blocking, feature-flagged off until env is set)
-  postWalleosBooking(env, {
-    event_id: `booking-first-install-${booking.id}`,
-    event_type: "first_install_booked",
+  const booking = await insertBooking(env, {
+    type: "first_install",
+    partner_name: partnerName,
     partner_email: partnerEmail,
-    session: {
-      session_id: String(booking.id),
-      start_at: preferredWeek, // week id; completion milestone arrives via AM confirm
-      host: assignedAm.name,
-    },
-  }).catch((e) => console.error("Wall-E OS first_install_booked push failed:", e));
+    partner_phone: partnerPhone,
+    company_name: companyName,
+    kvk_number: kvkNumber || null,
+    preferred_date: preferredWeek,
+    location: installationAddress,
+    notes: notes || null,
+    status: "pending_am_confirmation",
+    assigned_am: assignedAm.email,
+  });
+
+  // Tentative week-long calendar hold on IC calendar
+  waitUntil(
+    alertOnFailure(
+      env,
+      "First install calendar hold",
+      createFirstInstallHold(env, {
+        companyName,
+        partnerName,
+        partnerEmail,
+        partnerPhone,
+        installationAddress,
+        preferredWeek,
+        amEmail: assignedAm.email,
+        notes,
+      }).then((calendarEventId) => {
+        if (calendarEventId) return updateBookingCalendar(env, booking.id, calendarEventId);
+      }),
+    ),
+  );
+
+  // Google Sheet
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Bookings sheet append (first_install)",
+      appendBookingRow(env, {
+        type: "first_install",
+        partnerName,
+        email: partnerEmail,
+        phone: partnerPhone,
+        company: companyName,
+        date: preferredWeek,
+        am: assignedAm.name,
+        status: "pending_am_confirmation",
+        hubspotDealId: "",
+      }).then((rowId) => {
+        if (rowId) return updateBookingSheetRow(env, booking.id, rowId);
+      }),
+    ),
+  );
+
+  // Slack
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Slack first-install notification",
+      sendSlackNotification(
+        env,
+        formatFirstInstallNotification({
+          partnerName,
+          companyName,
+          address: installationAddress,
+          preferredWeek,
+        }),
+      ),
+    ),
+  );
+
+  // Confirmation email
+  waitUntil(
+    alertOnFailure(
+      env,
+      "First install confirmation email",
+      sendFirstInstallConfirmation(env, {
+        to: partnerEmail,
+        partnerName,
+        amName: assignedAm.name,
+        address: installationAddress,
+        preferredWeek,
+      }),
+    ),
+  );
+
+  // Wall-E OS milestone
+  waitUntil(
+    alertOnFailure(
+      env,
+      "Wall-E OS first_install_booked push",
+      postWalleosBooking(env, {
+        event_id: `booking-first-install-${booking.id}`,
+        event_type: "first_install_booked",
+        partner_email: partnerEmail,
+        session: {
+          session_id: String(booking.id),
+          start_at: preferredWeek,
+          host: assignedAm.name,
+        },
+      }),
+    ),
+  );
 
   return Response.json({
     success: true,

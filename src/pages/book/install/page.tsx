@@ -1,5 +1,6 @@
 /**
  * /book/install -- First installation scheduling.
+ * Premium-utility design matching AM Toolkit.
  */
 
 import { useState } from "react";
@@ -73,7 +74,8 @@ export function InstallPage() {
     };
 
     try {
-      const res = await fetch("/api/bookings", {
+      const testFlag = getSearchParam("test") === "1" ? "?test=1" : "";
+      const res = await fetch(`/api/bookings${testFlag}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -97,30 +99,22 @@ export function InstallPage() {
 
   if (result) {
     return (
-      <div className="max-w-lg mx-auto px-6 py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#97B9BF]/20 flex items-center justify-center mx-auto">
-          <svg className="w-8 h-8 text-[#97B9BF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
+      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+        <div className="max-w-lg mx-auto px-6 py-16 text-center">
+          <div className="w-14 h-14 rounded-full bg-quatt-success-bg flex items-center justify-center mx-auto">
+            <svg className="w-7 h-7 text-quatt-success-text" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="mt-6 text-[28px] font-semibold text-quatt-ink tracking-[-0.04em]">Aanvraag ontvangen</h1>
+          <div className="mt-6 bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 text-left space-y-2">
+            <DetailRow label="Account manager" value={result.assignedAm} />
+            <DetailRow label="Status" value="Wacht op bevestiging" />
+          </div>
+          <p className="mt-5 text-[14px] text-quatt-text-secondary">
+            Je account manager neemt contact op om een exacte datum en tijd af te spreken. Je ontvangt een bevestiging zodra de afspraak is ingepland.
+          </p>
         </div>
-        <h1 className="mt-6 text-2xl font-bold text-[#1A1A1A]">Aanvraag ontvangen!</h1>
-        <div className="mt-6 bg-white rounded-xl border border-[#E8E4DD] p-5 text-left">
-          <table className="w-full text-sm">
-            <tbody>
-              <tr>
-                <td className="py-2 text-[#8A8580] pr-4">Account manager</td>
-                <td className="py-2 font-semibold">{result.assignedAm}</td>
-              </tr>
-              <tr>
-                <td className="py-2 text-[#8A8580] pr-4">Status</td>
-                <td className="py-2 font-semibold">Wacht op bevestiging</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-4 text-sm text-[#8A8580]">
-          Je account manager neemt contact op om een exacte datum en tijd af te spreken. Je ontvangt een bevestiging zodra de afspraak is ingepland.
-        </p>
       </div>
     );
   }
@@ -128,21 +122,26 @@ export function InstallPage() {
   const weekOptions = getNextWeeks(8);
 
   return (
-    <div>
-      <section className="bg-white">
-        <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] tracking-tight">Eerste Installatie</h1>
-          <p className="mt-3 text-[#8A8580] max-w-lg leading-relaxed">
+    <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
+      <div className="max-w-3xl mx-auto px-6 py-12 md:py-14">
+        <header className="mb-8">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+            Eerste installatie
+          </p>
+          <h1 className="text-[32px] md:text-[40px] font-semibold text-quatt-ink leading-[1.1] tracking-[-0.04em]">
+            Plan je eerste Quatt installatie
+          </h1>
+          <p className="mt-3 text-[16px] text-quatt-text-secondary max-w-lg leading-relaxed">
             Vraag begeleiding aan bij je eerste Quatt installatie. Een account manager komt ter plaatse om je te ondersteunen.
           </p>
-        </div>
-      </section>
+        </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-[#1A1A1A]">Je gegevens</h2>
-            <div className="bg-white rounded-xl border border-[#E8E4DD] p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <section>
+            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+              Je gegevens
+            </h2>
+            <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InputField name="partnerName" label="Naam" required placeholder="Jan de Vries" defaultValue={prefill.name} />
                 <InputField name="companyName" label="Bedrijfsnaam" required placeholder="Installatiebedrijf BV" defaultValue={prefill.company} />
@@ -151,21 +150,23 @@ export function InstallPage() {
                 <InputField name="kvkNumber" label="KvK-nummer" placeholder="Optioneel" defaultValue={prefill.kvk} />
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-[#1A1A1A]">Installatie details</h2>
-            <div className="bg-white rounded-xl border border-[#E8E4DD] p-6 space-y-4">
+          <section>
+            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
+              Installatie details
+            </h2>
+            <div className="bg-white rounded-[14px] border border-quatt-border-light shadow-card p-5 space-y-4">
               <InputField name="installationAddress" label="Installatieadres" required placeholder="Straat 123, 1234 AB Amsterdam" />
               <div>
-                <label htmlFor="preferredWeek" className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">
-                  Gewenste week<span className="text-[#FF6933] ml-0.5">*</span>
+                <label htmlFor="preferredWeek" className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">
+                  Gewenste week<span className="text-quatt-orange ml-0.5">*</span>
                 </label>
                 <select
                   id="preferredWeek"
                   name="preferredWeek"
                   required
-                  className="w-full rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200"
+                  className="w-full rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150"
                 >
                   <option value="">Kies een week</option>
                   {weekOptions.map((week) => (
@@ -174,26 +175,30 @@ export function InstallPage() {
                 </select>
               </div>
               <div>
-                <label htmlFor="notes" className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">Opmerkingen</label>
+                <label htmlFor="notes" className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">
+                  Opmerkingen
+                </label>
                 <textarea
                   id="notes"
                   name="notes"
                   rows={3}
                   placeholder="Type warmtepomp, bijzonderheden over de locatie, etc."
-                  className="w-full rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200 resize-none"
+                  className="w-full rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150 resize-none"
                 />
               </div>
             </div>
-          </div>
+          </section>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{error}</div>
+            <div className="bg-quatt-error-bg border border-quatt-error-border rounded-[12px] p-3.5 text-[13px] text-quatt-error-text">
+              {error}
+            </div>
           )}
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-[#FF6933] text-white font-semibold rounded-full px-8 py-3.5 text-base hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="w-full bg-quatt-orange text-white font-semibold rounded-full px-6 py-3.5 text-[15px] hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 shadow-card"
           >
             {submitting ? "Bezig met versturen..." : "Eerste installatie aanvragen"}
           </button>
@@ -203,16 +208,37 @@ export function InstallPage() {
   );
 }
 
+function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-[10px] bg-quatt-bg px-3 py-2">
+      <span className="text-[12px] font-medium uppercase tracking-wider text-quatt-text-secondary">
+        {label}
+      </span>
+      <span className="text-[14px] font-semibold text-quatt-ink text-right">{value}</span>
+    </div>
+  );
+}
+
 function InputField({
-  name, label, type = "text", required, placeholder, defaultValue,
+  name,
+  label,
+  type = "text",
+  required,
+  placeholder,
+  defaultValue,
 }: {
-  name: string; label: string; type?: string; required?: boolean;
-  placeholder?: string; defaultValue?: string;
+  name: string;
+  label: string;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  defaultValue?: string;
 }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-semibold text-[#1A1A1A]/60 mb-2">
-        {label}{required && <span className="text-[#FF6933] ml-0.5">*</span>}
+      <label htmlFor={name} className="block text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-2">
+        {label}
+        {required && <span className="text-quatt-orange ml-0.5">*</span>}
       </label>
       <input
         id={name}
@@ -221,7 +247,7 @@ function InputField({
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}
-        className="w-full rounded-xl bg-[#F7F5F0] px-4 py-3 text-base text-[#1A1A1A] border border-[#E8E4DD] focus:outline-none focus:border-[#FF6933] transition-colors duration-200"
+        className="w-full rounded-[12px] bg-white px-3.5 py-2.5 text-[15px] text-quatt-ink border-[1.5px] border-quatt-border-mid focus:outline-none focus:border-quatt-orange focus:ring-2 focus:ring-quatt-orange/20 transition-colors duration-150"
       />
     </div>
   );

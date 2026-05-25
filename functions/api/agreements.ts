@@ -17,7 +17,7 @@ import {
   rateLimitResponse,
   originMatchesHost,
 } from "../lib/rate-limit";
-import { generateAgreementPdf } from "../lib/generate-agreement-pdf";
+import { generateSignedAgreementPdf } from "../lib/generate-agreement-pdf";
 import {
   AGREEMENT_HTML,
   AGREEMENT_PLAINTEXT,
@@ -61,6 +61,22 @@ async function sendAgreementPdfEmail(
   contactPerson: string,
 ): Promise<void> {
   const from = env.EMAIL_FROM || "Quatt Installatiepartners <onboarding@resend.dev>";
+  const baseUrl = (env.BASE_URL || "https://booking.quatt.io").replace(/\/$/, "");
+  const trainingParams = new URLSearchParams();
+  if (to) trainingParams.set("email", to);
+  if (companyName) trainingParams.set("company", companyName);
+  const trainingHref = `${baseUrl}/book/training?${trainingParams.toString()}`;
+  // Weekend stopgap: route every confirmation to RESEND_OVERRIDE_TO when set,
+  // and drop the bcc. Lets the Resend sandbox deliver while booking.quatt.io
+  // domain verification is pending (Monday). Delete the secret to revert.
+  const overrideTo = env.RESEND_OVERRIDE_TO;
+  const effectiveTo = overrideTo || to;
+  const includeBcc = !overrideTo;
+  if (overrideTo) {
+    console.log(
+      `[agreement-email] OVERRIDE active: routing to ${overrideTo} instead of ${to}, bcc suppressed`,
+    );
+  }
   const body = `<!DOCTYPE html>
 <html lang="nl"><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#F7F5F0;font-family:'Helvetica Neue',Arial,sans-serif;color:#1A1A1A;">
@@ -69,7 +85,10 @@ async function sendAgreementPdfEmail(
       <h1 style="font-size:22px;margin:0 0 16px 0;color:#1A1A1A;">Bedankt voor het ondertekenen</h1>
       <p style="font-size:15px;line-height:1.6;color:#1A1A1A;">Beste ${contactPerson},</p>
       <p style="font-size:15px;line-height:1.6;color:#1A1A1A;">Je hebt zojuist de Quatt partnerovereenkomst ondertekend namens <strong>${companyName}</strong>. Een kopie van de ondertekende overeenkomst vind je in de bijlage van deze mail.</p>
-      <p style="font-size:15px;line-height:1.6;color:#1A1A1A;">Je Quatt partnermanager neemt binnen enkele dagen contact met je op over de volgende stappen.</p>
+      <p style="font-size:15px;line-height:1.6;color:#1A1A1A;"><strong>Volgende stap:</strong> plan je installatietraining in. Daarna ben je klaar om te starten als Quatt partner.</p>
+      <p style="margin:24px 0;text-align:center;">
+        <a href="${trainingHref}" style="display:inline-block;background:#FF6933;color:#fff;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:999px;font-size:15px;">Plan je training</a>
+      </p>
       <p style="font-size:15px;line-height:1.6;color:#1A1A1A;margin-top:24px;">Met vriendelijke groet,<br>Team Quatt Installatiepartners</p>
     </div>
     <div style="margin-top:24px;padding:0 4px;color:#8A8580;font-size:13px;line-height:1.6;">
@@ -87,8 +106,8 @@ async function sendAgreementPdfEmail(
     },
     body: JSON.stringify({
       from,
-      to,
-      bcc: "partners@quatt.io",
+      to: effectiveTo,
+      ...(includeBcc ? { bcc: "partners@quatt.io" } : {}),
       subject: "Je ondertekende Quatt partnerovereenkomst",
       html: body,
       attachments: [
@@ -136,8 +155,9 @@ function uuidv4(): string {
 export const onRequestPost = async (context: {
   request: Request;
   env: Env;
+  waitUntil: (promise: Promise<unknown>) => void;
 }) => {
-  const { env, request } = context;
+  const { env, request, waitUntil } = context;
 
   if (!originMatchesHost(request)) {
     return Response.json({ error: "Invalid origin" }, { status: 403 });
@@ -257,22 +277,13 @@ export const onRequestPost = async (context: {
     let pdfR2Key: string | null = null;
     let pdfBase64: string | null = null;
     try {
-      const pdfBytes = await generateAgreementPdf({
-        companyName,
-        kvkNumber,
-        btwNumber,
+      const pdfBytes = await generateSignedAgreementPdf(env, {
         contactPerson,
-        email,
-        phone,
-        address,
-        postcode,
-        city,
-        dealId,
-        version: resolvedVersion,
+        signaturePngDataUrl: signature,
         signedAt,
         signedIp,
-        signaturePngDataUrl: signature,
-        agreementPlainText: AGREEMENT_PLAINTEXT,
+        version: resolvedVersion,
+        agreementId: id,
       });
       pdfBase64 = pdfToBase64(pdfBytes);
 
@@ -298,39 +309,51 @@ export const onRequestPost = async (context: {
       }
     } catch (pdfErr) {
       console.error("PDF generate/upload failed:", pdfErr);
-      sendSlackNotification(
-        env,
-        `*ALERT: PDF generation failed for signed agreement*\n` +
-          `D1 row ${id} exists but no PDF was stored.\n` +
-          `Company: ${companyName}\nEmail: ${email}\n` +
-          (dealId ? `Deal: ${dealId}\n` : "") +
-          `Error: ${pdfErr instanceof Error ? pdfErr.message : String(pdfErr)}`,
-      ).catch(() => {});
-    }
-
-    if (pdfBase64) {
-      sendAgreementPdfEmail(env, email, pdfBase64, companyName, contactPerson).catch((e) => {
-        console.error("Resend agreement PDF mail failed:", e);
+      waitUntil(
         sendSlackNotification(
           env,
-          `*ALERT: could not email signed agreement PDF to ${email}*\n` +
-            `D1 row: ${id}\nR2 key: ${pdfR2Key ?? "(none)"}\n` +
-            `Error: ${e instanceof Error ? e.message : String(e)}`,
-        ).catch(() => {});
-      });
+          `*ALERT: PDF generation failed for signed agreement*\n` +
+            `D1 row ${id} exists but no PDF was stored.\n` +
+            `Company: ${companyName}\nEmail: ${email}\n` +
+            (dealId ? `Deal: ${dealId}\n` : "") +
+            `Error: ${pdfErr instanceof Error ? pdfErr.message : String(pdfErr)}`,
+        ).catch(() => {}),
+      );
     }
 
-    appendAgreementRow(env, {
-      companyName,
-      kvkNumber,
-      btwNumber,
-      contactPerson,
-      email,
-      phone,
-      address: `${address}, ${postcode} ${city}`,
-      signedAt,
-      dealId: dealId || "",
-    }).catch((e) => console.error("Agreement sheet write failed:", e));
+    // All side-effects below run after the Response returns. Cloudflare Pages
+    // Functions terminate floating promises post-Response, so each call must
+    // be kept alive via `waitUntil` -- otherwise Resend / HubSpot / Slack /
+    // Sheets / Wall-E OS pushes silently drop. (Audit log handler had the same
+    // bug; fixed 2026-05-01.)
+
+    if (pdfBase64) {
+      waitUntil(
+        sendAgreementPdfEmail(env, email, pdfBase64, companyName, contactPerson).catch((e) => {
+          console.error("Resend agreement PDF mail failed:", e);
+          return sendSlackNotification(
+            env,
+            `*ALERT: could not email signed agreement PDF to ${email}*\n` +
+              `D1 row: ${id}\nR2 key: ${pdfR2Key ?? "(none)"}\n` +
+              `Error: ${e instanceof Error ? e.message : String(e)}`,
+          ).catch(() => {});
+        }),
+      );
+    }
+
+    waitUntil(
+      appendAgreementRow(env, {
+        companyName,
+        kvkNumber,
+        btwNumber,
+        contactPerson,
+        email,
+        phone,
+        address: `${address}, ${postcode} ${city}`,
+        signedAt,
+        dealId: dealId || "",
+      }).catch((e) => console.error("Agreement sheet write failed:", e)),
+    );
 
     const hubspotFields: Record<string, string> = {
       email,
@@ -343,47 +366,53 @@ export const onRequestPost = async (context: {
       btwNumber,
     };
     if (dealId) hubspotFields.ic_agreement_deal_id = dealId;
-    submitToHubSpot(env, hubspotFields).catch((e) => {
-      console.error("HubSpot form submission failed:", e);
+    waitUntil(
+      submitToHubSpot(env, hubspotFields).catch((e) => {
+        console.error("HubSpot form submission failed:", e);
+        return sendSlackNotification(
+          env,
+          `*ALERT: HubSpot agreement form submission failed*\n` +
+            `Partner saw success but the form did NOT reach HubSpot. Partner Progression will not fire.\n` +
+            `Email: ${email}\nCompany: ${companyName}\n` +
+            (dealId ? `Deal ID: ${dealId}\n` : "No dealId in payload\n") +
+            `Error: ${e instanceof Error ? e.message : String(e)}`,
+        ).catch(() => {});
+      }),
+    );
+
+    waitUntil(
       sendSlackNotification(
         env,
-        `*ALERT: HubSpot agreement form submission failed*\n` +
-          `Partner saw success but the form did NOT reach HubSpot. Partner Progression will not fire.\n` +
-          `Email: ${email}\nCompany: ${companyName}\n` +
-          (dealId ? `Deal ID: ${dealId}\n` : "No dealId in payload\n") +
-          `Error: ${e instanceof Error ? e.message : String(e)}`,
-      ).catch(() => {});
-    });
-
-    sendSlackNotification(
-      env,
-      `*Nieuwe partnerovereenkomst ondertekend*\n` +
-        `Bedrijf: ${companyName}\n` +
-        `Contact: ${contactPerson}\n` +
-        `KvK: ${kvkNumber}\n` +
-        `E-mail: ${email}\n` +
-        `Tel: ${phone}\n` +
-        `Versie: ${resolvedVersion}\n` +
-        (pdfR2Key ? `PDF: ${pdfR2Key}\n` : "") +
-        (dealId ? `Deal ID: ${dealId}\n` : "") +
-        `_Ondertekend via Installatiepartners Booking Portal_`,
-    ).catch((e) => console.error("Slack notification failed:", e));
+        `*Nieuwe partnerovereenkomst ondertekend*\n` +
+          `Bedrijf: ${companyName}\n` +
+          `Contact: ${contactPerson}\n` +
+          `KvK: ${kvkNumber}\n` +
+          `E-mail: ${email}\n` +
+          `Tel: ${phone}\n` +
+          `Versie: ${resolvedVersion}\n` +
+          (pdfR2Key ? `PDF: ${pdfR2Key}\n` : "") +
+          (dealId ? `Deal ID: ${dealId}\n` : "") +
+          `_Ondertekend via Installatiepartners Booking Portal_`,
+      ).catch((e) => console.error("Slack notification failed:", e)),
+    );
 
     // Wall-E OS milestone (non-blocking, feature-flagged off until env is set).
     // agreement_signed is now the canonical source for the Deelnameovereenkomst
     // -- JotForm is deprecated as of 2026-04-23.
-    postWalleosBooking(env, {
-      event_id: `agreement-${id}`,
-      event_type: "agreement_signed",
-      partner_email: email,
-      hubspot_deal_id: dealId || undefined,
-      session: {
-        session_id: id,
-        start_at: new Date().toISOString(),
-        url: pdfR2Key ? `${env.BASE_URL}/api/agreements/${id}/pdf` : undefined,
-        host: `agreement ${resolvedVersion}`,
-      },
-    }).catch((e) => console.error("Wall-E OS agreement_signed push failed:", e));
+    waitUntil(
+      postWalleosBooking(env, {
+        event_id: `agreement-${id}`,
+        event_type: "agreement_signed",
+        partner_email: email,
+        hubspot_deal_id: dealId || undefined,
+        session: {
+          session_id: id,
+          start_at: new Date().toISOString(),
+          url: pdfR2Key ? `${env.BASE_URL}/api/agreements/${id}/pdf` : undefined,
+          host: `agreement ${resolvedVersion}`,
+        },
+      }).catch((e) => console.error("Wall-E OS agreement_signed push failed:", e)),
+    );
 
     return Response.json({
       success: true,
