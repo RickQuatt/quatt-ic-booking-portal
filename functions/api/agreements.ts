@@ -116,6 +116,12 @@ async function sendAgreementPdfEmail(
           content: pdfBase64,
         },
       ],
+      // walleos /api/v1/webhooks/resend uses these tags to attribute the
+      // mail event in partner_email_events. Phase 4 of portal-sync.
+      tags: [
+        { name: "source", value: "booking_portal" },
+        { name: "template", value: "agreement_signed" },
+      ],
     }),
   });
 
