@@ -240,6 +240,31 @@ export const onRequestPost = async (context: {
     );
   }
 
+  // Phase 5b: duplicate-sign guard. If walleos already has an
+  // agreement_signed_at for this email's partner, return 409 with the
+  // prior signature info instead of creating a second row. Fail-open on
+  // walleos unreachable (no block).
+  try {
+    const { resolvePartnerByEmail } = await import("../../lib/walleos-pull");
+    const state = await resolvePartnerByEmail(env, email);
+    if (state?.agreement_signed_at) {
+      return Response.json(
+        {
+          error: "already_signed",
+          detail:
+            "Deze partner heeft de partnerovereenkomst al eerder ondertekend.",
+          agreement_signed_at: state.agreement_signed_at,
+          partner_name: state.name,
+        },
+        { status: 409 },
+      );
+    }
+  } catch (err) {
+    console.warn(
+      `[agreements] walleos duplicate-sign guard skipped: ${(err as Error).message}`,
+    );
+  }
+
   const resolvedVersion = (version && version.trim()) || AGREEMENT_VERSION;
   const resolvedSnapshot = AGREEMENT_HTML; // server-baked, never trust client
   const signedAt = new Date().toISOString();

@@ -71,6 +71,10 @@ export interface Env {
   // Forms push. Non-blocking -- HubSpot stays the primary sink.
   WALLEOS_URL?: string;
   WALLEOS_WEBHOOK_SECRET?: string;
+  // Service-token for walleos READ endpoints (functions/lib/walleos-pull.ts).
+  // Scope: partners:read. When unset, the PULL gates fail-open (allow
+  // action, log warning). Phase 5 of portal-sync.
+  WALLEOS_SERVICE_TOKEN?: string;
 }
 
 // --- Booking domain types ---
