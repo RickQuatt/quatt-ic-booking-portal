@@ -5,11 +5,21 @@
 
 import type { Env } from "./types";
 
+/** Resend tag values are 256-char limited and must match /^[a-z0-9_-]+$/i. */
+type BookingTemplate =
+  | "kennismaking"
+  | "site_visit"
+  | "training"
+  | "first_install"
+  | "cancellation"
+  | "reschedule";
+
 async function sendEmail(
   env: Env,
   to: string,
   subject: string,
   html: string,
+  template: BookingTemplate,
 ): Promise<void> {
   const from =
     env.EMAIL_FROM ||
@@ -32,7 +42,20 @@ async function sendEmail(
       "Content-Type": "application/json",
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
     },
-    body: JSON.stringify({ from, to: effectiveTo, subject, html }),
+    body: JSON.stringify({
+      from,
+      to: effectiveTo,
+      subject,
+      html,
+      // walleos /api/v1/webhooks/resend uses these tags to route incoming
+      // mail events into partner_email_events with the right source +
+      // template. Source = booking_portal so the AM comms timeline can
+      // distinguish portal-vs-portal sends. Phase 4 of portal-sync.
+      tags: [
+        { name: "source", value: "booking_portal" },
+        { name: "template", value: template },
+      ],
+    }),
   });
 
   if (!res.ok) {
@@ -173,6 +196,7 @@ export async function sendKennismakingConfirmation(
     to,
     `Bevestiging kennismakingsgesprek - ${formatDateNL(date)}`,
     baseTemplate(env, content),
+    "kennismaking",
   );
 }
 
@@ -208,6 +232,7 @@ export async function sendSiteVisitConfirmation(
     to,
     "Bevestiging bezoekverzoek - Quatt Installatiepartners",
     baseTemplate(env, content),
+    "site_visit",
   );
 }
 
@@ -279,6 +304,7 @@ export async function sendTrainingConfirmation(
     to,
     `Bevestiging producttraining - ${formatDateNL(sessionDate)}`,
     baseTemplate(env, content),
+    "training",
   );
 }
 
@@ -315,6 +341,7 @@ export async function sendFirstInstallConfirmation(
     to,
     "Bevestiging eerste installatie - Quatt Installatiepartners",
     baseTemplate(env, content),
+    "first_install",
   );
 }
 
@@ -351,6 +378,7 @@ export async function sendCancellationConfirmation(
     to,
     "Afspraak geannuleerd - Quatt Installatiepartners",
     baseTemplate(env, content),
+    "cancellation",
   );
 }
 
@@ -431,5 +459,6 @@ export async function sendRescheduleConfirmation(
     to,
     `Afspraak verplaatst - ${formatDateNL(date)}`,
     baseTemplate(env, content),
+    "reschedule",
   );
 }

@@ -13,6 +13,7 @@ import {
   getBookingById,
   setBookingStatus,
 } from "../../../lib/d1-bookings";
+import { postWalleosBooking, type WalleosMilestone } from "../../../lib/walleos";
 
 export const onRequestPost = async (context: {
   request: Request;
@@ -86,6 +87,31 @@ export const onRequestPost = async (context: {
       amName: am.name,
     }),
   ).catch((e) => console.error("Slack cancel notification failed:", e));
+
+  // walleos push (best-effort): cancel milestone + auto-revert the
+  // original booked row. wall-e-os PR #113 added training_cancelled +
+  // kennismaking_cancelled to the booking-portal webhook and flips the
+  // latest achieved booked-milestone to status='reverted' on receipt.
+  // intro_call maps to kennismaking; first_install has no cancellation
+  // event type today (no AM check-in for first_install_completed either).
+  const cancelType: WalleosMilestone | null =
+    booking.type === "training"
+      ? "training_cancelled"
+      : booking.type === "intro_call"
+        ? "kennismaking_cancelled"
+        : null;
+  if (cancelType) {
+    postWalleosBooking(env, {
+      event_id: `booking-cancel-${id}`,
+      event_type: cancelType,
+      partner_email: email,
+      hubspot_deal_id: booking.hubspot_deal_id ?? undefined,
+      session: {
+        session_id: booking.session_id ?? id,
+        start_at: booking.preferred_date || new Date().toISOString(),
+      },
+    }).catch((e) => console.error("walleos cancel push failed:", e));
+  }
 
   return Response.json({ success: true });
 };

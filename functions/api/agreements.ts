@@ -116,6 +116,12 @@ async function sendAgreementPdfEmail(
           content: pdfBase64,
         },
       ],
+      // walleos /api/v1/webhooks/resend uses these tags to attribute the
+      // mail event in partner_email_events. Phase 4 of portal-sync.
+      tags: [
+        { name: "source", value: "booking_portal" },
+        { name: "template", value: "agreement_signed" },
+      ],
     }),
   });
 
@@ -231,6 +237,31 @@ export const onRequestPost = async (context: {
     return Response.json(
       { error: "Accepteer de voorwaarden om door te gaan." },
       { status: 400 },
+    );
+  }
+
+  // Phase 5b: duplicate-sign guard. If walleos already has an
+  // agreement_signed_at for this email's partner, return 409 with the
+  // prior signature info instead of creating a second row. Fail-open on
+  // walleos unreachable (no block).
+  try {
+    const { resolvePartnerByEmail } = await import("../../lib/walleos-pull");
+    const state = await resolvePartnerByEmail(env, email);
+    if (state?.agreement_signed_at) {
+      return Response.json(
+        {
+          error: "already_signed",
+          detail:
+            "Deze partner heeft de partnerovereenkomst al eerder ondertekend.",
+          agreement_signed_at: state.agreement_signed_at,
+          partner_name: state.name,
+        },
+        { status: 409 },
+      );
+    }
+  } catch (err) {
+    console.warn(
+      `[agreements] walleos duplicate-sign guard skipped: ${(err as Error).message}`,
     );
   }
 

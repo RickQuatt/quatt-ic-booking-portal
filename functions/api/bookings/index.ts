@@ -112,6 +112,54 @@ export const onRequestPost = async (context: {
     );
   }
 
+  // Phase 5b walleos PULL gates. Soft-fail: if walleos is unreachable
+  // we permit the action (fail-open) so the portal can never be DoS'd
+  // by a walleos outage. Each gate is keyed on the partner's email and
+  // checks the canonical onboarding milestones.
+  //   - training: require agreement_signed_at
+  //   - first_install: require training_completed_at
+  // intro_call has no prerequisite -- it's the entry point.
+  const gateEmail =
+    typeof (body as Record<string, unknown>)?.partnerEmail === "string"
+      ? ((body as Record<string, unknown>).partnerEmail as string)
+      : typeof (body as Record<string, unknown>)?.email === "string"
+        ? ((body as Record<string, unknown>).email as string)
+        : null;
+  if (gateEmail) {
+    try {
+      const { resolvePartnerByEmail } = await import("../../lib/walleos-pull");
+      const state = await resolvePartnerByEmail(env, gateEmail);
+      if (state) {
+        if (type === "training" && !state.agreement_signed_at) {
+          return Response.json(
+            {
+              error: "agreement_required",
+              detail:
+                "Je moet eerst de partnerovereenkomst ondertekenen voordat je een training kunt boeken.",
+              agreement_url: "/agreement",
+            },
+            { status: 409 },
+          );
+        }
+        if (type === "first_install" && !state.training_completed_at) {
+          return Response.json(
+            {
+              error: "training_required",
+              detail:
+                "Je moet de installatietraining hebben afgerond voordat je een eerste installatie boekt.",
+              training_url: "/book/training",
+            },
+            { status: 409 },
+          );
+        }
+      }
+    } catch (err) {
+      console.warn(
+        `[bookings] walleos gate skipped (fail-open) for ${gateEmail}: ${(err as Error).message}`,
+      );
+    }
+  }
+
   try {
     if (type === "training") return await handleTrainingBooking(env, body, waitUntil);
     if (type === "intro_call") return await handleIntroCallBooking(env, body, waitUntil);
