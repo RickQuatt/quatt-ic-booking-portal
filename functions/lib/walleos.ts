@@ -22,8 +22,10 @@ export type WalleosMilestone =
   | "agreement_signed"
   | "kennismaking_booked"
   | "kennismaking_completed"
+  | "kennismaking_cancelled"
   | "training_booked"
   | "training_completed"
+  | "training_cancelled"
   | "first_install_booked"
   | "first_install_completed";
 
