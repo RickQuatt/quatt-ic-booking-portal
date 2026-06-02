@@ -90,35 +90,9 @@ export function TrainingPage({ track = "hybrid" }: { track?: Track } = {}) {
   const [result, setResult] = useState<BookingResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Agreement-first gate. We must verify the partner has signed the
-  // partnerovereenkomst before we let them pick a training session.
-  // Lookup is by email OR dealId (whichever is present in the URL).
-  // If nothing is identifiable, treat as "not signed" -- safest default.
-  const [agreementCheck, setAgreementCheck] = useState<
-    "checking" | "signed" | "not-signed"
-  >("checking");
-
+  // Agreement-first gate removed 2026-06-03. Anyone can land here and
+  // book a training (cold prospects become tracked leads downstream).
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (prefill.email) params.set("email", prefill.email);
-    if (prefill.dealId) params.set("dealId", prefill.dealId);
-    if (!params.toString()) {
-      setAgreementCheck("not-signed");
-      return;
-    }
-    fetch(`/api/agreement-status?${params.toString()}`)
-      .then((r) => r.json())
-      .then((data: { signed?: boolean }) => {
-        setAgreementCheck(data?.signed ? "signed" : "not-signed");
-      })
-      .catch(() => {
-        // Be conservative on error: force the agreement step.
-        setAgreementCheck("not-signed");
-      });
-  }, [prefill.email, prefill.dealId]);
-
-  useEffect(() => {
-    if (agreementCheck !== "signed") return;
     fetch(`/api/sessions?track=${track}`)
       .then((r) => r.json())
       .then((data) => {
@@ -129,7 +103,7 @@ export function TrainingPage({ track = "hybrid" }: { track?: Track } = {}) {
         setError("Kon trainingen niet laden. Probeer het later opnieuw.");
         setLoading(false);
       });
-  }, [track, agreementCheck]);
+  }, [track]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -161,12 +135,6 @@ export function TrainingPage({ track = "hybrid" }: { track?: Track } = {}) {
 
       const json = await res.json();
 
-      if (res.status === 412 && json?.redirect) {
-        // Defensive: server says agreement not signed. Send them to /book/agreement.
-        window.location.href = json.redirect;
-        return;
-      }
-
       if (!res.ok) {
         setError(json.error || "Boeking mislukt");
         setSubmitting(false);
@@ -179,52 +147,6 @@ export function TrainingPage({ track = "hybrid" }: { track?: Track } = {}) {
     } finally {
       setSubmitting(false);
     }
-  }
-
-  if (agreementCheck === "checking") {
-    return (
-      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
-        <div className="max-w-lg mx-auto px-6 py-16 text-center text-[14px] text-quatt-text-secondary">
-          Even kijken of je overeenkomst al getekend is…
-        </div>
-      </div>
-    );
-  }
-
-  if (agreementCheck === "not-signed") {
-    const params = new URLSearchParams();
-    if (prefill.email) params.set("email", prefill.email);
-    if (prefill.company) params.set("company", prefill.company);
-    if (prefill.dealId) params.set("dealId", prefill.dealId);
-    params.set("returnTo", "training");
-    const agreementHref = `/book/agreement?${params.toString()}`;
-    return (
-      <div className="bg-quatt-bg min-h-[calc(100vh-65px)]">
-        <div className="max-w-lg mx-auto px-6 py-16">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-quatt-text-secondary mb-3">
-            Eerste stap
-          </p>
-          <h1 className="text-[28px] font-semibold text-quatt-ink tracking-[-0.04em] leading-[1.15]">
-            Eerst de partnerovereenkomst tekenen
-          </h1>
-          <p className="mt-4 text-[15px] text-quatt-text-secondary leading-relaxed">
-            Voordat je een training kunt inplannen, moet de partnerovereenkomst
-            getekend zijn. Dit kost een paar minuten. Daarna stuur ik je
-            automatisch terug naar de trainingspagina.
-          </p>
-          <a
-            href={agreementHref}
-            className="mt-7 inline-flex items-center justify-center rounded-full bg-quatt-orange text-white text-[15px] font-semibold px-7 py-3 shadow-sm hover:opacity-95 transition"
-          >
-            Teken de overeenkomst
-          </a>
-          <p className="mt-5 text-[13px] text-quatt-text-secondary">
-            Al getekend en kom je hier ondanks dat? Open de link uit de e-mail
-            van Quatt opnieuw, of neem contact op met je AM.
-          </p>
-        </div>
-      </div>
-    );
   }
 
   if (result) {
