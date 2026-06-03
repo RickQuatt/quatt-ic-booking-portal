@@ -51,8 +51,6 @@ import {
   updateBookingCalendar,
   updateBookingSheetRow,
 } from "../../lib/d1-bookings";
-import { hasSignedAgreement } from "../../lib/d1-agreements";
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const onRequestPost = async (context: {
@@ -112,6 +110,42 @@ export const onRequestPost = async (context: {
     );
   }
 
+  // Phase 5b walleos PULL gates. Soft-fail: if walleos is unreachable
+  // we permit the action (fail-open) so the portal can never be DoS'd
+  // by a walleos outage.
+  //   - first_install: require training_completed_at
+  // intro_call + training have no prerequisite -- both are open entry points
+  // (training gate removed 2026-06-03 per Rick: cold prospects + lapsed
+  // partners must be able to book trainings without first signing the
+  // agreement; the agreement gate now lives at a later step).
+  const gateEmail =
+    typeof (body as Record<string, unknown>)?.partnerEmail === "string"
+      ? ((body as Record<string, unknown>).partnerEmail as string)
+      : typeof (body as Record<string, unknown>)?.email === "string"
+        ? ((body as Record<string, unknown>).email as string)
+        : null;
+  if (gateEmail && type === "first_install") {
+    try {
+      const { resolvePartnerByEmail } = await import("../../lib/walleos-pull");
+      const state = await resolvePartnerByEmail(env, gateEmail);
+      if (state && !state.training_completed_at) {
+        return Response.json(
+          {
+            error: "training_required",
+            detail:
+              "Je moet de installatietraining hebben afgerond voordat je een eerste installatie boekt.",
+            training_url: "/book/training",
+          },
+          { status: 409 },
+        );
+      }
+    } catch (err) {
+      console.warn(
+        `[bookings] walleos gate skipped (fail-open) for ${gateEmail}: ${(err as Error).message}`,
+      );
+    }
+  }
+
   try {
     if (type === "training") return await handleTrainingBooking(env, body, waitUntil);
     if (type === "intro_call") return await handleIntroCallBooking(env, body, waitUntil);
@@ -149,30 +183,35 @@ async function handleTrainingBooking(
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // Agreement-first gate: training booking requires a signed agreement
-  // for the partner (matched by email OR dealId per Rick's call --
-  // dealId is per-installer-company, so once anyone at the company has
-  // signed, others can book training without re-signing).
-  const agreement = await hasSignedAgreement(env, {
-    email: partnerEmail,
-    dealId,
-  });
-  if (!agreement.signed) {
-    const params = new URLSearchParams();
-    if (partnerEmail) params.set("email", partnerEmail);
-    if (companyName) params.set("company", companyName);
-    if (dealId) params.set("dealId", dealId);
-    params.set("returnTo", "training");
-    return Response.json(
-      {
-        error: "agreement-not-signed",
-        message:
-          "Eerst de partnerovereenkomst tekenen, daarna kun je je training inplannen.",
-        redirect: `/book/agreement?${params.toString()}`,
-      },
-      { status: 412 },
+  // (Agreement gate removed 2026-06-03 -- training is now an open entry
+  // point. Cold prospects who land here become tracked leads via the
+  // walleos `training_booked` webhook downstream of insertBooking.)
+
+  // Resolve which AM owns this booking. 3-step routing: existing AM in
+  // walleos -> specific-partner override -> round-robin Mitchell/Ralph.
+  // The result drives the Resend From + Reply-To, the D1 assigned_am
+  // column, the walleos host field, the Slack notification, and the
+  // Google Sheet `am` column. See functions/lib/am-assignment.ts.
+  let amAssignment;
+  try {
+    const { resolveAmForBooking } = await import("../../lib/am-assignment");
+    const { resolvePartnerByEmail } = await import("../../lib/walleos-pull");
+    const partnerState = await resolvePartnerByEmail(env, partnerEmail).catch(() => null);
+    amAssignment = await resolveAmForBooking(env, {
+      companyName,
+      kvkNumber,
+      partnerState,
+    });
+  } catch (err) {
+    console.warn(
+      `[bookings] AM resolution fell back to default for ${partnerEmail}: ${(err as Error).message}`,
     );
+    const fallback = AM_CONFIG[0];
+    amAssignment = { amEmail: fallback.email, amName: fallback.name, source: "fallback" as const };
   }
+  console.log(
+    `[bookings] AM resolved: email=${amAssignment.amEmail} source=${amAssignment.source} partner=${partnerEmail} company=${companyName}`,
+  );
 
   const session = await getSessionById(env, sessionId);
   if (!session) {
@@ -206,7 +245,7 @@ async function handleTrainingBooking(
     kvk_number: kvkNumber || null,
     notes: notes || null,
     status: "confirmed",
-    assigned_am: "mitchell.k@quatt.io",
+    assigned_am: amAssignment.amEmail,
   });
 
   await incrementSessionBookings(env, sessionId);
@@ -304,7 +343,7 @@ async function handleTrainingBooking(
         session: {
           session_id: String(session.id),
           start_at: session.date,
-          host: "Mitchell van Kleef",
+          host: amAssignment.amName,
           product_line: sessionTrack === "alle" ? "all_e" : "quatt_heat_pump",
         },
       }),
@@ -323,7 +362,7 @@ async function handleTrainingBooking(
         phone: partnerPhone,
         company: companyName,
         date: session.date,
-        am: "Mitchell van Kleef",
+        am: amAssignment.amName,
         status: "confirmed",
         hubspotDealId: "",
       }).then((rowId) => {
@@ -361,6 +400,8 @@ async function handleTrainingBooking(
         sessionDate: session.date,
         sessionTime: `${session.start_time} - ${session.end_time}`,
         location: session.location || "",
+        amName: amAssignment.amName,
+        amEmail: amAssignment.amEmail,
       }),
     ),
   );

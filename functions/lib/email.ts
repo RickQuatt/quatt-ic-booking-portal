@@ -5,13 +5,30 @@
 
 import type { Env } from "./types";
 
+/** Resend tag values are 256-char limited and must match /^[a-z0-9_-]+$/i. */
+type BookingTemplate =
+  | "kennismaking"
+  | "site_visit"
+  | "training"
+  | "first_install"
+  | "cancellation"
+  | "reschedule";
+
 async function sendEmail(
   env: Env,
   to: string,
   subject: string,
   html: string,
+  template: BookingTemplate,
+  options?: {
+    /** Override the From header. Use to impersonate an AM (display name + verified sender domain). */
+    fromOverride?: string;
+    /** Reply-To header so replies route to the AM's mailbox, not the verified sender alias. */
+    replyTo?: string;
+  },
 ): Promise<void> {
   const from =
+    options?.fromOverride ||
     env.EMAIL_FROM ||
     "Quatt Installatiepartners <onboarding@resend.dev>";
 
@@ -26,19 +43,70 @@ async function sendEmail(
     );
   }
 
+  const body: Record<string, unknown> = {
+    from,
+    to: effectiveTo,
+    subject,
+    html,
+    // walleos /api/v1/webhooks/resend uses these tags to route incoming
+    // mail events into partner_email_events with the right source +
+    // template. Source = booking_portal so the AM comms timeline can
+    // distinguish portal-vs-portal sends. Phase 4 of portal-sync.
+    tags: [
+      { name: "source", value: "booking_portal" },
+      { name: "template", value: template },
+    ],
+  };
+  if (options?.replyTo) {
+    body.reply_to = options.replyTo;
+  }
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
     },
-    body: JSON.stringify({ from, to: effectiveTo, subject, html }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Resend API error (${res.status}): ${text}`);
   }
+}
+
+/**
+ * Build a From header that impersonates an AM via Resend.
+ *
+ *   From: "Daniel Mens <noreply@partners.quatt.io>"
+ *   Reply-To: daniel.m@quatt.io
+ *
+ * Inbox shows the AM's name; replies route to the AM's mailbox.
+ * Falls back to the configured EMAIL_FROM (or sandbox sender) when
+ * either amEmail or amName is missing.
+ */
+function buildAmSenderHeaders(
+  env: Env,
+  amName: string | undefined | null,
+  amEmail: string | undefined | null,
+): { fromOverride?: string; replyTo?: string } {
+  if (!amName || !amEmail) return {};
+  // Derive the sender alias from EMAIL_FROM. EMAIL_FROM looks like:
+  //   "Quatt Installatiepartners <noreply@partners.quatt.io>"
+  // We want just the address part.
+  const senderAlias = (() => {
+    const fallback = "noreply@partners.quatt.io";
+    const raw = env.EMAIL_FROM || "";
+    const m = raw.match(/<([^>]+)>/);
+    if (m) return m[1];
+    if (raw.includes("@") && !raw.includes("<")) return raw.trim();
+    return fallback;
+  })();
+  return {
+    fromOverride: `${amName} <${senderAlias}>`,
+    replyTo: amEmail,
+  };
 }
 
 function formatDateNL(iso: string): string {
@@ -173,6 +241,7 @@ export async function sendKennismakingConfirmation(
     to,
     `Bevestiging kennismakingsgesprek - ${formatDateNL(date)}`,
     baseTemplate(env, content),
+    "kennismaking",
   );
 }
 
@@ -208,6 +277,7 @@ export async function sendSiteVisitConfirmation(
     to,
     "Bevestiging bezoekverzoek - Quatt Installatiepartners",
     baseTemplate(env, content),
+    "site_visit",
   );
 }
 
@@ -228,9 +298,16 @@ export async function sendTrainingConfirmation(
      */
      agreementPending?: boolean;
      dealId?: string;
+     /**
+      * AM identity for Reply-To impersonation. When both amName and amEmail
+      * are provided, the From header shows the AM's name and replies route
+      * to amEmail. Inbox-side this looks like an email from the AM directly.
+      */
+     amName?: string;
+     amEmail?: string;
   },
 ): Promise<void> {
-  const { to, partnerName, sessionDate, sessionTime, location, agreementPending, dealId } = params;
+  const { to, partnerName, sessionDate, sessionTime, location, agreementPending, dealId, amName, amEmail } = params;
 
   const agreementUrl = (() => {
     if (!agreementPending) return null;
@@ -255,9 +332,11 @@ export async function sendTrainingConfirmation(
     </div>`
     : "";
 
+  const firstName = partnerName.split(" ")[0];
+  const amLine = amName ? ` Je accountmanager bij Quatt is ${amName} -- reply gerust direct op deze mail als je vragen hebt.` : "";
   const intro = agreementPending
-    ? `Hoi ${partnerName.split(" ")[0]}, je trainingsplek is gereserveerd door je accountmanager. Tot dan!`
-    : `Hoi ${partnerName.split(" ")[0]}, je bent aangemeld voor de Quatt producttraining. Tot dan!`;
+    ? `Hoi ${firstName}, je trainingsplek is gereserveerd door je accountmanager. Tot dan!${amLine}`
+    : `Hoi ${firstName}, je bent aangemeld voor de Quatt producttraining. Tot dan!${amLine}`;
 
   const content = `
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;">Je training is bevestigd</h1>
@@ -279,6 +358,8 @@ export async function sendTrainingConfirmation(
     to,
     `Bevestiging producttraining - ${formatDateNL(sessionDate)}`,
     baseTemplate(env, content),
+    "training",
+    buildAmSenderHeaders(env, amName, amEmail),
   );
 }
 
@@ -315,6 +396,7 @@ export async function sendFirstInstallConfirmation(
     to,
     "Bevestiging eerste installatie - Quatt Installatiepartners",
     baseTemplate(env, content),
+    "first_install",
   );
 }
 
@@ -351,6 +433,7 @@ export async function sendCancellationConfirmation(
     to,
     "Afspraak geannuleerd - Quatt Installatiepartners",
     baseTemplate(env, content),
+    "cancellation",
   );
 }
 
@@ -431,5 +514,6 @@ export async function sendRescheduleConfirmation(
     to,
     `Afspraak verplaatst - ${formatDateNL(date)}`,
     baseTemplate(env, content),
+    "reschedule",
   );
 }
