@@ -44,7 +44,6 @@ import {
 } from "../../lib/rate-limit";
 import {
   countBookingsByType,
-  findActiveSessionBookingForEmail,
   getSessionById,
   incrementSessionBookings,
   insertBooking,
@@ -66,7 +65,10 @@ export const onRequestPost = async (context: {
 
   const rl = await rateLimit(env.RATE_LIMIT, request, {
     bucket: "bookings",
-    max: 5,
+    // Loosened 2026-06-03 (5 -> 20) -- multi-attendee company bookings + AM-
+    // initiated batch flows were hitting the cap. 20/10min still blocks
+    // scripted floods. Watch wall-e-alerts for spikes; tighten if abuse shows.
+    max: 20,
     windowSeconds: 600,
   });
   if (!rl.ok) return rateLimitResponse(rl);
@@ -227,13 +229,10 @@ async function handleTrainingBooking(
     return Response.json({ error: "Training session is full" }, { status: 400 });
   }
 
-  const duplicate = await findActiveSessionBookingForEmail(env, sessionId, partnerEmail);
-  if (duplicate) {
-    return Response.json(
-      { error: "You have already booked this training session" },
-      { status: 400 },
-    );
-  }
+  // Duplicate-per-session-email check removed 2026-06-03. A single email
+  // (typically the partner's shared inbox) can now book N attendees on the
+  // same session -- one D1 row per attendee, partnerName distinguishes them.
+  // Calendar invites and confirmation emails all land at the shared inbox.
 
   const booking = await insertBooking(env, {
     type: "training",
