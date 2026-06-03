@@ -142,7 +142,6 @@ function baseTemplate(env: Env, content: string): string {
     </div>
     <div style="margin-top:24px;padding:0 4px;color:#8A8580;font-size:13px;line-height:1.6;">
       <p>Vragen? Bel ons op <a href="tel:+31208082116" style="color:#FF6933;text-decoration:none;">020 808 2116</a> of mail naar <a href="mailto:zakelijk@quatt.io" style="color:#FF6933;text-decoration:none;">zakelijk@quatt.io</a></p>
-      <p style="margin-top:8px;"><em>Dit is een automatisch bericht - niet beantwoorden.</em></p>
       <p style="margin-top:8px;">Quatt B.V. - Kon. Wilhelminaplein 29, 1062 HJ Amsterdam</p>
     </div>
   </div>
