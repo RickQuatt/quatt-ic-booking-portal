@@ -7,6 +7,15 @@ import type { Env, TrainingTrack } from "./types";
 
 const PORTAL_ID = "25848718";
 
+// HubSpot's spam filter quarantines submissions that lack a valid absolute
+// pageUri. BASE_URL is not reliably set on the Cloudflare Pages env (it was
+// only set on the old Vercel deploy), so fall back to the production domain
+// the same way agreements.ts does. Without this, training submissions went out
+// with a relative/empty pageUri and got spam-quarantined.
+function bookingBaseUrl(env: Env): string {
+  return (env.BASE_URL || "https://booking.quatt.io").replace(/\/$/, "");
+}
+
 // Per-product-line multi-checkbox writes (ic__trained_products /
 // ic__training_booked_products) moved to the Wall-E OS drain on 2026-05-22.
 // Booking portal still picks per-track form GUIDs below so the HubSpot
@@ -71,7 +80,7 @@ export async function setKennismakingBooked(
       body: JSON.stringify({
         fields,
         context: {
-          pageUri: `${env.BASE_URL}/book/kennismaking`,
+          pageUri: `${bookingBaseUrl(env)}/book/kennismaking`,
           pageName: "Kennismaking Booking",
         },
       }),
@@ -129,7 +138,7 @@ export async function setTrainingBooked(
       body: JSON.stringify({
         fields,
         context: {
-          pageUri: `${env.BASE_URL}${pagePath}`,
+          pageUri: `${bookingBaseUrl(env)}${pagePath}`,
           pageName: track === "alle" ? "All-e Training Booking" : "Training Booking",
         },
       }),
@@ -175,7 +184,7 @@ export async function setTrainingAttended(
       body: JSON.stringify({
         fields,
         context: {
-          pageUri: `${env.BASE_URL}/training/check-in${track === "alle" ? "?track=alle" : ""}`,
+          pageUri: `${bookingBaseUrl(env)}/training/check-in${track === "alle" ? "?track=alle" : ""}`,
           pageName: track === "alle" ? "All-e Training Check-in" : "Training Check-in",
         },
       }),
