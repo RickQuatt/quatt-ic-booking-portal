@@ -34,7 +34,7 @@ import { postWalleosBooking } from "../../lib/walleos";
 import { sendTrainingConfirmation } from "../../lib/email";
 import { alertOnFailure } from "../../lib/slack";
 import {
-  findActiveSessionBookingForEmail,
+  findActiveSessionBookingForAttendee,
   getSessionById,
   incrementSessionBookings,
   insertBooking,
@@ -104,7 +104,14 @@ export const onRequestPost = async (context: {
     assignedAm,
   } = body;
 
-  if (!sessionId || !partnerName || !partnerEmail || !companyName || !assignedAm) {
+  if (
+    !sessionId ||
+    typeof partnerName !== "string" ||
+    !partnerName.trim() ||
+    !partnerEmail ||
+    !companyName ||
+    !assignedAm
+  ) {
     return Response.json(
       { error: "Missing required fields (sessionId, partnerName, partnerEmail, companyName, assignedAm)" },
       { status: 400 },
@@ -131,10 +138,18 @@ export const onRequestPost = async (context: {
     return Response.json({ error: "Training session is full" }, { status: 400 });
   }
 
-  const duplicate = await findActiveSessionBookingForEmail(env, sessionId, partnerEmail);
+  // Email-only duplicate check loosened 2026-07-02 to match the public flow's
+  // shared-inbox support (PR #6): N attendees may share one email, but the
+  // same (email, name) pair may only hold one active booking per session.
+  const duplicate = await findActiveSessionBookingForAttendee(
+    env,
+    sessionId,
+    partnerEmail,
+    partnerName,
+  );
   if (duplicate) {
     return Response.json(
-      { error: "Partner is al ingeschreven voor deze training" },
+      { error: `${partnerName} is al ingeschreven voor deze training` },
       { status: 409 },
     );
   }

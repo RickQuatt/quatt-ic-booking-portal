@@ -397,6 +397,31 @@ export async function findActiveSessionBookingForEmail(
     .first<BookingRow>();
 }
 
+/**
+ * Same-person duplicate guard: a shared inbox may register N *different*
+ * attendees on one session (one row per name), but the same (email, name)
+ * pair may only hold one active booking per session. Name match is
+ * case/whitespace-insensitive.
+ */
+export async function findActiveSessionBookingForAttendee(
+  env: Env,
+  sessionId: string,
+  email: string,
+  name: string,
+): Promise<BookingRow | null> {
+  return await requireDb(env)
+    .prepare(
+      `SELECT * FROM bookings
+        WHERE session_id = ?
+          AND partner_email = ? COLLATE NOCASE
+          AND TRIM(partner_name) = TRIM(?) COLLATE NOCASE
+          AND status != 'cancelled'
+        LIMIT 1`,
+    )
+    .bind(sessionId, email, name)
+    .first<BookingRow>();
+}
+
 export async function countBookingsByType(env: Env, type: string): Promise<number> {
   const row = await requireDb(env)
     .prepare(`SELECT COUNT(*) as n FROM bookings WHERE type = ?`)
