@@ -4,6 +4,7 @@
  */
 
 import type { Env, TrainingTrack } from "./types";
+import { upsertContactProps } from "./hubspot-crm";
 
 const PORTAL_ID = "25848718";
 
@@ -30,12 +31,19 @@ function bookingBaseUrl(env: Env): string {
  * If an All-e GUID isn't configured, we fall back to the Hybrid form so a
  * misconfigured deploy doesn't drop attendance signals on the floor.
  */
-function pickBookedFormGuid(env: Env, track: TrainingTrack): string | undefined {
-  if (track === "alle") return env.HUBSPOT_TRAINING_ALLE_FORM_ID || env.HUBSPOT_TRAINING_FORM_ID;
+function pickBookedFormGuid(
+  env: Env,
+  track: TrainingTrack,
+): string | undefined {
+  if (track === "alle")
+    return env.HUBSPOT_TRAINING_ALLE_FORM_ID || env.HUBSPOT_TRAINING_FORM_ID;
   return env.HUBSPOT_TRAINING_FORM_ID;
 }
 
-function pickAttendedFormGuid(env: Env, track: TrainingTrack): string | undefined {
+function pickAttendedFormGuid(
+  env: Env,
+  track: TrainingTrack,
+): string | undefined {
   if (track === "alle") {
     return (
       env.HUBSPOT_TRAINING_ALLE_ATTENDED_FORM_ID ||
@@ -47,6 +55,48 @@ function pickAttendedFormGuid(env: Env, track: TrainingTrack): string | undefine
 }
 
 export async function setKennismakingBooked(
+  env: Env,
+  email: string,
+  dealId?: string,
+  meetingDate?: string,
+): Promise<void> {
+  const props: Record<string, string> = { ic__kennismaking_booked: "true" };
+  if (meetingDate) {
+    props.ic__kennismaking_date = meetingDate;
+  }
+  if (dealId) {
+    props.ic__kennismaking_deal_id = dealId;
+  }
+
+  const direct = await upsertContactProps(
+    env,
+    email,
+    props,
+    "kennismaking booked",
+  );
+  await submitKennismakingForm(env, email, dealId, meetingDate, direct.skipped);
+}
+
+async function submitKennismakingForm(
+  env: Env,
+  email: string,
+  dealId: string | undefined,
+  meetingDate: string | undefined,
+  primary: boolean,
+): Promise<void> {
+  try {
+    await postKennismakingForm(env, email, dealId, meetingDate);
+  } catch (e) {
+    if (primary) {
+      throw e;
+    }
+    // Direct CRM write already succeeded; form-submission history is
+    // nice-to-have (HubSpot lists) so never fail the request for it.
+    console.warn("legacy Forms API submit failed (kennismaking booked)", e);
+  }
+}
+
+async function postKennismakingForm(
   env: Env,
   email: string,
   dealId?: string,
@@ -100,6 +150,53 @@ export async function setTrainingBooked(
   trainingDate?: string,
   track: TrainingTrack = "hybrid",
 ): Promise<void> {
+  const props: Record<string, string> = { ic__training_booked: "true" };
+  if (trainingDate) {
+    // HubSpot date properties want an epoch-ms at UTC midnight; an ISO
+    // date-only string (YYYY-MM-DD) parses as UTC, same conversion the form
+    // field used.
+    props.ic__training_date = String(Date.parse(trainingDate));
+  }
+  if (dealId) {
+    props.ic__kennismaking_deal_id = dealId;
+  }
+
+  const direct = await upsertContactProps(env, email, props, "training booked");
+  await submitTrainingBookedForm(
+    env,
+    email,
+    dealId,
+    trainingDate,
+    track,
+    direct.skipped,
+  );
+}
+
+async function submitTrainingBookedForm(
+  env: Env,
+  email: string,
+  dealId: string | undefined,
+  trainingDate: string | undefined,
+  track: TrainingTrack,
+  primary: boolean,
+): Promise<void> {
+  try {
+    await postTrainingBookedForm(env, email, dealId, trainingDate, track);
+  } catch (e) {
+    if (primary) {
+      throw e;
+    }
+    console.warn("legacy Forms API submit failed (training booked)", e);
+  }
+}
+
+async function postTrainingBookedForm(
+  env: Env,
+  email: string,
+  dealId?: string,
+  trainingDate?: string,
+  track: TrainingTrack = "hybrid",
+): Promise<void> {
   const formGuid = pickBookedFormGuid(env, track);
   if (!formGuid) {
     console.warn(
@@ -139,7 +236,8 @@ export async function setTrainingBooked(
         fields,
         context: {
           pageUri: `${bookingBaseUrl(env)}${pagePath}`,
-          pageName: track === "alle" ? "All-e Training Booking" : "Training Booking",
+          pageName:
+            track === "alle" ? "All-e Training Booking" : "Training Booking",
         },
       }),
     },
@@ -152,6 +250,36 @@ export async function setTrainingBooked(
 }
 
 export async function setTrainingAttended(
+  env: Env,
+  email: string,
+  track: TrainingTrack = "hybrid",
+): Promise<void> {
+  const direct = await upsertContactProps(
+    env,
+    email,
+    { ic__training_completed: "true" },
+    "training attended",
+  );
+  await submitTrainingAttendedForm(env, email, track, direct.skipped);
+}
+
+async function submitTrainingAttendedForm(
+  env: Env,
+  email: string,
+  track: TrainingTrack,
+  primary: boolean,
+): Promise<void> {
+  try {
+    await postTrainingAttendedForm(env, email, track);
+  } catch (e) {
+    if (primary) {
+      throw e;
+    }
+    console.warn("legacy Forms API submit failed (training attended)", e);
+  }
+}
+
+async function postTrainingAttendedForm(
   env: Env,
   email: string,
   track: TrainingTrack = "hybrid",
@@ -185,7 +313,8 @@ export async function setTrainingAttended(
         fields,
         context: {
           pageUri: `${bookingBaseUrl(env)}/training/check-in${track === "alle" ? "?track=alle" : ""}`,
-          pageName: track === "alle" ? "All-e Training Check-in" : "Training Check-in",
+          pageName:
+            track === "alle" ? "All-e Training Check-in" : "Training Check-in",
         },
       }),
     },
