@@ -6,7 +6,8 @@
  *  2. Snapshot = server-baked AGREEMENT_HTML (client cannot forge).
  *  3. Insert row into D1 `signed_agreements`.
  *  4. Generate PDF (pdf-lib), upload to R2, update the row with pdf_r2_key.
- *  5. Fire-and-forget: Google Sheet, HubSpot form, Slack ping, partner email with PDF.
+ *  5. Fire-and-forget: Google Sheet, HubSpot (CRM contact + company writes, plus
+ *     the enrollment-signal form), Slack ping, partner email with PDF.
  *  6. Return success + download URL (/api/agreements/{id}/pdf).
  */
 
@@ -25,10 +26,19 @@ import {
 } from "../lib/agreement-content";
 import type { Env } from "../lib/types";
 import { postWalleosBooking } from "../lib/walleos";
+import { syncAgreementToHubSpot } from "../lib/agreement-hubspot-sync";
 
 const HUBSPOT_PORTAL_ID = "25848718";
 const HUBSPOT_FORM_GUID = "617e3a0d-0e25-44d6-b8c9-724e83226a96";
 
+/**
+ * Submit the agreement enrollment signal to HubSpot. This is the SOLE remaining
+ * Forms API call and the only "agreement signed" signal that fires Partner
+ * Progression enrollment, so we keep it -- but it now carries ONLY the email.
+ * All partner data (contact fields, KvK/BTW) is written via the CRM API in
+ * syncAgreementToHubSpot below, because a 200-but-quarantined Forms submission
+ * is undetectable and must never be the source of truth.
+ */
 async function submitToHubSpot(env: Env, fields: Record<string, string>) {
   const response = await fetch(
     `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`,
@@ -36,7 +46,10 @@ async function submitToHubSpot(env: Env, fields: Record<string, string>) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        fields: Object.entries(fields).map(([name, value]) => ({ name, value })),
+        fields: Object.entries(fields).map(([name, value]) => ({
+          name,
+          value,
+        })),
         context: {
           pageUri: `${env.BASE_URL}/book/agreement`,
           pageName: "IC - Partner Agreement",
@@ -47,7 +60,9 @@ async function submitToHubSpot(env: Env, fields: Record<string, string>) {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`HubSpot form submission failed: ${response.status} ${text}`);
+    throw new Error(
+      `HubSpot form submission failed: ${response.status} ${text}`,
+    );
   }
 
   return response.json();
@@ -60,8 +75,12 @@ async function sendAgreementPdfEmail(
   companyName: string,
   contactPerson: string,
 ): Promise<void> {
-  const from = env.EMAIL_FROM || "Quatt Installatiepartners <onboarding@resend.dev>";
-  const baseUrl = (env.BASE_URL || "https://booking.quatt.io").replace(/\/$/, "");
+  const from =
+    env.EMAIL_FROM || "Quatt Installatiepartners <onboarding@resend.dev>";
+  const baseUrl = (env.BASE_URL || "https://booking.quatt.io").replace(
+    /\/$/,
+    "",
+  );
   const trainingParams = new URLSearchParams();
   if (to) trainingParams.set("email", to);
   if (companyName) trainingParams.set("company", companyName);
@@ -149,7 +168,8 @@ function getClientIp(request: Request): string {
 
 function uuidv4(): string {
   // Workers have crypto.randomUUID() on all recent runtimes.
-  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  if (typeof crypto !== "undefined" && crypto.randomUUID)
+    return crypto.randomUUID();
   // Fallback (shouldn't hit on Cloudflare).
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -178,7 +198,10 @@ export const onRequestPost = async (context: {
 
   if (!env.DB) {
     console.error("D1 binding 'DB' missing");
-    return Response.json({ error: "Opslag is tijdelijk niet beschikbaar." }, { status: 503 });
+    return Response.json(
+      { error: "Opslag is tijdelijk niet beschikbaar." },
+      { status: 503 },
+    );
   }
 
   const body = (await context.request.json()) as Record<string, unknown>;
@@ -225,13 +248,19 @@ export const onRequestPost = async (context: {
     !postcode ||
     !city
   ) {
-    return Response.json({ error: "Vul alle verplichte velden in." }, { status: 400 });
+    return Response.json(
+      { error: "Vul alle verplichte velden in." },
+      { status: 400 },
+    );
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return Response.json({ error: "Ongeldig e-mailadres." }, { status: 400 });
   }
   if (!signature) {
-    return Response.json({ error: "Handtekening is verplicht." }, { status: 400 });
+    return Response.json(
+      { error: "Handtekening is verplicht." },
+      { status: 400 },
+    );
   }
   if (!acceptTerms || !acceptDistribution) {
     return Response.json(
@@ -332,7 +361,9 @@ export const onRequestPost = async (context: {
             dealId: dealId || "",
           },
         });
-        await env.DB.prepare("UPDATE signed_agreements SET pdf_r2_key = ? WHERE id = ?")
+        await env.DB.prepare(
+          "UPDATE signed_agreements SET pdf_r2_key = ? WHERE id = ?",
+        )
           .bind(pdfR2Key, id)
           .run();
       } else {
@@ -360,7 +391,13 @@ export const onRequestPost = async (context: {
 
     if (pdfBase64) {
       waitUntil(
-        sendAgreementPdfEmail(env, email, pdfBase64, companyName, contactPerson).catch((e) => {
+        sendAgreementPdfEmail(
+          env,
+          email,
+          pdfBase64,
+          companyName,
+          contactPerson,
+        ).catch((e) => {
           console.error("Resend agreement PDF mail failed:", e);
           return sendSlackNotification(
             env,
@@ -386,24 +423,46 @@ export const onRequestPost = async (context: {
       }).catch((e) => console.error("Agreement sheet write failed:", e)),
     );
 
-    const hubspotFields: Record<string, string> = {
-      email,
-      firstname: contactPerson.split(" ")[0],
-      lastname: contactPerson.split(" ").slice(1).join(" "),
-      company: companyName,
-      phone,
-      address: `${address}, ${postcode} ${city}`,
-      kvkNumber,
-      btwNumber,
-    };
-    if (dealId) hubspotFields.ic_agreement_deal_id = dealId;
+    const fullAddress = `${address}, ${postcode} ${city}`;
+
+    // CRM writes are the source of truth (see syncAgreementToHubSpot). Contact
+    // fields + company KvK/BTW land here reliably; a spam-quarantined Forms
+    // submission cannot.
     waitUntil(
-      submitToHubSpot(env, hubspotFields).catch((e) => {
+      syncAgreementToHubSpot(env, {
+        email,
+        firstname: contactPerson.split(" ")[0],
+        lastname: contactPerson.split(" ").slice(1).join(" "),
+        company: companyName,
+        phone,
+        address: fullAddress,
+        kvkNumber,
+        btwNumber,
+        dealId: dealId || undefined,
+      }).catch((e) => {
+        console.error("HubSpot agreement CRM sync failed:", e);
+        return sendSlackNotification(
+          env,
+          `*ALERT: HubSpot agreement CRM sync failed*\n` +
+            `Partner saw success but a CRM contact/company write did NOT land.\n` +
+            `Email: ${email}\nCompany: ${companyName}\n` +
+            (dealId ? `Deal ID: ${dealId}\n` : "No dealId in payload\n") +
+            `Error: ${e instanceof Error ? e.message : String(e)}`,
+        ).catch(() => {});
+      }),
+    );
+
+    // Enrollment signal only: send just the email. This is the sole HubSpot
+    // "agreement signed" trigger for Partner Progression. A 200-but-quarantined
+    // submission is undetectable, so the CRM writes above are authoritative --
+    // this call carries no partner data (phantom/redundant fields removed).
+    waitUntil(
+      submitToHubSpot(env, { email }).catch((e) => {
         console.error("HubSpot form submission failed:", e);
         return sendSlackNotification(
           env,
           `*ALERT: HubSpot agreement form submission failed*\n` +
-            `Partner saw success but the form did NOT reach HubSpot. Partner Progression will not fire.\n` +
+            `Partner saw success but the form did NOT reach HubSpot. Partner Progression may not fire.\n` +
             `Email: ${email}\nCompany: ${companyName}\n` +
             (dealId ? `Deal ID: ${dealId}\n` : "No dealId in payload\n") +
             `Error: ${e instanceof Error ? e.message : String(e)}`,
@@ -439,10 +498,14 @@ export const onRequestPost = async (context: {
         session: {
           session_id: id,
           start_at: new Date().toISOString(),
-          url: pdfR2Key ? `${env.BASE_URL}/api/agreements/${id}/pdf` : undefined,
+          url: pdfR2Key
+            ? `${env.BASE_URL}/api/agreements/${id}/pdf`
+            : undefined,
           host: `agreement ${resolvedVersion}`,
         },
-      }).catch((e) => console.error("Wall-E OS agreement_signed push failed:", e)),
+      }).catch((e) =>
+        console.error("Wall-E OS agreement_signed push failed:", e),
+      ),
     );
 
     return Response.json({
