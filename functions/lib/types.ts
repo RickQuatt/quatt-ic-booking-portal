@@ -42,6 +42,13 @@ export interface Env {
   // if unset, All-e bookings/attendance fall back to the Hybrid forms.
   HUBSPOT_TRAINING_ALLE_FORM_ID?: string;
   HUBSPOT_TRAINING_ALLE_ATTENDED_FORM_ID?: string;
+  // Private-app token for direct CRM v3 contact-property writes. When set, the
+  // portal PATCHes contacts directly instead of relying on the Forms API (whose
+  // spam filter silently drops submissions). Unset = legacy Forms-only path.
+  HUBSPOT_WRITE_TOKEN?: string;
+  // Slack channel that receives a one-line audit for every direct CRM write.
+  // Best-effort; unset = no audit line (write still happens).
+  HUBSPOT_AUDIT_CHANNEL?: string;
 
   // Auth / tokens
   BOOKING_SECRET: string;

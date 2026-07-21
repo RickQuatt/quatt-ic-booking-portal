@@ -36,6 +36,38 @@ export async function sendSlackNotification(
 }
 
 /**
+ * Post to an explicit Slack channel via chat.postMessage. Same shape as
+ * sendSlackNotification but the channel is passed in rather than read from env.
+ * Used by the HubSpot CRM audit trail (functions/lib/hubspot-crm.ts).
+ */
+export async function postToChannel(
+  env: Env,
+  channelId: string,
+  text: string,
+): Promise<boolean> {
+  if (!env.SLACK_BOT_TOKEN) {
+    console.error("SLACK_BOT_TOKEN not configured");
+    return false;
+  }
+
+  const response = await fetch("https://slack.com/api/chat.postMessage", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+    },
+    body: JSON.stringify({
+      channel: channelId,
+      text,
+      mrkdwn: true,
+    }),
+  });
+
+  const data = (await response.json()) as { ok: boolean };
+  return data.ok === true;
+}
+
+/**
  * Send to the central Wall-e alerts channel (#wall-e-alerts, C0B2E5S1XHD).
  * Used for silent-failure signals: HubSpot Forms drops, Wall-e OS push fails,
  * etc. Falls back to console.error when the bot token is missing so the alert
@@ -77,7 +109,10 @@ export function alertOnFailure<T>(
       const msg =
         `:rotating_light: *${label}* failed\n` +
         "```" +
-        (e instanceof Error ? `${e.message}\n${e.stack ?? ""}` : String(e)).slice(0, 1500) +
+        (e instanceof Error
+          ? `${e.message}\n${e.stack ?? ""}`
+          : String(e)
+        ).slice(0, 1500) +
         "```";
       console.error(`[${label}]`, e);
       await sendAlert(env, msg);
