@@ -13,6 +13,11 @@ import type { Env } from "./types";
 import { postToChannel } from "./slack";
 
 const CONTACTS_URL = "https://api.hubapi.com/crm/v3/objects/contacts";
+const COMPANIES_URL = "https://api.hubapi.com/crm/v3/objects/companies";
+const DEALS_URL = "https://api.hubapi.com/crm/v4/objects/deals";
+
+// HubSpot association typeId for the "Primary" deal<->company label.
+const PRIMARY_COMPANY_ASSOCIATION_TYPE_ID = 5;
 
 export type UpsertContactResult =
   | { skipped: true }
@@ -58,9 +63,9 @@ export function toHubSpotDateMs(dateInput: string): string | undefined {
  */
 async function hsFetch(
   env: Env,
-  method: "PATCH" | "POST",
+  method: "GET" | "PATCH" | "POST",
   url: string,
-  body: unknown,
+  body?: unknown,
 ): Promise<Response> {
   const doFetch = () =>
     fetch(url, {
@@ -69,7 +74,8 @@ async function hsFetch(
         "Content-Type": "application/json",
         Authorization: `Bearer ${env.HUBSPOT_WRITE_TOKEN}`,
       },
-      body: JSON.stringify(body),
+      // GET carries no body; sending one is rejected by fetch in Workers.
+      ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
     });
 
   let res = await doFetch();
@@ -86,20 +92,16 @@ async function throwHsError(res: Response): Promise<never> {
 }
 
 /**
- * Fire-and-forget audit line. Never throws, never blocks the write result.
- * Silently skipped when the audit channel or bot token is unset.
+ * Fire-and-forget audit line to the booking-portal HubSpot audit channel.
+ * Never throws, never blocks the write result. Silently skipped when the audit
+ * channel or bot token is unset. Shared by contact and company writes, and by
+ * the agreement flow's "no linked company" notice.
  */
-async function auditWrite(
-  env: Env,
-  email: string,
-  properties: Record<string, string>,
-  label: string,
-): Promise<void> {
+export async function postAudit(env: Env, text: string): Promise<void> {
   if (!env.HUBSPOT_AUDIT_CHANNEL || !env.SLACK_BOT_TOKEN) {
     return;
   }
   try {
-    const text = `booking-portal write: contact ${email} ${JSON.stringify(properties)} (${label})`;
     await postToChannel(env, env.HUBSPOT_AUDIT_CHANNEL, text);
   } catch (e) {
     console.warn("[hubspot-crm audit failed]", e);
@@ -149,9 +151,97 @@ export async function upsertContactProps(
   }
 
   // Fire-and-forget: never add Slack latency to the caller's request path.
-  // auditWrite catches its own errors; a dropped audit line is acceptable,
+  // postAudit catches its own errors; a dropped audit line is acceptable,
   // a slower check-in is not.
-  void auditWrite(env, email, properties, label);
+  void postAudit(
+    env,
+    `booking-portal write: contact ${email} ${JSON.stringify(properties)} (${label})`,
+  );
 
   return { skipped: false, created };
+}
+
+/**
+ * Resolve the company associated with a deal, preferring the "Primary" one.
+ *
+ * GETs crm/v4 deal->company associations and returns the toObjectId of the
+ * association labelled Primary (associationTypes contains typeId 5), else the
+ * first association. Returns undefined -- never throws -- when there is no write
+ * token, the request fails, or the deal has no linked company, so callers can
+ * log-and-continue (the KvK/BTW data still lives in D1 + the Sheet).
+ */
+export async function resolvePrimaryCompanyId(
+  env: Env,
+  dealId: string,
+): Promise<string | undefined> {
+  if (!env.HUBSPOT_WRITE_TOKEN) {
+    return undefined;
+  }
+
+  const url = `${DEALS_URL}/${encodeURIComponent(dealId)}/associations/companies`;
+  const res = await hsFetch(env, "GET", url);
+  if (!res.ok) {
+    return undefined;
+  }
+
+  let data: {
+    results?: Array<{
+      toObjectId?: string | number;
+      associationTypes?: Array<{ typeId?: number }>;
+    }>;
+  };
+  try {
+    data = await res.json();
+  } catch {
+    // A 200 with an unparseable body is as good as no association: stay
+    // fail-soft so the caller logs the unattached data and continues.
+    return undefined;
+  }
+  const results = Array.isArray(data?.results) ? data.results : [];
+  if (results.length === 0) {
+    return undefined;
+  }
+
+  const primary = results.find(
+    (r) =>
+      Array.isArray(r.associationTypes) &&
+      r.associationTypes.some(
+        (t) => t.typeId === PRIMARY_COMPANY_ASSOCIATION_TYPE_ID,
+      ),
+  );
+  const chosen = primary ?? results[0];
+  if (chosen.toObjectId === undefined || chosen.toObjectId === null) {
+    return undefined;
+  }
+  return String(chosen.toObjectId);
+}
+
+/**
+ * Patch company properties by companyId. Returns { skipped: true } when no write
+ * token is configured. PATCHes crm/v3 with a single 429/5xx retry (via hsFetch),
+ * throwing on any other non-ok status so alertOnFailure wrappers surface it.
+ * On success, fires a best-effort audit line (never awaited, never blocks).
+ */
+export async function upsertCompanyProps(
+  env: Env,
+  companyId: string,
+  properties: Record<string, string>,
+  label: string,
+): Promise<{ skipped: boolean }> {
+  if (!env.HUBSPOT_WRITE_TOKEN) {
+    return { skipped: true };
+  }
+
+  const url = `${COMPANIES_URL}/${encodeURIComponent(companyId)}`;
+  const res = await hsFetch(env, "PATCH", url, { properties });
+  if (!res.ok) {
+    await throwHsError(res);
+  }
+
+  void postAudit(
+    env,
+    `booking-portal write: company ${companyId} ${JSON.stringify(properties)} (${label})`,
+  );
+
+  return { skipped: false };
 }
