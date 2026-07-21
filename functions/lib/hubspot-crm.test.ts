@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { upsertContactProps } from "./hubspot-crm";
+import { upsertContactProps, toHubSpotDateMs } from "./hubspot-crm";
 import type { Env } from "./types";
 
 function mockResponse(status: number, body: unknown = {}): Response {
@@ -17,6 +17,30 @@ function baseEnv(overrides: Partial<Env> = {}): Env {
     ...overrides,
   } as unknown as Env;
 }
+
+describe("toHubSpotDateMs", () => {
+  it("converts a YYYY-MM-DD date to UTC-midnight epoch-ms", () => {
+    expect(toHubSpotDateMs("2026-08-18")).toBe(String(Date.UTC(2026, 7, 18)));
+  });
+
+  it("strips a time component so the result is still UTC midnight", () => {
+    // A value with an offset must not leak a non-midnight timestamp (HubSpot
+    // date properties reject that).
+    expect(toHubSpotDateMs("2026-08-18T13:00:00+02:00")).toBe(
+      String(Date.UTC(2026, 7, 18)),
+    );
+  });
+
+  it("returns undefined for an unparseable date", () => {
+    expect(toHubSpotDateMs("not-a-date")).toBeUndefined();
+  });
+
+  it("rejects out-of-range and overflow calendar dates", () => {
+    expect(toHubSpotDateMs("2026-13-01")).toBeUndefined();
+    expect(toHubSpotDateMs("2026-00-10")).toBeUndefined();
+    expect(toHubSpotDateMs("2026-02-31")).toBeUndefined();
+  });
+});
 
 describe("upsertContactProps", () => {
   let fetchMock: ReturnType<typeof vi.fn>;

@@ -4,7 +4,7 @@
  */
 
 import type { Env, TrainingTrack } from "./types";
-import { upsertContactProps } from "./hubspot-crm";
+import { upsertContactProps, toHubSpotDateMs } from "./hubspot-crm";
 
 const PORTAL_ID = "25848718";
 
@@ -62,7 +62,17 @@ export async function setKennismakingBooked(
 ): Promise<void> {
   const props: Record<string, string> = { ic__kennismaking_booked: "true" };
   if (meetingDate) {
-    props.ic__kennismaking_date = meetingDate;
+    // ic__kennismaking_date is a HubSpot `date` property -> epoch-ms UTC midnight.
+    const ms = toHubSpotDateMs(meetingDate);
+    if (ms) {
+      props.ic__kennismaking_date = ms;
+    } else {
+      // Record the booking anyway (the flag matters most), but surface the bad
+      // input -- callers are expected to pass YYYY-MM-DD.
+      console.warn(
+        `setKennismakingBooked: unparseable meetingDate "${meetingDate}", skipping ic__kennismaking_date`,
+      );
+    }
   }
   if (dealId) {
     props.ic__kennismaking_deal_id = dealId;
@@ -152,10 +162,15 @@ export async function setTrainingBooked(
 ): Promise<void> {
   const props: Record<string, string> = { ic__training_booked: "true" };
   if (trainingDate) {
-    // HubSpot date properties want an epoch-ms at UTC midnight; an ISO
-    // date-only string (YYYY-MM-DD) parses as UTC, same conversion the form
-    // field used.
-    props.ic__training_date = String(Date.parse(trainingDate));
+    // ic__training_date is a HubSpot `date` property -> epoch-ms UTC midnight.
+    const ms = toHubSpotDateMs(trainingDate);
+    if (ms) {
+      props.ic__training_date = ms;
+    } else {
+      console.warn(
+        `setTrainingBooked: unparseable trainingDate "${trainingDate}", skipping ic__training_date`,
+      );
+    }
   }
   if (dealId) {
     props.ic__kennismaking_deal_id = dealId;

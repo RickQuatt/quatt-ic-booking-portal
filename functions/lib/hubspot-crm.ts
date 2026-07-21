@@ -23,6 +23,36 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
+ * Normalize a date for a HubSpot CRM `date`-type property. Those want epoch-ms
+ * at EXACTLY UTC midnight -- a value with a time component (e.g. an ISO string
+ * with an offset) is rejected. We take the leading YYYY-MM-DD, validate it, and
+ * build the timestamp from its parts via Date.UTC so no local-timezone or
+ * Date.parse leniency can shift the day. Returns the epoch-ms as a string, or
+ * undefined if the input isn't a valid calendar date.
+ */
+export function toHubSpotDateMs(dateInput: string): string | undefined {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateInput);
+  if (!m) {
+    return undefined;
+  }
+  const [, y, mo, d] = m;
+  const year = Number(y);
+  const month = Number(mo); // 1-12
+  const day = Number(d); // 1-31
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
+    return undefined;
+  }
+  const ms = Date.UTC(year, month - 1, day);
+  // Reject calendar overflow (e.g. 2026-02-31 -> March): the round-trip day
+  // must match what we asked for.
+  const back = new Date(ms);
+  if (back.getUTCMonth() !== month - 1 || back.getUTCDate() !== day) {
+    return undefined;
+  }
+  return String(ms);
+}
+
+/**
  * PATCH once, retrying a single time on 429/5xx after a short delay. Returns the
  * final Response; the caller decides what a non-ok status means (404 -> create).
  */
